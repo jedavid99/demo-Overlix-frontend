@@ -105,12 +105,13 @@ export default function Login() {
       {/* Right Section: Login Form */}
       <section className="flex-1 flex flex-col justify-between min-h-screen p-6 lg:p-12 relative pattern-bg">
         {/* Mobile Logo Header */}
-        <div className="w-full lg:hidden flex items-center gap-2 py-4">
-          <div className="bg-[#0058be] p-2 rounded-lg text-white">
-            <Wrench className="w-6 h-6 transform -rotate-45" />
-          </div>
-          <span className="text-xl font-extrabold text-[#0058be] tracking-tight">Overlix</span>
-        </div>
+        <div className="w-full lg:hidden flex items-center justify-center py-4">
+  <img 
+    src={logo} 
+    alt="Overlix" 
+    className="w-32 h-32 sm:w-40 sm:h-40 rounded-full object-cover border-4 border-white/80 bg-black/30" 
+  />
+</div>
 
         {/* Center Card */}
         <div className="flex-1 flex items-center justify-center py-8">
