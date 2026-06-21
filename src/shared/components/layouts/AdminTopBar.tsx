@@ -46,8 +46,14 @@ export const AdminTopBar = ({
   const [searchQuery, setSearchQuery] = useState('')
   const searchInputRef = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
+const navigateL=useNavigate()
 
-  const currentCategory = categories.find(cat => cat.value === selectedCategory) || categories[0]
+
+const handleLogout = () => {
+    // Limpiar sesión aquí si es necesario
+    navigateL('/')
+  } ;
+   const currentCategory = categories.find(cat => cat.value === selectedCategory) || categories[0]
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -199,7 +205,8 @@ export const AdminTopBar = ({
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-destructive cursor-pointer">
-              Cerrar sesión
+             
+             <button onClick={handleLogout}>Cerrar sesión</button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
