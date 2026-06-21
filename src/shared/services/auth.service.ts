@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+const API_URL = 'https://overlix-demo-backend-production.up.railway.app/api';
 
 export const login = async (email: string, password: string, codigoEmpresa: string) => {
   const payload = {
