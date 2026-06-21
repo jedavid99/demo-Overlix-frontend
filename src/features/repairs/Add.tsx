@@ -727,7 +727,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                         <Search className="text-primary-foreground/80" size={16} />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase">Cliente</p>
+                        <p className="text-[10px] font-bold text-primary-foreground uppercase">Cliente</p>
                         <p className="font-semibold text-sm">{state.selectedClient?.name || 'No Seleccionado'}</p>
                       </div>
                     </div>
@@ -736,11 +736,11 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                         <Smartphone className="text-primary-foreground/80" size={16} />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase">Dispositivo</p>
+                        <p className="text-[10px] font-bold text-primary-foreground uppercase">Dispositivo</p>
                         <p className="font-semibold text-sm">
                           {state.brand && state.model ? `${state.brand} ${state.model}` : 'No Especificado'}
                         </p>
-                        {state.serial && <p className="text-xs text-muted-foreground">{state.deviceType === 'phone' ? 'IMEI' : 'S/N'}: {state.serial}</p>}
+                        {state.serial && <p className="text-xs text-primary-foreground/80">{state.deviceType === 'phone' ? 'IMEI' : 'S/N'}: {state.serial}</p>}
                       </div>
                     </div>
                     {currentHardwareItems.length > 0 && (
