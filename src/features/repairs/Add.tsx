@@ -41,16 +41,16 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
     priority: 'Normal',
     estimatedDays: 3,
     hardwareChecks: {
-      power: true,
-      display: true,
+      power: false,
+      display: false,
       wifi: false,
-      bluetooth: true,
-      cameras: true,
-      audio: true,
+      bluetooth: false,
+      cameras: false,
+      audio: false,
     },
     securityType: 'pin',
-    accessPin: '920431',
-    patternDots: [true, false, false, true, true, false, false, false, true],
+    accessPin: '',
+    patternDots: [false, false, false, false, false, false, false, false, false],
     patternSequence: [],
     technicianNotes: '',
     termsAccepted: false,
@@ -65,25 +65,24 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
     else setLocalData(prev => ({ ...prev, ...updates }));
   };
 
-  // Datos mock eliminados - conectar con API real
-
+  // 📦 Categorías de dispositivos – fijas, pero se pueden cargar desde API
   const deviceCategories = [
-    { id: 'phone', name: 'Phone', icon: Smartphone, color: 'text-primary', bgColor: 'bg-primary/10' },
-    { id: 'notebook', name: 'Notebook', icon: Laptop, color: 'text-info', bgColor: 'bg-info/10' },
+    { id: 'phone', name: 'Teléfono', icon: Smartphone, color: 'text-primary', bgColor: 'bg-primary/10' },
+    { id: 'notebook', name: 'Portátil', icon: Laptop, color: 'text-info', bgColor: 'bg-info/10' },
     { id: 'pc', name: 'PC', icon: Monitor, color: 'text-success', bgColor: 'bg-success/10' },
     { id: 'tablet', name: 'Tablet', icon: Tablet, color: 'text-warning', bgColor: 'bg-warning/10' },
-    { id: 'console', name: 'Console', icon: Gamepad2, color: 'text-destructive', bgColor: 'bg-destructive/10' },
-    { id: 'other', name: 'Other', icon: Grid3X3, color: 'text-muted-foreground', bgColor: 'bg-muted' },
+    { id: 'console', name: 'Consola', icon: Gamepad2, color: 'text-destructive', bgColor: 'bg-destructive/10' },
+    { id: 'other', name: 'Otro', icon: Grid3X3, color: 'text-muted-foreground', bgColor: 'bg-muted' },
   ];
 
   const getAccessoriesForDevice = () => {
     const accessoriesMap: Record<string, string[]> = {
-      phone: ['Original Box', 'Charger Cable', 'Power Adapter', 'Case/Shell'],
-      notebook: ['Charger', 'Mouse', 'Original Box'],
-      pc: ['Keyboard', 'Mouse', 'Power Cable'],
-      tablet: ['Charger', 'Case', 'Stylus'],
-      console: ['Original Box', 'Controller', 'HDMI Cable'],
-      other: ['Accessories', 'Documentation'],
+      phone: ['Caja Original', 'Cable Cargador', 'Adaptador de Corriente', 'Funda'],
+      notebook: ['Cargador', 'Mouse', 'Caja Original'],
+      pc: ['Teclado', 'Mouse', 'Cable de Alimentación'],
+      tablet: ['Cargador', 'Funda', 'Lápiz'],
+      console: ['Caja Original', 'Control', 'Cable HDMI'],
+      other: ['Accesorios', 'Documentación'],
     };
     return accessoriesMap[state.deviceType] || [];
   };
@@ -96,14 +95,22 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
     }
   };
 
-  // Conectar con API real: api.get('/clients')
-  const filteredClients: any[] = []
+  // 📦 Clientes – vacío (cargar desde API)
+  const clients: any[] = [];
 
-  const totalBudget = 85.00 + 210.00;
+  const filteredClients = clients.filter(client =>
+    client.name?.toLowerCase().includes(search.toLowerCase()) ||
+    client.phone?.includes(search) ||
+    client.email?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  // 📊 Cálculo de presupuesto – valores en cero (cargar desde API)
+  const laborCost = 0;
+  const partsCost = 0;
+  const totalBudget = laborCost + partsCost;
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Main Content */}
       <main className="max-w-[1400px] mx-auto p-6 md:p-8">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
@@ -179,50 +186,56 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
                   />
                 </div>
 
-                    {state.selectedClient ? (
-                <div className="mt-4 border border-primary/20 rounded-2xl overflow-hidden">
-                  <div className="p-4 flex items-center justify-between bg-primary/5">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
-                        {state.selectedClient ? state.selectedClient.name.charAt(0) : ''}
-                      </div>
-                      <div>
-                        <p className="font-bold text-sm text-foreground">{state.selectedClient?.name}</p>
-                        <p className="text-xs text-muted-foreground">{state.selectedClient?.phone} • {state.selectedClient?.email}</p>
-                      </div>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => applyUpdate({ selectedClient: null })}
-                    >
-                      Cambiar
-                    </Button>
-                  </div>
-                </div>
-              ) : filteredClients.length > 0 ? (
-                <div className="mt-4 border border-border rounded-2xl overflow-hidden divide-y divide-border">
-                  {filteredClients.map((client) => (
-                    <div key={client.id} className="p-4 flex items-center justify-between hover:bg-muted transition-colors">
+                {state.selectedClient ? (
+                  <div className="mt-4 border border-primary/20 rounded-2xl overflow-hidden">
+                    <div className="p-4 flex items-center justify-between bg-primary/5">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold">
-                          {client.name.substring(0, 2).toUpperCase()}
+                        <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                          {state.selectedClient.name?.charAt(0) || '?'}
                         </div>
                         <div>
-                          <p className="font-bold text-sm text-foreground">{client.name}</p>
-                          <p className="text-xs text-muted-foreground">{client.phone} • {client.email}</p>
+                          <p className="font-bold text-sm text-foreground">{state.selectedClient.name}</p>
+                          <p className="text-xs text-muted-foreground">{state.selectedClient.phone} • {state.selectedClient.email}</p>
                         </div>
                       </div>
                       <Button
+                        variant="ghost"
                         size="sm"
-                        onClick={() => applyUpdate({ selectedClient: client })}
+                        onClick={() => applyUpdate({ selectedClient: null })}
                       >
-                        Seleccionar
+                        Cambiar
                       </Button>
                     </div>
-                  ))}
-                </div>
-              ) : null}
+                  </div>
+                ) : filteredClients.length > 0 ? (
+                  <div className="mt-4 border border-border rounded-2xl overflow-hidden divide-y divide-border">
+                    {filteredClients.map((client) => (
+                      <div key={client.id} className="p-4 flex items-center justify-between hover:bg-muted transition-colors">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold">
+                            {client.name?.substring(0, 2).toUpperCase() || '??'}
+                          </div>
+                          <div>
+                            <p className="font-bold text-sm text-foreground">{client.name}</p>
+                            <p className="text-xs text-muted-foreground">{client.phone} • {client.email}</p>
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          onClick={() => applyUpdate({ selectedClient: client })}
+                        >
+                          Seleccionar
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="mt-4 text-center py-8 text-muted-foreground">
+                    <Search className="w-12 h-12 mx-auto mb-3 text-muted-foreground/30" />
+                    <p className="font-medium">No hay clientes registrados</p>
+                    <p className="text-sm">Agrega un nuevo cliente para comenzar</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -238,29 +251,29 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4">
                   {deviceCategories.map((category) => {
-                  const Icon = category.icon;
-                  const isSelected = state.deviceType === category.id;
-                  return (
-                    <button
-                      key={category.id}
-                      onClick={() => applyUpdate({ deviceType: category.id })}
-                      className={`category-tile flex flex-col items-center gap-3 p-6 rounded-2xl transition-all ${
-                        isSelected
-                          ? 'border-2 border-primary bg-primary/5 shadow-sm'
-                          : 'border border-border bg-muted hover:border-primary/50 hover:bg-primary/5 hover:shadow-md'
-                      }`}
-                    >
-                      <div className={`${category.bgColor} ${category.color} p-3 rounded-xl`}>
-                        <Icon size={24} />
-                      </div>
-                      <span className={`text-xs font-bold uppercase tracking-wide ${
-                        isSelected ? 'text-primary' : 'text-muted-foreground'
-                      }`}>
-                        {category.name}
-                      </span>
-                    </button>
-                  );
-                })}
+                    const Icon = category.icon;
+                    const isSelected = state.deviceType === category.id;
+                    return (
+                      <button
+                        key={category.id}
+                        onClick={() => applyUpdate({ deviceType: category.id })}
+                        className={`category-tile flex flex-col items-center gap-3 p-6 rounded-2xl transition-all ${
+                          isSelected
+                            ? 'border-2 border-primary bg-primary/5 shadow-sm'
+                            : 'border border-border bg-muted hover:border-primary/50 hover:bg-primary/5 hover:shadow-md'
+                        }`}
+                      >
+                        <div className={`${category.bgColor} ${category.color} p-3 rounded-xl`}>
+                          <Icon size={24} />
+                        </div>
+                        <span className={`text-xs font-bold uppercase tracking-wide ${
+                          isSelected ? 'text-primary' : 'text-muted-foreground'
+                        }`}>
+                          {category.name}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
@@ -425,11 +438,11 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
                     <div className="pt-6 border-t border-primary-foreground/20">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-primary-foreground/70 text-sm">Mano de Obra</span>
-                        <span className="font-bold text-sm">$85.00</span>
+                        <span className="font-bold text-sm">${laborCost.toFixed(2)}</span>
                       </div>
                       <div className="flex items-center justify-between mb-4">
                         <span className="text-primary-foreground/70 text-sm">Repuestos Estimados</span>
-                        <span className="font-bold text-sm">$210.00</span>
+                        <span className="font-bold text-sm">${partsCost.toFixed(2)}</span>
                       </div>
                       <div className="flex items-center justify-between text-xl font-bold pt-4 border-t border-primary-foreground/30">
                         <span>Total</span>
@@ -502,7 +515,7 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
                   </Button>
 
                   <p className="text-[10px] text-center text-muted-foreground mt-4">
-                    Borrador guardado automáticamente a las 10:42 AM
+                    Borrador guardado automáticamente
                   </p>
                 </CardContent>
               </Card>
@@ -513,5 +526,3 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
     </div>
   );
 }
-
-
