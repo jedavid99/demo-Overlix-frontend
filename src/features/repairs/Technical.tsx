@@ -13,6 +13,7 @@ import {
   AlertCircle,
   Info,
   Check,
+  Fingerprint,
 } from 'lucide-react';
 import { MdCheck, MdBuild } from 'react-icons/md';
 import type { RepairData } from './RepairFlow';
@@ -69,6 +70,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     { key: 'cameras', label: 'Cameras', icon: Camera },
     { key: 'audio', label: 'Audio', icon: Volume2 },
     {key: 'frontarcamara', label: 'Cámara frontal', icon: Camera },
+    {key: 'huella', label: 'Huella', icon: Fingerprint },
   ];
 
   const handleHardwareToggle = (key: string) => {
@@ -525,12 +527,12 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                           Pre-Check Status
                         </p>
                         <p className="font-semibold text-sm text-green-400">
-                          {functionalCount}/7 Functional
+                          {functionalCount}/8 Functional
                         </p>
                         <p className="text-xs text-slate-400">
-                          {functionalCount === 7
+                          {functionalCount === 8
                             ? 'All systems operational'
-                            : `${7 - functionalCount} module${7 - functionalCount > 1 ? 's' : ''} faulty`}
+                            : `${8 - functionalCount} module${8 - functionalCount > 1 ? 's' : ''} faulty`}
                         </p>
                       </div>
                     </div>
