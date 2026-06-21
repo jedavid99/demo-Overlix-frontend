@@ -300,9 +300,9 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                   {/* Security Type Selector */}
                   <div className="flex p-1 bg-slate-100 rounded-xl">
                     {[
-                      { id: 'none', label: 'None' },
-                      { id: 'pin', label: 'PIN/Pass' },
-                      { id: 'pattern', label: 'Pattern' },
+                      { id: 'ninguno', label: 'Ninguno' },
+                      { id: 'pin', label: 'PIN' },
+                      { id: 'Patron', label: 'Patron' },
                     ].map((type) => (
                       <button
                         key={type.id}
@@ -340,7 +340,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                           </div>
                         </div>
                       )}
-                      {state.securityType === 'pattern' && (
+                      {state.securityType === 'Patron' && (
                         <div>
                           <p className="text-[10px] font-bold text-slate-400 uppercase mb-4">
                             Patrón de Bloqueo - Arrastra para dibujar
@@ -422,12 +422,12 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                 <div className="space-y-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
-                      Technician Notes
+                      Notas del Técnico
                     </label>
                     <textarea
                       value={state.technicianNotes}
                       onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => applyUpdate({ technicianNotes: e.target.value })}
-                      placeholder="Enter preliminary findings, moisture indicators, internal damage observations..."
+                      placeholder="Introduce los hallazgos preliminares, indicadores de humedad, observaciones de daño interno..."
                       rows={8}
                       className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-600 transition-all text-slate-900"
                     />
@@ -473,9 +473,9 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16"></div>
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-8">
-                    <h3 className="font-bold text-lg">Ticket Summary</h3>
+                    <h3 className="font-bold text-lg">Resumen del Ticket</h3>
                     <span className="text-[10px] font-bold bg-blue-600/30 text-blue-300 px-2 py-1 rounded uppercase tracking-widest">
-                      In Progress
+                      En Progreso
                     </span>
                   </div>
 
@@ -493,7 +493,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase">
-                          Customer
+                          Cliente
                         </p>
                         <p className="font-semibold text-sm">{state.selectedClient?.name || 'N/A'}</p>
                         <p className="text-xs text-slate-400">{state.selectedClient?.phone || ''}</p>
@@ -513,7 +513,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase">
-                          Device Info
+                          Información del Dispositivo
                         </p>
                         <p className="font-semibold text-sm">
                           {state.brand && state.model ? `${state.brand} ${state.model}` : 'N/A'}
@@ -531,15 +531,15 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase">
-                          Pre-Check Status
+                          Estado de Pre-Check
                         </p>
                         <p className="font-semibold text-sm text-green-400">
-                          {functionalCount}/6 Functional
+                          {functionalCount}/12 Funcionales
                         </p>
                         <p className="text-xs text-slate-400">
-                          {functionalCount === 6
-                            ? 'All systems operational'
-                            : `${6 - functionalCount} module${6 - functionalCount > 1 ? 's' : ''} faulty`}
+                          {functionalCount === 12
+                            ? 'Todos los sistemas operativos'
+                            : `${12 - functionalCount} módulo${12 - functionalCount > 1 ? 's' : ''} defectuoso`}
                         </p>
                       </div>
                     </div>
@@ -547,11 +547,11 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                     {/* Budget */}
                     <div className="pt-6 border-t border-white/10">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-slate-400 text-sm">Service Fee</span>
+                        <span className="text-slate-400 text-sm">Tarifa de Servicio</span>
                         <span className="font-bold text-sm">$</span>
                       </div>
                       <div className="flex items-center justify-between mb-4">
-                        <span className="text-slate-400 text-sm">Estimated Parts</span>
+                        <span className="text-slate-400 text-sm">Partes Estimadas</span>
                         <span className="font-bold text-sm">$</span>
                       </div>
                       <div className="flex items-center justify-between text-xl font-bold pt-4 border-t border-white/20">
