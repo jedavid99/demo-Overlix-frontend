@@ -312,9 +312,9 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                   {/* Security Type Selector */}
                   <div className="flex p-1 bg-slate-100 rounded-xl">
                     {[
-                      { id: 'ninguno', label: 'ninguno' },
-                      { id: 'pin', label: 'PIN/Pass' },
-                      { id: 'patron', label: 'Patron' },
+                      { id: 'Ninguno', label: 'Ninguno' },
+                      { id: 'Pin', label: 'PIN/Pass' },
+                      { id: 'Patron', label: 'Patron' },
                     ].map((type) => (
                       <button
                         key={type.id}
@@ -330,9 +330,9 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                     ))}
                   </div>
 
-                  {state.securityType !== 'ninguno' && (
+                  {state.securityType !== 'Ninguno' && (
                     <div className="space-y-4">
-                      {state.securityType === 'pin' && (
+                      {state.securityType === 'Pin' && (
                         <div>
                           <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
                             Accesso por PIN / Clave
@@ -352,10 +352,10 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                           </div>
                         </div>
                       )}
-                      {state.securityType === 'patron' && (
+                      {state.securityType === 'Patron' && (
                         <div>
                           <p className="text-[10px] font-bold text-slate-400 uppercase mb-4">
-                            Pattern Lock Visualization - Arrastra para dibujar
+                           Patrón de Bloqueo - Arrastra para dibujar
                           </p>
                           <div className="flex flex-col items-center gap-4">
                             <div className="relative bg-white p-8 rounded-3xl border-2 border-blue-200 shadow-md" style={{ width: '280px', height: '280px' }}>
@@ -439,7 +439,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                     <textarea
                       value={state.technicianNotes}
                       onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => applyUpdate({ technicianNotes: e.target.value })}
-                      placeholder="Enter preliminary findings, moisture indicators, internal damage observations..."
+                      placeholder="Introduce los hallazgos preliminares, indicadores de humedad, observaciones de daño interno..."
                       rows={8}
                       className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-600 transition-all text-slate-900"
                     />
