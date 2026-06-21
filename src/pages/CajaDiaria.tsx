@@ -12,18 +12,23 @@ import { Badge } from '../components/ui/badge'
 export default function CajaDiaria() {
   const navigate = useNavigate()
   const [cash, setCash] = useState({
-    bills100: '',
-    bills50: '',
-    bills20: '',
-    bills10: '',
-    bills5: '',
-    bills1: '',
-    other: '',
+    bills100: '0',
+    bills50: '0',
+    bills20: '0',
+    bills10: '0',
+    bills5: '0',
+    bills1: '0',
+    other: '0',
     notes: '',
   })
 
-  const expectedBalance = 1695.50
-  const transactions = 42
+  // 📊 Estos datos vendrán de la API – inicialmente en cero
+  const expectedBalance = 0
+  const transactions = 0
+  const initialCash = 0
+  const cashSales = 0
+  const cardSales = 0
+  const expenses = 0
 
   const calculateActualTotal = () => {
     const b100 = (parseFloat(cash.bills100) || 0) * 100
@@ -45,8 +50,8 @@ export default function CajaDiaria() {
   }
 
   const handleFinalize = () => {
-    // TODO: persist closing data
-    alert(`Cash closing finalized. Discrepancy: $${discrepancy}`)
+    alert('Cierre de caja finalizado. Envía los datos al servidor.')
+    // Aquí iría la llamada a la API para guardar el cierre
   }
 
   return (
@@ -59,7 +64,7 @@ export default function CajaDiaria() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight">Cierre de Caja</h1>
-          <p className="text-muted-foreground">Conciliación para 25 de marzo, 2024 • Tienda #104</p>
+          <p className="text-muted-foreground">Conciliación del día • Tienda #{' '}</p>
         </div>
         <Button variant="outline">
           <Download size={16} className="mr-2" />
@@ -79,19 +84,19 @@ export default function CajaDiaria() {
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center py-3 border-b border-border">
                 <span className="text-muted-foreground">Efectivo inicial</span>
-                <span className="font-semibold text-foreground">$500.00</span>
+                <span className="font-semibold text-foreground">${initialCash.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center py-3 border-b border-border">
                 <span className="text-muted-foreground">Ventas en efectivo (+)</span>
-                <span className="font-semibold text-foreground">$1,240.50</span>
+                <span className="font-semibold text-foreground">${cashSales.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center py-3 border-b border-border">
                 <span className="text-muted-foreground">Ventas tarjeta (ref)</span>
-                <span className="font-semibold text-muted-foreground">$850.00</span>
+                <span className="font-semibold text-muted-foreground">${cardSales.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center py-3 border-b border-border">
                 <span className="text-muted-foreground">Gastos (-)</span>
-                <span className="font-semibold text-destructive">-$45.00</span>
+                <span className="font-semibold text-destructive">${expenses.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center pt-6">
                 <span className="text-lg font-bold text-foreground">Total esperado</span>
@@ -248,7 +253,7 @@ export default function CajaDiaria() {
             <div className="h-12 w-px bg-border hidden md:block"></div>
             <div className="hidden md:flex flex-col">
               <span className="text-sm font-semibold text-muted-foreground uppercase">Cajero</span>
-              <span className="text-lg font-bold text-foreground">Alex Thompson</span>
+              <span className="text-lg font-bold text-foreground">Sin asignar</span>
             </div>
           </div>
           <div className="flex items-center gap-4 w-full md:w-auto">
@@ -266,5 +271,3 @@ export default function CajaDiaria() {
     </motion.div>
   )
 }
-
-
