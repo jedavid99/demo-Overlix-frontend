@@ -546,7 +546,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                           Pre-Check Status
                         </p>
                         <p className="font-semibold text-sm text-green-400">
-                          {functionalCount}/12 Functional
+                          {functionalCount}/11 Functional
                         </p>
                         <p className="text-xs text-slate-400">
                           {functionalCount === 11
