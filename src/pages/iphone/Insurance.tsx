@@ -58,76 +58,15 @@ export default function IPhoneInsurance() {
   });
   const [newInsurance, setNewInsurance] = useState({
     deviceId: '',
-    planType: 'AppleCare+ Total',
-    coverage: 'Full Coverage (Theft + Damage + Accidental)',
-    premium: 19.99,
+    planType: '',
+    coverage: '',
+    premium: 0,
     startDate: new Date().toISOString().split('T')[0],
     expiryDate: '',
   });
 
-  const devices: Device[] = [
-    {
-      id: '1',
-      saleId: '#SL-9021',
-      customer: 'John Doe',
-      email: 'j.doe@example.com',
-      model: 'iPhone 15 Pro, Natural Titanium',
-      imei: '358902114882001',
-      saleDate: 'Oct 12, 2023',
-      status: 'active',
-      policyId: 'POL-992031',
-      planType: 'AppleCare+ Total',
-      startDate: 'Oct 12, 2023',
-      expiryDate: 'Oct 11, 2025',
-      claims: [
-        {
-          id: 'CLM-102',
-          type: 'Screen Replacement',
-          date: 'Jan 14, 2024',
-          status: 'Completed',
-          center: 'Authorized Repair Center #24',
-        },
-      ],
-    },
-    {
-      id: '2',
-      saleId: '#SL-8842',
-      customer: 'Sarah Smith',
-      email: 'sarah.s@outlook.com',
-      model: 'iPhone 14, Midnight',
-      imei: '357710922450112',
-      saleDate: 'Sep 05, 2023',
-      status: 'expired',
-      policyId: 'POL-991245',
-      planType: 'AppleCare+',
-      startDate: 'Sep 05, 2023',
-      expiryDate: 'Sep 04, 2024',
-    },
-    {
-      id: '3',
-      saleId: '#SL-8750',
-      customer: 'Mike Ross',
-      email: 'mike.ross@pearson.com',
-      model: 'iPhone 13 Mini, Blue',
-      imei: '354421008771920',
-      saleDate: 'Aug 20, 2023',
-      status: 'none',
-    },
-    {
-      id: '4',
-      saleId: '#SL-8612',
-      customer: 'Emily Blunt',
-      email: 'e.blunt@studios.com',
-      model: 'iPhone 15 Plus, Pink',
-      imei: '351190223901114',
-      saleDate: 'Jul 15, 2023',
-      status: 'active',
-      policyId: 'POL-989102',
-      planType: 'AppleCare+ (Device Only)',
-      startDate: 'Jul 15, 2023',
-      expiryDate: 'Jul 14, 2026',
-    },
-  ];
+  // 📦 Lista de dispositivos – vacía (cargar desde API)
+  const devices: Device[] = [];
 
   const handleSearchClient = () => {
     const foundDevices = devices.filter(d => d.email.toLowerCase() === searchEmail.toLowerCase());
@@ -169,6 +108,8 @@ export default function IPhoneInsurance() {
         return <Badge variant="destructive">Expirado</Badge>;
       case 'none':
         return <Badge variant="outline">Sin seguro</Badge>;
+      default:
+        return <Badge variant="outline">Desconocido</Badge>;
     }
   };
 
@@ -260,42 +201,50 @@ export default function IPhoneInsurance() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {devices.map(device => (
-                  <tr
-                    key={device.id}
-                    onClick={() => setSelectedDevice(device)}
-                    className="hover:bg-muted/30 transition-colors cursor-pointer group"
-                  >
-                    <td className="px-6 py-5 text-sm font-semibold text-foreground">{device.saleId}</td>
-                    <td className="px-6 py-5">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-foreground">{device.customer}</span>
-                        <span className="text-xs text-muted-foreground">{device.email}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-5 text-sm font-medium text-foreground">{device.model}</td>
-                    <td className="px-6 py-5 text-sm font-mono text-muted-foreground">{device.imei}</td>
-                    <td className="px-6 py-5 text-sm text-muted-foreground">{device.saleDate}</td>
-                    <td className="px-6 py-5">{getStatusBadge(device.status)}</td>
-                    <td className="px-6 py-5 text-right">
-                      <ChevronRight size={18} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                {devices.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
+                      <Smartphone size={48} className="mx-auto text-muted-foreground/40 mb-4" />
+                      <p className="font-medium">No hay dispositivos registrados</p>
+                      <p className="text-sm">Agrega ventas desde el panel de administración</p>
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  devices.map(device => (
+                    <tr
+                      key={device.id}
+                      onClick={() => setSelectedDevice(device)}
+                      className="hover:bg-muted/30 transition-colors cursor-pointer group"
+                    >
+                      <td className="px-6 py-5 text-sm font-semibold text-foreground">{device.saleId}</td>
+                      <td className="px-6 py-5">
+                        <div className="flex flex-col">
+                          <span className="text-sm font-semibold text-foreground">{device.customer}</span>
+                          <span className="text-xs text-muted-foreground">{device.email}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-5 text-sm font-medium text-foreground">{device.model}</td>
+                      <td className="px-6 py-5 text-sm font-mono text-muted-foreground">{device.imei}</td>
+                      <td className="px-6 py-5 text-sm text-muted-foreground">{device.saleDate}</td>
+                      <td className="px-6 py-5">{getStatusBadge(device.status)}</td>
+                      <td className="px-6 py-5 text-right">
+                        <ChevronRight size={18} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
 
           {/* Pagination */}
           <div className="flex items-center justify-between px-6 py-4 bg-muted/30 border-t border-border">
-            <span className="text-sm text-muted-foreground">Mostrando 4 de 1,248 entradas</span>
+            <span className="text-sm text-muted-foreground">Mostrando {devices.length} de {devices.length} entradas</span>
             <div className="flex gap-2">
               <Button variant="outline" size="icon-sm">
                 <ChevronLeft size={16} />
               </Button>
               <Button variant="default" size="icon-sm">1</Button>
-              <Button variant="outline" size="icon-sm">2</Button>
-              <Button variant="outline" size="icon-sm">3</Button>
               <Button variant="outline" size="icon-sm">
                 <ChevronRight size={16} />
               </Button>
@@ -337,19 +286,19 @@ export default function IPhoneInsurance() {
                         <div className="grid grid-cols-2 gap-y-4">
                           <div>
                             <p className="text-[10px] text-muted-foreground font-bold uppercase">Tipo de Plan</p>
-                            <p className="text-sm font-semibold text-foreground">{selectedDevice.planType}</p>
+                            <p className="text-sm font-semibold text-foreground">{selectedDevice.planType || '—'}</p>
                           </div>
                           <div>
                             <p className="text-[10px] text-muted-foreground font-bold uppercase">ID de Póliza</p>
-                            <p className="text-sm font-semibold text-foreground">{selectedDevice.policyId}</p>
+                            <p className="text-sm font-semibold text-foreground">{selectedDevice.policyId || '—'}</p>
                           </div>
                           <div>
                             <p className="text-[10px] text-muted-foreground font-bold uppercase">Fecha Inicio</p>
-                            <p className="text-sm font-semibold text-foreground">{selectedDevice.startDate}</p>
+                            <p className="text-sm font-semibold text-foreground">{selectedDevice.startDate || '—'}</p>
                           </div>
                           <div>
                             <p className="text-[10px] text-muted-foreground font-bold uppercase">Expira</p>
-                            <p className="text-sm font-semibold text-foreground">{selectedDevice.expiryDate}</p>
+                            <p className="text-sm font-semibold text-foreground">{selectedDevice.expiryDate || '—'}</p>
                           </div>
                         </div>
                       </CardContent>
@@ -365,15 +314,15 @@ export default function IPhoneInsurance() {
                   <div className="space-y-3">
                     <div className="flex justify-between border-b border-border pb-2">
                       <span className="text-sm text-muted-foreground">Modelo</span>
-                      <span className="text-sm font-medium text-foreground">{selectedDevice.model}</span>
+                      <span className="text-sm font-medium text-foreground">{selectedDevice.model || '—'}</span>
                     </div>
                     <div className="flex justify-between border-b border-border pb-2">
                       <span className="text-sm text-muted-foreground">IMEI</span>
-                      <span className="text-sm font-mono text-foreground">{selectedDevice.imei}</span>
+                      <span className="text-sm font-mono text-foreground">{selectedDevice.imei || '—'}</span>
                     </div>
                     <div className="flex justify-between border-b border-border pb-2">
                       <span className="text-sm text-muted-foreground">Fecha Venta</span>
-                      <span className="text-sm font-medium text-foreground">{selectedDevice.saleDate}</span>
+                      <span className="text-sm font-medium text-foreground">{selectedDevice.saleDate || '—'}</span>
                     </div>
                   </div>
                 </section>
