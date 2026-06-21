@@ -96,18 +96,18 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
   }, [data]);
 
   const hardwareItems = [
-    { key: 'botonPawer', label: 'Botón de Power', icon: Power },
-    { key: 'botonVolumen', label: 'Botón de Volumen', icon: Volume2 },
-    { key: 'sensorProximidad', label: 'Sensor de Proximidad', icon: Eye },
-    { key: 'camarrontal', label: 'Cámara Frontal', icon: Camera },
-    { key: 'modulo', label: 'Módulo', icon: MonitorPlay },
-    { key: 'wifi', label: 'WiFi', icon: Wifi },
-    { key: 'huella', label: 'Huella', icon: Fingerprint },
-    { key: 'camaraTrasera', label: 'Cámara Trasera', icon: Camera },
-   
-    { key: 'altavoz', label: 'Altavoz', icon: Volume2 },
-    { key: 'fichaCarga', label: 'Ficha de Carga', icon: Zap },
-    { key: 'bateria', label: 'Batería', icon: Battery },
+    { key: '1', label: 'Botón de Power', icon: Power },
+    { key: '2', label: 'Botón de Volumen', icon: Volume2 },
+    { key: '3', label: 'Sensor de Proximidad', icon: Eye },
+    { key: '4', label: 'Cámara Frontal', icon: Camera },
+    { key: '5', label: 'Módulo', icon: MonitorPlay },
+    { key: '6', label: 'WiFi', icon: Wifi },
+    { key: '7', label: 'Huella', icon: Fingerprint },
+    { key: '8', label: 'Cámara Trasera', icon: Camera },
+    { key: '9', label: 'Audio', icon: Volume2 },
+    { key: '10', label: 'Altavoz', icon: Volume2 },
+    { key: '11', label: 'Ficha de Carga', icon: Zap },
+    { key: '12', label: 'Batería', icon: Battery },
   ];
 
   const handleHardwareToggle = (key: string) => {
