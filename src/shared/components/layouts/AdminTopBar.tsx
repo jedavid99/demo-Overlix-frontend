@@ -50,7 +50,7 @@ export const AdminTopBar = ({
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const searchInputRef = useRef<HTMLInputElement>(null)
-  const navigate = useNavigate()
+  
 
   const currentCategory = categories.find(cat => cat.value === selectedCategory) || categories[0]
 
