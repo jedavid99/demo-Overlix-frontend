@@ -48,7 +48,7 @@ export default function RepairFlow() {
     
     // Step 2 data
     hardwareChecks: {
-    
+    audio: true,
       botonPawer: true,
       botonVolumen: true,
       sensorProximidad: true,

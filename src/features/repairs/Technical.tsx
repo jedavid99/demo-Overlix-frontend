@@ -88,18 +88,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
 { key: 'lectorSimcard', label: 'Lector de Simcard', icon: RiSimCard2Line  },
 
 
-//  { key: 'botonPawer', label: 'Botón de Power', icon: Power },
-//     { key: 'botonVolumen', label: 'Botón de Volumen', icon: Volume2 },
-//     
-//     { key: 'camaraFrontal', label: 'Cámara Frontal', icon: Camera },
-//     { key: 'modulo', label: 'Módulo', icon: MonitorPlay },
-//     { key: 'wifi', label: 'WiFi', icon: Wifi },
-//     { key: 'huella', label: 'Huella', icon: Fingerprint },
-//     { key: 'camaraTrasera', label: 'Cámara Trasera', icon: Camera },
-//     { key: 'audio', label: 'Audio', icon: Volume2 },
-//     { key: 'altavoz', label: 'Altavoz', icon: Volume2 },
-//     { key: 'fichaCarga', label: 'Ficha de Carga', icon: Zap },
-//     
+    
 
   ];
 
