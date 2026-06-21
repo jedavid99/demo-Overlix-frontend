@@ -66,15 +66,7 @@ export default function SaleAdd() {
       {/* Encabezado */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-extrabold">Crear Venta</h1>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => navigate('/sales')}
-            className="px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm"
-          >
-            Volver a Ventas
-          </button>
-         
-        </div>
+        
       </div>
 
       <div className="flex-1 flex gap-4 min-h-0">
@@ -105,24 +97,7 @@ export default function SaleAdd() {
             </button>
           </div>
 
-          {/* Filtros por categoría (ejemplo) */}
-          <div className="flex border-b border-slate-100 dark:border-slate-800 px-4">
-            <button className="px-4 py-3 text-sm font-bold border-b-2 border-primary text-primary">
-              Todos los Items
-            </button>
-            <button className="px-4 py-3 text-sm font-semibold text-slate-500">
-              Servicios
-            </button>
-            <button className="px-4 py-3 text-sm font-semibold text-slate-500">
-              Pantallas
-            </button>
-            <button className="px-4 py-3 text-sm font-semibold text-slate-500">
-              Baterías
-            </button>
-            <button className="px-4 py-3 text-sm font-semibold text-slate-500">
-              Accesorios
-            </button>
-          </div>
+         
 
           {/* Grid de productos */}
           <div className="flex-1 overflow-y-auto p-4">
@@ -158,130 +133,134 @@ export default function SaleAdd() {
         </section>
 
         {/* Venta Actual */}
-        <section className="w-[420px] shrink-0 flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-          <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold">Venta Actual</h2>
-              <span className="text-slate-500 text-sm">#Nuevo</span>
+        odos los Items
+Servicios
+Pantallas
+Baterías
+Accesorios<section className="w-[420px] shrink-0 flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+  {/* Cabecera: cliente y número de venta */}
+  <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col gap-3">
+    <div className="flex items-center justify-between">
+      <h2 className="text-xl font-bold">Venta Actual</h2>
+      <span className="text-slate-500 text-sm">#Nuevo</span>
+    </div>
+    <div className="relative">
+      <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+        <Search className="text-slate-400" />
+        <div className="flex-1">
+          <p className="text-xs text-slate-500 font-bold uppercase tracking-wide">Cliente</p>
+          <p className="text-sm font-bold">
+            {selectedCustomer || 'Seleccionar cliente'}
+          </p>
+        </div>
+        <button
+          onClick={() => setSelectedCustomer('Cliente en Caja')}
+          className="text-primary text-xs font-bold px-2 py-1 rounded bg-primary/10"
+        >
+          Cambiar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {/* Lista de items del carrito (scroll) */}
+  <div className="flex-1 overflow-y-auto p-4 space-y-4">
+    {items.length === 0 ? (
+      <div className="text-center text-slate-400 py-12">
+        <ShoppingCart className="mx-auto mb-4 opacity-20" size={48} />
+        <p className="font-medium">Carrito vacío</p>
+        <p className="text-sm">Selecciona productos del catálogo</p>
+      </div>
+    ) : (
+      items.map(p => (
+        <div key={p.item.id} className="flex items-start gap-3">
+          <div className="size-12 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+            <ShoppingCart className="text-slate-500" />
+          </div>
+          <div className="flex-1">
+            <div className="flex justify-between mb-0.5">
+              <p className="text-sm font-bold">{p.item.title}</p>
+              <p className="text-sm font-bold">${(p.item.price).toFixed(2)}</p>
             </div>
-            <div className="relative">
-              <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-                <Search className="text-slate-400" />
-                <div className="flex-1">
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wide">Cliente</p>
-                  <p className="text-sm font-bold">
-                    {selectedCustomer || 'Seleccionar cliente'}
-                  </p>
-                </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setSelectedCustomer('Cliente en Caja')}
-                  className="text-primary text-xs font-bold px-2 py-1 rounded bg-primary/10"
+                  onClick={() => changeQty(p.item.id, -1)}
+                  className="size-6 rounded border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800"
                 >
-                  Cambiar
+                  <Minus size={14} />
+                </button>
+                <span className="text-sm font-bold">{p.qty}</span>
+                <button
+                  onClick={() => changeQty(p.item.id, 1)}
+                  className="size-6 rounded border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800"
+                >
+                  <Plus size={14} />
                 </button>
               </div>
+              <button
+                onClick={() => removeItem(p.item.id)}
+                className="text-red-500 text-xs font-bold hover:underline"
+              >
+                Eliminar
+              </button>
             </div>
           </div>
-
-          {/* Lista de items del carrito */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {items.length === 0 ? (
-              <div className="text-center text-slate-400 py-12">
-                <ShoppingCart className="mx-auto mb-4 opacity-20" size={48} />
-                <p className="font-medium">Carrito vacío</p>
-                <p className="text-sm">Selecciona productos del catálogo</p>
-              </div>
-            ) : (
-              items.map(p => (
-                <div key={p.item.id} className="flex items-start gap-3">
-                  <div className="size-12 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                    <ShoppingCart className="text-slate-500" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between mb-0.5">
-                      <p className="text-sm font-bold">{p.item.title}</p>
-                      <p className="text-sm font-bold">${(p.item.price).toFixed(2)}</p>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => changeQty(p.item.id, -1)}
-                          className="size-6 rounded border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800"
-                        >
-                          <Minus size={14} />
-                        </button>
-                        <span className="text-sm font-bold">{p.qty}</span>
-                        <button
-                          onClick={() => changeQty(p.item.id, 1)}
-                          className="size-6 rounded border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800"
-                        >
-                          <Plus size={14} />
-                        </button>
-                      </div>
-                      <button
-                        onClick={() => removeItem(p.item.id)}
-                        className="text-red-500 text-xs font-bold hover:underline"
-                      >
-                        Eliminar
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-
-          
-          <div className="p-4 pb-6 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 space-y-3">
-  {/* Totales */}
-  <div className="flex items-center justify-between text-sm text-slate-500 font-medium">
-    <span>Subtotal</span>
-    <span>${subtotal.toFixed(2)}</span>
+        </div>
+      ))
+    )}
   </div>
-  <div className="flex items-center justify-between text-sm text-slate-500 font-medium">
-    <div className="flex items-center gap-1">
-      <span>Impuesto</span>
-      <span className="text-[10px] bg-slate-200 dark:bg-slate-700 px-1 rounded">8%</span>
+
+  {/* Totales y acciones - MEJORADO CON MÁS ESPACIO */}
+  <div className="p-6 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 space-y-4">
+    <div className="flex items-center justify-between text-sm text-slate-500 font-medium">
+      <span>Subtotal</span>
+      <span>${subtotal.toFixed(2)}</span>
     </div>
-    <span>${tax.toFixed(2)}</span>
-  </div>
-  <div className="flex items-center justify-between text-sm text-slate-500 font-medium pb-2 border-b border-dashed border-slate-300 dark:border-slate-600">
-    <button className="text-primary flex items-center gap-1 hover:underline">
-      <DollarSign size={14} /> Aplicar Descuento
-    </button>
-    <span>-$0.00</span>
-  </div>
-  <div className="flex items-center justify-between text-xl font-extrabold text-slate-900 dark:text-slate-100 py-2">
-    <span>Total</span>
-    <span className="text-primary">${total.toFixed(2)}</span>
-  </div>
+    <div className="flex items-center justify-between text-sm text-slate-500 font-medium">
+      <div className="flex items-center gap-1">
+        <span>Impuesto</span>
+        <span className="text-[10px] bg-slate-200 dark:bg-slate-700 px-1 rounded">8%</span>
+      </div>
+      <span>${tax.toFixed(2)}</span>
+    </div>
+    <div className="flex items-center justify-between text-sm text-slate-500 font-medium pb-2 border-b border-dashed border-slate-300 dark:border-slate-600">
+      <button className="text-primary flex items-center gap-1 hover:underline">
+        <DollarSign size={14} /> Aplicar Descuento
+      </button>
+      <span>-$0.00</span>
+    </div>
+    <div className="flex items-center justify-between text-xl font-extrabold text-slate-900 dark:text-slate-100 py-2">
+      <span>Total</span>
+      <span className="text-primary">${total.toFixed(2)}</span>
+    </div>
 
-  {/* Métodos de pago */}
-  <div className="grid grid-cols-3 gap-2 pt-2">
-    <button className="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:border-primary hover:text-primary transition-all">
-      <span className="mb-1"><CreditCard size={18} /></span>
-      <span className="text-[10px] font-bold uppercase tracking-wider">Tarjeta</span>
-    </button>
-    <button className="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:border-primary hover:text-primary transition-all">
-      <span className="mb-1">💵</span>
-      <span className="text-[10px] font-bold uppercase tracking-wider">Efectivo</span>
-    </button>
-    <button className="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:border-primary hover:text-primary transition-all">
-      <span className="mb-1">🔀</span>
-      <span className="text-[10px] font-bold uppercase tracking-wider">Dividir</span>
+    {/* Métodos de pago */}
+    <div className="grid grid-cols-3 gap-2 pt-2">
+      <button className="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:border-primary hover:text-primary transition-all">
+        <span className="mb-1"><CreditCard size={18} /></span>
+        <span className="text-[10px] font-bold uppercase tracking-wider">Tarjeta</span>
+      </button>
+      <button className="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:border-primary hover:text-primary transition-all">
+        <span className="mb-1">💵</span>
+        <span className="text-[10px] font-bold uppercase tracking-wider">Efectivo</span>
+      </button>
+      <button className="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:border-primary hover:text-primary transition-all">
+        <span className="mb-1">🔀</span>
+        <span className="text-[10px] font-bold uppercase tracking-wider">Dividir</span>
+      </button>
+    </div>
+
+    {/* Botón principal con mucho más espacio */}
+    <button
+      onClick={() => navigate('/sales')}
+      className="w-full mt-6 py-5 bg-primary text-white rounded-xl font-bold text-lg hover:bg-primary/90 shadow-xl shadow-primary/30 transition-all flex items-center justify-center gap-2"
+    >
+      Completar Transacción
+      <ChevronRight size={20} />
     </button>
   </div>
-
-  {/* Botón principal con más espacio */}
-  <button
-    onClick={() => navigate('/sales')}
-    className="w-full mt-4 py-5 bg-primary text-white rounded-xl font-bold text-lg hover:bg-primary/90 shadow-xl shadow-primary/30 transition-all flex items-center justify-center gap-2"
-  >
-    Completar Transacción
-    <ChevronRight size={20} />
-  </button>
-</div>
-        </section>
+</section>
       </div>
     </div>
   )
