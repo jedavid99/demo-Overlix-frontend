@@ -527,13 +527,13 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                           Estado de Pre-Check
                         </p>
                         <p className="font-semibold text-sm text-green-400">
-                          {functionalCount} módulo{functionalCount !== 1 ? 's' : ''} funcionales
+                          {functionalCount} módulo{functionalCount !== 12 ? 's' : ''} funcionales
                         </p>
                         <p className="text-xs text-slate-400">
-                          {functionalCount === 0
-                            ? 'Ningún módulo reportado como funcional'
-                            : functionalCount === 12
+                          {functionalCount === 12
                             ? 'Todos los módulos funcionales'
+                            : functionalCount === 0
+                            ? 'Ningún módulo reportado como funcional'
                             : `${functionalCount} módulos funcionales`}
                         </p>
                       </div>
