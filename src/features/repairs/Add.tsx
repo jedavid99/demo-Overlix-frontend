@@ -761,11 +761,11 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                     )}
                     <div className="pt-4 border-t border-white/10">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-muted-foreground text-sm">Mano de Obra</span>
+                        <span className="text-primary-foreground text-sm">Mano de Obra</span>
                         <span className="font-bold text-sm">$0.00</span>
                       </div>
                       <div className="flex items-center justify-between mb-3">
-                        <span className="text-muted-foreground text-sm">Repuestos</span>
+                        <span className="text-primary-foreground text-sm">Repuestos</span>
                         <span className="font-bold text-sm">$0.00</span>
                       </div>
                       <div className="flex items-center justify-between text-lg font-bold pt-3 border-t border-white/20">
