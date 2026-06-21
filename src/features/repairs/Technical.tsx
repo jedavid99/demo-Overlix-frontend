@@ -14,6 +14,8 @@ import {
   Info,
   Check,
   Fingerprint,
+  Key,
+  Eye,
 } from 'lucide-react';
 import { MdCheck, MdBuild } from 'react-icons/md';
 import type { RepairData } from './RepairFlow';
@@ -71,6 +73,22 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     { key: 'audio', label: 'Audio', icon: Volume2 },
     {key: 'frontarcamara', label: 'Cámara frontal', icon: Camera },
     {key: 'huella', label: 'Huella', icon: Fingerprint },
+    {key: 'sensorproximidad', label: 'Sensor de Proximidad', icon: Eye },
+
+
+//  { key: 'botonPawer', label: 'Botón de Power', icon: Power },
+//     { key: 'botonVolumen', label: 'Botón de Volumen', icon: Volume2 },
+//     { key: 'sensorProximidad', label: 'Sensor de Proximidad', icon: Eye },
+//     { key: 'camaraFrontal', label: 'Cámara Frontal', icon: Camera },
+//     { key: 'modulo', label: 'Módulo', icon: MonitorPlay },
+//     { key: 'wifi', label: 'WiFi', icon: Wifi },
+//     { key: 'huella', label: 'Huella', icon: Fingerprint },
+//     { key: 'camaraTrasera', label: 'Cámara Trasera', icon: Camera },
+//     { key: 'audio', label: 'Audio', icon: Volume2 },
+//     { key: 'altavoz', label: 'Altavoz', icon: Volume2 },
+//     { key: 'fichaCarga', label: 'Ficha de Carga', icon: Zap },
+//     { key: 'bateria', label: 'Batería', icon: Battery },
+
   ];
 
   const handleHardwareToggle = (key: string) => {
@@ -527,12 +545,12 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                           Pre-Check Status
                         </p>
                         <p className="font-semibold text-sm text-green-400">
-                          {functionalCount}/8 Functional
+                          {functionalCount}/9 Functional
                         </p>
                         <p className="text-xs text-slate-400">
-                          {functionalCount === 8
+                          {functionalCount === 9
                             ? 'All systems operational'
-                            : `${8 - functionalCount} module${8 - functionalCount > 1 ? 's' : ''} faulty`}
+                            : `${9 - functionalCount} module${9 - functionalCount > 1 ? 's' : ''} faulty`}
                         </p>
                       </div>
                     </div>
