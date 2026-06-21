@@ -78,7 +78,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     {key: 'sensorproximidad', label: 'Sensor de Proximidad', icon: Eye },
     {key: 'bateria', label: 'Batería', icon: Battery },
     {key: 'fichacarga', label: 'Ficha de Carga', icon: Zap },
-{ key: 'altavoz', label: 'Altavoz', icon: Volume2 },
+ 
 
 
 
