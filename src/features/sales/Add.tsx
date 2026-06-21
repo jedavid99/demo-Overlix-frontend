@@ -133,11 +133,7 @@ export default function SaleAdd() {
         </section>
 
         {/* Venta Actual */}
-        odos los Items
-Servicios
-Pantallas
-Baterías
-Accesorios<section className="w-[420px] shrink-0 flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+         <section className="w-[420px] shrink-0 flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
   {/* Cabecera: cliente y número de venta */}
   <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col gap-3">
     <div className="flex items-center justify-between">
