@@ -108,7 +108,7 @@ export default function CajaDiaria() {
                 </div>
                 <div>
                   <p className="text-sm text-primary font-semibold uppercase tracking-wider">Transacciones</p>
-                  <p className="text-2xl font-bold text-foreground">{transactions} reparaciones</p>
+                  <p className="text-2xl font-bold text-foreground"> reparaciones</p>
                 </div>
               </div>
             </CardContent>
