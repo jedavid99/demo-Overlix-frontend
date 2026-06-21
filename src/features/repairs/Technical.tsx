@@ -532,8 +532,8 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                         <p className="text-xs text-slate-400">
                           {functionalCount === 0
                             ? 'Ningún módulo reportado como funcional'
-                            : functionalCount === 1
-                            ? '1 módulo funcional'
+                            : functionalCount === 12
+                            ? 'Todos los módulos funcionales'
                             : `${functionalCount} módulos funcionales`}
                         </p>
                       </div>
