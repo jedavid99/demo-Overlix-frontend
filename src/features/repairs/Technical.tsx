@@ -16,6 +16,7 @@ import {
   Fingerprint,
   Key,
   Eye,
+  Battery,
 } from 'lucide-react';
 import { MdCheck, MdBuild } from 'react-icons/md';
 import type { RepairData } from './RepairFlow';
@@ -74,7 +75,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     {key: 'frontarcamara', label: 'Cámara frontal', icon: Camera },
     {key: 'huella', label: 'Huella', icon: Fingerprint },
     {key: 'sensorproximidad', label: 'Sensor de Proximidad', icon: Eye },
-
+    {key: 'teclado', label: 'Batería', icon: Battery },
 
 //  { key: 'botonPawer', label: 'Botón de Power', icon: Power },
 //     { key: 'botonVolumen', label: 'Botón de Volumen', icon: Volume2 },
@@ -545,12 +546,12 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                           Pre-Check Status
                         </p>
                         <p className="font-semibold text-sm text-green-400">
-                          {functionalCount}/9 Functional
+                          {functionalCount}/10 Functional
                         </p>
                         <p className="text-xs text-slate-400">
-                          {functionalCount === 9
+                          {functionalCount === 10
                             ? 'All systems operational'
-                            : `${9 - functionalCount} module${9 - functionalCount > 1 ? 's' : ''} faulty`}
+                            : `${10 - functionalCount} module${10 - functionalCount > 1 ? 's' : ''} faulty`}
                         </p>
                       </div>
                     </div>
