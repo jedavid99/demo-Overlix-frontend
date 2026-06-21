@@ -14,6 +14,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../../components/ui/dropdown-menu'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '../../../components/ui/popover'
 
 const categories = [
   { value: 'all', label: 'Todo', placeholder: 'Buscar en Overlix...', route: '/dashboard' },
@@ -131,30 +136,30 @@ export const AdminTopBar = ({
           </div>
         </div>
 
-        {/* 🪟 Notificaciones con DropdownMenu */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+        {/* 🪟 Notificaciones con Popover (CORREGIDO) */}
+        <Popover>
+          <PopoverTrigger asChild>
             <Button variant="ghost" size="icon-sm" className="relative">
               <Bell size={18} className="text-muted-foreground" />
               <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px]">
                 {notifications.length}
               </Badge>
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-96 p-0 max-h-[70vh] overflow-hidden">
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-96 p-0 max-h-[70vh] overflow-hidden z-50">
             <div className="flex flex-col">
               {/* Cabecera */}
               <div className="flex items-center justify-between p-4 border-b border-border">
-                <DropdownMenuLabel className="p-0 text-foreground font-semibold">Notificaciones</DropdownMenuLabel>
+                <h4 className="font-semibold text-foreground">Notificaciones</h4>
                 <span className="text-xs text-muted-foreground">{notifications.length} nuevas</span>
               </div>
 
               {/* Lista con scroll */}
               <div className="flex-1 overflow-y-auto p-2 space-y-1">
                 {notifications.map(notif => (
-                  <DropdownMenuItem
+                  <div
                     key={notif.id}
-                    className="flex items-start gap-3 p-3 rounded-xl cursor-pointer focus:bg-muted/50"
+                    className="flex items-start gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors cursor-pointer"
                     onClick={() => console.log('Notificación clickeada:', notif)}
                   >
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${notif.color}`}>
@@ -164,7 +169,7 @@ export const AdminTopBar = ({
                       <p className="text-sm font-medium text-foreground truncate">{notif.title}</p>
                       <p className="text-xs text-muted-foreground">{notif.time}</p>
                     </div>
-                  </DropdownMenuItem>
+                  </div>
                 ))}
               </div>
 
@@ -178,8 +183,8 @@ export const AdminTopBar = ({
                 </button>
               </div>
             </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </PopoverContent>
+        </Popover>
 
         {/* Profile */}
         <DropdownMenu>
