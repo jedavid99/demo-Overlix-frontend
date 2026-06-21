@@ -549,9 +549,9 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                           {functionalCount}/12 Functional
                         </p>
                         <p className="text-xs text-slate-400">
-                          {functionalCount === 12
+                          {functionalCount === 11
                             ? 'All systems operational'
-                            : `${12 - functionalCount} module${12 - functionalCount > 1 ? 's' : ''} faulty`}
+                            : `${11 - functionalCount} module${11 - functionalCount > 1 ? 's' : ''} faulty`}
                         </p>
                       </div>
                     </div>
