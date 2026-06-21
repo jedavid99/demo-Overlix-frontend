@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
   UserPlus,
@@ -11,72 +12,188 @@ import {
   CheckCircle2,
   Cable,
   ArrowRight,
-  Settings
+  Settings,
+  Power,
+  Volume,
+  Eye,
+  Camera,
+  Wifi,
+  Fingerprint,
+  Volume2,
+  Mic,
+  Zap,
+  Battery,
+  Lock,
+  AlertCircle,
+  Info,
+  Check,
+  Keyboard,
+  Mouse,
+  Usb,
+  Headphones,
+  HardDrive,
+  Cpu,
 } from 'lucide-react';
 import { MdPerson, MdBuild, MdCheck } from 'react-icons/md';
+import { RiSimCard2Line } from 'react-icons/ri';
 import type { RepairData } from './RepairFlow';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
 
-interface RepairAddProps {
+// Mapa de hardware por categoría
+const hardwareByCategory: Record<string, { key: string; label: string; icon: any }[]> = {
+  phone: [
+    { key: 'botonPawer', label: 'Botón de Power', icon: Power },
+    { key: 'botonVolumen', label: 'Botón de Volumen', icon: Volume },
+    { key: 'sensorProximidad', label: 'Sensor de Proximidad', icon: Eye },
+    { key: 'camaraFrontal', label: 'Cámara Frontal', icon: Camera },
+    { key: 'modulo', label: 'Módulo', icon: Smartphone },
+    { key: 'wifi', label: 'WiFi', icon: Wifi },
+    { key: 'huella', label: 'Huella', icon: Fingerprint },
+    { key: 'camaraTrasera', label: 'Cámara Trasera', icon: Camera },
+    { key: 'audio', label: 'Audio', icon: Volume2 },
+    { key: 'altavoz', label: 'Altavoz', icon: Mic },
+    { key: 'fichaCarga', label: 'Ficha de Carga', icon: Zap },
+    { key: 'bateria', label: 'Batería', icon: Battery },
+    { key: 'lectorSimcard', label: 'Lector de Simcard', icon: RiSimCard2Line },
+  ],
+  notebook: [
+    { key: 'teclado', label: 'Teclado', icon: Keyboard },
+    { key: 'trackpad', label: 'Trackpad', icon: Mouse },
+    { key: 'pantalla', label: 'Pantalla', icon: Monitor },
+    { key: 'bateria', label: 'Batería', icon: Battery },
+    { key: 'wifi', label: 'WiFi', icon: Wifi },
+    { key: 'camara', label: 'Cámara', icon: Camera },
+    { key: 'altavoces', label: 'Altavoces', icon: Volume2 },
+    { key: 'puertos', label: 'Puertos USB', icon: Usb },
+    { key: 'cargador', label: 'Cargador', icon: Zap },
+  ],
+  pc: [
+    { key: 'fuentePoder', label: 'Fuente de Poder', icon: Power },
+    { key: 'cpu', label: 'CPU', icon: Cpu },
+    { key: 'ram', label: 'Memoria RAM', icon: HardDrive },
+    { key: 'disco', label: 'Disco Duro/SSD', icon: HardDrive },
+    { key: 'wifi', label: 'WiFi', icon: Wifi },
+    { key: 'puertos', label: 'Puertos USB', icon: Usb },
+    { key: 'audio', label: 'Audio', icon: Volume2 },
+  ],
+  tablet: [
+    { key: 'pantalla', label: 'Pantalla', icon: Monitor },
+    { key: 'bateria', label: 'Batería', icon: Battery },
+    { key: 'wifi', label: 'WiFi', icon: Wifi },
+    { key: 'camara', label: 'Cámara', icon: Camera },
+    { key: 'altavoces', label: 'Altavoces', icon: Volume2 },
+    { key: 'botones', label: 'Botones Físicos', icon: Power },
+    { key: 'cargador', label: 'Cargador', icon: Zap },
+  ],
+  console: [
+    { key: 'fuentePoder', label: 'Fuente de Poder', icon: Power },
+    { key: 'lectorDiscos', label: 'Lector de Discos', icon: HardDrive },
+    { key: 'wifi', label: 'WiFi', icon: Wifi },
+    { key: 'puertos', label: 'Puertos USB', icon: Usb },
+    { key: 'audio', label: 'Audio', icon: Volume2 },
+    { key: 'control', label: 'Control/Gamepad', icon: Gamepad2 },
+  ],
+  other: [
+    { key: 'bateria', label: 'Batería', icon: Battery },
+    { key: 'wifi', label: 'WiFi', icon: Wifi },
+    { key: 'puertos', label: 'Puertos', icon: Usb },
+    { key: 'audio', label: 'Audio', icon: Volume2 },
+  ],
+};
+
+// Categorías de dispositivo
+const deviceCategories = [
+  { id: 'phone', name: 'Teléfono', icon: Smartphone, color: 'text-primary', bgColor: 'bg-primary/10' },
+  { id: 'notebook', name: 'Portátil', icon: Laptop, color: 'text-info', bgColor: 'bg-info/10' },
+  { id: 'pc', name: 'PC', icon: Monitor, color: 'text-success', bgColor: 'bg-success/10' },
+  { id: 'tablet', name: 'Tablet', icon: Tablet, color: 'text-warning', bgColor: 'bg-warning/10' },
+  { id: 'console', name: 'Consola', icon: Gamepad2, color: 'text-destructive', bgColor: 'bg-destructive/10' },
+  { id: 'other', name: 'Otro', icon: Grid3X3, color: 'text-muted-foreground', bgColor: 'bg-muted' },
+];
+
+// Estado inicial
+const defaultData: RepairData = {
+  selectedClient: null,
+  deviceType: 'phone',
+  brand: '',
+  model: '',
+  serial: '',
+  aestheticCondition: '',
+  accessories: [],
+  issueDescription: '',
+  priority: 'Normal',
+  estimatedDays: 3,
+  hardwareChecks: {},
+  securityType: 'pin',
+  accessPin: '',
+  patternDots: [false, false, false, false, false, false, false, false, false],
+  patternSequence: [],
+  technicianNotes: '',
+  termsAccepted: false,
+  signaturePad: '',
+  printOption: 'both',
+};
+
+interface RepairCreateProps {
   data?: RepairData;
   updateData?: (updates: Partial<RepairData>) => void;
-  onNext?: () => void;
+  onSave?: () => void;
   currentStep?: number;
 }
 
-export default function RepairAdd({ data, updateData, onNext = () => {}, currentStep = 1 }: RepairAddProps) {
+export default function RepairCreate({ data, updateData, onSave = () => {}, currentStep = 1 }: RepairCreateProps) {
   const [search, setSearch] = useState('');
-
-  const defaultData: RepairData = {
-    selectedClient: null,
-    deviceType: 'phone',
-    brand: '',
-    model: '',
-    serial: '',
-    aestheticCondition: '',
-    accessories: [],
-    issueDescription: '',
-    priority: 'Normal',
-    estimatedDays: 3,
-    hardwareChecks: {
-      power: false,
-      display: false,
-      wifi: false,
-      bluetooth: false,
-      cameras: false,
-      audio: false,
-    },
-    securityType: 'pin',
-    accessPin: '',
-    patternDots: [false, false, false, false, false, false, false, false, false],
-    patternSequence: [],
-    technicianNotes: '',
-    termsAccepted: false,
-    signaturePad: '',
-    printOption: 'both',
-  };
-
   const [localData, setLocalData] = useState<RepairData>(defaultData);
   const state = data ?? localData;
+
   const applyUpdate = (updates: Partial<RepairData>) => {
     if (updateData) updateData(updates);
-    else setLocalData(prev => ({ ...prev, ...updates }));
+    else setLocalData((prev) => ({ ...prev, ...updates }));
   };
 
-  // 📦 Categorías de dispositivos – fijas, pero se pueden cargar desde API
-  const deviceCategories = [
-    { id: 'phone', name: 'Teléfono', icon: Smartphone, color: 'text-primary', bgColor: 'bg-primary/10' },
-    { id: 'notebook', name: 'Portátil', icon: Laptop, color: 'text-info', bgColor: 'bg-info/10' },
-    { id: 'pc', name: 'PC', icon: Monitor, color: 'text-success', bgColor: 'bg-success/10' },
-    { id: 'tablet', name: 'Tablet', icon: Tablet, color: 'text-warning', bgColor: 'bg-warning/10' },
-    { id: 'console', name: 'Consola', icon: Gamepad2, color: 'text-destructive', bgColor: 'bg-destructive/10' },
-    { id: 'other', name: 'Otro', icon: Grid3X3, color: 'text-muted-foreground', bgColor: 'bg-muted' },
-  ];
+  // Clientes mock (cargar desde API)
+  const clients: any[] = [];
+  const filteredClients = clients.filter((client) =>
+    client.name?.toLowerCase().includes(search.toLowerCase()) ||
+    client.phone?.includes(search) ||
+    client.email?.toLowerCase().includes(search.toLowerCase())
+  );
 
+  // Obtener items de hardware según categoría seleccionada
+  const currentHardwareItems = useMemo(() => {
+    return hardwareByCategory[state.deviceType] || [];
+  }, [state.deviceType]);
+
+  // Inicializar hardwareChecks con valores en false para los items de la categoría actual
+  const hardwareKeys = currentHardwareItems.map((item) => item.key);
+  const initialHardwareChecks = hardwareKeys.reduce((acc, key) => ({ ...acc, [key]: false }), {});
+  // Si el estado ya tiene algunos checks, los fusionamos
+  const mergedHardwareChecks = { ...initialHardwareChecks, ...state.hardwareChecks };
+  // Solo mantener las claves que corresponden a la categoría actual
+  const filteredHardwareChecks = Object.fromEntries(
+    Object.entries(mergedHardwareChecks).filter(([key]) => hardwareKeys.includes(key))
+  );
+
+  // Actualizar hardwareChecks cuando cambie la categoría
+  React.useEffect(() => {
+    const newChecks = { ...initialHardwareChecks, ...state.hardwareChecks };
+    const filtered = Object.fromEntries(Object.entries(newChecks).filter(([key]) => hardwareKeys.includes(key)));
+    applyUpdate({ hardwareChecks: filtered });
+  }, [state.deviceType]);
+
+  const handleHardwareToggle = (key: string) => {
+    const updated = { ...state.hardwareChecks };
+    updated[key] = !updated[key];
+    applyUpdate({ hardwareChecks: updated });
+  };
+
+  const functionalCount = Object.values(state.hardwareChecks).filter(Boolean).length;
+
+  // Accesorios según categoría
   const getAccessoriesForDevice = () => {
-    const accessoriesMap: Record<string, string[]> = {
+    const map: Record<string, string[]> = {
       phone: ['Caja Original', 'Cable Cargador', 'Adaptador de Corriente', 'Funda'],
       notebook: ['Cargador', 'Mouse', 'Caja Original'],
       pc: ['Teclado', 'Mouse', 'Cable de Alimentación'],
@@ -84,74 +201,30 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
       console: ['Caja Original', 'Control', 'Cable HDMI'],
       other: ['Accesorios', 'Documentación'],
     };
-    return accessoriesMap[state.deviceType] || [];
+    return map[state.deviceType] || [];
   };
 
   const handleAccessoryToggle = (accessory: string) => {
     if (state.accessories.includes(accessory)) {
-      applyUpdate({ accessories: state.accessories.filter(a => a !== accessory) });
+      applyUpdate({ accessories: state.accessories.filter((a) => a !== accessory) });
     } else {
       applyUpdate({ accessories: [...state.accessories, accessory] });
     }
   };
 
-  // 📦 Clientes – vacío (cargar desde API)
-  const clients: any[] = [];
-
-  const filteredClients = clients.filter(client =>
-    client.name?.toLowerCase().includes(search.toLowerCase()) ||
-    client.phone?.includes(search) ||
-    client.email?.toLowerCase().includes(search.toLowerCase())
-  );
-
-  // 📊 Cálculo de presupuesto – valores en cero (cargar desde API)
-  const laborCost = 0;
-  const partsCost = 0;
-  const totalBudget = laborCost + partsCost;
-
   return (
-    <div className="min-h-screen bg-background">
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="min-h-screen bg-background"
+    >
       <main className="max-w-[1400px] mx-auto p-6 md:p-8">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Registro de Reparación</h1>
-            <p className="text-muted-foreground text-sm">Paso 1: Información de Cliente y Dispositivo</p>
-          </div>
-
-          {/* Stepper */}
-          <div className="hidden md:flex items-center gap-4">
-            {[
-              { num: 1, label: 'Cliente y Dispositivo', icon: <MdPerson size={16} /> },
-              { num: 2, label: 'Información Técnica', icon: <MdBuild size={16} /> },
-              { num: 3, label: 'Finalizar', icon: <MdCheck size={16} /> },
-            ].map((step, idx) => (
-              <React.Fragment key={step.num}>
-                <div
-                  className={`flex items-center gap-3 px-6 py-3 rounded-2xl border ${
-                    currentStep >= step.num
-                      ? 'bg-card border-border shadow-sm'
-                      : 'bg-card border-border'
-                  }`}
-                >
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                      currentStep >= step.num
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted text-muted-foreground'
-                    }`}
-                  >
-                    {step.num}
-                  </div>
-                  <span className={`text-sm font-semibold ${
-                    currentStep >= step.num ? 'text-foreground' : 'text-muted-foreground'
-                  }`}>
-                    {step.label}
-                  </span>
-                </div>
-                {idx < 2 && <div className="w-8 h-px bg-border"></div>}
-              </React.Fragment>
-            ))}
+            <p className="text-muted-foreground text-sm">Información de Cliente, Dispositivo y Diagnóstico</p>
           </div>
         </div>
 
@@ -159,7 +232,7 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left Column - Main Content */}
           <div className="lg:col-span-8 space-y-8">
-            {/* Customer Selection */}
+            {/* Cliente */}
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-6">
@@ -174,7 +247,6 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
                     Agregar Nuevo Cliente
                   </Button>
                 </div>
-
                 <div className="relative group">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={20} />
                   <input
@@ -185,7 +257,6 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
                     className="w-full pl-12 pr-4 py-4 bg-muted border border-border rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-lg font-medium text-foreground"
                   />
                 </div>
-
                 {state.selectedClient ? (
                   <div className="mt-4 border border-primary/20 rounded-2xl overflow-hidden">
                     <div className="p-4 flex items-center justify-between bg-primary/5">
@@ -198,11 +269,7 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
                           <p className="text-xs text-muted-foreground">{state.selectedClient.phone} • {state.selectedClient.email}</p>
                         </div>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => applyUpdate({ selectedClient: null })}
-                      >
+                      <Button variant="ghost" size="sm" onClick={() => applyUpdate({ selectedClient: null })}>
                         Cambiar
                       </Button>
                     </div>
@@ -220,10 +287,7 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
                             <p className="text-xs text-muted-foreground">{client.phone} • {client.email}</p>
                           </div>
                         </div>
-                        <Button
-                          size="sm"
-                          onClick={() => applyUpdate({ selectedClient: client })}
-                        >
+                        <Button size="sm" onClick={() => applyUpdate({ selectedClient: client })}>
                           Seleccionar
                         </Button>
                       </div>
@@ -239,7 +303,7 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
               </CardContent>
             </Card>
 
-            {/* Device Category */}
+            {/* Dispositivo */}
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-6">
@@ -248,7 +312,6 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
                   </div>
                   <h2 className="text-lg font-bold text-foreground">Categoría de Dispositivo</h2>
                 </div>
-
                 <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4">
                   {deviceCategories.map((category) => {
                     const Icon = category.icon;
@@ -266,9 +329,7 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
                         <div className={`${category.bgColor} ${category.color} p-3 rounded-xl`}>
                           <Icon size={24} />
                         </div>
-                        <span className={`text-xs font-bold uppercase tracking-wide ${
-                          isSelected ? 'text-primary' : 'text-muted-foreground'
-                        }`}>
+                        <span className={`text-xs font-bold uppercase tracking-wide ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
                           {category.name}
                         </span>
                       </button>
@@ -278,7 +339,7 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
               </CardContent>
             </Card>
 
-            {/* Technical Specifications */}
+            {/* Especificaciones Técnicas */}
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-3 mb-6">
@@ -287,12 +348,9 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
                   </div>
                   <h2 className="text-lg font-bold text-foreground">Especificaciones Técnicas</h2>
                 </div>
-
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                   <div>
-                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">
-                      Marca
-                    </label>
+                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Marca</label>
                     <input
                       type="text"
                       value={state.brand}
@@ -302,9 +360,7 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">
-                      Modelo
-                    </label>
+                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Modelo</label>
                     <input
                       type="text"
                       value={state.model}
@@ -314,9 +370,7 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">
-                      Serial / IMEI
-                    </label>
+                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Serial / IMEI</label>
                     <div className="relative">
                       <input
                         type="text"
@@ -332,9 +386,8 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
                   </div>
                 </div>
 
-                {/* Two Column Layout */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {/* Aesthetic Condition */}
+                  {/* Condición Estética */}
                   <Card className="border border-border">
                     <CardContent className="p-6">
                       <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
@@ -359,7 +412,7 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
                     </CardContent>
                   </Card>
 
-                  {/* Included Accessories */}
+                  {/* Accesorios */}
                   <Card className="border border-border">
                     <CardContent className="p-6">
                       <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
@@ -392,14 +445,146 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
                 </div>
               </CardContent>
             </Card>
+
+            {/* Chequeo rápido de hardware (dinámico) */}
+            <AnimatePresence mode="wait">
+              {state.deviceType && currentHardwareItems.length > 0 && (
+                <motion.section
+                  key={state.deviceType}
+                  initial={{ opacity: 0, height: 0, overflow: 'hidden' }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200"
+                >
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="bg-blue-100 text-blue-600 p-2 rounded-xl">
+                      <CheckCircle2 size={20} />
+                    </div>
+                    <h2 className="text-lg font-bold text-slate-900">Chequeo rápido de hardware</h2>
+                    <Badge variant="outline" className="ml-auto">{functionalCount}/{currentHardwareItems.length} funcionales</Badge>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+                    {currentHardwareItems.map((item) => {
+                      const Icon = item.icon;
+                      const isChecked = state.hardwareChecks[item.key] ?? false;
+                      return (
+                        <div
+                          key={item.key}
+                          className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-slate-200 transition-colors"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Icon size={18} className={isChecked ? 'text-blue-600' : 'text-slate-400'} />
+                            <span className="text-sm font-bold text-slate-700">{item.label}</span>
+                          </div>
+                          <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={isChecked}
+                              onChange={() => handleHardwareToggle(item.key)}
+                              className="sr-only"
+                            />
+                            <div
+                              className={`w-11 h-6 rounded-full transition-colors ${isChecked ? 'bg-blue-600' : 'bg-slate-200'}`}
+                            >
+                              <div
+                                className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform shadow-sm ${
+                                  isChecked ? 'translate-x-5' : ''
+                                }`}
+                              />
+                            </div>
+                          </label>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </motion.section>
+              )}
+            </AnimatePresence>
+
+            {/* Notas y diagnóstico */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="bg-emerald-100 text-emerald-600 p-2 rounded-xl">
+                    <AlertCircle size={20} />
+                  </div>
+                  <h2 className="text-lg font-bold text-foreground">Diagnóstico y Notas</h2>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">
+                      Descripción del Problema
+                    </label>
+                    <textarea
+                      value={state.issueDescription}
+                      onChange={(e) => applyUpdate({ issueDescription: e.target.value })}
+                      placeholder="Pantalla rota, puerto de carga suelto..."
+                      rows={3}
+                      className="w-full bg-muted border border-border rounded-xl p-4 text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-foreground"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Prioridad</label>
+                      <select
+                        value={state.priority}
+                        onChange={(e) => applyUpdate({ priority: e.target.value })}
+                        className="w-full bg-muted border border-border rounded-xl py-3 px-4 focus:ring-primary/10 focus:border-primary transition-all text-foreground"
+                      >
+                        <option>Normal</option>
+                        <option>Urgente</option>
+                        <option>Baja</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Días Estimados</label>
+                      <input
+                        type="number"
+                        value={state.estimatedDays}
+                        onChange={(e) => applyUpdate({ estimatedDays: parseInt(e.target.value) })}
+                        className="w-full bg-muted border border-border rounded-xl py-3 px-4 focus:ring-primary/10 focus:border-primary transition-all text-foreground"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Notas del Técnico</label>
+                    <textarea
+                      value={state.technicianNotes}
+                      onChange={(e) => applyUpdate({ technicianNotes: e.target.value })}
+                      placeholder="Observaciones adicionales..."
+                      rows={3}
+                      className="w-full bg-muted border border-border rounded-xl p-4 text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-foreground"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Botón Guardar */}
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex justify-end"
+            >
+              <Button onClick={onSave} size="lg" className="px-10 py-6 text-base">
+                <Check size={20} className="mr-2" />
+                Crear Orden de Servicio
+              </Button>
+            </motion.div>
           </div>
 
-          {/* Right Column - Ticket Summary */}
+          {/* Right Column - Resumen */}
           <div className="lg:col-span-4">
             <div className="sticky top-24 space-y-6">
-              {/* Ticket Summary Card */}
-              <Card className="bg-primary text-primary-foreground rounded-[2rem] p-8 shadow-2xl relative overflow-hidden border-primary/20">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16"></div>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2 }}
+                className="bg-slate-900 text-white rounded-[2rem] p-8 shadow-2xl relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16"></div>
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-8">
                     <h3 className="font-bold text-lg">Resumen del Ticket</h3>
@@ -407,122 +592,76 @@ export default function RepairAdd({ data, updateData, onNext = () => {}, current
                       Nueva Orden
                     </Badge>
                   </div>
-
                   <div className="space-y-6">
-                    {/* Customer Info */}
                     <div className="flex items-start gap-3">
-                      <div className="bg-primary-foreground/10 p-2 rounded-lg">
+                      <div className="bg-white/10 p-2 rounded-lg">
                         <Search className="text-primary-foreground/80" size={18} />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-primary-foreground/70 uppercase">Cliente</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase">Cliente</p>
                         <p className="font-semibold text-sm">{state.selectedClient?.name || 'No Seleccionado'}</p>
                       </div>
                     </div>
-
-                    {/* Device Info */}
                     <div className="flex items-start gap-3">
-                      <div className="bg-primary-foreground/10 p-2 rounded-lg">
+                      <div className="bg-white/10 p-2 rounded-lg">
                         <Smartphone className="text-primary-foreground/80" size={18} />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-primary-foreground/70 uppercase">Dispositivo</p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase">Dispositivo</p>
                         <p className="font-semibold text-sm">
                           {state.brand && state.model ? `${state.brand} ${state.model}` : 'No Especificado'}
                         </p>
-                        {state.serial && <p className="text-xs text-primary-foreground/70">S/N: {state.serial}</p>}
+                        {state.serial && <p className="text-xs text-slate-400">S/N: {state.serial}</p>}
                       </div>
                     </div>
-
-                    {/* Budget */}
-                    <div className="pt-6 border-t border-primary-foreground/20">
+                    {currentHardwareItems.length > 0 && (
+                      <div className="flex items-start gap-3">
+                        <div className="bg-white/10 p-2 rounded-lg">
+                          <CheckCircle2 size={18} className="text-blue-400" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase">Estado de Pre-Check</p>
+                          <p className="font-semibold text-sm text-green-400">
+                            {functionalCount}/{currentHardwareItems.length} funcionales
+                          </p>
+                          <p className="text-xs text-slate-400">
+                            {currentHardwareItems.length - functionalCount} módulo{currentHardwareItems.length - functionalCount !== 1 ? 's' : ''} defectuoso{currentHardwareItems.length - functionalCount !== 1 ? 's' : ''}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    <div className="pt-6 border-t border-white/10">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-primary-foreground/70 text-sm">Mano de Obra</span>
-                        <span className="font-bold text-sm">${laborCost.toFixed(2)}</span>
+                        <span className="text-slate-400 text-sm">Mano de Obra</span>
+                        <span className="font-bold text-sm">$0.00</span>
                       </div>
                       <div className="flex items-center justify-between mb-4">
-                        <span className="text-primary-foreground/70 text-sm">Repuestos Estimados</span>
-                        <span className="font-bold text-sm">${partsCost.toFixed(2)}</span>
+                        <span className="text-slate-400 text-sm">Repuestos Estimados</span>
+                        <span className="font-bold text-sm">$0.00</span>
                       </div>
-                      <div className="flex items-center justify-between text-xl font-bold pt-4 border-t border-primary-foreground/30">
+                      <div className="flex items-center justify-between text-xl font-bold pt-4 border-t border-white/20">
                         <span>Total</span>
-                        <span className="text-primary-foreground">${totalBudget.toFixed(2)}</span>
+                        <span className="text-blue-400">$0.00</span>
                       </div>
                     </div>
                   </div>
                 </div>
-              </Card>
+              </motion.div>
 
-              {/* Service Details */}
-              <Card>
-                <CardContent className="p-6">
-                  <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3">
-                    Detalles del Servicio
-                  </label>
-
-                  <div className="space-y-4">
-                    {/* Issue Description */}
-                    <div>
-                      <label className="block text-[10px] font-bold text-muted-foreground mb-1">
-                        Descripción del Problema
-                      </label>
-                      <textarea
-                        value={state.issueDescription}
-                        onChange={(e) => applyUpdate({ issueDescription: e.target.value })}
-                        placeholder="Pantalla rota, puerto de carga suelto..."
-                        rows={3}
-                        className="w-full text-xs bg-muted border border-border rounded-xl py-2 px-3 focus:ring-primary/10 focus:border-primary transition-all text-foreground"
-                      />
-                    </div>
-
-                    {/* Priority and Days */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-[10px] font-bold text-muted-foreground mb-1">
-                          Prioridad
-                        </label>
-                        <select
-                          value={state.priority}
-                          onChange={(e) => applyUpdate({ priority: e.target.value })}
-                          className="w-full text-xs bg-muted border border-border rounded-xl py-2 focus:ring-primary/10 focus:border-primary transition-all text-foreground"
-                        >
-                          <option>Normal</option>
-                          <option>Urgente</option>
-                          <option>Baja</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-[10px] font-bold text-muted-foreground mb-1">
-                          Días Est.
-                        </label>
-                        <input
-                          type="number"
-                          value={state.estimatedDays}
-                          onChange={(e) => applyUpdate({ estimatedDays: parseInt(e.target.value) })}
-                          className="w-full text-xs bg-muted border border-border rounded-xl py-2 focus:ring-primary/10 focus:border-primary transition-all text-foreground"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Next Step Button */}
-                  <Button
-                    onClick={onNext}
-                    className="w-full mt-6"
-                  >
-                    Siguiente Paso: Técnico
-                    <ArrowRight size={20} className="ml-2" />
-                  </Button>
-
-                  <p className="text-[10px] text-center text-muted-foreground mt-4">
-                    Borrador guardado automáticamente
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
+                <div className="flex items-center gap-2 mb-4">
+                  <Info size={18} className="text-blue-600" />
+                  <span className="text-xs font-bold text-slate-600">Ayuda</span>
+                </div>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Completa todos los campos para crear la orden de reparación.
+                  El chequeo de hardware es específico para la categoría seleccionada.
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </main>
-    </div>
+    </motion.div>
   );
 }
