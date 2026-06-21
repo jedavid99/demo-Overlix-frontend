@@ -401,7 +401,7 @@ export const AdminSidebar = ({
 
           {/* Footer */}
           <div className="border-t border-border-light dark:border-border-dark p-4 space-y-2">
-            <button
+            {/* <button
               onClick={handleLogout}
               className={`w-full flex items-center gap-3 py-2.5 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors whitespace-nowrap
                 ${collapsed ? 'justify-center px-0' : 'px-4 mx-2'}`}
@@ -411,7 +411,7 @@ export const AdminSidebar = ({
               {!collapsed && (
                 <span className="flex-1 text-left">Cerrar sesión</span>
               )}
-            </button>
+            </button> */}
           </div>
         </div>
       </motion.aside>
