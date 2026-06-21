@@ -118,8 +118,8 @@ export default function CanjeNew() {
       </div>
 
       {step === 1 && (
-  <div className="space-y-6">
-    <Card>
+        <div className="space-y-6">
+        <Card>
       <CardContent className="p-6">
         <div className="flex items-center gap-3 mb-6">
           <ShoppingBag className="text-primary p-2 bg-primary/10 rounded-lg w-8 h-8" />
@@ -173,10 +173,125 @@ export default function CanjeNew() {
       </CardContent>
     </Card>
 
-    {/* Resto del paso 1 (especificaciones, estado, etc.) */}
-    {selectedDeviceId && ( ... )}
-  </div>
-)}
+          {selectedDeviceId && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-6">
+                <Card>
+                  <CardContent className="p-8">
+                    <div className="flex items-center gap-3 mb-8">
+                      <QrCode className="text-primary p-2 bg-primary/10 rounded-lg w-8 h-8" />
+                      <h2 className="text-xl font-bold text-foreground">Especificaciones del Dispositivo</h2>
+                    </div>
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="flex flex-col gap-2">
+                          <label className="text-sm font-semibold text-foreground">Capacidad</label>
+                          <select value={device.storage} onChange={e => setDevice(d => ({ ...d, storage: e.target.value }))} className="rounded-lg border border-input bg-background text-foreground py-3 px-4 focus:outline-none focus:ring-2 focus:ring-ring/20 h-12">
+                            <option>128 GB</option>
+                            <option>256 GB</option>
+                            <option>512 GB</option>
+                            <option>1 TB</option>
+                          </select>
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <label className="text-sm font-semibold text-foreground">Color</label>
+                          <select value={deviceColor} onChange={e => setDeviceColor(e.target.value)} className="rounded-lg border border-input bg-background text-foreground py-3 px-4 focus:outline-none focus:ring-2 focus:ring-ring/20 h-12">
+                            {colorOptions.map(c => (
+                              <option key={c.value} value={c.value}>{c.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <label className="text-sm font-semibold text-foreground flex justify-between">
+                          <span>Número IMEI</span>
+                          <span className="text-xs font-normal text-muted-foreground italic">Marque *#06# para encontrar IMEI</span>
+                        </label>
+                        <div className="relative">
+                          <input value={imei} onChange={e => setImei(e.target.value)} className="w-full rounded-lg border border-input bg-background text-foreground py-3 px-4 focus:outline-none focus:ring-2 focus:ring-ring/20 h-12 pl-4" placeholder="Ingrese IMEI de 15 dígitos..." type="text" />
+                          <Button variant="outline" size="sm" onClick={() => alert('Verificando IMEI...')} className="absolute right-2 top-2">VERIFICAR</Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent className="p-8">
+                    <div className="flex items-center gap-3 mb-6">
+                      <Settings className="text-primary p-2 bg-primary/10 rounded-lg w-8 h-8" />
+                      <h2 className="text-xl font-bold text-foreground">Estado Inicial</h2>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border border-border">
+                        <div className="flex items-center gap-3">
+                          <Power className="text-green-500 w-5 h-5" />
+                          <div>
+                            <p className="font-bold text-sm text-foreground">¿El dispositivo enciende?</p>
+                            <p className="text-xs text-muted-foreground">El dispositivo debe llegar a la pantalla de inicio</p>
+                          </div>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input checked={powerOn} onChange={e => setPowerOn(e.target.checked)} className="sr-only peer" type="checkbox" />
+                          <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                      </div>
+                      <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg border border-border">
+                        <div className="flex items-center gap-3">
+                          <Cloud className="text-amber-500 w-5 h-5" />
+                          <div>
+                            <p className="font-bold text-sm text-foreground">¿iCloud cerrado?</p>
+                            <p className="text-xs text-muted-foreground">Buscar mi iPhone debe estar desactivado</p>
+                          </div>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input checked={icloudLogout} onChange={e => setIcloudLogout(e.target.checked)} className="sr-only peer" type="checkbox" />
+                          <div className="w-11 h-6 bg-muted peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Estimated Price */}
+              <div className="lg:col-span-1 flex flex-col gap-6">
+                <Card className="bg-gradient-to-br from-primary to-primary/80 text-white border-0">
+                  <CardContent className="p-8 flex flex-col">
+                    <h3 className="text-lg font-bold mb-6">Canje Estimado</h3>
+                    <div className="space-y-4 flex-1">
+                      <div>
+                        <p className="text-sm opacity-80 mb-1">Modelo de Dispositivo</p>
+                        <p className="text-sm font-bold">{device.model || '—'}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm opacity-80 mb-1">Almacenamiento</p>
+                        <p className="text-sm font-bold">{device.storage || '—'}</p>
+                      </div>
+                      <div className="border-t border-white/20 pt-4 mt-6">
+                        <p className="text-xs opacity-70 uppercase font-bold mb-2">Valor Estimado</p>
+                        <p className="text-5xl font-black tracking-tight">${availableDevices.find(d => d.id === selectedDeviceId)?.basePrice || 0}</p>
+                        <p className="text-xs opacity-70 mt-2">*Sujeto a evaluación y condición</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="flex flex-col gap-3">
+                  <Button variant="outline" onClick={() => navigate('/iphone-canje')} className="w-full">
+                    <X size={16} className="mr-2" />
+                    Cancelar
+                  </Button>
+                  <Button onClick={() => setStep(2)} className="w-full" size="lg">
+                    Siguiente Paso
+                    <ArrowRight size={16} className="ml-2" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {step === 2 && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
