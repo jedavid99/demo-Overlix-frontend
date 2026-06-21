@@ -47,28 +47,32 @@ export default function ClientAdd() {
                 </div>
               </div>
 
-              <div className="flex gap-3">
-                <div className="w-36">
-                  <label className="block text-sm text-gray-600 mb-2">Teléfono</label>
-                  <select name="phoneCode" value={form.phoneCode} onChange={handleChange} className="w-full px-3 py-3 border rounded-lg bg-gray-50">
-                    <option value="+34">ES +34</option>
-                    <option value="+54">AR +54</option>
-                    <option value="+1">US +1</option>
-                  </select>
-                </div>
-                <div className="flex-1">
-                  <label className="block text-sm text-gray-600 mb-2">&nbsp;</label>
-                  <input name="phone" value={form.phone} onChange={handleChange} className="w-full px-4 py-3 border rounded-lg bg-gray-50" placeholder="000 000 000" />
-                </div>
-              </div>
+              <div className="flex gap-3 items-end">
+  {/* Código de país fijo */}
+  <div className="w-24 flex-shrink-0">
+    <label className="block text-sm text-gray-600 mb-2">Código</label>
+    <div className="px-3 py-3 border rounded-lg bg-gray-50 text-gray-700 font-medium text-center select-none">
+      +54
+    </div>
+  </div>
+  
+  {/* Campo de teléfono */}
+  <div className="flex-1">
+    <label className="block text-sm text-gray-600 mb-2">Teléfono</label>
+    <input
+      name="phone"
+      value={form.phone}
+      onChange={handleChange}
+      className="w-full px-4 py-3 border rounded-lg bg-gray-50"
+      placeholder="000 000 000"
+    />
+  </div>
+</div>
+
+             
 
               <div>
-                <label className="block text-sm text-gray-600 mb-2">Correo Electrónico</label>
-                <input name="email" value={form.email} onChange={handleChange} className="w-full px-4 py-3 border rounded-lg bg-gray-50" placeholder="juan@ejemplo.com" />
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-600 mb-2">DNI / Identificación</label>
+                <label className="block text-sm text-gray-600 mb-2">DNI </label>
                 <input name="dni" value={form.dni} onChange={handleChange} className="w-full px-4 py-3 border rounded-lg bg-gray-50" placeholder="12345678X" />
               </div>
             </div>
@@ -88,13 +92,10 @@ export default function ClientAdd() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm text-gray-600 mb-2">Ciudad</label>
-                  <input name="city" value={form.city} onChange={handleChange} className="w-full px-4 py-3 border rounded-lg bg-gray-50" placeholder="Madrid" />
+                  <label className="block text-sm text-gray-600 mb-2">Provicia</label>
+                  <input name="city" value={form.city} onChange={handleChange} className="w-full px-4 py-3 border rounded-lg bg-gray-50" placeholder="Buenos Aires" />
                 </div>
-                <div>
-                  <label className="block text-sm text-gray-600 mb-2">Cód. Postal</label>
-                  <input name="zip" value={form.zip} onChange={handleChange} className="w-full px-4 py-3 border rounded-lg bg-gray-50" placeholder="28001" />
-                </div>
+                
               </div>
 
               <div>
