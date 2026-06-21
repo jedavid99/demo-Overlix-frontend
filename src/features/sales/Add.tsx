@@ -221,10 +221,7 @@ export default function SaleAdd() {
       <span>${tax.toFixed(2)}</span>
     </div>
     <div className="flex items-center justify-between text-sm text-slate-500 font-medium pb-2 border-b border-dashed border-slate-300 dark:border-slate-600">
-      <button className="text-primary flex items-center gap-1 hover:underline">
-        <DollarSign size={14} /> Aplicar Descuento
-      </button>
-      <span>-$0.00</span>
+    
     </div>
     <div className="flex items-center justify-between text-xl font-extrabold text-slate-900 dark:text-slate-100 py-2">
       <span>Total</span>
