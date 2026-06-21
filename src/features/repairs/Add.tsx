@@ -330,49 +330,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                     className="w-full pl-10 pr-4 py-3 bg-muted border border-border rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm font-medium text-foreground"
                   />
                 </div>
-                {state.selectedClient ? (
-                  <div className="mt-3 border border-primary/20 rounded-xl overflow-hidden">
-                    <div className="p-3 flex items-center justify-between bg-primary/5">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
-                          {state.selectedClient.name?.charAt(0) || '?'}
-                        </div>
-                        <div>
-                          <p className="font-bold text-sm text-foreground">{state.selectedClient.name}</p>
-                          <p className="text-xs text-muted-foreground">{state.selectedClient.phone} • {state.selectedClient.email}</p>
-                        </div>
-                      </div>
-                      <Button variant="ghost" size="sm" onClick={() => applyUpdate({ selectedClient: null })}>
-                        Cambiar
-                      </Button>
-                    </div>
-                  </div>
-                ) : filteredClients.length > 0 ? (
-                  <div className="mt-3 border border-border rounded-xl overflow-hidden divide-y divide-border">
-                    {filteredClients.map((client) => (
-                      <div key={client.id} className="p-3 flex items-center justify-between hover:bg-muted transition-colors">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold text-xs">
-                            {client.name?.substring(0, 2).toUpperCase() || '??'}
-                          </div>
-                          <div>
-                            <p className="font-bold text-sm text-foreground">{client.name}</p>
-                            <p className="text-xs text-muted-foreground">{client.phone} • {client.email}</p>
-                          </div>
-                        </div>
-                        <Button size="sm" onClick={() => applyUpdate({ selectedClient: client })}>
-                          Seleccionar
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="mt-3 text-center py-6 text-muted-foreground">
-                    <Search className="w-10 h-10 mx-auto mb-2 text-muted-foreground/30" />
-                    <p className="font-medium text-sm">No hay clientes registrados</p>
-                    <p className="text-xs">Agrega un nuevo cliente para comenzar</p>
-                  </div>
-                )}
+             
               </CardContent>
             </Card>
 
@@ -445,15 +403,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                     </label>
                     <div className="flex flex-wrap gap-2">
                       
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleGenerateSerial}
-                        className="text-xs whitespace-nowrap"
-                      >
-                        <Hash size={14} className="mr-1" />
-                        
-                      </Button>
+                      
                       <input
                         type="text"
                         value={state.serial}
