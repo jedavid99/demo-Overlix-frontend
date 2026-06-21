@@ -1,24 +1,38 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, Filter, Plus, Minus, CreditCard, DollarSign, ShoppingCart, ChevronRight } from 'lucide-react'
+import axios from 'axios'
 
-type CatalogItem = { id: string; title: string; price: number; stock?: number; img?: string; badge?: string }
+type CatalogItem = { id: string; name: string; price: number; stock?: number; category?: string }
 
-const CATALOG: CatalogItem[] = [
-  { id: 'p1', title: 'iPhone 13 Pro Screen', price: 120, stock: 12, img: '' },
-  { id: 's1', title: 'Labor: Screen Repair', price: 60, badge: 'Service' },
-  { id: 'p2', title: 'Samsung S22 Battery', price: 45, stock: 5, img: '' },
-  { id: 'p3', title: 'Tempered Glass Protector', price: 15, stock: 50, img: '' },
-  { id: 'p4', title: 'Anker USB-C Cable 6ft', price: 19.99, stock: 22, img: '' },
-]
+const API_URL = 'https://overlix-demo-backend-production.up.railway.app/api'
 
 export default function SaleAdd() {
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [selectedCustomer, setSelectedCustomer] = useState('Walk-in Customer')
-  const [items, setItems] = useState<{ item: CatalogItem; qty: number }[]>([ { item: CATALOG[0], qty: 1 }, { item: CATALOG[1], qty: 1 } ])
+  const [catalog, setCatalog] = useState<CatalogItem[]>([])
+  const [items, setItems] = useState<{ item: CatalogItem; qty: number }[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
-  const filtered = useMemo(() => CATALOG.filter(c => c.title.toLowerCase().includes(query.toLowerCase())), [query])
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const token = localStorage.getItem('access_token')
+        const response = await axios.get(`${API_URL}/products`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        setCatalog(response.data)
+      } catch (error) {
+        console.error('Error loading products:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchProducts()
+  }, [])
+
+  const filtered = useMemo(() => catalog.filter(c => c.name.toLowerCase().includes(query.toLowerCase())), [query, catalog])
 
   const addItem = (it: CatalogItem) => {
     setItems(prev => {
@@ -80,20 +94,26 @@ export default function SaleAdd() {
           </div>
 
           <div className="flex-1 overflow-y-auto p-4">
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filtered.map(it => (
-                <button key={it.id} onClick={() => addItem(it)} className="group flex flex-col text-left p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-primary hover:shadow-md transition-all">
-                  <div className="aspect-square w-full rounded-lg bg-slate-100 dark:bg-slate-700 mb-3 flex items-center justify-center overflow-hidden">
-                    <ShoppingCart size={36} className="text-slate-500" />
-                  </div>
-                  <p className="font-bold text-sm mb-1 truncate">{it.title}</p>
-                  <div className="flex justify-between items-center">
-                    <span className="text-primary font-bold">${it.price.toFixed(2)}</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-500 font-bold uppercase tracking-tight">{it.badge ?? (it.stock ? `${it.stock} in stock` : 'Service')}</span>
-                  </div>
-                </button>
-              ))}
-            </div>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <p className="text-slate-500">Loading products...</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                {filtered.map(it => (
+                  <button key={it.id} onClick={() => addItem(it)} className="group flex flex-col text-left p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-primary hover:shadow-md transition-all">
+                    <div className="aspect-square w-full rounded-lg bg-slate-100 dark:bg-slate-700 mb-3 flex items-center justify-center overflow-hidden">
+                      <ShoppingCart size={36} className="text-slate-500" />
+                    </div>
+                    <p className="font-bold text-sm mb-1 truncate">{it.name}</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-primary font-bold">${it.price.toFixed(2)}</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-500 font-bold uppercase tracking-tight">{it.category || (it.stock ? `${it.stock} in stock` : 'Service')}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
@@ -124,7 +144,7 @@ export default function SaleAdd() {
                 </div>
                 <div className="flex-1">
                   <div className="flex justify-between mb-0.5">
-                    <p className="text-sm font-bold">{p.item.title}</p>
+                    <p className="text-sm font-bold">{p.item.name}</p>
                     <p className="text-sm font-bold">${(p.item.price).toFixed(2)}</p>
                   </div>
                   <div className="flex items-center justify-between">
