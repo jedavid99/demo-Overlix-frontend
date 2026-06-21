@@ -13,10 +13,6 @@ import {
   AlertCircle,
   Info,
   Check,
-  Battery,
-  Fingerprint,
-  Eye,
-  Zap,
 } from 'lucide-react';
 import { MdCheck, MdBuild } from 'react-icons/md';
 import type { RepairData } from './RepairFlow';
@@ -42,16 +38,16 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     priority: 'Normal',
     estimatedDays: 3,
     hardwareChecks: {
-      power: false,
-      display: false,
+      power: true,
+      display: true,
       wifi: false,
-      bluetooth: false,
-      cameras: false,
-      audio: false,
+      bluetooth: true,
+      cameras: true,
+      audio: true,
     },
     securityType: 'pin',
-    accessPin: '',
-    patternDots: [false, false, false, false, false, false, false, false, false],
+    accessPin: '920431',
+    patternDots: [true, false, false, true, true, false, false, false, true],
     patternSequence: [],
     technicianNotes: '',
     termsAccepted: false,
@@ -65,32 +61,21 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     if (updateData) updateData(updates);
     else setLocalData(prev => ({ ...prev, ...updates }));
   };
-
   const hardwareItems = [
-    { key: 'botonpawer', label: 'Botón de Power', icon: Power },
-    { key: 'botonvolumen', label: 'Botón de Volumen', icon: Volume2 },
-    { key: 'sensorproximidad', label: 'Sensor de Proximidad', icon: Eye },
-    { key: 'camarafrontal', label: 'Cámara Frontal', icon: Camera },
-    { key: 'modulo', label: 'Módulo', icon: MonitorPlay },
+    { key: 'power', label: 'Power', icon: Power },
+    { key: 'display', label: 'Display', icon: MonitorPlay },
     { key: 'wifi', label: 'WiFi', icon: Wifi },
-    { key: 'huella', label: 'Huella', icon: Fingerprint },
-    { key: 'camaratraser', label: 'Cámara Trasera', icon: Camera },
+    { key: 'bluetooth', label: 'Bluetooth', icon: Bluetooth },
+    { key: 'cameras', label: 'Cameras', icon: Camera },
     { key: 'audio', label: 'Audio', icon: Volume2 },
-    { key: 'altavoz', label: 'Altavoz', icon: Volume2 },
-    { key: 'fichaCarga', label: 'Ficha de Carga', icon: Zap },
-    { key: 'bateria', label: 'Batería', icon: Battery },
   ];
 
   const handleHardwareToggle = (key: string) => {
-    // Solo actualiza si la clave existe en hardwareChecks
-    if (key in state.hardwareChecks) {
-      const updated = { ...state.hardwareChecks };
-      updated[key as keyof typeof state.hardwareChecks] = !updated[key as keyof typeof state.hardwareChecks];
-      applyUpdate({ hardwareChecks: updated });
-    }
+    const updated = { ...state.hardwareChecks };
+    updated[key as keyof typeof state.hardwareChecks] = !updated[key as keyof typeof state.hardwareChecks];
+    applyUpdate({ hardwareChecks: updated });
   };
 
-  // Contador de funcionales (solo las claves que existen en el estado)
   const functionalCount = Object.values(state.hardwareChecks).filter(Boolean).length;
 
   // Pattern drawing helpers
@@ -106,15 +91,18 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     seqRef.current = state.patternSequence ? [...state.patternSequence] : [];
   }, [state.patternDots, state.patternSequence]);
 
+  // Calculate dot positions and draw canvas
   useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Clear canvas
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    // Calculate positions (3x3 grid centered in canvas)
     const startX = 35;
     const startY = 35;
     const spacing = 93;
@@ -128,6 +116,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
       });
     }
 
+    // Draw lines between connected dots
     if (seqRef.current.length > 1) {
       ctx.strokeStyle = '#3B82F6';
       ctx.lineWidth = 3;
@@ -235,14 +224,13 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                 <div className="bg-blue-100 text-blue-600 p-2 rounded-xl">
                   <CheckCircle2 size={20} />
                 </div>
-                <h2 className="text-lg font-bold text-slate-900">Chequeo rápido</h2>
+                <h2 className="text-lg font-bold text-slate-900">Chequeo rapido </h2>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
                 {hardwareItems.map((item) => {
                   const Icon = item.icon;
-                  // Verificamos si la clave existe en el estado
-                  const isChecked = state.hardwareChecks[item.key as keyof typeof state.hardwareChecks] ?? false;
+                  const isChecked = state.hardwareChecks[item.key as keyof typeof state.hardwareChecks];
 
                   return (
                     <div
@@ -252,7 +240,9 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                       <div className="flex items-center gap-3">
                         <Icon
                           size={18}
-                          className={`${isChecked ? 'text-blue-600' : 'text-slate-400'}`}
+                          className={`${
+                            isChecked ? 'text-blue-600' : 'text-slate-400'
+                          }`}
                         />
                         <span className="text-sm font-bold text-slate-700">
                           {item.label}
@@ -293,16 +283,16 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                   <div className="bg-amber-100 text-amber-600 p-2 rounded-xl">
                     <Lock size={20} />
                   </div>
-                  <h2 className="text-lg font-bold text-slate-900">Seguridad y Acceso</h2>
+                  <h2 className="text-lg font-bold text-slate-900">Security & Access</h2>
                 </div>
 
                 <div className="space-y-6">
                   {/* Security Type Selector */}
                   <div className="flex p-1 bg-slate-100 rounded-xl">
                     {[
-                      { id: 'ninguno', label: 'Ninguno' },
-                      { id: 'pin', label: 'PIN' },
-                      { id: 'Patron', label: 'Patrón' },
+                      { id: 'none', label: 'None' },
+                      { id: 'pin', label: 'PIN/Pass' },
+                      { id: 'pattern', label: 'Pattern' },
                     ].map((type) => (
                       <button
                         key={type.id}
@@ -323,7 +313,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                       {state.securityType === 'pin' && (
                         <div>
                           <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
-                            PIN / Clave
+                            Access PIN / Password
                           </label>
                           <div className="relative">
                             <input
@@ -340,13 +330,14 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                           </div>
                         </div>
                       )}
-                      {state.securityType === 'Patron' && (
+                      {state.securityType === 'pattern' && (
                         <div>
                           <p className="text-[10px] font-bold text-slate-400 uppercase mb-4">
-                            Patrón de Bloqueo - Arrastra para dibujar
+                            Pattern Lock Visualization - Arrastra para dibujar
                           </p>
                           <div className="flex flex-col items-center gap-4">
                             <div className="relative bg-white p-8 rounded-3xl border-2 border-blue-200 shadow-md" style={{ width: '280px', height: '280px' }}>
+                              {/* Canvas for drawing lines */}
                               <canvas
                                 ref={canvasRef}
                                 width={280}
@@ -354,11 +345,13 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                                 className="absolute inset-0 rounded-3xl"
                                 style={{ cursor: 'crosshair' }}
                               />
+                              {/* Grid of dots */}
                               <div className="absolute inset-8 grid grid-cols-3 gap-6 pointer-events-none">
                                 {localDots.map((_, idx) => (
                                   <div key={idx} className="w-full h-full" />
                                 ))}
                               </div>
+                              {/* Dot buttons */}
                               <div className="absolute inset-8 grid grid-cols-3 gap-6">
                                 {localDots.map((active, idx) => (
                                   <button
@@ -367,7 +360,9 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                                     onPointerEnter={() => enterDot(idx)}
                                     onPointerUp={(e) => endDraw(e)}
                                     onPointerCancel={() => endDraw()}
-                                    onPointerLeave={() => {}}
+                                    onPointerLeave={() => {
+                                      // Permite movimiento fuera pero no termina
+                                    }}
                                     className={`rounded-full transition-all transform touch-none select-none cursor-pointer relative z-10 ${
                                       active
                                         ? 'bg-blue-600 shadow-lg shadow-blue-300 scale-110'
@@ -383,12 +378,14 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                               </div>
                             </div>
                             
+                            {/* Sequence display */}
                             {seqRef.current.length > 0 && (
                               <div className="text-sm text-slate-700 bg-blue-50 px-4 py-2 rounded-lg border border-blue-100">
                                 <span className="font-semibold">Secuencia dibujada:</span> {seqRef.current.map(n => n + 1).join(' → ')}
                               </div>
                             )}
                             
+                            {/* Clear button */}
                             <button 
                               onClick={clearPattern} 
                               className="text-sm text-blue-600 hover:text-blue-700 hover:underline font-bold transition-colors"
@@ -409,18 +406,18 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                   <div className="bg-emerald-100 text-emerald-600 p-2 rounded-xl">
                     <AlertCircle size={20} />
                   </div>
-                  <h2 className="text-lg font-bold text-slate-900">Diagnóstico Interno</h2>
+                  <h2 className="text-lg font-bold text-slate-900">Internal Diagnosis</h2>
                 </div>
 
                 <div className="space-y-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
-                      Notas del Técnico
+                      Technician Notes
                     </label>
                     <textarea
                       value={state.technicianNotes}
                       onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => applyUpdate({ technicianNotes: e.target.value })}
-                      placeholder="Introduce los hallazgos preliminares, indicadores de humedad, observaciones de daño interno..."
+                      placeholder="Enter preliminary findings, moisture indicators, internal damage observations..."
                       rows={8}
                       className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-600 transition-all text-slate-900"
                     />
@@ -429,7 +426,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                   <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 p-3 rounded-xl border border-emerald-100">
                     <Check size={20} />
                     <span className="text-xs font-semibold">
-                      Listo para selección de piezas y revisión final
+                      Ready for part selection & final review
                     </span>
                   </div>
                 </div>
@@ -437,19 +434,19 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
             </div>
 
             {/* Navigation Buttons */}
-            <div className="flex items-center justify-between pt-4">
+              <div className="flex items-center justify-between pt-4">
               <button
                 onClick={onBack}
                 className="px-6 py-3 border border-slate-200 text-slate-600 font-bold rounded-2xl hover:bg-slate-50 transition-colors flex items-center gap-2"
               >
                 <ArrowLeft size={18} />
-                Volver a Información del Cliente
+                Back to Client Info
               </button>
               <button
                 onClick={onNext}
                 className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-200 transition-all flex items-center gap-2 group"
               >
-                Siguiente Paso: Revisión Final
+                Next Step: Final Review
                 <ArrowRight
                   size={18}
                   className="group-hover:translate-x-1 transition-transform"
@@ -466,9 +463,9 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16"></div>
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-8">
-                    <h3 className="font-bold text-lg">Resumen del Ticket</h3>
+                    <h3 className="font-bold text-lg">Ticket Summary</h3>
                     <span className="text-[10px] font-bold bg-blue-600/30 text-blue-300 px-2 py-1 rounded uppercase tracking-widest">
-                      En Progreso
+                      In Progress
                     </span>
                   </div>
 
@@ -486,7 +483,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase">
-                          Cliente
+                          Customer
                         </p>
                         <p className="font-semibold text-sm">{state.selectedClient?.name || 'N/A'}</p>
                         <p className="text-xs text-slate-400">{state.selectedClient?.phone || ''}</p>
@@ -506,7 +503,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase">
-                          Información del Dispositivo
+                          Device Info
                         </p>
                         <p className="font-semibold text-sm">
                           {state.brand && state.model ? `${state.brand} ${state.model}` : 'N/A'}
@@ -517,24 +514,22 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                       </div>
                     </div>
 
-                    {/* Pre-Check Status - CORREGIDO */}
+                    {/* Pre-Check Status */}
                     <div className="flex items-start gap-3">
                       <div className="bg-white/10 p-2 rounded-lg">
                         <AlertCircle size={18} className="text-blue-400" />
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase">
-                          Estado de Pre-Check
+                          Pre-Check Status
                         </p>
                         <p className="font-semibold text-sm text-green-400">
-                          {functionalCount} módulo{functionalCount !== 1 ? 's' : ''} funcionales
+                          {functionalCount}/6 Functional
                         </p>
                         <p className="text-xs text-slate-400">
-                          {functionalCount === 0
-                            ? 'Ningún módulo reportado como funcional'
-                            : functionalCount === 1
-                            ? '1 módulo funcional'
-                            : `${functionalCount} módulos funcionales`}
+                          {functionalCount === 6
+                            ? 'All systems operational'
+                            : `${6 - functionalCount} module${6 - functionalCount > 1 ? 's' : ''} faulty`}
                         </p>
                       </div>
                     </div>
@@ -542,16 +537,16 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                     {/* Budget */}
                     <div className="pt-6 border-t border-white/10">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-slate-400 text-sm">Tarifa de Servicio</span>
-                        <span className="font-bold text-sm">$0.00</span>
+                        <span className="text-slate-400 text-sm">Service Fee</span>
+                        <span className="font-bold text-sm">$</span>
                       </div>
                       <div className="flex items-center justify-between mb-4">
-                        <span className="text-slate-400 text-sm">Partes Estimadas</span>
-                        <span className="font-bold text-sm">$0.00</span>
+                        <span className="text-slate-400 text-sm">Estimated Parts</span>
+                        <span className="font-bold text-sm">$</span>
                       </div>
                       <div className="flex items-center justify-between text-xl font-bold pt-4 border-t border-white/20">
                         <span>Subtotal</span>
-                        <span className="text-blue-400">$0.00</span>
+                        <span className="text-blue-400">$</span>
                       </div>
                     </div>
                   </div>
@@ -562,14 +557,14 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
               <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
                 <div className="flex items-center gap-2 mb-4">
                   <Info size={18} className="text-blue-600" />
-                  <span className="text-xs font-bold text-slate-600">Ayuda del Proceso</span>
+                  <span className="text-xs font-bold text-slate-600">Process Help</span>
                 </div>
                 <p className="text-xs text-slate-500 leading-relaxed">
-                  Completa el diagnóstico técnico para generar el presupuesto final.
-                  Todas las pruebas de hardware son obligatorias para la validación de la garantía.
+                  Complete the technical diagnosis to generate the final repair quote.
+                  All hardware tests are mandatory for warranty validation.
                 </p>
                 <p className="text-[10px] text-slate-400 mt-4 italic">
-                  Borrador actualizado a las 10:48 AM
+                  Draft last updated at 10:48 AM
                 </p>
               </div>
             </div>
@@ -579,3 +574,5 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     </div>
   );
 }
+
+
