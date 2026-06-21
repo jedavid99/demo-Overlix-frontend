@@ -54,7 +54,7 @@ export default function Sales() {
               <Badge variant="success" size="sm">+12.5%</Badge>
             </div>
             <p className="text-sm text-muted-foreground">Ingresos diarios</p>
-            <p className="text-3xl font-bold text-foreground">$1,240.00</p>
+            <p className="text-3xl font-bold text-foreground">$</p>
           </CardContent>
         </Card>
 
@@ -64,10 +64,10 @@ export default function Sales() {
               <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
                 <ShoppingCart className="h-5 w-5 text-primary" />
               </div>
-              <Badge variant="success" size="sm">+5%</Badge>
+              <Badge variant="success" size="sm">%</Badge>
             </div>
             <p className="text-sm text-muted-foreground">Ventas hoy</p>
-            <p className="text-3xl font-bold text-foreground">14</p>
+            <p className="text-3xl font-bold text-foreground"></p>
           </CardContent>
         </Card>
 
@@ -77,10 +77,10 @@ export default function Sales() {
               <div className="h-8 w-8 rounded-lg bg-orange-500/10 flex items-center justify-center">
                 <TrendingDown className="h-5 w-5 text-orange-500" />
               </div>
-              <Badge variant="destructive" size="sm">-2.1%</Badge>
+              <Badge variant="destructive" size="sm">%</Badge>
             </div>
             <p className="text-sm text-muted-foreground">Promedio</p>
-            <p className="text-3xl font-bold text-foreground">$88.57</p>
+            <p className="text-3xl font-bold text-foreground">$</p>
           </CardContent>
         </Card>
 
@@ -90,7 +90,7 @@ export default function Sales() {
               <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Package className="h-5 w-5 text-primary" />
               </div>
-              <Badge variant="secondary" size="sm">8 activas</Badge>
+              <Badge variant="secondary" size="sm"></Badge>
             </div>
             <p className="text-sm text-muted-foreground">Servicios pendientes</p>
             <p className="text-3xl font-bold text-foreground">8</p>
