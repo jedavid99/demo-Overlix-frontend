@@ -232,29 +232,16 @@ export default function SaleAdd() {
     </div>
 
     {/* Métodos de pago */}
-    <div className="grid grid-cols-3 gap-2 pt-2">
-      <button className="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:border-primary hover:text-primary transition-all">
-        <span className="mb-1"><CreditCard size={18} /></span>
-        <span className="text-[10px] font-bold uppercase tracking-wider">Tarjeta</span>
-      </button>
-      <button className="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:border-primary hover:text-primary transition-all">
-        <span className="mb-1">💵</span>
-        <span className="text-[10px] font-bold uppercase tracking-wider">Efectivo</span>
-      </button>
-      <button className="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:border-primary hover:text-primary transition-all">
-        <span className="mb-1">🔀</span>
-        <span className="text-[10px] font-bold uppercase tracking-wider">Dividir</span>
-      </button>
-    </div>
-
-    {/* Botón principal con mucho más espacio */}
-    <button
+  
+ <button
       onClick={() => navigate('/sales')}
       className="w-full mt-6 py-5 bg-primary text-white rounded-xl font-bold text-lg hover:bg-primary/90 shadow-xl shadow-primary/30 transition-all flex items-center justify-center gap-2"
     >
       Completar Transacción
       <ChevronRight size={20} />
     </button>
+    {/* Botón principal con mucho más espacio */}
+   
   </div>
 </section>
       </div>
