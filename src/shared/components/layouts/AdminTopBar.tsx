@@ -199,7 +199,7 @@ export const AdminTopBar = ({
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-destructive cursor-pointer">
-              Cerrar sesión
+              Cerrar sesiónSS
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
