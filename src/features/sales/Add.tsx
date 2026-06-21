@@ -73,9 +73,7 @@ export default function SaleAdd() {
           >
             Volver a Ventas
           </button>
-          <button className="px-4 py-2 rounded-lg bg-primary text-white font-bold">
-            Item Personalizado
-          </button>
+         
         </div>
       </div>
 
@@ -233,7 +231,7 @@ export default function SaleAdd() {
             )}
           </div>
 
-          {/* Totales y acciones */}
+          
           <div className="p-4 pb-6 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 space-y-3">
   {/* Totales */}
   <div className="flex items-center justify-between text-sm text-slate-500 font-medium">
