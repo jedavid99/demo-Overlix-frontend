@@ -68,6 +68,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     { key: 'bluetooth', label: 'Bluetooth', icon: Bluetooth },
     { key: 'cameras', label: 'Cameras', icon: Camera },
     { key: 'audio', label: 'Audio', icon: Volume2 },
+    {key: 'frontarcamara', label: 'Cámara frontal', icon: Camera },
   ];
 
   const handleHardwareToggle = (key: string) => {
