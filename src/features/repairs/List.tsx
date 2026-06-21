@@ -77,10 +77,10 @@ export default function RepairsList() {
                 <Clock className="h-5 w-5 text-primary" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-foreground mb-2">24</p>
+            <p className="text-3xl font-bold text-foreground mb-2"></p>
             <div className="flex items-center gap-1 text-green-600 text-sm mt-2">
               <TrendingUp size={16} />
-              <span>+12% vs ayer</span>
+              <span>% vs ayer</span>
             </div>
           </CardContent>
         </Card>
@@ -93,9 +93,9 @@ export default function RepairsList() {
                 <AlertCircle className="h-5 w-5 text-orange-500" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-foreground mb-2">7</p>
+            <p className="text-3xl font-bold text-foreground mb-2"></p>
             <div className="flex items-center gap-1 text-red-500 text-sm mt-2">
-              <span>+2 en 24h</span>
+              <span>% en 24h</span>
             </div>
           </CardContent>
         </Card>
@@ -108,9 +108,9 @@ export default function RepairsList() {
                 <CheckCircle className="h-5 w-5 text-green-600" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-foreground mb-2">15</p>
+            <p className="text-3xl font-bold text-foreground mb-2"></p>
             <div className="flex items-center gap-1 text-muted-foreground text-sm mt-2">
-              <span>Listos para cerrar</span>
+              <span>% listos para cerrar</span>
             </div>
           </CardContent>
         </Card>
@@ -123,10 +123,10 @@ export default function RepairsList() {
                 <DollarSign className="h-5 w-5 text-primary" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-foreground mb-2">$4,280</p>
+            <p className="text-3xl font-bold text-foreground mb-2"></p>
             <div className="flex items-center gap-1 text-green-600 text-sm mt-2">
               <TrendingUp size={16} />
-              <span>+8%</span>
+              <span>%</span>
             </div>
           </CardContent>
         </Card>
