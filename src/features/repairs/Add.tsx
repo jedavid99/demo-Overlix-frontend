@@ -494,13 +494,13 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200"
+                  className="bg-card rounded-2xl p-4 shadow-sm border border-border"
                 >
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="bg-blue-100 text-blue-600 p-2 rounded-xl">
+                    <div className="bg-primary/10 text-primary p-2 rounded-xl">
                       <CheckCircle2 size={18} />
                     </div>
-                    <h2 className="text-base font-bold text-slate-900">Chequeo rápido de hardware</h2>
+                    <h2 className="text-base font-bold text-foreground">Chequeo rápido de hardware</h2>
                     <Badge variant="outline" className="ml-auto text-xs">{functionalCount}/{currentHardwareItems.length} funcionales</Badge>
                   </div>
 
@@ -511,7 +511,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                       return (
                         <div
                           key={item.key}
-                          className="flex items-center justify-between p-2 bg-slate-50 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors"
+                          className="flex items-center justify-between p-2 bg-muted rounded-xl border border-slate-100 hover:border-slate-200 transition-colors"
                         >
                           <div className="flex items-center gap-2">
                             <Icon size={16} className={isChecked ? 'text-blue-600' : 'text-slate-400'} />
@@ -549,13 +549,13 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200"
+                  className="bg-card rounded-2xl p-4 shadow-sm border border-border"
                 >
                   <div className="flex items-center gap-3 mb-4">
                     <div className="bg-amber-100 text-amber-600 p-2 rounded-xl">
                       <Lock size={18} />
                     </div>
-                    <h2 className="text-base font-bold text-slate-900">Seguridad y Acceso</h2>
+                    <h2 className="text-base font-bold text-foreground">Seguridad y Acceso</h2>
                   </div>
 
                   <div className="flex gap-2 mb-4">
@@ -590,7 +590,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                           value={state.accessPin}
                           onChange={(e) => applyUpdate({ accessPin: e.target.value })}
                           placeholder="••••••"
-                          className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-4 focus:ring-blue-100 focus:border-blue-600 transition-all font-mono text-sm text-slate-900"
+                          className="w-full pl-8 pr-3 py-2 bg-muted border border-slate-200 rounded-lg focus:ring-4 focus:ring-blue-100 focus:border-blue-600 transition-all font-mono text-sm text-foreground"
                         />
                         <Lock size={16} className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400" />
                       </div>
@@ -860,7 +860,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
               </Card>
 
               {/* Ayuda */}
-              <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
+              <div className="bg-card rounded-2xl p-4 shadow-sm border border-border">
                 <div className="flex items-center gap-2 mb-2">
                   <Info size={16} className="text-blue-600" />
                   <span className="text-xs font-bold text-slate-600">Ayuda</span>
@@ -876,3 +876,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
     </motion.div>
   );
 }
+
+
+
+
