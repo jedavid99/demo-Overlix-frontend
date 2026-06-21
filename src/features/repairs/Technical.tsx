@@ -539,7 +539,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                         <p className="text-xs text-slate-400">
                           {functionalCount === 12
                             ? 'Todos los sistemas operativos'
-                            : `${12 - functionalCount} módulo${12 - functionalCount > 1 ? 's' : ''} defectuoso`}
+                            : `${12 - functionalCount} módulo${12 - functionalCount > 0 ? 's' : ''} defectuoso`}
                         </p>
                       </div>
                     </div>
