@@ -212,7 +212,7 @@ export const AdminSidebar = ({
 
   const handleLogout = () => {
     // Limpiar sesión aquí si es necesario
-    navigate('/login')
+    navigate('/')
   }
 
   // Auto-expandir secciones basado en la ruta actual
@@ -409,7 +409,7 @@ export const AdminSidebar = ({
             >
               <LogOut size={18} className="h-5 w-5 flex items-center justify-center shrink-0" />
               {!collapsed && (
-                <span className="flex-1 text-left">Cerrar SSSsesión</span>
+                <span className="flex-1 text-left">Cerrar sesión</span>
               )}
             </button>
           </div>
