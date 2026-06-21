@@ -224,7 +224,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                 <div className="bg-blue-100 text-blue-600 p-2 rounded-xl">
                   <CheckCircle2 size={20} />
                 </div>
-                <h2 className="text-lg font-bold text-slate-900">Hardware & Software Check</h2>
+                <h2 className="text-lg font-bold text-slate-900">Chequeo rapido </h2>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
@@ -538,15 +538,15 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                     <div className="pt-6 border-t border-white/10">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-slate-400 text-sm">Service Fee</span>
-                        <span className="font-bold text-sm">$85.00</span>
+                        <span className="font-bold text-sm">$</span>
                       </div>
                       <div className="flex items-center justify-between mb-4">
                         <span className="text-slate-400 text-sm">Estimated Parts</span>
-                        <span className="font-bold text-sm">$210.00</span>
+                        <span className="font-bold text-sm">$</span>
                       </div>
                       <div className="flex items-center justify-between text-xl font-bold pt-4 border-t border-white/20">
                         <span>Subtotal</span>
-                        <span className="text-blue-400">$295.00</span>
+                        <span className="text-blue-400">$</span>
                       </div>
                     </div>
                   </div>
