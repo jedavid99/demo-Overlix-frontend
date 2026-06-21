@@ -93,7 +93,7 @@ export default function Sales() {
               <Badge variant="secondary" size="sm"></Badge>
             </div>
             <p className="text-sm text-muted-foreground">Servicios pendientes</p>
-            <p className="text-3xl font-bold text-foreground">8</p>
+            <p className="text-3xl font-bold text-foreground"></p>
           </CardContent>
         </Card>
       </div>

@@ -147,10 +147,10 @@ export default function InvoicesList() {
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total facturado</p>
               <Wallet className="h-5 w-5 text-primary" />
             </div>
-            <p className="text-3xl font-bold text-foreground">${totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
+            <p className="text-3xl font-bold text-foreground">$</p>
             <div className="flex items-center gap-1 text-green-600 text-sm mt-2">
               <TrendingUp size={16} />
-              <span>+12.5% vs mes anterior</span>
+              <span>% vs mes anterior</span>
             </div>
           </CardContent>
         </Card>
@@ -161,7 +161,7 @@ export default function InvoicesList() {
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pendientes</p>
               <Clock className="h-5 w-5 text-orange-500" />
             </div>
-            <p className="text-3xl font-bold text-foreground">{pendingCount}</p>
+            <p className="text-3xl font-bold text-foreground"></p>
             <p className="text-sm text-muted-foreground mt-2">Requieren acción ARCA</p>
           </CardContent>
         </Card>
@@ -172,8 +172,8 @@ export default function InvoicesList() {
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Saldo pendiente</p>
               <Wallet className="h-5 w-5 text-primary" />
             </div>
-            <p className="text-3xl font-bold text-foreground">${unpaidAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</p>
-            <p className="text-sm text-muted-foreground mt-2">14 facturas sin pagar</p>
+            <p className="text-3xl font-bold text-foreground">$</p>
+            <p className="text-sm text-muted-foreground mt-2">facturas sin pagar</p>
           </CardContent>
         </Card>
       </div>
