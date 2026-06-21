@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Menu, Search, Bell, User, Command, PanelLeft, ChevronDown, ArrowRight, ArrowRightToLine } from 'lucide-react'
+import { Menu, Search, Bell, User, Command, PanelLeft, ChevronDown, ArrowRight, ArrowRightToLine, LogOut } from 'lucide-react'
 import { MdSearch, MdSettings, MdBarChart, MdInventory2, MdAttachMoney, MdReceipt } from 'react-icons/md'
 import { Button } from '../../../components/ui/button'
 import { Input } from '../../../components/ui/input'
@@ -30,6 +30,12 @@ const categories = [
   { value: 'reports-financial', label: 'Reporte Financiero', placeholder: 'Buscar en reporte financiero...', route: '/reports/financial', icon: <MdAttachMoney size={16} /> },
 ]
 
+  const navigate = useNavigate()
+
+const handleLogout = () => {
+    // Limpiar sesión aquí si es necesario
+    navigate('/')
+  }
 export const AdminTopBar = ({
   onMenuClick = () => {},
   onToggleCollapse = () => {},
@@ -198,9 +204,16 @@ export const AdminTopBar = ({
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive cursor-pointer">
-              Cerrar sesión
-            </DropdownMenuItem>
+             <button
+              onClick={handleLogout}
+          
+            >
+              <LogOut size={18} className="h-5 w-5 flex items-center justify-center shrink-0" />
+              
+                <span className="flex-1 text-left">Cerrar sesión</span>
+            
+            </button>
+           
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
