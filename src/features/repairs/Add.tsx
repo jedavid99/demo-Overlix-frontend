@@ -749,11 +749,11 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                           <CheckCircle2 size={16} className="text-blue-400" />
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold text-muted-foreground uppercase">Pre-Check</p>
-                          <p className="font-semibold text-sm text-success">
+                          <p className="text-[10px] font-bold text-primary-foreground uppercase">Pre-Check</p>
+                          <p className="font-semibold text-sm text-black">
                             {functionalCount}/{currentHardwareItems.length} funcionales
                           </p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-xs text-primary-foreground/80">
                             {currentHardwareItems.length - functionalCount} defectuoso{currentHardwareItems.length - functionalCount !== 1 ? 's' : ''}
                           </p>
                         </div>
