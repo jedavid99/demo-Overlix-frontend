@@ -316,16 +316,16 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                   <div className="bg-amber-100 text-amber-600 p-2 rounded-xl">
                     <Lock size={20} />
                   </div>
-                  <h2 className="text-lg font-bold text-slate-900">Security & Access</h2>
+                  <h2 className="text-lg font-bold text-slate-900">Seguridad y Acceso</h2>
                 </div>
 
                 <div className="space-y-6">
                   {/* Security Type Selector */}
                   <div className="flex p-1 bg-slate-100 rounded-xl">
                     {[
-                      { id: 'none', label: 'None' },
+                      { id: 'ninguno', label: 'ninguno' },
                       { id: 'pin', label: 'PIN/Pass' },
-                      { id: 'pattern', label: 'Pattern' },
+                      { id: 'patron', label: 'Patron' },
                     ].map((type) => (
                       <button
                         key={type.id}
@@ -341,12 +341,12 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                     ))}
                   </div>
 
-                  {state.securityType !== 'none' && (
+                  {state.securityType !== 'ninguno' && (
                     <div className="space-y-4">
                       {state.securityType === 'pin' && (
                         <div>
                           <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
-                            Access PIN / Password
+                            Accesso por PIN / Clave
                           </label>
                           <div className="relative">
                             <input
@@ -363,7 +363,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                           </div>
                         </div>
                       )}
-                      {state.securityType === 'pattern' && (
+                      {state.securityType === 'patron' && (
                         <div>
                           <p className="text-[10px] font-bold text-slate-400 uppercase mb-4">
                             Pattern Lock Visualization - Arrastra para dibujar
@@ -439,13 +439,13 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                   <div className="bg-emerald-100 text-emerald-600 p-2 rounded-xl">
                     <AlertCircle size={20} />
                   </div>
-                  <h2 className="text-lg font-bold text-slate-900">Internal Diagnosis</h2>
+                  <h2 className="text-lg font-bold text-slate-900">Diagnóstico interno</h2>
                 </div>
 
                 <div className="space-y-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
-                      Technician Notes
+                      Nota del tecnico
                     </label>
                     <textarea
                       value={state.technicianNotes}
@@ -459,7 +459,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                   <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 p-3 rounded-xl border border-emerald-100">
                     <Check size={20} />
                     <span className="text-xs font-semibold">
-                      Ready for part selection & final review
+                      Listo para seleccionar piezas y revisión final
                     </span>
                   </div>
                 </div>
@@ -473,13 +473,13 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                 className="px-6 py-3 border border-slate-200 text-slate-600 font-bold rounded-2xl hover:bg-slate-50 transition-colors flex items-center gap-2"
               >
                 <ArrowLeft size={18} />
-                Back to Client Info
+                Volver a Información del Cliente
               </button>
               <button
                 onClick={onNext}
                 className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-200 transition-all flex items-center gap-2 group"
               >
-                Next Step: Final Review
+                Siguiente: Revisión Final
                 <ArrowRight
                   size={18}
                   className="group-hover:translate-x-1 transition-transform"
@@ -496,9 +496,9 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16"></div>
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-8">
-                    <h3 className="font-bold text-lg">Ticket Summary</h3>
+                    <h3 className="font-bold text-lg">Resumen del Ticket</h3>
                     <span className="text-[10px] font-bold bg-blue-600/30 text-blue-300 px-2 py-1 rounded uppercase tracking-widest">
-                      In Progress
+                      En Progreso
                     </span>
                   </div>
 
@@ -516,7 +516,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase">
-                          Customer
+                          Cliente
                         </p>
                         <p className="font-semibold text-sm">{state.selectedClient?.name || 'N/A'}</p>
                         <p className="text-xs text-slate-400">{state.selectedClient?.phone || ''}</p>
@@ -536,7 +536,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase">
-                          Device Info
+                          Información del Dispositivo
                         </p>
                         <p className="font-semibold text-sm">
                           {state.brand && state.model ? `${state.brand} ${state.model}` : 'N/A'}
@@ -554,15 +554,15 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase">
-                          Pre-Check Status
+                          Estado de Pre-Check
                         </p>
                         <p className="font-semibold text-sm text-green-400">
-                          {functionalCount}/12 Functional
+                          {functionalCount}/13 Funcionales
                         </p>
                         <p className="text-xs text-slate-400">
-                          {functionalCount === 12
-                            ? 'All systems operational'
-                            : `${12 - functionalCount} module${12 - functionalCount > 1 ? 's' : ''} faulty`}
+                          {functionalCount === 13
+                            ? 'Todos los sistemas operativos'
+                            : `${13 - functionalCount} módulo${13 - functionalCount > 1 ? 's' : ''} defectuoso`}
                         </p>
                       </div>
                     </div>
@@ -570,11 +570,11 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                     {/* Budget */}
                     <div className="pt-6 border-t border-white/10">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-slate-400 text-sm">Service Fee</span>
+                        <span className="text-slate-400 text-sm">Tarifa de Servicio</span>
                         <span className="font-bold text-sm">$</span>
                       </div>
                       <div className="flex items-center justify-between mb-4">
-                        <span className="text-slate-400 text-sm">Estimated Parts</span>
+                        <span className="text-slate-400 text-sm">Partes Estimadas</span>
                         <span className="font-bold text-sm">$</span>
                       </div>
                       <div className="flex items-center justify-between text-xl font-bold pt-4 border-t border-white/20">
@@ -590,14 +590,14 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
               <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
                 <div className="flex items-center gap-2 mb-4">
                   <Info size={18} className="text-blue-600" />
-                  <span className="text-xs font-bold text-slate-600">Process Help</span>
+                  <span className="text-xs font-bold text-slate-600">Ayuda del Proceso</span>
                 </div>
                 <p className="text-xs text-slate-500 leading-relaxed">
-                  Complete the technical diagnosis to generate the final repair quote.
-                  All hardware tests are mandatory for warranty validation.
+                  Complete el diagnóstico técnico para generar la cotización final del reparación.
+                  Todas las pruebas de hardware son obligatorias para la validación de garantía.
                 </p>
                 <p className="text-[10px] text-slate-400 mt-4 italic">
-                  Draft last updated at 10:48 AM
+                  Borrador actualizado por última vez a las 10:48 AM
                 </p>
               </div>
             </div>
