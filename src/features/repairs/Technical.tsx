@@ -67,14 +67,14 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
   };
 
   const hardwareItems = [
-    { key: 'BotonPawer', label: 'Botón de Power', icon: Power },
-    { key: 'BotonVolumen', label: 'Botón de Volumen', icon: Volume2 },
-    { key: 'sensorProximidad', label: 'Sensor de Proximidad', icon: Eye },
-    { key: 'camaraFrontal', label: 'Cámara Frontal', icon: Camera },
-    { key: 'Modulo', label: 'Módulo', icon: MonitorPlay },
+    { key: 'botonpawer', label: 'Botón de Power', icon: Power },
+    { key: 'botonvolumen', label: 'Botón de Volumen', icon: Volume2 },
+    { key: 'sensorproximidad', label: 'Sensor de Proximidad', icon: Eye },
+    { key: 'camarafrontal', label: 'Cámara Frontal', icon: Camera },
+    { key: 'modulo', label: 'Módulo', icon: MonitorPlay },
     { key: 'wifi', label: 'WiFi', icon: Wifi },
-    { key: 'Huella', label: 'Huella', icon: Fingerprint },
-    { key: 'camaraTrasera', label: 'Cámara Trasera', icon: Camera },
+    { key: 'huella', label: 'Huella', icon: Fingerprint },
+    { key: 'camaratraser', label: 'Cámara Trasera', icon: Camera },
     { key: 'audio', label: 'Audio', icon: Volume2 },
     { key: 'altavoz', label: 'Altavoz', icon: Volume2 },
     { key: 'fichaCarga', label: 'Ficha de Carga', icon: Zap },
