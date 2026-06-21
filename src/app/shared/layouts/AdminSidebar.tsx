@@ -212,7 +212,7 @@ export const AdminSidebar = ({
 
   const handleLogout = () => {
     // Limpiar sesión aquí si es necesario
-    navigate('/login')
+    navigate('/')
   }
 
   // Auto-expandir secciones basado en la ruta actual
