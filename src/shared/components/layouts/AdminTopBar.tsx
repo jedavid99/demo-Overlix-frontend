@@ -29,12 +29,7 @@ const categories = [
   { value: 'reports-stock', label: 'Reporte Stock', placeholder: 'Buscar en reporte de stock...', route: '/reports/stock', icon: <MdInventory2 size={16} /> },
   { value: 'reports-financial', label: 'Reporte Financiero', placeholder: 'Buscar en reporte financiero...', route: '/reports/financial', icon: <MdAttachMoney size={16} /> },
 ]
-  const navigate = useNavigate()
 
- const handleLogout = () => {
-    // Limpiar sesión aquí si es necesario
-    navigate('/')
-  }
 export const AdminTopBar = ({
   onMenuClick = () => {},
   onToggleCollapse = () => {},
@@ -50,7 +45,7 @@ export const AdminTopBar = ({
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const searchInputRef = useRef<HTMLInputElement>(null)
-  
+  const navigate = useNavigate()
 
   const currentCategory = categories.find(cat => cat.value === selectedCategory) || categories[0]
 
@@ -203,10 +198,9 @@ export const AdminTopBar = ({
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <a  onClick={handleLogout}
- className="text-destructive cursor-pointer">
+            <DropdownMenuItem className="text-destructive cursor-pointer">
               Cerrar sesión
-            </a>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
