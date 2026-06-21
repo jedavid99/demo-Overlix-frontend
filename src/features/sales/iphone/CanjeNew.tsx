@@ -120,34 +120,58 @@ export default function CanjeNew() {
               <div className="space-y-6">
                 {/* Device Selection */}
                 <Card>
-                  <CardContent className="p-8">
-                    <div className="flex items-center gap-3 mb-8">
-                      <ShoppingBag className="text-primary p-2 bg-primary/10 rounded-lg w-8 h-8" />
-                      <h2 className="text-xl font-bold text-foreground">Seleccione su Dispositivo de Canje</h2>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                      {availableDevices.map(dev => (
-                        <Button
-                          key={dev.id}
-                          variant={selectedDeviceId === dev.id ? 'default' : 'outline'}
-                          onClick={() => {
-                            setSelectedDeviceId(dev.id)
-                            setDevice({ model: dev.name, storage: dev.storage, battery: 88 })
-                          }}
-                          className="h-auto py-4 flex-col gap-2"
-                        >
-                          <Smartphone className="w-8 h-8" />
-                          <h4 className="font-bold text-sm text-center">{dev.name}</h4>
-                          <p className="text-xs text-muted-foreground">{dev.storage}</p>
-                          <div className="text-lg font-black">${dev.basePrice}</div>
-                          {selectedDeviceId === dev.id && (
-                            <Badge variant="secondary" className="mt-2">SELECCIONADO</Badge>
-                          )}
-                        </Button>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+      <CardContent className="p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <ShoppingBag className="text-primary p-2 bg-primary/10 rounded-lg w-8 h-8" />
+          <h2 className="text-xl font-bold text-foreground">Seleccione su Dispositivo de Canje</h2>
+        </div>
+
+        {/* Buscador (opcional, mejora UX) */}
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Buscar modelo, almacenamiento..."
+            className="w-full px-4 py-2 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/20"
+          />
+        </div>
+
+        {availableDevices.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">
+            <Smartphone className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
+            <p className="font-medium">No hay dispositivos disponibles</p>
+            <p className="text-sm">Agrega dispositivos desde el panel de administración</p>
+          </div>
+        ) : (
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
+            {availableDevices.map(dev => (
+              <div
+                key={dev.id}
+                onClick={() => {
+                  setSelectedDeviceId(dev.id)
+                  setDevice({ model: dev.name, storage: dev.storage, battery: 88 })
+                }}
+                className={`flex-shrink-0 w-48 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
+                  selectedDeviceId === dev.id
+                    ? 'border-primary bg-primary/5 shadow-lg shadow-primary/10'
+                    : 'border-border hover:border-primary/40 hover:shadow-md'
+                }`}
+              >
+                <div className="flex flex-col">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm font-semibold text-foreground truncate">{dev.name}</span>
+                    {selectedDeviceId === dev.id && (
+                      <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">✓</span>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">{dev.storage}</p>
+                  <p className="text-lg font-bold text-primary mt-2">${dev.basePrice}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
 
                 {/* Device Details */}
                 {selectedDeviceId && (
