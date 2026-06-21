@@ -80,7 +80,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     {key: 'fichacarga', label: 'Ficha de Cargador', icon: Zap },
 
 
-    
+
 //  { key: 'botonPawer', label: 'Botón de Power', icon: Power },
 //     { key: 'botonVolumen', label: 'Botón de Volumen', icon: Volume2 },
 //     
@@ -550,12 +550,12 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                           Pre-Check Status
                         </p>
                         <p className="font-semibold text-sm text-green-400">
-                          {functionalCount}/10 Functional
+                          {functionalCount}/11 Functional
                         </p>
                         <p className="text-xs text-slate-400">
-                          {functionalCount === 10
+                          {functionalCount === 11
                             ? 'All systems operational'
-                            : `${10 - functionalCount} module${10 - functionalCount > 1 ? 's' : ''} faulty`}
+                            : `${11 - functionalCount} module${11 - functionalCount > 1 ? 's' : ''} faulty`}
                         </p>
                       </div>
                     </div>
