@@ -33,6 +33,8 @@ import {
   Headphones,
   HardDrive,
   Cpu,
+  Shield,
+  Key,
 } from 'lucide-react';
 import { MdPerson, MdBuild, MdCheck } from 'react-icons/md';
 import { RiSimCard2Line } from 'react-icons/ri';
@@ -41,7 +43,7 @@ import { Card, CardContent } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
 
-// Mapa de hardware por categoría
+// Mapa de hardware por categoría (sin cambios)
 const hardwareByCategory: Record<string, { key: string; label: string; icon: any }[]> = {
   phone: [
     { key: 'botonPawer', label: 'Botón de Power', icon: Power },
@@ -103,7 +105,39 @@ const hardwareByCategory: Record<string, { key: string; label: string; icon: any
   ],
 };
 
-// Categorías de dispositivo
+// Opciones de seguridad por categoría
+const securityOptionsByCategory: Record<string, { id: string; label: string; icon: any }[]> = {
+  phone: [
+    { id: 'ninguno', label: 'Ninguno', icon: Shield },
+    { id: 'pin', label: 'PIN', icon: Key },
+    { id: 'patron', label: 'Patrón', icon: Grid3X3 },
+    { id: 'huella', label: 'Huella', icon: Fingerprint },
+  ],
+  notebook: [
+    { id: 'ninguno', label: 'Ninguno', icon: Shield },
+    { id: 'pin', label: 'Contraseña', icon: Key },
+    { id: 'huella', label: 'Huella', icon: Fingerprint },
+  ],
+  pc: [
+    { id: 'ninguno', label: 'Ninguno', icon: Shield },
+    { id: 'pin', label: 'Contraseña', icon: Key },
+  ],
+  tablet: [
+    { id: 'ninguno', label: 'Ninguno', icon: Shield },
+    { id: 'pin', label: 'PIN', icon: Key },
+    { id: 'patron', label: 'Patrón', icon: Grid3X3 },
+  ],
+  console: [
+    { id: 'ninguno', label: 'Ninguno', icon: Shield },
+    { id: 'pin', label: 'Código', icon: Key },
+  ],
+  other: [
+    { id: 'ninguno', label: 'Ninguno', icon: Shield },
+    { id: 'pin', label: 'Contraseña', icon: Key },
+  ],
+};
+
+// Categorías de dispositivo (sin cambios)
 const deviceCategories = [
   { id: 'phone', name: 'Teléfono', icon: Smartphone, color: 'text-primary', bgColor: 'bg-primary/10' },
   { id: 'notebook', name: 'Portátil', icon: Laptop, color: 'text-info', bgColor: 'bg-info/10' },
@@ -113,7 +147,7 @@ const deviceCategories = [
   { id: 'other', name: 'Otro', icon: Grid3X3, color: 'text-muted-foreground', bgColor: 'bg-muted' },
 ];
 
-// Estado inicial
+// Estado inicial (con seguridad por defecto)
 const defaultData: RepairData = {
   selectedClient: null,
   deviceType: 'phone',
@@ -126,7 +160,7 @@ const defaultData: RepairData = {
   priority: 'Normal',
   estimatedDays: 3,
   hardwareChecks: {},
-  securityType: 'pin',
+  securityType: 'ninguno',
   accessPin: '',
   patternDots: [false, false, false, false, false, false, false, false, false],
   patternSequence: [],
@@ -161,26 +195,33 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
     client.email?.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Obtener items de hardware según categoría seleccionada
+  // Obtener items de hardware según categoría
   const currentHardwareItems = useMemo(() => {
     return hardwareByCategory[state.deviceType] || [];
   }, [state.deviceType]);
 
-  // Inicializar hardwareChecks con valores en false para los items de la categoría actual
+  // Obtener opciones de seguridad según categoría
+  const currentSecurityOptions = useMemo(() => {
+    return securityOptionsByCategory[state.deviceType] || securityOptionsByCategory.other;
+  }, [state.deviceType]);
+
+  // Inicializar hardwareChecks
   const hardwareKeys = currentHardwareItems.map((item) => item.key);
   const initialHardwareChecks = hardwareKeys.reduce((acc, key) => ({ ...acc, [key]: false }), {});
-  // Si el estado ya tiene algunos checks, los fusionamos
   const mergedHardwareChecks = { ...initialHardwareChecks, ...state.hardwareChecks };
-  // Solo mantener las claves que corresponden a la categoría actual
   const filteredHardwareChecks = Object.fromEntries(
     Object.entries(mergedHardwareChecks).filter(([key]) => hardwareKeys.includes(key))
   );
 
-  // Actualizar hardwareChecks cuando cambie la categoría
   React.useEffect(() => {
     const newChecks = { ...initialHardwareChecks, ...state.hardwareChecks };
     const filtered = Object.fromEntries(Object.entries(newChecks).filter(([key]) => hardwareKeys.includes(key)));
     applyUpdate({ hardwareChecks: filtered });
+    // Si la categoría cambia y el tipo de seguridad actual no está disponible, lo resetamos a 'ninguno'
+    const availableSecurityIds = currentSecurityOptions.map(opt => opt.id);
+    if (!availableSecurityIds.includes(state.securityType)) {
+      applyUpdate({ securityType: 'ninguno' });
+    }
   }, [state.deviceType]);
 
   const handleHardwareToggle = (key: string) => {
@@ -219,9 +260,9 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
       transition={{ duration: 0.4 }}
       className="min-h-screen bg-background"
     >
-      <main className="max-w-[1400px] mx-auto p-6 md:p-8">
+      <main className="max-w-[1400px] mx-auto p-4 md:p-6">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Registro de Reparación</h1>
             <p className="text-muted-foreground text-sm">Información de Cliente, Dispositivo y Diagnóstico</p>
@@ -229,39 +270,39 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
         </div>
 
         {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Column - Main Content */}
-          <div className="lg:col-span-8 space-y-8">
+          <div className="lg:col-span-8 space-y-6">
             {/* Cliente */}
             <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-6">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <div className="bg-primary/10 text-primary p-2 rounded-xl">
-                      <Search size={20} />
+                      <Search size={18} />
                     </div>
-                    <h2 className="text-lg font-bold text-foreground">Selección de Cliente</h2>
+                    <h2 className="text-base font-bold text-foreground">Selección de Cliente</h2>
                   </div>
-                  <Button variant="ghost" className="text-primary">
-                    <UserPlus size={18} className="mr-2" />
+                  <Button variant="ghost" className="text-primary text-sm">
+                    <UserPlus size={16} className="mr-1" />
                     Agregar Nuevo Cliente
                   </Button>
                 </div>
                 <div className="relative group">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={20} />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
                   <input
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Buscar por nombre, teléfono o número de identificación..."
-                    className="w-full pl-12 pr-4 py-4 bg-muted border border-border rounded-2xl focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-lg font-medium text-foreground"
+                    className="w-full pl-10 pr-4 py-3 bg-muted border border-border rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm font-medium text-foreground"
                   />
                 </div>
                 {state.selectedClient ? (
-                  <div className="mt-4 border border-primary/20 rounded-2xl overflow-hidden">
-                    <div className="p-4 flex items-center justify-between bg-primary/5">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">
+                  <div className="mt-3 border border-primary/20 rounded-xl overflow-hidden">
+                    <div className="p-3 flex items-center justify-between bg-primary/5">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
                           {state.selectedClient.name?.charAt(0) || '?'}
                         </div>
                         <div>
@@ -275,11 +316,11 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                     </div>
                   </div>
                 ) : filteredClients.length > 0 ? (
-                  <div className="mt-4 border border-border rounded-2xl overflow-hidden divide-y divide-border">
+                  <div className="mt-3 border border-border rounded-xl overflow-hidden divide-y divide-border">
                     {filteredClients.map((client) => (
-                      <div key={client.id} className="p-4 flex items-center justify-between hover:bg-muted transition-colors">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold">
+                      <div key={client.id} className="p-3 flex items-center justify-between hover:bg-muted transition-colors">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold text-xs">
                             {client.name?.substring(0, 2).toUpperCase() || '??'}
                           </div>
                           <div>
@@ -294,25 +335,26 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                     ))}
                   </div>
                 ) : (
-                  <div className="mt-4 text-center py-8 text-muted-foreground">
-                    <Search className="w-12 h-12 mx-auto mb-3 text-muted-foreground/30" />
-                    <p className="font-medium">No hay clientes registrados</p>
-                    <p className="text-sm">Agrega un nuevo cliente para comenzar</p>
+                  <div className="mt-3 text-center py-6 text-muted-foreground">
+                    <Search className="w-10 h-10 mx-auto mb-2 text-muted-foreground/30" />
+                    <p className="font-medium text-sm">No hay clientes registrados</p>
+                    <p className="text-xs">Agrega un nuevo cliente para comenzar</p>
                   </div>
                 )}
               </CardContent>
             </Card>
 
-            {/* Dispositivo */}
+            {/* Dispositivo + Especificaciones en una sola tarjeta */}
             <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-6">
+              <CardContent className="p-4">
+                {/* Categoría */}
+                <div className="flex items-center gap-3 mb-4">
                   <div className="bg-primary/10 text-primary p-2 rounded-xl">
-                    <Smartphone size={20} />
+                    <Smartphone size={18} />
                   </div>
-                  <h2 className="text-lg font-bold text-foreground">Categoría de Dispositivo</h2>
+                  <h2 className="text-base font-bold text-foreground">Categoría de Dispositivo</h2>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-4">
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-6">
                   {deviceCategories.map((category) => {
                     const Icon = category.icon;
                     const isSelected = state.deviceType === category.id;
@@ -320,128 +362,119 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                       <button
                         key={category.id}
                         onClick={() => applyUpdate({ deviceType: category.id })}
-                        className={`category-tile flex flex-col items-center gap-3 p-6 rounded-2xl transition-all ${
+                        className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all ${
                           isSelected
                             ? 'border-2 border-primary bg-primary/5 shadow-sm'
                             : 'border border-border bg-muted hover:border-primary/50 hover:bg-primary/5 hover:shadow-md'
                         }`}
                       >
-                        <div className={`${category.bgColor} ${category.color} p-3 rounded-xl`}>
-                          <Icon size={24} />
+                        <div className={`${category.bgColor} ${category.color} p-2 rounded-lg`}>
+                          <Icon size={20} />
                         </div>
-                        <span className={`text-xs font-bold uppercase tracking-wide ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
+                        <span className={`text-[10px] font-bold uppercase tracking-wide ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
                           {category.name}
                         </span>
                       </button>
                     );
                   })}
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Especificaciones Técnicas */}
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-6">
+                {/* Especificaciones Técnicas */}
+                <div className="flex items-center gap-3 mb-4">
                   <div className="bg-primary/10 text-primary p-2 rounded-xl">
-                    <Settings size={20} />
+                    <Settings size={18} />
                   </div>
-                  <h2 className="text-lg font-bold text-foreground">Especificaciones Técnicas</h2>
+                  <h2 className="text-base font-bold text-foreground">Especificaciones Técnicas</h2>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                   <div>
-                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Marca</label>
+                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Marca</label>
                     <input
                       type="text"
                       value={state.brand}
                       onChange={(e) => applyUpdate({ brand: e.target.value })}
                       placeholder="ej. Samsung, Apple..."
-                      className="w-full px-4 py-3 bg-muted border border-border rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-medium text-foreground"
+                      className="w-full px-3 py-2 bg-muted border border-border rounded-lg focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm text-foreground"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Modelo</label>
+                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Modelo</label>
                     <input
                       type="text"
                       value={state.model}
                       onChange={(e) => applyUpdate({ model: e.target.value })}
                       placeholder="ej. Galaxy S24 Ultra..."
-                      className="w-full px-4 py-3 bg-muted border border-border rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-medium text-foreground"
+                      className="w-full px-3 py-2 bg-muted border border-border rounded-lg focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm text-foreground"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Serial / IMEI</label>
+                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Serial / IMEI</label>
                     <div className="relative">
                       <input
                         type="text"
                         value={state.serial}
                         onChange={(e) => applyUpdate({ serial: e.target.value })}
                         placeholder="15 dígitos..."
-                        className="w-full pl-4 pr-10 py-3 bg-muted border border-border rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-medium text-foreground"
+                        className="w-full pl-3 pr-8 py-2 bg-muted border border-border rounded-lg focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm text-foreground"
                       />
                       <button className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-primary transition-colors">
-                        <Smartphone size={20} />
+                        <Smartphone size={16} />
                       </button>
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {/* Condición Estética */}
-                  <Card className="border border-border">
-                    <CardContent className="p-6">
-                      <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-                        <CheckCircle2 size={18} className="text-muted-foreground" />
-                        Condición Estética
-                      </h3>
-                      <div className="grid grid-cols-2 gap-3">
-                        {['Nuevo', 'Rayones Leves', 'Pantalla Rota', 'Desgaste Intenso'].map((condition) => (
-                          <button
-                            key={condition}
-                            onClick={() => applyUpdate({ aestheticCondition: condition })}
-                            className={`py-2.5 px-3 text-xs font-bold border-2 rounded-xl transition-all ${
-                              state.aestheticCondition === condition
-                                ? 'border-primary bg-primary/5 text-primary'
-                                : 'border-border text-muted-foreground hover:border-border'
-                            }`}
-                          >
-                            {condition}
-                          </button>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
+                {/* Condición y Accesorios */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="border border-border rounded-xl p-4">
+                    <h3 className="text-xs font-bold text-foreground mb-3 flex items-center gap-2">
+                      <CheckCircle2 size={16} className="text-muted-foreground" />
+                      Condición Estética
+                    </h3>
+                    <div className="grid grid-cols-2 gap-2">
+                      {['Nuevo', 'Rayones Leves', 'Pantalla Rota', 'Desgaste Intenso'].map((condition) => (
+                        <button
+                          key={condition}
+                          onClick={() => applyUpdate({ aestheticCondition: condition })}
+                          className={`py-1.5 px-2 text-[10px] font-bold border rounded-lg transition-all ${
+                            state.aestheticCondition === condition
+                              ? 'border-primary bg-primary/5 text-primary'
+                              : 'border-border text-muted-foreground hover:border-border'
+                          }`}
+                        >
+                          {condition}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-                  {/* Accesorios */}
-                  <Card className="border border-border">
-                    <CardContent className="p-6">
-                      <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-                        <Cable size={18} className="text-muted-foreground" />
-                        Accesorios Incluidos
-                      </h3>
-                      <div className="flex flex-wrap gap-2">
-                        {getAccessoriesForDevice().map((accessory) => (
-                          <button
-                            key={accessory}
-                            onClick={() => handleAccessoryToggle(accessory)}
-                            className={`px-4 py-2 text-xs font-bold rounded-full border transition-all flex items-center gap-2 ${
-                              state.accessories.includes(accessory)
-                                ? 'bg-primary/5 border-primary text-primary'
-                                : 'bg-muted border-border text-foreground hover:border-border'
-                            }`}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={state.accessories.includes(accessory)}
-                              onChange={() => {}}
-                              className="w-3.5 h-3.5 rounded"
-                            />
-                            {accessory}
-                          </button>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <div className="border border-border rounded-xl p-4">
+                    <h3 className="text-xs font-bold text-foreground mb-3 flex items-center gap-2">
+                      <Cable size={16} className="text-muted-foreground" />
+                      Accesorios Incluidos
+                    </h3>
+                    <div className="flex flex-wrap gap-1">
+                      {getAccessoriesForDevice().map((accessory) => (
+                        <button
+                          key={accessory}
+                          onClick={() => handleAccessoryToggle(accessory)}
+                          className={`px-3 py-1 text-[10px] font-bold rounded-full border transition-all flex items-center gap-1 ${
+                            state.accessories.includes(accessory)
+                              ? 'bg-primary/5 border-primary text-primary'
+                              : 'bg-muted border-border text-foreground hover:border-border'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={state.accessories.includes(accessory)}
+                            onChange={() => {}}
+                            className="w-3 h-3 rounded"
+                          />
+                          {accessory}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -455,28 +488,28 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200"
+                  className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200"
                 >
-                  <div className="flex items-center gap-3 mb-6">
+                  <div className="flex items-center gap-3 mb-4">
                     <div className="bg-blue-100 text-blue-600 p-2 rounded-xl">
-                      <CheckCircle2 size={20} />
+                      <CheckCircle2 size={18} />
                     </div>
-                    <h2 className="text-lg font-bold text-slate-900">Chequeo rápido de hardware</h2>
-                    <Badge variant="outline" className="ml-auto">{functionalCount}/{currentHardwareItems.length} funcionales</Badge>
+                    <h2 className="text-base font-bold text-slate-900">Chequeo rápido de hardware</h2>
+                    <Badge variant="outline" className="ml-auto text-xs">{functionalCount}/{currentHardwareItems.length} funcionales</Badge>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                     {currentHardwareItems.map((item) => {
                       const Icon = item.icon;
                       const isChecked = state.hardwareChecks[item.key] ?? false;
                       return (
                         <div
                           key={item.key}
-                          className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-slate-200 transition-colors"
+                          className="flex items-center justify-between p-2 bg-slate-50 rounded-xl border border-slate-100 hover:border-slate-200 transition-colors"
                         >
-                          <div className="flex items-center gap-3">
-                            <Icon size={18} className={isChecked ? 'text-blue-600' : 'text-slate-400'} />
-                            <span className="text-sm font-bold text-slate-700">{item.label}</span>
+                          <div className="flex items-center gap-2">
+                            <Icon size={16} className={isChecked ? 'text-blue-600' : 'text-slate-400'} />
+                            <span className="text-xs font-medium text-slate-700">{item.label}</span>
                           </div>
                           <label className="relative inline-flex items-center cursor-pointer">
                             <input
@@ -485,12 +518,10 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                               onChange={() => handleHardwareToggle(item.key)}
                               className="sr-only"
                             />
-                            <div
-                              className={`w-11 h-6 rounded-full transition-colors ${isChecked ? 'bg-blue-600' : 'bg-slate-200'}`}
-                            >
+                            <div className={`w-8 h-4 rounded-full transition-colors ${isChecked ? 'bg-blue-600' : 'bg-slate-200'}`}>
                               <div
-                                className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform shadow-sm ${
-                                  isChecked ? 'translate-x-5' : ''
+                                className={`absolute left-0.5 top-0.5 bg-white w-3 h-3 rounded-full transition-transform shadow-sm ${
+                                  isChecked ? 'translate-x-4' : ''
                                 }`}
                               />
                             </div>
@@ -503,18 +534,100 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
               )}
             </AnimatePresence>
 
-            {/* Notas y diagnóstico */}
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="bg-emerald-100 text-emerald-600 p-2 rounded-xl">
-                    <AlertCircle size={20} />
+            {/* Seguridad y Acceso (dinámico) */}
+            <AnimatePresence mode="wait">
+              {state.deviceType && currentSecurityOptions.length > 0 && (
+                <motion.section
+                  key={`security-${state.deviceType}`}
+                  initial={{ opacity: 0, height: 0, overflow: 'hidden' }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200"
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="bg-amber-100 text-amber-600 p-2 rounded-xl">
+                      <Lock size={18} />
+                    </div>
+                    <h2 className="text-base font-bold text-slate-900">Seguridad y Acceso</h2>
                   </div>
-                  <h2 className="text-lg font-bold text-foreground">Diagnóstico y Notas</h2>
+
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {currentSecurityOptions.map((opt) => {
+                      const Icon = opt.icon;
+                      const isSelected = state.securityType === opt.id;
+                      return (
+                        <button
+                          key={opt.id}
+                          onClick={() => applyUpdate({ securityType: opt.id })}
+                          className={`flex items-center gap-2 px-4 py-1.5 text-xs font-bold rounded-full border transition-all ${
+                            isSelected
+                              ? 'bg-primary/5 border-primary text-primary'
+                              : 'bg-muted border-border text-muted-foreground hover:border-primary/50'
+                          }`}
+                        >
+                          <Icon size={14} />
+                          {opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {state.securityType === 'pin' && (
+                    <div className="max-w-xs">
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                        {state.deviceType === 'phone' ? 'PIN' : 'Contraseña'}
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="password"
+                          value={state.accessPin}
+                          onChange={(e) => applyUpdate({ accessPin: e.target.value })}
+                          placeholder="••••••"
+                          className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-4 focus:ring-blue-100 focus:border-blue-600 transition-all font-mono text-sm text-slate-900"
+                        />
+                        <Lock size={16} className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400" />
+                      </div>
+                    </div>
+                  )}
+
+                  {state.securityType === 'patron' && (
+                    <div className="flex flex-col items-start gap-3">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase">Dibuja el patrón (3x3)</p>
+                      <div className="relative bg-white p-4 rounded-2xl border-2 border-blue-200 shadow-md" style={{ width: '200px', height: '200px' }}>
+                        {/* Aquí iría el canvas para dibujar el patrón, pero para simplificar se puede omitir o añadir más adelante */}
+                        <div className="grid grid-cols-3 gap-4 w-full h-full">
+                          {Array.from({ length: 9 }).map((_, i) => (
+                            <div key={i} className="w-full h-full bg-slate-200 rounded-full hover:bg-blue-200 transition-colors" />
+                          ))}
+                        </div>
+                      </div>
+                      <Button variant="ghost" size="sm" className="text-xs">Limpiar patrón</Button>
+                    </div>
+                  )}
+
+                  {state.securityType === 'huella' && (
+                    <div className="flex items-center gap-3">
+                      <Fingerprint size={24} className="text-blue-600" />
+                      <span className="text-sm text-slate-700">Dispositivo con lector de huellas</span>
+                    </div>
+                  )}
+                </motion.section>
+              )}
+            </AnimatePresence>
+
+            {/* Diagnóstico y Notas (compacto) */}
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="bg-emerald-100 text-emerald-600 p-2 rounded-xl">
+                    <AlertCircle size={18} />
+                  </div>
+                  <h2 className="text-base font-bold text-foreground">Diagnóstico y Notas</h2>
                 </div>
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">
+                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">
                       Descripción del Problema
                     </label>
                     <textarea
@@ -522,33 +635,44 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                       onChange={(e) => applyUpdate({ issueDescription: e.target.value })}
                       placeholder="Pantalla rota, puerto de carga suelto..."
                       rows={3}
-                      className="w-full bg-muted border border-border rounded-xl p-4 text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-foreground"
+                      className="w-full bg-muted border border-border rounded-lg p-2 text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-foreground"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Prioridad</label>
-                      <select
-                        value={state.priority}
-                        onChange={(e) => applyUpdate({ priority: e.target.value })}
-                        className="w-full bg-muted border border-border rounded-xl py-3 px-4 focus:ring-primary/10 focus:border-primary transition-all text-foreground"
-                      >
-                        <option>Normal</option>
-                        <option>Urgente</option>
-                        <option>Baja</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Días Estimados</label>
-                      <input
-                        type="number"
-                        value={state.estimatedDays}
-                        onChange={(e) => applyUpdate({ estimatedDays: parseInt(e.target.value) })}
-                        className="w-full bg-muted border border-border rounded-xl py-3 px-4 focus:ring-primary/10 focus:border-primary transition-all text-foreground"
-                      />
-                    </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">
+                      Notas del Técnico
+                    </label>
+                    <textarea
+                      value={state.technicianNotes}
+                      onChange={(e) => applyUpdate({ technicianNotes: e.target.value })}
+                      placeholder="Observaciones adicionales..."
+                      rows={3}
+                      className="w-full bg-muted border border-border rounded-lg p-2 text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-foreground"
+                    />
                   </div>
-                  
+                </div>
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Prioridad</label>
+                    <select
+                      value={state.priority}
+                      onChange={(e) => applyUpdate({ priority: e.target.value })}
+                      className="w-full bg-muted border border-border rounded-lg py-2 px-3 text-sm focus:ring-primary/10 focus:border-primary transition-all text-foreground"
+                    >
+                      <option>Normal</option>
+                      <option>Urgente</option>
+                      <option>Baja</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Días Estimados</label>
+                    <input
+                      type="number"
+                      value={state.estimatedDays}
+                      onChange={(e) => applyUpdate({ estimatedDays: parseInt(e.target.value) })}
+                      className="w-full bg-muted border border-border rounded-lg py-2 px-3 text-sm focus:ring-primary/10 focus:border-primary transition-all text-foreground"
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -559,34 +683,34 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
               whileTap={{ scale: 0.98 }}
               className="flex justify-end"
             >
-              <Button onClick={onSave} size="lg" className="px-10 py-6 text-base">
+              <Button onClick={onSave} size="lg" className="px-8 py-5 text-base">
                 <Check size={20} className="mr-2" />
                 Crear Orden de Servicio
               </Button>
             </motion.div>
           </div>
 
-          {/* Right Column - Resumen */}
+          {/* Right Column - Resumen (sin cambios, solo ajuste de padding) */}
           <div className="lg:col-span-4">
-            <div className="sticky top-24 space-y-6">
+            <div className="sticky top-24 space-y-4">
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-slate-900 text-white rounded-[2rem] p-8 shadow-2xl relative overflow-hidden"
+                className="bg-slate-900 text-white rounded-2xl p-6 shadow-2xl relative overflow-hidden"
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16"></div>
                 <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-8">
-                    <h3 className="font-bold text-lg">Resumen del Ticket</h3>
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="font-bold text-base">Resumen del Ticket</h3>
                     <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-widest">
                       Nueva Orden
                     </Badge>
                   </div>
-                  <div className="space-y-6">
+                  <div className="space-y-4">
                     <div className="flex items-start gap-3">
                       <div className="bg-white/10 p-2 rounded-lg">
-                        <Search className="text-primary-foreground/80" size={18} />
+                        <Search className="text-primary-foreground/80" size={16} />
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase">Cliente</p>
@@ -595,7 +719,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                     </div>
                     <div className="flex items-start gap-3">
                       <div className="bg-white/10 p-2 rounded-lg">
-                        <Smartphone className="text-primary-foreground/80" size={18} />
+                        <Smartphone className="text-primary-foreground/80" size={16} />
                       </div>
                       <div>
                         <p className="text-[10px] font-bold text-slate-400 uppercase">Dispositivo</p>
@@ -608,29 +732,29 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                     {currentHardwareItems.length > 0 && (
                       <div className="flex items-start gap-3">
                         <div className="bg-white/10 p-2 rounded-lg">
-                          <CheckCircle2 size={18} className="text-blue-400" />
+                          <CheckCircle2 size={16} className="text-blue-400" />
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase">Estado de Pre-Check</p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase">Pre-Check</p>
                           <p className="font-semibold text-sm text-green-400">
                             {functionalCount}/{currentHardwareItems.length} funcionales
                           </p>
                           <p className="text-xs text-slate-400">
-                            {currentHardwareItems.length - functionalCount} módulo{currentHardwareItems.length - functionalCount !== 1 ? 's' : ''} defectuoso{currentHardwareItems.length - functionalCount !== 1 ? 's' : ''}
+                            {currentHardwareItems.length - functionalCount} defectuoso{currentHardwareItems.length - functionalCount !== 1 ? 's' : ''}
                           </p>
                         </div>
                       </div>
                     )}
-                    <div className="pt-6 border-t border-white/10">
-                      <div className="flex items-center justify-between mb-2">
+                    <div className="pt-4 border-t border-white/10">
+                      <div className="flex items-center justify-between mb-1">
                         <span className="text-slate-400 text-sm">Mano de Obra</span>
                         <span className="font-bold text-sm">$0.00</span>
                       </div>
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="text-slate-400 text-sm">Repuestos Estimados</span>
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-slate-400 text-sm">Repuestos</span>
                         <span className="font-bold text-sm">$0.00</span>
                       </div>
-                      <div className="flex items-center justify-between text-xl font-bold pt-4 border-t border-white/20">
+                      <div className="flex items-center justify-between text-lg font-bold pt-3 border-t border-white/20">
                         <span>Total</span>
                         <span className="text-blue-400">$0.00</span>
                       </div>
@@ -639,14 +763,14 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                 </div>
               </motion.div>
 
-              <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
-                <div className="flex items-center gap-2 mb-4">
-                  <Info size={18} className="text-blue-600" />
+              <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <Info size={16} className="text-blue-600" />
                   <span className="text-xs font-bold text-slate-600">Ayuda</span>
                 </div>
                 <p className="text-xs text-slate-500 leading-relaxed">
                   Completa todos los campos para crear la orden de reparación.
-                  El chequeo de hardware es específico para la categoría seleccionada.
+                  El chequeo de hardware y las opciones de seguridad se adaptan a la categoría seleccionada.
                 </p>
               </div>
             </div>
