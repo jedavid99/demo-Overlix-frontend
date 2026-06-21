@@ -67,7 +67,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     else setLocalData(prev => ({ ...prev, ...updates }));
   };
   const hardwareItems = [
-    { key: 'power', label: 'Power', icon: Power },
+    { key: 'power', label: 'Boton de Power', icon: Power },
     { key: 'display', label: 'Display', icon: MonitorPlay },
     { key: 'wifi', label: 'WiFi', icon: Wifi },
     { key: 'bluetooth', label: 'Bluetooth', icon: Bluetooth },
