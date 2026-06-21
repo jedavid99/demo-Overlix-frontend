@@ -358,7 +358,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                   </div>
                   <h2 className="text-base font-bold text-foreground">Categoría de Dispositivo</h2>
                 </div>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 mb-6">
                   {deviceCategories.map((category) => {
                     const Icon = category.icon;
                     const isSelected = state.deviceType === category.id;
@@ -390,7 +390,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                   </div>
                   <h2 className="text-base font-bold text-foreground">Especificaciones Técnicas</h2>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4">
                   <div>
                     <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Marca</label>
                     <input
@@ -415,7 +415,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                     <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">
                       {state.deviceType === 'phone' ? 'IMEI' : 'Serial / Número de Serie'}
                     </label>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex gap-2">
                       
                       
                       <input
@@ -423,7 +423,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                         value={state.serial}
                         onChange={(e) => applyUpdate({ serial: e.target.value })}
                         placeholder={state.deviceType === 'phone' ? '15 dígitos' : '12 caracteres'}
-                        className="flex-1 min-w-[120px] px-3 py-2 bg-muted border border-border rounded-lg focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm text-foreground"
+                        className="flex-1 min-w-0 px-3 py-2.5 bg-muted border border-border rounded-lg focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm text-foreground"
                       />
                       
                     </div>
@@ -504,7 +504,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                     <Badge variant="outline" className="ml-auto text-xs">{functionalCount}/{currentHardwareItems.length} funcionales</Badge>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5">
                     {currentHardwareItems.map((item) => {
                       const Icon = item.icon;
                       const isChecked = state.hardwareChecks[item.key] ?? false;
@@ -558,7 +558,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                     <h2 className="text-base font-bold text-slate-900">Seguridad y Acceso</h2>
                   </div>
 
-                  <div className="flex flex-wrap gap-2 mb-4">
+                  <div className="flex gap-2 mb-4">
                     {currentSecurityOptions.map((opt) => {
                       const Icon = opt.icon;
                       const isSelected = state.securityType === opt.id;
@@ -656,7 +656,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 mt-4">
                   <div>
                     <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Prioridad</label>
                     <select
@@ -711,9 +711,9 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-slate-900 text-white rounded-2xl p-6 shadow-2xl relative overflow-hidden"
+                className="bg-primary text-primary-foreground rounded-2xl p-5 lg:p-6 shadow-2xl relative overflow-hidden"
               >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary-foreground/10 rounded-full -mr-16 -mt-16"></div>
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="font-bold text-base">Resumen del Ticket</h3>
@@ -791,7 +791,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                       <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">
                         Tipo de Pago
                       </label>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex gap-2">
                         {[
                           { id: 'cash', label: 'Efectivo', icon: DollarSign },
                           { id: 'transfer', label: 'Transferencia', icon: Building2 },
@@ -820,7 +820,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                       <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">
                         Modalidad de Pago
                       </label>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex gap-2">
                         {[
                           { id: 'full', label: 'Completo' },
                           { id: 'half', label: 'Mitad (50%)' },
