@@ -525,12 +525,12 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                           Pre-Check Status
                         </p>
                         <p className="font-semibold text-sm text-green-400">
-                          {functionalCount}/6 Functional
+                          {functionalCount}/7 Functional
                         </p>
                         <p className="text-xs text-slate-400">
-                          {functionalCount === 6
+                          {functionalCount === 7
                             ? 'All systems operational'
-                            : `${6 - functionalCount} module${6 - functionalCount > 1 ? 's' : ''} faulty`}
+                            : `${7 - functionalCount} module${7 - functionalCount > 1 ? 's' : ''} faulty`}
                         </p>
                       </div>
                     </div>
