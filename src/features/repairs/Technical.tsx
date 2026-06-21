@@ -18,9 +18,15 @@ import {
   Eye,
   Battery,
   Zap,
+  Smartphone,
+  Mic,
+  Volume,
+  SwitchCamera,
 } from 'lucide-react';
 import { MdCheck, MdBuild } from 'react-icons/md';
 import type { RepairData } from './RepairFlow';
+import { RiSimCard2Line } from "react-icons/ri";
+
 
 interface RepairTechnicalProps {
   data?: RepairData;
@@ -68,18 +74,18 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
   };
   const hardwareItems = [
     { key: 'botonPawer', label: 'Botón de Power', icon: Power },
-    { key: 'botonVolumen', label: 'Botón de Volumen', icon: Volume2 },
+    { key: 'botonVolumen', label: 'Botón de Volumen', icon: Volume },
     { key: 'sensorProximidad', label: 'Sensor de Proximidad', icon: Eye },
-    { key: 'camaraFrontal', label: 'Cámara Frontal', icon: Camera },
-    { key: 'modulo', label: 'Módulo', icon: MonitorPlay },
+    { key: 'camaraFrontal', label: 'Cámara Frontal', icon: SwitchCamera  },
+    { key: 'modulo', label: 'Módulo', icon: Smartphone },
     { key: 'wifi', label: 'WiFi', icon: Wifi },
     { key: 'huella', label: 'Huella', icon: Fingerprint },
     { key: 'camaraTrasera', label: 'Cámara Trasera', icon: Camera },
     { key: 'audio', label: 'Audio', icon: Volume2 },
-    { key: 'altavoz', label: 'Altavoz', icon: Volume2 },
+    { key: 'altavoz', label: 'Altavoz', icon: Mic  },
     { key: 'fichaCarga', label: 'Ficha de Carga', icon: Zap },
     { key: 'bateria', label: 'Batería', icon: Battery },
-
+{ key: 'lectorSimcard', label: 'Lector de Simcard', icon: RiSimCard2Line  },
 
 
 //  { key: 'botonPawer', label: 'Botón de Power', icon: Power },
