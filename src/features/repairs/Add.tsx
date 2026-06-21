@@ -309,18 +309,13 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
+                  {/* <div className="flex items-center gap-3">
                     <div className="bg-primary/10 text-primary p-2 rounded-xl">
                       <Search size={18} />
                     </div>
                     <h2 className="text-base font-bold text-foreground">Selección de Cliente</h2>
-                  </div>
-                  <Button variant="ghost" className="text-primary text-sm">
-                    <UserPlus size={16} className="mr-1" />
-                    Agregar Nuevo Cliente
-                  </Button>
-                </div>
-                <div className="relative group">
+                  </div> */}
+                  <div className="relative group">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
                   <input
                     type="text"
@@ -330,6 +325,12 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                     className="w-full pl-10 pr-4 py-3 bg-muted border border-border rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm font-medium text-foreground"
                   />
                 </div>
+                  <Button variant="ghost" className="text-primary text-sm">
+                    <UserPlus size={16} className="mr-1" />
+                    Agregar Nuevo Cliente
+                  </Button>
+                </div>
+                
              
               </CardContent>
             </Card>
