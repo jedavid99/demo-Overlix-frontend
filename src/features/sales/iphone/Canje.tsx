@@ -12,7 +12,7 @@ export default function IphoneCanje() {
   // Datos mock eliminados - conectar con API real
 
   return (
-    <div className="space-y-6">
+   <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight">Canje iPhone</h1>
@@ -39,10 +39,10 @@ export default function IphoneCanje() {
                 <Smartphone className="h-5 w-5 text-primary" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-foreground">142</p>
+            <p className="text-3xl font-bold text-foreground"></p>
             <div className="flex items-center gap-1 text-green-600 text-sm mt-2">
               <TrendingUp size={16} />
-              <span>+12.5% vs mes anterior</span>
+              <span>% vs mes anterior</span>
             </div>
           </CardContent>
         </Card>
@@ -55,10 +55,10 @@ export default function IphoneCanje() {
                 <TrendingDown className="h-5 w-5 text-orange-500" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-foreground">$450.00</p>
+            <p className="text-3xl font-bold text-foreground">$</p>
             <div className="flex items-center gap-1 text-red-500 text-sm mt-2">
               <TrendingDown size={16} />
-              <span>-2.1% vs mes anterior</span>
+              <span>% vs mes anterior</span>
             </div>
           </CardContent>
         </Card>
@@ -71,10 +71,10 @@ export default function IphoneCanje() {
                 <Wallet className="h-5 w-5 text-primary" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-foreground">$63,900.00</p>
+            <p className="text-3xl font-bold text-foreground">$</p>
             <div className="flex items-center gap-1 text-green-600 text-sm mt-2">
               <TrendingUp size={16} />
-              <span>+8.4% vs mes anterior</span>
+              <span>% vs mes anterior</span>
             </div>
           </CardContent>
         </Card>
