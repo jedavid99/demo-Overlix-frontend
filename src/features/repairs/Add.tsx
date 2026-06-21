@@ -548,16 +548,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                       />
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Notas del Técnico</label>
-                    <textarea
-                      value={state.technicianNotes}
-                      onChange={(e) => applyUpdate({ technicianNotes: e.target.value })}
-                      placeholder="Observaciones adicionales..."
-                      rows={3}
-                      className="w-full bg-muted border border-border rounded-xl p-4 text-sm focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-foreground"
-                    />
-                  </div>
+                  
                 </div>
               </CardContent>
             </Card>
