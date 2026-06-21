@@ -42,16 +42,16 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     priority: 'Normal',
     estimatedDays: 3,
     hardwareChecks: {
-      power: true,
-      display: true,
+      power: false,
+      display: false,
       wifi: false,
-      bluetooth: true,
-      cameras: true,
-      audio: true,
+      bluetooth: false,
+      cameras: false,
+      audio: false,
     },
     securityType: 'pin',
-    accessPin: '920431',
-    patternDots: [true, false, false, true, true, false, false, false, true],
+    accessPin: '',
+    patternDots: [false, false, false, false, false, false, false, false, false],
     patternSequence: [],
     technicianNotes: '',
     termsAccepted: false,
@@ -65,27 +65,32 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     if (updateData) updateData(updates);
     else setLocalData(prev => ({ ...prev, ...updates }));
   };
+
   const hardwareItems = [
-    { key: 'BotonPawer', label: 'Boton de Power', icon: Power },
-    { key: 'BotonVolumen', label: 'Boton de Volumen', icon: Volume2 },
+    { key: 'BotonPawer', label: 'Botón de Power', icon: Power },
+    { key: 'BotonVolumen', label: 'Botón de Volumen', icon: Volume2 },
     { key: 'sensorProximidad', label: 'Sensor de Proximidad', icon: Eye },
-    { key: 'camaraFrontal', label: 'Camara Frontal', icon: Camera },
-    { key: 'Modulo', label: 'Modulo', icon: MonitorPlay },
+    { key: 'camaraFrontal', label: 'Cámara Frontal', icon: Camera },
+    { key: 'Modulo', label: 'Módulo', icon: MonitorPlay },
     { key: 'wifi', label: 'WiFi', icon: Wifi },
     { key: 'Huella', label: 'Huella', icon: Fingerprint },
-    { key: 'camaraTrasera', label: 'Camara Trasera', icon: Camera },
+    { key: 'camaraTrasera', label: 'Cámara Trasera', icon: Camera },
     { key: 'audio', label: 'Audio', icon: Volume2 },
     { key: 'altavoz', label: 'Altavoz', icon: Volume2 },
     { key: 'fichaCarga', label: 'Ficha de Carga', icon: Zap },
-    { key: 'bateria', label: 'Bateria', icon: Battery },
+    { key: 'bateria', label: 'Batería', icon: Battery },
   ];
 
   const handleHardwareToggle = (key: string) => {
-    const updated = { ...state.hardwareChecks };
-    updated[key as keyof typeof state.hardwareChecks] = !updated[key as keyof typeof state.hardwareChecks];
-    applyUpdate({ hardwareChecks: updated });
+    // Solo actualiza si la clave existe en hardwareChecks
+    if (key in state.hardwareChecks) {
+      const updated = { ...state.hardwareChecks };
+      updated[key as keyof typeof state.hardwareChecks] = !updated[key as keyof typeof state.hardwareChecks];
+      applyUpdate({ hardwareChecks: updated });
+    }
   };
 
+  // Contador de funcionales (solo las claves que existen en el estado)
   const functionalCount = Object.values(state.hardwareChecks).filter(Boolean).length;
 
   // Pattern drawing helpers
@@ -101,18 +106,15 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     seqRef.current = state.patternSequence ? [...state.patternSequence] : [];
   }, [state.patternDots, state.patternSequence]);
 
-  // Calculate dot positions and draw canvas
   useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Clear canvas
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Calculate positions (3x3 grid centered in canvas)
     const startX = 35;
     const startY = 35;
     const spacing = 93;
@@ -126,7 +128,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
       });
     }
 
-    // Draw lines between connected dots
     if (seqRef.current.length > 1) {
       ctx.strokeStyle = '#3B82F6';
       ctx.lineWidth = 3;
@@ -234,13 +235,14 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                 <div className="bg-blue-100 text-blue-600 p-2 rounded-xl">
                   <CheckCircle2 size={20} />
                 </div>
-                <h2 className="text-lg font-bold text-slate-900">Chequeo rapido </h2>
+                <h2 className="text-lg font-bold text-slate-900">Chequeo rápido</h2>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
                 {hardwareItems.map((item) => {
                   const Icon = item.icon;
-                  const isChecked = state.hardwareChecks[item.key as keyof typeof state.hardwareChecks];
+                  // Verificamos si la clave existe en el estado
+                  const isChecked = state.hardwareChecks[item.key as keyof typeof state.hardwareChecks] ?? false;
 
                   return (
                     <div
@@ -250,9 +252,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                       <div className="flex items-center gap-3">
                         <Icon
                           size={18}
-                          className={`${
-                            isChecked ? 'text-blue-600' : 'text-slate-400'
-                          }`}
+                          className={`${isChecked ? 'text-blue-600' : 'text-slate-400'}`}
                         />
                         <span className="text-sm font-bold text-slate-700">
                           {item.label}
@@ -302,7 +302,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                     {[
                       { id: 'ninguno', label: 'Ninguno' },
                       { id: 'pin', label: 'PIN' },
-                      { id: 'Patron', label: 'Patron' },
+                      { id: 'Patron', label: 'Patrón' },
                     ].map((type) => (
                       <button
                         key={type.id}
@@ -347,7 +347,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                           </p>
                           <div className="flex flex-col items-center gap-4">
                             <div className="relative bg-white p-8 rounded-3xl border-2 border-blue-200 shadow-md" style={{ width: '280px', height: '280px' }}>
-                              {/* Canvas for drawing lines */}
                               <canvas
                                 ref={canvasRef}
                                 width={280}
@@ -355,13 +354,11 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                                 className="absolute inset-0 rounded-3xl"
                                 style={{ cursor: 'crosshair' }}
                               />
-                              {/* Grid of dots */}
                               <div className="absolute inset-8 grid grid-cols-3 gap-6 pointer-events-none">
                                 {localDots.map((_, idx) => (
                                   <div key={idx} className="w-full h-full" />
                                 ))}
                               </div>
-                              {/* Dot buttons */}
                               <div className="absolute inset-8 grid grid-cols-3 gap-6">
                                 {localDots.map((active, idx) => (
                                   <button
@@ -370,9 +367,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                                     onPointerEnter={() => enterDot(idx)}
                                     onPointerUp={(e) => endDraw(e)}
                                     onPointerCancel={() => endDraw()}
-                                    onPointerLeave={() => {
-                                      // Permite movimiento fuera pero no termina
-                                    }}
+                                    onPointerLeave={() => {}}
                                     className={`rounded-full transition-all transform touch-none select-none cursor-pointer relative z-10 ${
                                       active
                                         ? 'bg-blue-600 shadow-lg shadow-blue-300 scale-110'
@@ -388,14 +383,12 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                               </div>
                             </div>
                             
-                            {/* Sequence display */}
                             {seqRef.current.length > 0 && (
                               <div className="text-sm text-slate-700 bg-blue-50 px-4 py-2 rounded-lg border border-blue-100">
                                 <span className="font-semibold">Secuencia dibujada:</span> {seqRef.current.map(n => n + 1).join(' → ')}
                               </div>
                             )}
                             
-                            {/* Clear button */}
                             <button 
                               onClick={clearPattern} 
                               className="text-sm text-blue-600 hover:text-blue-700 hover:underline font-bold transition-colors"
@@ -436,7 +429,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                   <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 p-3 rounded-xl border border-emerald-100">
                     <Check size={20} />
                     <span className="text-xs font-semibold">
-                      Ready for part selection & final review
+                      Listo para selección de piezas y revisión final
                     </span>
                   </div>
                 </div>
@@ -444,7 +437,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
             </div>
 
             {/* Navigation Buttons */}
-              <div className="flex items-center justify-between pt-4">
+            <div className="flex items-center justify-between pt-4">
               <button
                 onClick={onBack}
                 className="px-6 py-3 border border-slate-200 text-slate-600 font-bold rounded-2xl hover:bg-slate-50 transition-colors flex items-center gap-2"
@@ -524,7 +517,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                       </div>
                     </div>
 
-                    {/* Pre-Check Status */}
+                    {/* Pre-Check Status - CORREGIDO */}
                     <div className="flex items-start gap-3">
                       <div className="bg-white/10 p-2 rounded-lg">
                         <AlertCircle size={18} className="text-blue-400" />
@@ -534,12 +527,14 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                           Estado de Pre-Check
                         </p>
                         <p className="font-semibold text-sm text-green-400">
-                          {functionalCount}/12 Funcionales
+                          {functionalCount} módulo{functionalCount !== 1 ? 's' : ''} funcionales
                         </p>
                         <p className="text-xs text-slate-400">
-                          {functionalCount === 12
-                            ? 'Todos los sistemas operativos'
-                            : `${12 - functionalCount} módulo${12 - functionalCount > 0 ? 's' : ''} defectuoso`}
+                          {functionalCount === 0
+                            ? 'Ningún módulo reportado como funcional'
+                            : functionalCount === 1
+                            ? '1 módulo funcional'
+                            : `${functionalCount} módulos funcionales`}
                         </p>
                       </div>
                     </div>
@@ -548,15 +543,15 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                     <div className="pt-6 border-t border-white/10">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-slate-400 text-sm">Tarifa de Servicio</span>
-                        <span className="font-bold text-sm">$</span>
+                        <span className="font-bold text-sm">$0.00</span>
                       </div>
                       <div className="flex items-center justify-between mb-4">
                         <span className="text-slate-400 text-sm">Partes Estimadas</span>
-                        <span className="font-bold text-sm">$</span>
+                        <span className="font-bold text-sm">$0.00</span>
                       </div>
                       <div className="flex items-center justify-between text-xl font-bold pt-4 border-t border-white/20">
                         <span>Subtotal</span>
-                        <span className="text-blue-400">$</span>
+                        <span className="text-blue-400">$0.00</span>
                       </div>
                     </div>
                   </div>
@@ -567,14 +562,14 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
               <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
                 <div className="flex items-center gap-2 mb-4">
                   <Info size={18} className="text-blue-600" />
-                  <span className="text-xs font-bold text-slate-600">Process Help</span>
+                  <span className="text-xs font-bold text-slate-600">Ayuda del Proceso</span>
                 </div>
                 <p className="text-xs text-slate-500 leading-relaxed">
-                  Complete the technical diagnosis to generate the final repair quote.
-                  All hardware tests are mandatory for warranty validation.
+                  Completa el diagnóstico técnico para generar el presupuesto final.
+                  Todas las pruebas de hardware son obligatorias para la validación de la garantía.
                 </p>
                 <p className="text-[10px] text-slate-400 mt-4 italic">
-                  Draft last updated at 10:48 AM
+                  Borrador actualizado a las 10:48 AM
                 </p>
               </div>
             </div>
@@ -584,5 +579,3 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     </div>
   );
 }
-
-
