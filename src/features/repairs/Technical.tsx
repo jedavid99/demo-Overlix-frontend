@@ -67,27 +67,24 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     else setLocalData(prev => ({ ...prev, ...updates }));
   };
   const hardwareItems = [
-    { key: 'power', label: 'Power', icon: Power },
-    { key: 'display', label: 'Display', icon: MonitorPlay },
+    { key: 'power', label: 'Boton de Power', icon: Power },
+    { key: 'modulo', label: 'Modulo', icon: MonitorPlay },
     { key: 'wifi', label: 'WiFi', icon: Wifi },
-    { key: 'bluetooth', label: 'Bluetooth', icon: Bluetooth },
-    { key: 'cameras', label: 'Cameras', icon: Camera },
+    { key: 'volumen', label: 'Boton de Volumen', icon: Volume2 },
+    { key: 'frontal', label: 'Camara Frontal', icon: Camera },
     { key: 'audio', label: 'Audio', icon: Volume2 },
-    {key: 'frontarcamara', label: 'Cámara frontal', icon: Camera },
+    {key: 'trasera', label: 'Cámara Trasera', icon: Camera },
     {key: 'huella', label: 'Huella', icon: Fingerprint },
     {key: 'sensorproximidad', label: 'Sensor de Proximidad', icon: Eye },
     {key: 'bateria', label: 'Batería', icon: Battery },
-    {key: 'fichacarga', label: 'Ficha de Cargador', icon: Zap },
+    {key: 'fichacarga', label: 'Ficha de Carga', icon: Zap },
+{ key: 'altavoz', label: 'Altavoz', icon: Volume2 },
 
 
 
-//  { key: 'botonPawer', label: 'Botón de Power', icon: Power },
-//     { key: 'botonVolumen', label: 'Botón de Volumen', icon: Volume2 },
+
+
 //     
-//     { key: 'camaraFrontal', label: 'Cámara Frontal', icon: Camera },
-//     { key: 'modulo', label: 'Módulo', icon: MonitorPlay },
-//     { key: 'wifi', label: 'WiFi', icon: Wifi },
-//     { key: 'huella', label: 'Huella', icon: Fingerprint },
 //     { key: 'camaraTrasera', label: 'Cámara Trasera', icon: Camera },
 //     { key: 'audio', label: 'Audio', icon: Volume2 },
 //     { key: 'altavoz', label: 'Altavoz', icon: Volume2 },
@@ -550,12 +547,12 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                           Pre-Check Status
                         </p>
                         <p className="font-semibold text-sm text-green-400">
-                          {functionalCount}/11 Functional
+                          {functionalCount}/12 Functional
                         </p>
                         <p className="text-xs text-slate-400">
-                          {functionalCount === 11
+                          {functionalCount === 12
                             ? 'All systems operational'
-                            : `${11 - functionalCount} module${11 - functionalCount > 1 ? 's' : ''} faulty`}
+                            : `${12 - functionalCount} module${12 - functionalCount > 1 ? 's' : ''} faulty`}
                         </p>
                       </div>
                     </div>
