@@ -133,9 +133,9 @@ export default function SaleAdd() {
         </section>
 
         {/* Venta Actual */}
-         <section className="w-[420px] shrink-0 flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-  {/* Cabecera: cliente y número de venta */}
-  <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col gap-3">
+         <section className="w-[420px] shrink-0 flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm h-full max-h-[calc(100vh-120px)]">
+  {/* Cabecera: cliente y número de venta - fijo */}
+  <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col gap-3 flex-shrink-0">
     <div className="flex items-center justify-between">
       <h2 className="text-xl font-bold">Venta Actual</h2>
       <span className="text-slate-500 text-sm">#Nuevo</span>
@@ -159,8 +159,8 @@ export default function SaleAdd() {
     </div>
   </div>
 
-  {/* Lista de items del carrito (scroll) */}
-  <div className="flex-1 overflow-y-auto p-4 space-y-4">
+  {/* Lista de items del carrito (scroll) - con altura limitada */}
+  <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-[100px] max-h-[280px]">
     {items.length === 0 ? (
       <div className="text-center text-slate-400 py-12">
         <ShoppingCart className="mx-auto mb-4 opacity-20" size={48} />
@@ -207,8 +207,8 @@ export default function SaleAdd() {
     )}
   </div>
 
-  {/* Totales y acciones - MEJORADO CON MÁS ESPACIO */}
-  <div className="p-6 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 space-y-4">
+  {/* Totales y botón - fijo abajo */}
+  <div className="p-6 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 space-y-4 flex-shrink-0">
     <div className="flex items-center justify-between text-sm text-slate-500 font-medium">
       <span>Subtotal</span>
       <span>${subtotal.toFixed(2)}</span>
@@ -231,17 +231,14 @@ export default function SaleAdd() {
       <span className="text-primary">${total.toFixed(2)}</span>
     </div>
 
-    {/* Métodos de pago */}
-  
- <button
+    {/* Botón principal */}
+    <button
       onClick={() => navigate('/sales')}
-      className="w-full mt-6 py-5 bg-primary text-white rounded-xl font-bold text-lg hover:bg-primary/90 shadow-xl shadow-primary/30 transition-all flex items-center justify-center gap-2"
+      className="w-full mt-4 py-5 bg-primary text-white rounded-xl font-bold text-lg hover:bg-primary/90 shadow-xl shadow-primary/30 transition-all flex items-center justify-center gap-2"
     >
       Completar Transacción
       <ChevronRight size={20} />
     </button>
-    {/* Botón principal con mucho más espacio */}
-   
   </div>
 </section>
       </div>
