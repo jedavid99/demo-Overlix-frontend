@@ -73,12 +73,12 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     { key: 'volumen', label: 'Boton de Volumen', icon: Volume2 },
     { key: 'frontal', label: 'Camara Frontal', icon: Camera },
     { key: 'audio', label: 'Audio', icon: Volume2 },
-    {key: 'trasera', label: 'Cámara Trasera', icon: Camera },
+    {key: 'frontarcamara', label: 'Cámara frontal', icon: Camera },
     {key: 'huella', label: 'Huella', icon: Fingerprint },
     {key: 'sensorproximidad', label: 'Sensor de Proximidad', icon: Eye },
     {key: 'bateria', label: 'Batería', icon: Battery },
     {key: 'fichacarga', label: 'Ficha de Carga', icon: Zap },
- 
+  {key: 'cargador', label: 'Cargador', icon: Zap}
 
 
 
