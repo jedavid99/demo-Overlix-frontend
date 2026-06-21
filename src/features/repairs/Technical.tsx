@@ -17,6 +17,7 @@ import {
   Key,
   Eye,
   Battery,
+  Zap,
 } from 'lucide-react';
 import { MdCheck, MdBuild } from 'react-icons/md';
 import type { RepairData } from './RepairFlow';
@@ -75,11 +76,14 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     {key: 'frontarcamara', label: 'Cámara frontal', icon: Camera },
     {key: 'huella', label: 'Huella', icon: Fingerprint },
     {key: 'sensorproximidad', label: 'Sensor de Proximidad', icon: Eye },
-    {key: 'teclado', label: 'Batería', icon: Battery },
+    {key: 'bateria', label: 'Batería', icon: Battery },
+    {key: 'fichacarga', label: 'Ficha de Cargador', icon: Zap },
 
+
+    
 //  { key: 'botonPawer', label: 'Botón de Power', icon: Power },
 //     { key: 'botonVolumen', label: 'Botón de Volumen', icon: Volume2 },
-//     { key: 'sensorProximidad', label: 'Sensor de Proximidad', icon: Eye },
+//     
 //     { key: 'camaraFrontal', label: 'Cámara Frontal', icon: Camera },
 //     { key: 'modulo', label: 'Módulo', icon: MonitorPlay },
 //     { key: 'wifi', label: 'WiFi', icon: Wifi },
@@ -88,7 +92,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
 //     { key: 'audio', label: 'Audio', icon: Volume2 },
 //     { key: 'altavoz', label: 'Altavoz', icon: Volume2 },
 //     { key: 'fichaCarga', label: 'Ficha de Carga', icon: Zap },
-//     { key: 'bateria', label: 'Batería', icon: Battery },
+//     
 
   ];
 
