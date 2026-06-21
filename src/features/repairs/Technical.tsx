@@ -13,6 +13,10 @@ import {
   AlertCircle,
   Info,
   Check,
+  Battery,
+  Fingerprint,
+  Eye,
+  Zap,
 } from 'lucide-react';
 import { MdCheck, MdBuild } from 'react-icons/md';
 import type { RepairData } from './RepairFlow';
@@ -62,12 +66,18 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     else setLocalData(prev => ({ ...prev, ...updates }));
   };
   const hardwareItems = [
-    { key: 'power', label: 'Power', icon: Power },
-    { key: 'display', label: 'Display', icon: MonitorPlay },
+    { key: 'BotonPawer', label: 'Boton de Power', icon: Power },
+    { key: 'BotonVolumen', label: 'Boton de Volumen', icon: Volume2 },
+    { key: 'sensorProximidad', label: 'Sensor de Proximidad', icon: Eye },
+    { key: 'camaraFrontal', label: 'Camara Frontal', icon: Camera },
+    { key: 'Modulo', label: 'Modulo', icon: MonitorPlay },
     { key: 'wifi', label: 'WiFi', icon: Wifi },
-    { key: 'bluetooth', label: 'Bluetooth', icon: Bluetooth },
-    { key: 'cameras', label: 'Cameras', icon: Camera },
+    { key: 'Huella', label: 'Huella', icon: Fingerprint },
+    { key: 'camaraTrasera', label: 'Camara Trasera', icon: Camera },
     { key: 'audio', label: 'Audio', icon: Volume2 },
+    { key: 'altavoz', label: 'Altavoz', icon: Volume2 },
+    { key: 'fichaCarga', label: 'Ficha de Carga', icon: Zap },
+    { key: 'bateria', label: 'Bateria', icon: Battery },
   ];
 
   const handleHardwareToggle = (key: string) => {
@@ -283,7 +293,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                   <div className="bg-amber-100 text-amber-600 p-2 rounded-xl">
                     <Lock size={20} />
                   </div>
-                  <h2 className="text-lg font-bold text-slate-900">Security & Access</h2>
+                  <h2 className="text-lg font-bold text-slate-900">Seguridad y Acceso</h2>
                 </div>
 
                 <div className="space-y-6">
@@ -313,7 +323,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                       {state.securityType === 'pin' && (
                         <div>
                           <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
-                            Access PIN / Password
+                            PIN / Clave
                           </label>
                           <div className="relative">
                             <input
@@ -333,7 +343,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                       {state.securityType === 'pattern' && (
                         <div>
                           <p className="text-[10px] font-bold text-slate-400 uppercase mb-4">
-                            Pattern Lock Visualization - Arrastra para dibujar
+                            Patrón de Bloqueo - Arrastra para dibujar
                           </p>
                           <div className="flex flex-col items-center gap-4">
                             <div className="relative bg-white p-8 rounded-3xl border-2 border-blue-200 shadow-md" style={{ width: '280px', height: '280px' }}>
@@ -406,7 +416,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                   <div className="bg-emerald-100 text-emerald-600 p-2 rounded-xl">
                     <AlertCircle size={20} />
                   </div>
-                  <h2 className="text-lg font-bold text-slate-900">Internal Diagnosis</h2>
+                  <h2 className="text-lg font-bold text-slate-900">Diagnóstico Interno</h2>
                 </div>
 
                 <div className="space-y-4">
@@ -440,13 +450,13 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                 className="px-6 py-3 border border-slate-200 text-slate-600 font-bold rounded-2xl hover:bg-slate-50 transition-colors flex items-center gap-2"
               >
                 <ArrowLeft size={18} />
-                Back to Client Info
+                Volver a Información del Cliente
               </button>
               <button
                 onClick={onNext}
                 className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-200 transition-all flex items-center gap-2 group"
               >
-                Next Step: Final Review
+                Siguiente Paso: Revisión Final
                 <ArrowRight
                   size={18}
                   className="group-hover:translate-x-1 transition-transform"
