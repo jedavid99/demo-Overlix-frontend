@@ -307,33 +307,46 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
           <div className="lg:col-span-8 space-y-6">
             {/* Cliente */}
             <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-4">
-                  {/* <div className="flex items-center gap-3">
-                    <div className="bg-primary/10 text-primary p-2 rounded-xl">
-                      <Search size={18} />
-                    </div>
-                    <h2 className="text-base font-bold text-foreground">Selección de Cliente</h2>
-                  </div> */}
-                  <div className="relative group">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Buscar por nombre, teléfono o número de identificación..."
-                    className="w-full pl-10 pr-4 py-3 bg-muted border border-border rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm font-medium text-foreground"
-                  />
-                </div>
-                  <Button variant="ghost" className="text-primary text-sm">
-                    <UserPlus size={16} className="mr-1" />
-                    Agregar Nuevo Cliente
-                  </Button>
-                </div>
-                
-             
-              </CardContent>
-            </Card>
+  <CardContent className="p-4">
+    <div className="flex items-center gap-2 mb-3">
+      <div className="relative flex-1">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Buscar cliente por nombre, teléfono..."
+          className="w-full pl-9 pr-4 py-2 bg-muted border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm text-foreground"
+        />
+      </div>
+      <Button variant="ghost" size="sm" className="text-primary whitespace-nowrap px-3">
+        <UserPlus size={16} className="mr-1" />
+        Agregar
+      </Button>
+    </div>
+
+    {state.selectedClient ? (
+      <div className="flex items-center justify-between p-2 bg-primary/5 rounded-lg border border-primary/20">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs">
+            {state.selectedClient.name?.charAt(0) || '?'}
+          </div>
+          <div>
+            <p className="font-semibold text-sm text-foreground">{state.selectedClient.name}</p>
+            <p className="text-[10px] text-muted-foreground">{state.selectedClient.phone}</p>
+          </div>
+        </div>
+        <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => applyUpdate({ selectedClient: null })}>
+          Cambiar
+        </Button>
+      </div>
+    ) : (
+      <p className="text-center text-xs text-muted-foreground py-2">
+        No hay cliente seleccionado.
+      </p>
+    )}
+  </CardContent>
+</Card>
 
             {/* Dispositivo + Especificaciones */}
             <Card>
