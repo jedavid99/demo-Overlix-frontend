@@ -46,6 +46,7 @@ import type { RepairData } from './RepairFlow';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
+import { Navigate } from 'react-router-dom';
 
 // Mapa de hardware por categoría
 const hardwareByCategory: Record<string, { key: string; label: string; icon: any }[]> = {
@@ -319,7 +320,12 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
           className="w-full pl-9 pr-4 py-2.5 bg-muted border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm text-foreground"
         />
       </div>
-      <Button variant="ghost" size="sm" className="text-primary whitespace-nowrap px-3">
+      <Button
+        variant="ghost"
+        size="sm"
+        className="text-primary whitespace-nowrap px-3"
+        onClick={() => Navigate('/clients/add')}
+      >
         <UserPlus size={16} className="mr-1" />
         Agregar
       </Button>
