@@ -29,6 +29,28 @@ interface RepairTechnicalProps {
   currentStep?: number;
 }
 
+// Definimos las claves de hardware que usaremos en todo el componente
+const HARDWARE_KEYS = [
+  'botonPawer',
+  'botonVolumen',
+  'sensorProximidad',
+  'camaraFrontal',
+  'modulo',
+  'wifi',
+  'huella',
+  'camaraTrasera',
+  'audio',
+  'altavoz',
+  'fichaCarga',
+  'bateria',
+] as const;
+
+type HardwareKeys = typeof HARDWARE_KEYS[number];
+
+// Creamos un objeto con todas las claves en false
+const createDefaultHardwareChecks = () =>
+  HARDWARE_KEYS.reduce((acc, key) => ({ ...acc, [key]: false }), {} as Record<HardwareKeys, boolean>);
+
 export default function RepairTechnical({ data, updateData, onNext = () => {}, onBack = () => {}, currentStep = 2 }: RepairTechnicalProps) {
   const defaultData: RepairData = {
     selectedClient: null,
@@ -41,14 +63,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     issueDescription: '',
     priority: 'Normal',
     estimatedDays: 3,
-    hardwareChecks: {
-      power: false,
-      display: false,
-      wifi: false,
-      bluetooth: false,
-      cameras: false,
-      audio: false,
-    },
+    hardwareChecks: createDefaultHardwareChecks(), // todas false
     securityType: 'pin',
     accessPin: '',
     patternDots: [false, false, false, false, false, false, false, false, false],
@@ -66,15 +81,29 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     else setLocalData(prev => ({ ...prev, ...updates }));
   };
 
+  // Aseguramos que hardwareChecks tenga todas las claves, incluso si vienen del padre sin algunas
+  useEffect(() => {
+    if (data?.hardwareChecks) {
+      // Si el padre tiene hardwareChecks, nos aseguramos de tener todas las claves (fusionamos)
+      const merged = { ...createDefaultHardwareChecks(), ...data.hardwareChecks };
+      // Solo actualizamos si hay diferencias para evitar bucles
+      const currentKeys = Object.keys(state.hardwareChecks);
+      const newKeys = Object.keys(merged);
+      if (currentKeys.length !== newKeys.length || currentKeys.some(k => !newKeys.includes(k))) {
+        applyUpdate({ hardwareChecks: merged as any });
+      }
+    }
+  }, [data]);
+
   const hardwareItems = [
-    { key: 'botonpawer', label: 'Botón de Power', icon: Power },
-    { key: 'botonvolumen', label: 'Botón de Volumen', icon: Volume2 },
-    { key: 'sensorproximidad', label: 'Sensor de Proximidad', icon: Eye },
-    { key: 'camarafrontal', label: 'Cámara Frontal', icon: Camera },
+    { key: 'botonPawer', label: 'Botón de Power', icon: Power },
+    { key: 'botonVolumen', label: 'Botón de Volumen', icon: Volume2 },
+    { key: 'sensorProximidad', label: 'Sensor de Proximidad', icon: Eye },
+    { key: 'camaraFrontal', label: 'Cámara Frontal', icon: Camera },
     { key: 'modulo', label: 'Módulo', icon: MonitorPlay },
     { key: 'wifi', label: 'WiFi', icon: Wifi },
     { key: 'huella', label: 'Huella', icon: Fingerprint },
-    { key: 'camaratraser', label: 'Cámara Trasera', icon: Camera },
+    { key: 'camaraTrasera', label: 'Cámara Trasera', icon: Camera },
     { key: 'audio', label: 'Audio', icon: Volume2 },
     { key: 'altavoz', label: 'Altavoz', icon: Volume2 },
     { key: 'fichaCarga', label: 'Ficha de Carga', icon: Zap },
@@ -82,18 +111,15 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
   ];
 
   const handleHardwareToggle = (key: string) => {
-    // Solo actualiza si la clave existe en hardwareChecks
-    if (key in state.hardwareChecks) {
-      const updated = { ...state.hardwareChecks };
-      updated[key as keyof typeof state.hardwareChecks] = !updated[key as keyof typeof state.hardwareChecks];
-      applyUpdate({ hardwareChecks: updated });
-    }
+    const current = state.hardwareChecks as Record<string, boolean>;
+    const updated = { ...current, [key]: !current[key] };
+    applyUpdate({ hardwareChecks: updated });
   };
 
-  // Contador de funcionales (solo las claves que existen en el estado)
+  // Contador de funcionales
   const functionalCount = Object.values(state.hardwareChecks).filter(Boolean).length;
 
-  // Pattern drawing helpers
+  // Pattern drawing helpers (sin cambios)
   const isDrawing = useRef(false);
   const seqRef = useRef<number[]>(state.patternSequence ? [...state.patternSequence] : []);
   const [localDots, setLocalDots] = useState<boolean[]>(state.patternDots.slice());
@@ -195,9 +221,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
               { num: 3, label: 'Finalizar', icon: <MdCheck size={16} />, completed: false },
             ].map((step, idx) => (
               <React.Fragment key={step.num}>
-                <div
-                  className={`flex items-center gap-2 opacity-${currentStep >= step.num ? '100' : '40'}`}
-                >
+                <div className={`flex items-center gap-2 opacity-${currentStep >= step.num ? '100' : '40'}`}>
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                       currentStep > step.num
@@ -209,13 +233,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                   >
                     {currentStep > step.num ? <MdCheck size={12} /> : step.num}
                   </div>
-                  <span
-                    className={`text-sm font-semibold ${
-                      currentStep >= step.num
-                        ? 'text-foreground'
-                        : 'text-muted-foreground'
-                    }`}
-                  >
+                  <span className={`text-sm font-semibold ${currentStep >= step.num ? 'text-foreground' : 'text-muted-foreground'}`}>
                     {step.label}
                   </span>
                 </div>
@@ -241,8 +259,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
                 {hardwareItems.map((item) => {
                   const Icon = item.icon;
-                  // Verificamos si la clave existe en el estado
-                  const isChecked = state.hardwareChecks[item.key as keyof typeof state.hardwareChecks] ?? false;
+                  const isChecked = (state.hardwareChecks as Record<string, boolean>)[item.key] ?? false;
 
                   return (
                     <div
@@ -250,13 +267,8 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                       className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 hover:border-slate-200 transition-colors"
                     >
                       <div className="flex items-center gap-3">
-                        <Icon
-                          size={18}
-                          className={`${isChecked ? 'text-blue-600' : 'text-slate-400'}`}
-                        />
-                        <span className="text-sm font-bold text-slate-700">
-                          {item.label}
-                        </span>
+                        <Icon size={18} className={isChecked ? 'text-blue-600' : 'text-slate-400'} />
+                        <span className="text-sm font-bold text-slate-700">{item.label}</span>
                       </div>
 
                       {/* Toggle Switch */}
@@ -297,7 +309,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                 </div>
 
                 <div className="space-y-6">
-                  {/* Security Type Selector */}
                   <div className="flex p-1 bg-slate-100 rounded-xl">
                     {[
                       { id: 'ninguno', label: 'Ninguno' },
@@ -322,38 +333,25 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                     <div className="space-y-4">
                       {state.securityType === 'pin' && (
                         <div>
-                          <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
-                            PIN / Clave
-                          </label>
+                          <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">PIN / Clave</label>
                           <div className="relative">
                             <input
                               type="password"
                               value={state.accessPin}
-                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => applyUpdate({ accessPin: e.target.value })}
+                              onChange={(e) => applyUpdate({ accessPin: e.target.value })}
                               placeholder="••••••"
                               className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-100 focus:border-blue-600 transition-all font-mono font-bold tracking-widest text-slate-900"
                             />
-                            <Lock
-                              size={18}
-                              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                            />
+                            <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                           </div>
                         </div>
                       )}
                       {state.securityType === 'Patron' && (
                         <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-4">
-                            Patrón de Bloqueo - Arrastra para dibujar
-                          </p>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase mb-4">Patrón de Bloqueo - Arrastra para dibujar</p>
                           <div className="flex flex-col items-center gap-4">
                             <div className="relative bg-white p-8 rounded-3xl border-2 border-blue-200 shadow-md" style={{ width: '280px', height: '280px' }}>
-                              <canvas
-                                ref={canvasRef}
-                                width={280}
-                                height={280}
-                                className="absolute inset-0 rounded-3xl"
-                                style={{ cursor: 'crosshair' }}
-                              />
+                              <canvas ref={canvasRef} width={280} height={280} className="absolute inset-0 rounded-3xl" style={{ cursor: 'crosshair' }} />
                               <div className="absolute inset-8 grid grid-cols-3 gap-6 pointer-events-none">
                                 {localDots.map((_, idx) => (
                                   <div key={idx} className="w-full h-full" />
@@ -373,26 +371,17 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                                         ? 'bg-blue-600 shadow-lg shadow-blue-300 scale-110'
                                         : 'bg-slate-300 hover:bg-slate-400 hover:scale-105'
                                     }`}
-                                    style={{
-                                      width: '50px',
-                                      height: '50px',
-                                      margin: 'auto',
-                                    }}
+                                    style={{ width: '50px', height: '50px', margin: 'auto' }}
                                   />
                                 ))}
                               </div>
                             </div>
-                            
                             {seqRef.current.length > 0 && (
                               <div className="text-sm text-slate-700 bg-blue-50 px-4 py-2 rounded-lg border border-blue-100">
                                 <span className="font-semibold">Secuencia dibujada:</span> {seqRef.current.map(n => n + 1).join(' → ')}
                               </div>
                             )}
-                            
-                            <button 
-                              onClick={clearPattern} 
-                              className="text-sm text-blue-600 hover:text-blue-700 hover:underline font-bold transition-colors"
-                            >
+                            <button onClick={clearPattern} className="text-sm text-blue-600 hover:text-blue-700 hover:underline font-bold transition-colors">
                               Limpiar Patrón
                             </button>
                           </div>
@@ -411,26 +400,20 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                   </div>
                   <h2 className="text-lg font-bold text-slate-900">Diagnóstico Interno</h2>
                 </div>
-
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
-                      Notas del Técnico
-                    </label>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Notas del Técnico</label>
                     <textarea
                       value={state.technicianNotes}
-                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => applyUpdate({ technicianNotes: e.target.value })}
+                      onChange={(e) => applyUpdate({ technicianNotes: e.target.value })}
                       placeholder="Introduce los hallazgos preliminares, indicadores de humedad, observaciones de daño interno..."
                       rows={8}
                       className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-600 transition-all text-slate-900"
                     />
                   </div>
-
                   <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 p-3 rounded-xl border border-emerald-100">
                     <Check size={20} />
-                    <span className="text-xs font-semibold">
-                      Listo para selección de piezas y revisión final
-                    </span>
+                    <span className="text-xs font-semibold">Listo para selección de piezas y revisión final</span>
                   </div>
                 </div>
               </section>
@@ -442,18 +425,14 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                 onClick={onBack}
                 className="px-6 py-3 border border-slate-200 text-slate-600 font-bold rounded-2xl hover:bg-slate-50 transition-colors flex items-center gap-2"
               >
-                <ArrowLeft size={18} />
-                Volver a Información del Cliente
+                <ArrowLeft size={18} /> Volver a Información del Cliente
               </button>
               <button
                 onClick={onNext}
                 className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-200 transition-all flex items-center gap-2 group"
               >
                 Siguiente Paso: Revisión Final
-                <ArrowRight
-                  size={18}
-                  className="group-hover:translate-x-1 transition-transform"
-                />
+                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           </div>
@@ -461,33 +440,23 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
           {/* Right Column - Ticket Summary */}
           <div className="lg:col-span-4">
             <div className="sticky top-24 space-y-6">
-              {/* Ticket Summary Card */}
               <div className="bg-slate-900 text-white rounded-[2rem] p-8 shadow-2xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-16 -mt-16"></div>
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-8">
                     <h3 className="font-bold text-lg">Resumen del Ticket</h3>
-                    <span className="text-[10px] font-bold bg-blue-600/30 text-blue-300 px-2 py-1 rounded uppercase tracking-widest">
-                      En Progreso
-                    </span>
+                    <span className="text-[10px] font-bold bg-blue-600/30 text-blue-300 px-2 py-1 rounded uppercase tracking-widest">En Progreso</span>
                   </div>
-
                   <div className="space-y-6">
                     {/* Customer */}
                     <div className="flex items-start gap-3">
                       <div className="bg-white/10 p-2 rounded-lg">
-                        <svg
-                          className="w-5 h-5 text-blue-400"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
+                        <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                         </svg>
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase">
-                          Cliente
-                        </p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase">Cliente</p>
                         <p className="font-semibold text-sm">{state.selectedClient?.name || 'N/A'}</p>
                         <p className="text-xs text-slate-400">{state.selectedClient?.phone || ''}</p>
                       </div>
@@ -496,44 +465,32 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                     {/* Device Info */}
                     <div className="flex items-start gap-3">
                       <div className="bg-white/10 p-2 rounded-lg">
-                        <svg
-                          className="w-5 h-5 text-blue-400"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
+                        <svg className="w-5 h-5 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M17 2H7c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-5 18c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm5-3H7V4h10v13z" />
                         </svg>
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase">
-                          Información del Dispositivo
-                        </p>
-                        <p className="font-semibold text-sm">
-                          {state.brand && state.model ? `${state.brand} ${state.model}` : 'N/A'}
-                        </p>
-                        <p className="text-xs text-slate-400 font-mono">
-                          IMEI: {state.serial || '---'}
-                        </p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase">Información del Dispositivo</p>
+                        <p className="font-semibold text-sm">{state.brand && state.model ? `${state.brand} ${state.model}` : 'N/A'}</p>
+                        <p className="text-xs text-slate-400 font-mono">IMEI: {state.serial || '---'}</p>
                       </div>
                     </div>
 
-                    {/* Pre-Check Status - CORREGIDO */}
+                    {/* Pre-Check Status - AHORA CORRECTO */}
                     <div className="flex items-start gap-3">
                       <div className="bg-white/10 p-2 rounded-lg">
                         <AlertCircle size={18} className="text-blue-400" />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase">
-                          Estado de Pre-Check
-                        </p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase">Estado de Pre-Check</p>
                         <p className="font-semibold text-sm text-green-400">
-                          {functionalCount} módulo{functionalCount !== 12 ? 's' : ''} funcionales
+                          {functionalCount} módulo{functionalCount !== 1 ? 's' : ''} funcionales
                         </p>
                         <p className="text-xs text-slate-400">
-                          {functionalCount === 12
-                            ? 'Todos los módulos funcionales'
-                            : functionalCount === 0
+                          {functionalCount === 0
                             ? 'Ningún módulo reportado como funcional'
+                            : functionalCount === 1
+                            ? '1 módulo funcional'
                             : `${functionalCount} módulos funcionales`}
                         </p>
                       </div>
@@ -558,7 +515,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                 </div>
               </div>
 
-              {/* Process Help */}
               <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
                 <div className="flex items-center gap-2 mb-4">
                   <Info size={18} className="text-blue-600" />
@@ -568,9 +524,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                   Completa el diagnóstico técnico para generar el presupuesto final.
                   Todas las pruebas de hardware son obligatorias para la validación de la garantía.
                 </p>
-                <p className="text-[10px] text-slate-400 mt-4 italic">
-                  Borrador actualizado a las 10:48 AM
-                </p>
+                <p className="text-[10px] text-slate-400 mt-4 italic">Borrador actualizado a las 10:48 AM</p>
               </div>
             </div>
           </div>
