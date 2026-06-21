@@ -135,7 +135,7 @@ export default function SaleAdd() {
         {/* Venta Actual */}
          <section className="w-[420px] shrink-0 flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm h-full max-h-[calc(100vh-120px)]">
   {/* Cabecera: cliente y número de venta - fijo */}
-  <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col gap-3 flex-shrink-0">
+  {/* <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col gap-3 flex-shrink-0">
     <div className="flex items-center justify-between">
       <h2 className="text-xl font-bold">Venta Actual</h2>
       <span className="text-slate-500 text-sm">#Nuevo</span>
@@ -157,7 +157,7 @@ export default function SaleAdd() {
         </button>
       </div>
     </div>
-  </div>
+  </div> */}
 
   {/* Lista de items del carrito (scroll) - con altura limitada */}
   <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-[100px] max-h-[280px]">
