@@ -107,23 +107,7 @@ export default function ClientAdd() {
         </div>
 
         <div className="mt-6 border-t pt-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-green-50 rounded-md text-green-600"><MessageCircle size={18} /></div>
-              <div>
-                <div className="font-medium">Notificaciones por WhatsApp</div>
-                <div className="text-sm text-gray-500">Enviar actualizaciones automáticas del estado de la orden.</div>
-              </div>
-            </div>
-
-            <div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" name="whatsapp" checked={!!form.whatsapp} onChange={handleChange as any} className="sr-only" />
-                <span className={`w-11 h-6 inline-block rounded-full transition-colors ${form.whatsapp ? 'bg-green-500' : 'bg-gray-300'}`} />
-                <span className="ml-3 text-sm text-gray-600">{form.whatsapp ? 'Activado' : 'Inactivo'}</span>
-              </label>
-            </div>
-          </div>
+          
 
           <div className="mt-6 flex items-center justify-end gap-3">
             <button type="button" onClick={() => navigate('/clients')} className="px-4 py-2 border rounded">Cancelar</button>
