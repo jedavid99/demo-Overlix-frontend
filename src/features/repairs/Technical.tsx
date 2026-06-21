@@ -68,7 +68,7 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
   };
   const hardwareItems = [
     { key: 'power', label: 'Boton de Power', icon: Power },
-    { key: 'modulo', label: 'Modulo', icon: MonitorPlay },
+    { key: 'Modulo', label: 'Modulo', icon: MonitorPlay },
     { key: 'wifi', label: 'WiFi', icon: Wifi },
     { key: 'bluetooth', label: 'Bluetooth', icon: Bluetooth },
     { key: 'cameras', label: 'Cameras', icon: Camera },
