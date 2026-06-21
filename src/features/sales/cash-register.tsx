@@ -79,23 +79,23 @@ export default function CajaDiaria() {
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center py-3 border-b border-border">
                 <span className="text-muted-foreground">Efectivo inicial</span>
-                <span className="font-semibold text-foreground">$500.00</span>
+                <span className="font-semibold text-foreground">$</span>
               </div>
               <div className="flex justify-between items-center py-3 border-b border-border">
                 <span className="text-muted-foreground">Ventas en efectivo (+)</span>
-                <span className="font-semibold text-foreground">$1,240.50</span>
+                <span className="font-semibold text-foreground">$</span>
               </div>
               <div className="flex justify-between items-center py-3 border-b border-border">
                 <span className="text-muted-foreground">Ventas tarjeta (ref)</span>
-                <span className="font-semibold text-muted-foreground">$850.00</span>
+                <span className="font-semibold text-muted-foreground">$</span>
               </div>
               <div className="flex justify-between items-center py-3 border-b border-border">
                 <span className="text-muted-foreground">Gastos (-)</span>
-                <span className="font-semibold text-destructive">-$45.00</span>
+                <span className="font-semibold text-destructive">$</span>
               </div>
               <div className="flex justify-between items-center pt-6">
                 <span className="text-lg font-bold text-foreground">Total esperado</span>
-                <span className="text-2xl font-bold text-primary">${expectedBalance.toFixed(2)}</span>
+                <span className="text-2xl font-bold text-primary">$</span>
               </div>
             </CardContent>
           </Card>
@@ -235,12 +235,12 @@ export default function CajaDiaria() {
                 {hasDiscrepancy ? (
                   <>
                     <MdWarning size={24} className="text-destructive" />
-                    <span className="text-3xl font-bold text-destructive">${Math.abs(parseFloat(discrepancy)).toFixed(2)}</span>
+                    <span className="text-3xl font-bold text-destructive">$</span>
                   </>
                 ) : (
                   <>
                     <MdCheckCircle size={24} className="text-success" />
-                    <span className="text-3xl font-bold text-success">$0.00</span>
+                    <span className="text-3xl font-bold text-success">$</span>
                   </>
                 )}
               </div>
