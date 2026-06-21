@@ -234,52 +234,55 @@ export default function SaleAdd() {
           </div>
 
           {/* Totales y acciones */}
-          <div className="p-4 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 space-y-3">
-            <div className="flex items-center justify-between text-sm text-slate-500 font-medium">
-              <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex items-center justify-between text-sm text-slate-500 font-medium">
-              <div className="flex items-center gap-1">
-                <span>Impuesto</span>
-                <span className="text-[10px] bg-slate-200 dark:bg-slate-700 px-1 rounded">8%</span>
-              </div>
-              <span>${tax.toFixed(2)}</span>
-            </div>
-            <div className="flex items-center justify-between text-sm text-slate-500 font-medium pb-2 border-b border-dashed border-slate-300 dark:border-slate-600">
-              <button className="text-primary flex items-center gap-1 hover:underline">
-                <DollarSign size={14} /> Aplicar Descuento
-              </button>
-              <span>-$0.00</span>
-            </div>
-            <div className="flex items-center justify-between text-xl font-extrabold text-slate-900 dark:text-slate-100 py-2">
-              <span>Total</span>
-              <span className="text-primary">${total.toFixed(2)}</span>
-            </div>
+          <div className="p-4 pb-6 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 space-y-3">
+  {/* Totales */}
+  <div className="flex items-center justify-between text-sm text-slate-500 font-medium">
+    <span>Subtotal</span>
+    <span>${subtotal.toFixed(2)}</span>
+  </div>
+  <div className="flex items-center justify-between text-sm text-slate-500 font-medium">
+    <div className="flex items-center gap-1">
+      <span>Impuesto</span>
+      <span className="text-[10px] bg-slate-200 dark:bg-slate-700 px-1 rounded">8%</span>
+    </div>
+    <span>${tax.toFixed(2)}</span>
+  </div>
+  <div className="flex items-center justify-between text-sm text-slate-500 font-medium pb-2 border-b border-dashed border-slate-300 dark:border-slate-600">
+    <button className="text-primary flex items-center gap-1 hover:underline">
+      <DollarSign size={14} /> Aplicar Descuento
+    </button>
+    <span>-$0.00</span>
+  </div>
+  <div className="flex items-center justify-between text-xl font-extrabold text-slate-900 dark:text-slate-100 py-2">
+    <span>Total</span>
+    <span className="text-primary">${total.toFixed(2)}</span>
+  </div>
 
-            <div className="grid grid-cols-3 gap-2 pt-2">
-              <button className="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:border-primary hover:text-primary transition-all">
-                <span className="mb-1"><CreditCard size={18} /></span>
-                <span className="text-[10px] font-bold uppercase tracking-wider">Tarjeta</span>
-              </button>
-              <button className="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:border-primary hover:text-primary transition-all">
-                <span className="mb-1">💵</span>
-                <span className="text-[10px] font-bold uppercase tracking-wider">Efectivo</span>
-              </button>
-              <button className="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:border-primary hover:text-primary transition-all">
-                <span className="mb-1">🔀</span>
-                <span className="text-[10px] font-bold uppercase tracking-wider">Dividir</span>
-              </button>
-            </div>
+  {/* Métodos de pago */}
+  <div className="grid grid-cols-3 gap-2 pt-2">
+    <button className="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:border-primary hover:text-primary transition-all">
+      <span className="mb-1"><CreditCard size={18} /></span>
+      <span className="text-[10px] font-bold uppercase tracking-wider">Tarjeta</span>
+    </button>
+    <button className="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:border-primary hover:text-primary transition-all">
+      <span className="mb-1">💵</span>
+      <span className="text-[10px] font-bold uppercase tracking-wider">Efectivo</span>
+    </button>
+    <button className="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:border-primary hover:text-primary transition-all">
+      <span className="mb-1">🔀</span>
+      <span className="text-[10px] font-bold uppercase tracking-wider">Dividir</span>
+    </button>
+  </div>
 
-            <button
-              onClick={() => navigate('/sales')}
-              className="w-full py-4 bg-primary text-white rounded-xl font-bold text-lg hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2"
-            >
-              Completar Transacción
-              <ChevronRight size={18} />
-            </button>
-          </div>
+  {/* Botón principal con más espacio */}
+  <button
+    onClick={() => navigate('/sales')}
+    className="w-full mt-4 py-5 bg-primary text-white rounded-xl font-bold text-lg hover:bg-primary/90 shadow-xl shadow-primary/30 transition-all flex items-center justify-center gap-2"
+  >
+    Completar Transacción
+    <ChevronRight size={20} />
+  </button>
+</div>
         </section>
       </div>
     </div>
