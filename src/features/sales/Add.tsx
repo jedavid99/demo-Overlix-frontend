@@ -42,10 +42,10 @@ export default function SaleAdd() {
   return (
     <div className="h-full flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-extrabold">Add New Sale</h1>
+        <h1 className="text-2xl font-extrabold">Crear Venta</h1>
         <div className="flex items-center gap-2">
-          <button onClick={() => navigate('/sales')} className="px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm">Back to Sales</button>
-          <button className="px-4 py-2 rounded-lg bg-primary text-white font-bold">Custom Item</button>
+          <button onClick={() => navigate('/sales')} className="px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-sm">Volver a Ventas</button>
+          <button className="px-4 py-2 rounded-lg bg-primary text-white font-bold">Item Personalizado</button>
         </div>
       </div>
 
@@ -53,10 +53,10 @@ export default function SaleAdd() {
         {/* Catalog */}
         <section className="flex-1 min-w-0 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm flex flex-col">
           <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <h2 className="text-lg font-bold">Catalog</h2>
+            <h2 className="text-lg font-bold">Catálogo</h2>
             <div className="flex gap-2">
               <button className="px-3 py-2 rounded-lg bg-primary text-white text-xs font-bold flex items-center gap-2">
-                <Plus size={14} /> Custom Item
+                <Plus size={14} /> Item Personalizado
               </button>
             </div>
           </div>
@@ -72,11 +72,11 @@ export default function SaleAdd() {
           </div>
 
           <div className="flex border-b border-slate-100 dark:border-slate-800 px-4">
-            <button className="px-4 py-3 text-sm font-bold border-b-2 border-primary text-primary">All Items</button>
-            <button className="px-4 py-3 text-sm font-semibold text-slate-500">Repair Services</button>
-            <button className="px-4 py-3 text-sm font-semibold text-slate-500">Screens</button>
-            <button className="px-4 py-3 text-sm font-semibold text-slate-500">Batteries</button>
-            <button className="px-4 py-3 text-sm font-semibold text-slate-500">Accessories</button>
+            <button className="px-4 py-3 text-sm font-bold border-b-2 border-primary text-primary">Todos los Items</button>
+            <button className="px-4 py-3 text-sm font-semibold text-slate-500">Servicios de Reparación</button>
+            <button className="px-4 py-3 text-sm font-semibold text-slate-500">Pantallas</button>
+            <button className="px-4 py-3 text-sm font-semibold text-slate-500">Baterías</button>
+            <button className="px-4 py-3 text-sm font-semibold text-slate-500">Accesorios</button>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4">
@@ -101,17 +101,17 @@ export default function SaleAdd() {
         <section className="w-[420px] shrink-0 flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
           <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold">Current Sale</h2>
+              <h2 className="text-xl font-bold">Venta Actual</h2>
               <span className="text-slate-500 text-sm">#INV-9402</span>
             </div>
             <div className="relative">
               <div className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                 <Search className="text-slate-400" />
                 <div className="flex-1">
-                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wide">Customer</p>
+                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wide">Cliente</p>
                   <p className="text-sm font-bold">{selectedCustomer}</p>
                 </div>
-                <button onClick={() => setSelectedCustomer('Walk-in Customer')} className="text-primary text-xs font-bold px-2 py-1 rounded bg-primary/10">Change</button>
+                <button onClick={() => setSelectedCustomer('Cliente en Caja')} className="text-primary text-xs font-bold px-2 py-1 rounded bg-primary/10">Cambiar</button>
               </div>
             </div>
           </div>
@@ -133,7 +133,7 @@ export default function SaleAdd() {
                       <span className="text-sm font-bold">{p.qty}</span>
                       <button onClick={() => changeQty(p.item.id, 1)} className="size-6 rounded border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800"><Plus size={14} /></button>
                     </div>
-                    <button onClick={() => removeItem(p.item.id)} className="text-red-500 text-xs font-bold hover:underline">Remove</button>
+                    <button onClick={() => removeItem(p.item.id)} className="text-red-500 text-xs font-bold hover:underline">Eliminar</button>
                   </div>
                 </div>
               </div>
@@ -154,7 +154,7 @@ export default function SaleAdd() {
             </div>
             <div className="flex items-center justify-between text-sm text-slate-500 font-medium pb-2 border-b border-dashed border-slate-300 dark:border-slate-600">
               <button className="text-primary flex items-center gap-1 hover:underline">
-                <DollarSign size={14} /> Add Discount
+                <DollarSign size={14} /> Aplicar Descuento
               </button>
               <span>-$0.00</span>
             </div>
@@ -165,19 +165,19 @@ export default function SaleAdd() {
             <div className="grid grid-cols-3 gap-2 pt-2">
               <button className="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:border-primary hover:text-primary transition-all">
                 <span className="mb-1"><CreditCard size={18} /></span>
-                <span className="text-[10px] font-bold uppercase tracking-wider">Card</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider">Tarjeta</span>
               </button>
               <button className="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:border-primary hover:text-primary transition-all">
                 <span className="mb-1">💵</span>
-                <span className="text-[10px] font-bold uppercase tracking-wider">Cash</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider">Efectivo</span>
               </button>
               <button className="flex flex-col items-center justify-center p-3 rounded-xl bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 hover:border-primary hover:text-primary transition-all">
                 <span className="mb-1">🔀</span>
-                <span className="text-[10px] font-bold uppercase tracking-wider">Split</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider">Dividir</span>
               </button>
             </div>
             <button onClick={() => navigate('/sales')} className="w-full py-4 bg-primary text-white rounded-xl font-bold text-lg hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2">
-              Complete Transaction
+              Completar Transacción
               <ChevronRight size={18} />
             </button>
           </div>
