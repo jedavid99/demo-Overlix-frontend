@@ -720,7 +720,30 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
             </Card>
 
             {/* NUEVA SECCIÓN: MÉTODO DE PAGO */}
-            <Card>
+            
+
+            {/* Botón Guardar */}
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex justify-end"
+            >
+              <Button
+                onClick={() => {
+                  // Generar número de orden antes de guardar
+                  const orderNum = `ORD-${String(Math.floor(Math.random() * 90000) + 10000)}`;
+                  applyUpdate({ orderNumber: orderNum });
+                  onSave();
+                }}
+                size="lg"
+                className="px-8 py-5 text-base"
+              >
+                <Check size={20} className="mr-2" />
+                Crear Orden de Servicio
+              </Button>
+            </motion.div>
+          </div>
+<Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="bg-indigo-100 text-indigo-600 p-2 rounded-xl">
@@ -800,29 +823,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                 )}
               </CardContent>
             </Card>
-
-            {/* Botón Guardar */}
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="flex justify-end"
-            >
-              <Button
-                onClick={() => {
-                  // Generar número de orden antes de guardar
-                  const orderNum = `ORD-${String(Math.floor(Math.random() * 90000) + 10000)}`;
-                  applyUpdate({ orderNumber: orderNum });
-                  onSave();
-                }}
-                size="lg"
-                className="px-8 py-5 text-base"
-              >
-                <Check size={20} className="mr-2" />
-                Crear Orden de Servicio
-              </Button>
-            </motion.div>
-          </div>
-
           {/* Right Column - Resumen del Ticket (actualizado) */}
           <div className="lg:col-span-4">
             <div className="sticky top-24 space-y-4">
