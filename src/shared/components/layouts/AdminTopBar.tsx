@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Menu, Search, Bell, User, Command, PanelLeft, ChevronDown, ArrowRight, ArrowRightToLine } from 'lucide-react'
+import { Menu, Search, Bell, User, Command, PanelLeft, ChevronDown, ArrowRight, ArrowRightToLine, LogOut } from 'lucide-react'
 import { MdSearch, MdSettings, MdBarChart, MdInventory2, MdAttachMoney, MdReceipt } from 'react-icons/md'
 import { Button } from '../../../components/ui/button'
 import { Input } from '../../../components/ui/input'
@@ -205,8 +205,7 @@ const handleLogout = () => {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-destructive cursor-pointer">
-             
-             <button onClick={handleLogout}>Cerrar sesión</button>
+             <button onClick={handleLogout}>Cerrar sesión <LogOut size={18} className="h-5 w-5 flex items-center justify-center shrink-0" /></button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
