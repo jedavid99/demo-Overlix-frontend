@@ -11,7 +11,7 @@ export interface AuthResponse {
 }
 
 export const login = async (email: string, password: string) => {
-  const response = await api.post<AuthResponse>('/auth/login', { usuario: email, clave: password });
+  const response = await api.post<AuthResponse>('/auth/login', { email, password });
   
   if (response.data.access_token) {
     localStorage.setItem('access_token', response.data.access_token);

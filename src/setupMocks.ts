@@ -10,7 +10,7 @@ if (isDev) {
     // Normalize path (strip origin)
     const path = url.replace(window.location.origin, '')
 
-    if (path === '/api/me') {
+    if (path === '/api/auth/me') {
       // If adminAuth set in localStorage, return mocked user
       const adminAuth = localStorage.getItem('adminAuth')
       if (adminAuth === 'true') {

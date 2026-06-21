@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }
 
         // If not in localStorage, attempt to validate with backend if available
-        const res = await fetch('/api/me', {
+        const res = await fetch('/api/auth/me', {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -112,7 +112,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setIsLoading(true)
 
       try {
-        const res = await fetch('/api/me', {
+        const res = await fetch('/api/auth/me', {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
