@@ -172,7 +172,6 @@ const defaultData: RepairData = {
   termsAccepted: false,
   signaturePad: '',
   printOption: 'both',
-  // Nuevos campos
   paymentMethod: 'cash',
   installmentsCount: 1,
   paymentType: 'full',
@@ -245,14 +244,12 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
   const generateSerial = () => {
     const isPhone = state.deviceType === 'phone';
     if (isPhone) {
-      // IMEI: 15 dígitos, comienza con 35 (código de fabricante)
       let imei = '35';
       for (let i = 0; i < 13; i++) {
         imei += Math.floor(Math.random() * 10);
       }
       return imei;
     } else {
-      // Serial alfanumérico de 12 caracteres
       const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
       let serial = '';
       for (let i = 0; i < 12; i++) {
@@ -446,13 +443,13 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                     <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">
                       {state.deviceType === 'phone' ? 'IMEI' : 'Serial / Número de Serie'}
                     </label>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <input
                         type="text"
                         value={state.serial}
                         onChange={(e) => applyUpdate({ serial: e.target.value })}
                         placeholder={state.deviceType === 'phone' ? '15 dígitos' : '12 caracteres'}
-                        className="flex-1 px-3 py-2 bg-muted border border-border rounded-lg focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm text-foreground"
+                        className="flex-1 min-w-[120px] px-3 py-2 bg-muted border border-border rounded-lg focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm text-foreground"
                       />
                       <Button
                         variant="outline"
@@ -719,9 +716,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
               </CardContent>
             </Card>
 
-            {/* NUEVA SECCIÓN: MÉTODO DE PAGO */}
-            
-
             {/* Botón Guardar */}
             <motion.div
               whileHover={{ scale: 1.02 }}
@@ -730,7 +724,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
             >
               <Button
                 onClick={() => {
-                  // Generar número de orden antes de guardar
                   const orderNum = `ORD-${String(Math.floor(Math.random() * 90000) + 10000)}`;
                   applyUpdate({ orderNumber: orderNum });
                   onSave();
@@ -743,89 +736,11 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
               </Button>
             </motion.div>
           </div>
-<Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="bg-indigo-100 text-indigo-600 p-2 rounded-xl">
-                    <DollarSign size={18} />
-                  </div>
-                  <h2 className="text-base font-bold text-foreground">Método de Pago</h2>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">
-                      Tipo de Pago
-                    </label>
-                    <div className="flex gap-2">
-                      {[
-                        { id: 'cash', label: 'Efectivo', icon: DollarSign },
-                        { id: 'transfer', label: 'Transferencia', icon: Building2 },
-                        { id: 'installments', label: 'Cuotas', icon: CreditCard },
-                      ].map((method) => {
-                        const Icon = method.icon;
-                        const isSelected = state.paymentMethod === method.id;
-                        return (
-                          <button
-                            key={method.id}
-                            onClick={() => applyUpdate({ paymentMethod: method.id })}
-                            className={`flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-full border transition-all ${
-                              isSelected
-                                ? 'bg-primary/5 border-primary text-primary'
-                                : 'bg-muted border-border text-muted-foreground hover:border-primary/50'
-                            }`}
-                          >
-                            <Icon size={14} />
-                            {method.label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">
-                      Modalidad de Pago
-                    </label>
-                    <div className="flex gap-2">
-                      {[
-                        { id: 'full', label: 'Completo' },
-                        { id: 'half', label: 'Mitad (50%)' },
-                      ].map((type) => (
-                        <button
-                          key={type.id}
-                          onClick={() => applyUpdate({ paymentType: type.id })}
-                          className={`px-4 py-1.5 text-xs font-bold rounded-full border transition-all ${
-                            state.paymentType === type.id
-                              ? 'bg-primary/5 border-primary text-primary'
-                              : 'bg-muted border-border text-muted-foreground hover:border-primary/50'
-                          }`}
-                        >
-                          {type.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                {state.paymentMethod === 'installments' && (
-                  <div className="mt-4 max-w-xs">
-                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">
-                      Número de Cuotas
-                    </label>
-                    <select
-                      value={state.installmentsCount}
-                      onChange={(e) => applyUpdate({ installmentsCount: parseInt(e.target.value) })}
-                      className="w-full bg-muted border border-border rounded-lg py-2 px-3 text-sm focus:ring-primary/10 focus:border-primary transition-all text-foreground"
-                    >
-                      {[1, 2, 3, 4, 5, 6, 9, 12].map((num) => (
-                        <option key={num} value={num}>{num} cuota{num > 1 ? 's' : ''}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          {/* Right Column - Resumen del Ticket (actualizado) */}
+
+          {/* Right Column - Resumen + Método de Pago */}
           <div className="lg:col-span-4">
             <div className="sticky top-24 space-y-4">
+              {/* Resumen del Ticket */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -878,23 +793,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                         </div>
                       </div>
                     )}
-                    {/* Método de pago en resumen */}
-                    <div className="flex items-start gap-3">
-                      <div className="bg-white/10 p-2 rounded-lg">
-                        <DollarSign size={16} className="text-blue-400" />
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase">Pago</p>
-                        <p className="font-semibold text-sm">
-                          {state.paymentMethod === 'cash' ? 'Efectivo' :
-                           state.paymentMethod === 'transfer' ? 'Transferencia' :
-                           `Cuotas (${state.installmentsCount})`}
-                        </p>
-                        <p className="text-xs text-slate-400">
-                          {state.paymentType === 'full' ? 'Pago completo' : '50% adelanto'}
-                        </p>
-                      </div>
-                    </div>
                     <div className="pt-4 border-t border-white/10">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-slate-400 text-sm">Mano de Obra</span>
@@ -913,6 +811,89 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                 </div>
               </motion.div>
 
+              {/* Método de Pago (NUEVA UBICACIÓN) */}
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="bg-indigo-100 text-indigo-600 p-2 rounded-xl">
+                      <DollarSign size={18} />
+                    </div>
+                    <h2 className="text-base font-bold text-foreground">Método de Pago</h2>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">
+                        Tipo de Pago
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          { id: 'cash', label: 'Efectivo', icon: DollarSign },
+                          { id: 'transfer', label: 'Transferencia', icon: Building2 },
+                          { id: 'installments', label: 'Cuotas', icon: CreditCard },
+                        ].map((method) => {
+                          const Icon = method.icon;
+                          const isSelected = state.paymentMethod === method.id;
+                          return (
+                            <button
+                              key={method.id}
+                              onClick={() => applyUpdate({ paymentMethod: method.id })}
+                              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-full border transition-all ${
+                                isSelected
+                                  ? 'bg-primary/5 border-primary text-primary'
+                                  : 'bg-muted border-border text-muted-foreground hover:border-primary/50'
+                              }`}
+                            >
+                              <Icon size={14} />
+                              {method.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">
+                        Modalidad de Pago
+                      </label>
+                      <div className="flex flex-wrap gap-2">
+                        {[
+                          { id: 'full', label: 'Completo' },
+                          { id: 'half', label: 'Mitad (50%)' },
+                        ].map((type) => (
+                          <button
+                            key={type.id}
+                            onClick={() => applyUpdate({ paymentType: type.id })}
+                            className={`px-4 py-1.5 text-xs font-bold rounded-full border transition-all ${
+                              state.paymentType === type.id
+                                ? 'bg-primary/5 border-primary text-primary'
+                                : 'bg-muted border-border text-muted-foreground hover:border-primary/50'
+                            }`}
+                          >
+                            {type.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    {state.paymentMethod === 'installments' && (
+                      <div className="max-w-xs">
+                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">
+                          Número de Cuotas
+                        </label>
+                        <select
+                          value={state.installmentsCount}
+                          onChange={(e) => applyUpdate({ installmentsCount: parseInt(e.target.value) })}
+                          className="w-full bg-muted border border-border rounded-lg py-2 px-3 text-sm focus:ring-primary/10 focus:border-primary transition-all text-foreground"
+                        >
+                          {[1, 2, 3, 4, 5, 6, 9, 12].map((num) => (
+                            <option key={num} value={num}>{num} cuota{num > 1 ? 's' : ''}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Ayuda */}
               <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
                 <div className="flex items-center gap-2 mb-2">
                   <Info size={16} className="text-blue-600" />
