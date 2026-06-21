@@ -46,7 +46,7 @@ import type { RepairData } from './RepairFlow';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 // Mapa de hardware por categoría
 const hardwareByCategory: Record<string, { key: string; label: string; icon: any }[]> = {
@@ -259,6 +259,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
       return serial;
     }
   };
+  const navigate = useNavigate();
 
   const handleGenerateSerial = () => {
     const newSerial = generateSerial();
@@ -324,7 +325,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
         variant="ghost"
         size="sm"
         className="text-primary whitespace-nowrap px-3"
-        onClick={() => Navigate('/clients/add')}
+        onClick={() => navigate('/clients/add')}
       >
         <UserPlus size={16} className="mr-1" />
         Agregar
