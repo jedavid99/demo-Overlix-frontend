@@ -48,12 +48,18 @@ export default function RepairFlow() {
     
     // Step 2 data
     hardwareChecks: {
-      power: true,
-      display: true,
-      wifi: false,
-      bluetooth: true,
-      cameras: true,
-      audio: true,
+    
+      botonPawer: true,
+      botonVolumen: true,
+      sensorProximidad: true,
+      camaraFrontal: true,
+      modulo: true,
+      wifi: true,
+      huella: true,
+      camaraTrasera: true,
+      altavoz: true,
+      fichaCarga: true,
+      bateria: true,
     },
     securityType: 'pin',
     accessPin: '920431',
@@ -92,7 +98,7 @@ export default function RepairFlow() {
   const handleComplete = () => {
     // Handle final submission
     
-    alert('Reparación completada e impresa!');
+    alert('Reparaciï¿½n completada e impresa!');
   };
 
   return (
