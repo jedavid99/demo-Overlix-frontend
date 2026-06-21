@@ -444,13 +444,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                       {state.deviceType === 'phone' ? 'IMEI' : 'Serial / Número de Serie'}
                     </label>
                     <div className="flex flex-wrap gap-2">
-                      <input
-                        type="text"
-                        value={state.serial}
-                        onChange={(e) => applyUpdate({ serial: e.target.value })}
-                        placeholder={state.deviceType === 'phone' ? '15 dígitos' : '12 caracteres'}
-                        className="flex-1 min-w-[120px] px-3 py-2 bg-muted border border-border rounded-lg focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm text-foreground"
-                      />
+                      
                       <Button
                         variant="outline"
                         size="sm"
@@ -458,8 +452,16 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                         className="text-xs whitespace-nowrap"
                       >
                         <Hash size={14} className="mr-1" />
-                        Generar
+                        
                       </Button>
+                      <input
+                        type="text"
+                        value={state.serial}
+                        onChange={(e) => applyUpdate({ serial: e.target.value })}
+                        placeholder={state.deviceType === 'phone' ? '15 dígitos' : '12 caracteres'}
+                        className="flex-1 min-w-[120px] px-3 py-2 bg-muted border border-border rounded-lg focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm text-foreground"
+                      />
+                      
                     </div>
                   </div>
                 </div>
