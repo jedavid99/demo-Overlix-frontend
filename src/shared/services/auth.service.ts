@@ -1,38 +1,26 @@
-import api from './api';
+import axios from 'axios';
 
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
-export interface AuthResponse {
-  access_token: string;
-  user?: any;
-}
+export const login = async (email: string, password: string, codigoEmpresa: string) => {
+  const payload = {
+    email,
+    contraseña: password,
+    codigo_empresa: codigoEmpresa
+  };
 
-export const login = async (email: string, password: string) => {
-  const response = await api.post<AuthResponse>('/auth/login', { email, password });
-  
-  if (response.data.access_token) {
-    localStorage.setItem('access_token', response.data.access_token);
-    if (response.data.user) {
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-    }
+  try {
+    const response = await axios.post(`${API_URL}/auth/login`, payload);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error en login:', error.response?.data);
+    throw error;
   }
-  
+};
+
+export const getMe = async (token: string) => {
+  const response = await axios.get(`${API_URL}/auth/me`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
   return response.data;
-};
-
-export const logout = () => {
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('user');
-  window.location.href = '/login';
-};
-
-export const getCurrentUser = () => {
-  const userStr = localStorage.getItem('user');
-  if (userStr) {
-    return JSON.parse(userStr);
-  }
-  return null;
 };

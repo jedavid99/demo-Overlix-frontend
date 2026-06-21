@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, LogIn, HelpCircle, Globe, Shield, ChevronRight, Building2, ArrowRight } from 'lucide-react';
-import { login } from '@/shared/services/auth.service';
+import { Mail, Lock, Eye, EyeOff, Building2, ArrowRight } from 'lucide-react';
+import { login } from '../../shared/services/auth.service';
 import logo from '/ovelix-claro.png';
 import { motion } from 'framer-motion';
 
