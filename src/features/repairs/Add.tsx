@@ -316,7 +316,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Buscar cliente por nombre, teléfono..."
-          className="w-full pl-9 pr-4 py-2 bg-muted border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm text-foreground"
+          className="w-full pl-9 pr-4 py-2.5 bg-muted border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm text-foreground"
         />
       </div>
       <Button variant="ghost" size="sm" className="text-primary whitespace-nowrap px-3">
@@ -369,7 +369,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                         className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all ${
                           isSelected
                             ? 'border-2 border-primary bg-primary/5 shadow-sm'
-                            : 'border border-border bg-muted hover:border-primary/50 hover:bg-primary/5 hover:shadow-md'
+                            : 'border border-border bg-muted hover:border-primary/30 hover:bg-primary/10 hover:shadow-sm'
                         }`}
                       >
                         <div className={`${category.bgColor} ${category.color} p-2 rounded-lg`}>
@@ -398,7 +398,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                       value={state.brand}
                       onChange={(e) => applyUpdate({ brand: e.target.value })}
                       placeholder="ej. Samsung, Apple..."
-                      className="w-full px-3 py-2 bg-muted border border-border rounded-lg focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm text-foreground"
+                      className="w-full px-3 py-2.5 bg-muted border border-border rounded-lg focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm text-foreground"
                     />
                   </div>
                   <div>
@@ -408,7 +408,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                       value={state.model}
                       onChange={(e) => applyUpdate({ model: e.target.value })}
                       placeholder="ej. Galaxy S24 Ultra..."
-                      className="w-full px-3 py-2 bg-muted border border-border rounded-lg focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm text-foreground"
+                      className="w-full px-3 py-2.5 bg-muted border border-border rounded-lg focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm text-foreground"
                     />
                   </div>
                   <div>
@@ -511,11 +511,11 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                       return (
                         <div
                           key={item.key}
-                          className="flex items-center justify-between p-2 bg-muted rounded-xl border border-slate-100 hover:border-slate-200 transition-colors"
+                          className="flex items-center justify-between p-2 bg-muted rounded-xl border border-border hover:border-border transition-colors"
                         >
                           <div className="flex items-center gap-2">
-                            <Icon size={16} className={isChecked ? 'text-blue-600' : 'text-slate-400'} />
-                            <span className="text-xs font-medium text-slate-700">{item.label}</span>
+                            <Icon size={16} className={isChecked ? 'text-primary' : 'text-muted-foreground'} />
+                            <span className="text-xs font-medium text-foreground">{item.label}</span>
                           </div>
                           <label className="relative inline-flex items-center cursor-pointer">
                             <input
@@ -524,9 +524,9 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                               onChange={() => handleHardwareToggle(item.key)}
                               className="sr-only"
                             />
-                            <div className={`w-8 h-4 rounded-full transition-colors ${isChecked ? 'bg-blue-600' : 'bg-slate-200'}`}>
+                            <div className={`w-8 h-4 rounded-full transition-colors ${isChecked ? 'bg-primary' : 'bg-muted'}`}>
                               <div
-                                className={`absolute left-0.5 top-0.5 bg-white w-3 h-3 rounded-full transition-transform shadow-sm ${
+                                className={`absolute left-0.5 top-0.5 bg-card w-3 h-3 rounded-full transition-transform shadow-sm ${
                                   isChecked ? 'translate-x-4' : ''
                                 }`}
                               />
@@ -552,7 +552,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                   className="bg-card rounded-2xl p-4 shadow-sm border border-border"
                 >
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="bg-amber-100 text-amber-600 p-2 rounded-xl">
+                    <div className="bg-warning/10 text-warning p-2 rounded-xl">
                       <Lock size={18} />
                     </div>
                     <h2 className="text-base font-bold text-foreground">Seguridad y Acceso</h2>
@@ -569,7 +569,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                           className={`flex items-center gap-2 px-4 py-1.5 text-xs font-bold rounded-full border transition-all ${
                             isSelected
                               ? 'bg-primary/5 border-primary text-primary'
-                              : 'bg-muted border-border text-muted-foreground hover:border-primary/50'
+                              : 'bg-muted border-border text-muted-foreground hover:border-primary/30'
                           }`}
                         >
                           <Icon size={14} />
@@ -581,7 +581,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
 
                   {state.securityType === 'pin' && (
                     <div className="max-w-xs">
-                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                      <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">
                         {state.deviceType === 'phone' ? 'PIN' : 'Contraseña'}
                       </label>
                       <div className="relative">
@@ -590,20 +590,20 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                           value={state.accessPin}
                           onChange={(e) => applyUpdate({ accessPin: e.target.value })}
                           placeholder="••••••"
-                          className="w-full pl-8 pr-3 py-2 bg-muted border border-slate-200 rounded-lg focus:ring-4 focus:ring-blue-100 focus:border-blue-600 transition-all font-mono text-sm text-foreground"
+                          className="w-full pl-8 pr-3 py-2.5 bg-muted border border-border rounded-lg focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-mono text-sm text-foreground"
                         />
-                        <Lock size={16} className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <Lock size={16} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
                       </div>
                     </div>
                   )}
 
                   {state.securityType === 'patron' && (
                     <div className="flex flex-col items-start gap-3">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase">Dibuja el patrón (3x3)</p>
-                      <div className="relative bg-white p-4 rounded-2xl border-2 border-blue-200 shadow-md" style={{ width: '200px', height: '200px' }}>
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase">Dibuja el patrón (3x3)</p>
+                      <div className="relative bg-card p-4 rounded-2xl border-2 border-primary/20 shadow-md" style={{ width: '200px', height: '200px' }}>
                         <div className="grid grid-cols-3 gap-4 w-full h-full">
                           {Array.from({ length: 9 }).map((_, i) => (
-                            <div key={i} className="w-full h-full bg-slate-200 rounded-full hover:bg-blue-200 transition-colors" />
+                            <div key={i} className="w-full h-full bg-muted rounded-full hover:bg-primary/20 transition-colors" />
                           ))}
                         </div>
                       </div>
@@ -613,8 +613,8 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
 
                   {state.securityType === 'huella' && (
                     <div className="flex items-center gap-3">
-                      <Fingerprint size={24} className="text-blue-600" />
-                      <span className="text-sm text-slate-700">Dispositivo con lector de huellas</span>
+                      <Fingerprint size={24} className="text-primary" />
+                      <span className="text-sm text-foreground">Dispositivo con lector de huellas</span>
                     </div>
                   )}
                 </motion.section>
@@ -625,7 +625,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="bg-emerald-100 text-emerald-600 p-2 rounded-xl">
+                  <div className="bg-success/10 text-success p-2 rounded-xl">
                     <AlertCircle size={18} />
                   </div>
                   <h2 className="text-base font-bold text-foreground">Diagnóstico y Notas</h2>
@@ -711,7 +711,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-primary text-primary-foreground rounded-2xl p-5 lg:p-6 shadow-2xl relative overflow-hidden"
+                className="bg-primary text-primary-foreground rounded-2xl p-5 lg:p-6 shadow-lg relative overflow-hidden"
               >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary-foreground/10 rounded-full -mr-16 -mt-16"></div>
                 <div className="relative z-10">
@@ -723,37 +723,37 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                   </div>
                   <div className="space-y-4">
                     <div className="flex items-start gap-3">
-                      <div className="bg-white/10 p-2 rounded-lg">
+                      <div className="bg-card/10 p-2 rounded-lg">
                         <Search className="text-primary-foreground/80" size={16} />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase">Cliente</p>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase">Cliente</p>
                         <p className="font-semibold text-sm">{state.selectedClient?.name || 'No Seleccionado'}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="bg-white/10 p-2 rounded-lg">
+                      <div className="bg-card/10 p-2 rounded-lg">
                         <Smartphone className="text-primary-foreground/80" size={16} />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase">Dispositivo</p>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase">Dispositivo</p>
                         <p className="font-semibold text-sm">
                           {state.brand && state.model ? `${state.brand} ${state.model}` : 'No Especificado'}
                         </p>
-                        {state.serial && <p className="text-xs text-slate-400">{state.deviceType === 'phone' ? 'IMEI' : 'S/N'}: {state.serial}</p>}
+                        {state.serial && <p className="text-xs text-muted-foreground">{state.deviceType === 'phone' ? 'IMEI' : 'S/N'}: {state.serial}</p>}
                       </div>
                     </div>
                     {currentHardwareItems.length > 0 && (
                       <div className="flex items-start gap-3">
-                        <div className="bg-white/10 p-2 rounded-lg">
+                        <div className="bg-card/10 p-2 rounded-lg">
                           <CheckCircle2 size={16} className="text-blue-400" />
                         </div>
                         <div>
-                          <p className="text-[10px] font-bold text-slate-400 uppercase">Pre-Check</p>
-                          <p className="font-semibold text-sm text-green-400">
+                          <p className="text-[10px] font-bold text-muted-foreground uppercase">Pre-Check</p>
+                          <p className="font-semibold text-sm text-success">
                             {functionalCount}/{currentHardwareItems.length} funcionales
                           </p>
-                          <p className="text-xs text-slate-400">
+                          <p className="text-xs text-muted-foreground">
                             {currentHardwareItems.length - functionalCount} defectuoso{currentHardwareItems.length - functionalCount !== 1 ? 's' : ''}
                           </p>
                         </div>
@@ -761,11 +761,11 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                     )}
                     <div className="pt-4 border-t border-white/10">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-slate-400 text-sm">Mano de Obra</span>
+                        <span className="text-muted-foreground text-sm">Mano de Obra</span>
                         <span className="font-bold text-sm">$0.00</span>
                       </div>
                       <div className="flex items-center justify-between mb-3">
-                        <span className="text-slate-400 text-sm">Repuestos</span>
+                        <span className="text-muted-foreground text-sm">Repuestos</span>
                         <span className="font-bold text-sm">$0.00</span>
                       </div>
                       <div className="flex items-center justify-between text-lg font-bold pt-3 border-t border-white/20">
@@ -781,7 +781,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="bg-indigo-100 text-indigo-600 p-2 rounded-xl">
+                    <div className="bg-primary/10 text-primary p-2 rounded-xl">
                       <DollarSign size={18} />
                     </div>
                     <h2 className="text-base font-bold text-foreground">Método de Pago</h2>
@@ -806,7 +806,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                               className={`flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-full border transition-all ${
                                 isSelected
                                   ? 'bg-primary/5 border-primary text-primary'
-                                  : 'bg-muted border-border text-muted-foreground hover:border-primary/50'
+                                  : 'bg-muted border-border text-muted-foreground hover:border-primary/30'
                               }`}
                             >
                               <Icon size={14} />
@@ -831,7 +831,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                             className={`px-4 py-1.5 text-xs font-bold rounded-full border transition-all ${
                               state.paymentType === type.id
                                 ? 'bg-primary/5 border-primary text-primary'
-                                : 'bg-muted border-border text-muted-foreground hover:border-primary/50'
+                                : 'bg-muted border-border text-muted-foreground hover:border-primary/30'
                             }`}
                           >
                             {type.label}
@@ -862,10 +862,10 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
               {/* Ayuda */}
               <div className="bg-card rounded-2xl p-4 shadow-sm border border-border">
                 <div className="flex items-center gap-2 mb-2">
-                  <Info size={16} className="text-blue-600" />
-                  <span className="text-xs font-bold text-slate-600">Ayuda</span>
+                  <Info size={16} className="text-primary" />
+                  <span className="text-xs font-bold text-muted-foreground">Ayuda</span>
                 </div>
-                <p className="text-xs text-slate-500 leading-relaxed">
+                <p className="text-xs text-muted-foreground leading-relaxed">
                   Completa todos los campos para crear la orden. El número de orden se genera automáticamente.
                 </p>
               </div>
@@ -876,6 +876,46 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
     </motion.div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
