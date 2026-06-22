@@ -14,11 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../components/ui/dropdown-menu'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '../../components/ui/popover'
 import { SimpleNotifications, SimpleNotification } from '../notifications/SimpleNotifications'
 
 const categories = [
@@ -47,7 +42,9 @@ export const AdminTopBar = ({
   const [searchFocused, setSearchFocused] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
+  const notificationsRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const navigateL = useNavigate()
 
@@ -68,6 +65,22 @@ export const AdminTopBar = ({
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        setNotificationsOpen(false)
+      }
+    }
+
+    if (notificationsOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [notificationsOpen])
 
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && searchQuery.trim()) {
@@ -196,28 +209,34 @@ export const AdminTopBar = ({
           </div>
         </div>
 
-        {/* 🪟 Notificaciones mejoradas con NotificationList */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="ghost" size="icon-sm" className="relative">
-              <Bell size={18} className="text-muted-foreground" />
-              {unreadCount > 0 && (
-                <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px] animate-pulse">
-                  {unreadCount}
-                </Badge>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent align="end" className="p-0 z-50">
-            <SimpleNotifications
-              notifications={notifications}
-              onRead={handleNotificationRead}
-              onDelete={handleNotificationDelete}
-              onMarkAllRead={handleMarkAllRead}
-              unreadCount={unreadCount}
-            />
-          </PopoverContent>
-        </Popover>
+        {/* 🪟 Notificaciones mejoradas */}
+        <div className="relative" ref={notificationsRef}>
+          <Button 
+            variant="ghost" 
+            size="icon-sm" 
+            className="relative"
+            onClick={() => setNotificationsOpen(!notificationsOpen)}
+          >
+            <Bell size={18} className="text-muted-foreground" />
+            {unreadCount > 0 && (
+              <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px] animate-pulse">
+                {unreadCount}
+              </Badge>
+            )}
+          </Button>
+          
+          {notificationsOpen && (
+            <div className="absolute right-0 top-full mt-2 z-50">
+              <SimpleNotifications
+                notifications={notifications}
+                onRead={handleNotificationRead}
+                onDelete={handleNotificationDelete}
+                onMarkAllRead={handleMarkAllRead}
+                unreadCount={unreadCount}
+              />
+            </div>
+          )}
+        </div>
 
         {/* Profile */}
         <DropdownMenu>
