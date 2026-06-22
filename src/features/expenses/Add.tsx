@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ChevronRight, Info, CreditCard, Cloud, Save, X, AlertCircle, Calendar, Building2, Tag, DollarSign } from 'lucide-react'
+import { ChevronRight, Info, CreditCard, Cloud, Save, X, AlertCircle, Calendar, Building2, Tag, DollarSign, LucideBanknote, Landmark } from 'lucide-react'
 import { MdAdd, MdCreditCard, MdAttachFile } from 'react-icons/md'
 import { Card, CardContent } from '@/shared/components/ui/card'
 import { Button } from '@/shared/components/ui/button'
@@ -257,9 +257,9 @@ export default function ExpensesAdd() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
-                  { value: 'cash', label: 'Efectivo', icon: '💵' },
+                  { value: 'cash', label: 'Efectivo', icon: <LucideBanknote size={24} /> },
                   { value: 'card', label: 'Tarjeta', icon: <MdCreditCard size={24} /> },
-                  { value: 'bank', label: 'Transferencia', icon: '🏦' },
+                  { value: 'bank', label: 'Transferencia', icon: <Landmark size={24} /> },
                 ].map((method) => (
                   <label
                     key={method.value}
