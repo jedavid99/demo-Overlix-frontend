@@ -141,6 +141,8 @@ const navItems: NavItem[] = [
           { title: 'Ventas', href: '/reports/sales', icon: <TrendingUp size={14} /> },
           { title: 'Stock', href: '/reports/stock', icon: <Package size={14} /> },
           { title: 'Financiero', href: '/reports/financial', icon: <DollarSign size={14} /> },
+            { title: 'Reparaciones', href: '/reports/repairs', icon: <Wrench size={14} /> },
+     
         ]
       },
       { 
