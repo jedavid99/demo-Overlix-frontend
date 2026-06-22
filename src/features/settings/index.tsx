@@ -47,7 +47,7 @@ export default function Settings() {
 
         <main className="flex-1">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{sections.find(s => s.id === section)?.label}</h1>
+            
             <div className="flex items-center gap-3">
               <button className="px-4 py-2 rounded-lg bg-white shadow text-slate-700">Cancelar</button>
               <button className="px-4 py-2 rounded-lg bg-blue-600 text-white">Guardar todos los cambios</button>
