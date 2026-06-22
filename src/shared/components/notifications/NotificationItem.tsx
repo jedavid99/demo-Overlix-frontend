@@ -4,7 +4,7 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { Button } from '../../ui/button'
-import { Avatar } from '../../ui/avatar'
+import { Avatar, AvatarFallback } from '../../ui/avatar'
 import { Card } from '../../ui/card'
 import { Notification } from './notification.types'
 
@@ -58,7 +58,9 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
           <div className="flex items-start gap-3">
             {/* Avatar con icono */}
             <Avatar className={`h-10 w-10 shrink-0 ${notification.color}`}>
-              <span className="text-lg">{notification.icon}</span>
+              <AvatarFallback className={notification.color}>
+                <span className="text-lg">{notification.icon}</span>
+              </AvatarFallback>
             </Avatar>
 
             {/* Contenido */}
