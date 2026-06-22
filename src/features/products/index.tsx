@@ -48,57 +48,8 @@ interface StockItem {
   color: string
 }
 
-// Datos de ejemplo (puedes reemplazar con API)
-const stockItems: StockItem[] = [
-  {
-    id: 1,
-    name: 'iPhone 14 Screen Assembly',
-    description: 'Premium OLED Display',
-    sku: 'IPH14-SCR-001',
-    category: 'Phone',
-    quantity: 45,
-    status: 'Good',
-    price: 129.0,
-    icon: Smartphone,
-    color: 'blue',
-  },
-  {
-    id: 2,
-    name: 'MacBook Air M2 Battery',
-    description: 'A2389 Replacement',
-    sku: 'MBA-M2-BAT-45',
-    category: 'PC',
-    quantity: 4,
-    status: 'Low',
-    price: 85.5,
-    icon: Cpu,
-    color: 'indigo',
-  },
-  {
-    id: 3,
-    name: 'PS5 HDMI Port',
-    description: '2.1 Specification OEM',
-    sku: 'PS5-HDMI-V2',
-    category: 'Console',
-    quantity: 0,
-    status: 'Out',
-    price: 12.0,
-    icon: Gamepad2,
-    color: 'purple',
-  },
-  {
-    id: 4,
-    name: 'Internal Wi-Fi Card',
-    description: 'Intel AX210 Gig+',
-    sku: 'NET-WIFI-AX210',
-    category: 'PC',
-    quantity: 112,
-    status: 'Good',
-    price: 34.99,
-    icon: Wifi,
-    color: 'indigo',
-  },
-]
+// 📦 Datos de muestra ELIMINADOS – array vacío (conectar con API)
+const stockItems: StockItem[] = []
 
 // Categorías y estados para filtros
 const categories = ['all', 'phone', 'pc', 'console']
@@ -127,7 +78,7 @@ export default function Stock() {
     })
   }, [searchTerm, activeCategory, activeStatus])
 
-  // KPIs
+  // KPIs (todos en 0 o valores genéricos)
   const totalItems = stockItems.length
   const totalCategories = new Set(stockItems.map((i) => i.category)).size
   const lowStockItems = stockItems.filter((i) => i.quantity < 5 && i.quantity > 0).length
@@ -152,15 +103,15 @@ export default function Stock() {
       label: 'Productos totales',
       value: totalItems,
       icon: Package,
-      trend: '+12%',
-      trendUp: true,
+      trend: 'Sin datos',
+      trendUp: false,
       color: 'text-blue-600',
     },
     {
       label: 'Categorías',
       value: totalCategories,
       icon: Filter,
-      trend: '3 activas',
+      trend: 'Sin datos',
       trendUp: false,
       color: 'text-indigo-600',
     },
@@ -168,7 +119,7 @@ export default function Stock() {
       label: 'Stock bajo',
       value: lowStockItems,
       icon: AlertCircle,
-      trend: lowStockItems > 0 ? '⚠️ Revisar' : '✅ OK',
+      trend: 'Sin datos',
       trendUp: false,
       color: 'text-amber-600',
     },
@@ -176,19 +127,47 @@ export default function Stock() {
       label: 'Valor total',
       value: `$${totalValue.toFixed(2)}`,
       icon: DollarSign,
-      trend: '+8% vs mes anterior',
-      trendUp: true,
+      trend: 'Sin datos',
+      trendUp: false,
       color: 'text-emerald-600',
     },
   ]
 
-  // Framer Motion variants para filas
+  // 🔥 Variantes para el contenedor de KPIs (stagger)
+  const kpiContainerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.08,
+        delayChildren: 0.1,
+      },
+    },
+  }
+
+  const kpiCardVariants = {
+    hidden: { opacity: 0, y: 20, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { type: 'spring', stiffness: 300, damping: 20 },
+    },
+    hover: {
+      y: -4,
+      scale: 1.02,
+      boxShadow: '0 12px 30px -8px rgba(0,0,0,0.15)',
+      transition: { type: 'spring', stiffness: 400, damping: 15 },
+    },
+  }
+
+  // Variantes para filas de tabla
   const rowVariants = {
     hidden: { opacity: 0, y: 10 },
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
-      transition: { delay: i * 0.05, duration: 0.25 },
+      transition: { delay: i * 0.04, duration: 0.25, ease: 'easeOut' },
     }),
     exit: { opacity: 0, scale: 0.95, transition: { duration: 0.15 } },
   }
@@ -197,7 +176,7 @@ export default function Stock() {
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35 }}
+      transition={{ duration: 0.35, ease: 'easeOut' }}
       className="space-y-8"
     >
       {/* Header */}
@@ -220,18 +199,23 @@ export default function Stock() {
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* KPI Cards con animación mejorada */}
+      <motion.div
+        variants={kpiContainerVariants}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-2 md:grid-cols-4 gap-4"
+      >
         {kpiData.map((kpi, idx) => {
           const Icon = kpi.icon
           return (
             <motion.div
               key={idx}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: idx * 0.06 }}
+              variants={kpiCardVariants}
+              whileHover="hover"
+              className="h-full"
             >
-              <Card className="border-border/60 shadow-sm hover:shadow-md transition-all duration-200">
+              <Card className="border-border/60 shadow-sm h-full transition-colors duration-200 hover:border-primary/20">
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between">
                     <div>
@@ -245,23 +229,30 @@ export default function Stock() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 mt-3 text-xs">
-                    {kpi.trendUp ? (
-                      <TrendingUp size={14} className="text-emerald-500" />
+                    {kpi.trend !== 'Sin datos' ? (
+                      kpi.trendUp ? (
+                        <>
+                          <TrendingUp size={14} className="text-emerald-500" />
+                          <span className="text-emerald-600">{kpi.trend}</span>
+                        </>
+                      ) : (
+                        <>
+                          <TrendingDown size={14} className="text-muted-foreground" />
+                          <span className="text-muted-foreground">{kpi.trend}</span>
+                        </>
+                      )
                     ) : (
-                      <TrendingDown size={14} className="text-muted-foreground" />
+                      <span className="text-muted-foreground/60 italic text-[10px]">
+                        Sin datos disponibles
+                      </span>
                     )}
-                    <span
-                      className={kpi.trendUp ? 'text-emerald-600' : 'text-muted-foreground'}
-                    >
-                      {kpi.trend}
-                    </span>
                   </div>
                 </CardContent>
               </Card>
             </motion.div>
           )
         })}
-      </div>
+      </motion.div>
 
       {/* Filtros y búsqueda */}
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
@@ -361,6 +352,7 @@ export default function Stock() {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
           className="text-center py-16 bg-muted/10 rounded-xl border border-dashed border-border"
         >
           <Package size={56} className="mx-auto text-muted-foreground/40 mb-4" />
@@ -375,7 +367,12 @@ export default function Stock() {
           </Button>
         </motion.div>
       ) : (
-        <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="bg-card border border-border rounded-xl shadow-sm overflow-hidden"
+        >
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -479,15 +476,15 @@ export default function Stock() {
             </table>
           </div>
 
-          {/* Footer de la tabla (opcional) */}
+          {/* Footer de la tabla */}
           <div className="flex items-center justify-between px-4 py-3 bg-muted/10 border-t border-border text-xs text-muted-foreground">
             <span>
               Mostrando <strong className="text-foreground">{filteredItems.length}</strong> de{' '}
               <strong className="text-foreground">{stockItems.length}</strong> productos
             </span>
-            <span>Última actualización: Hoy a las 10:30</span>
+            <span>Última actualización: Hoy a las {new Date().toLocaleTimeString()}</span>
           </div>
-        </div>
+        </motion.div>
       )}
     </motion.div>
   )
