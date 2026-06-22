@@ -50,6 +50,7 @@ import ReportsStock from '../features/reports/StockReport'
 import ReportsFinancial from '../features/reports/FinancialReport'
 import Docs from '../features/settings/docs'
 import Help from '../features/settings/help'
+import RepairsReport from '@/features/reports/RepairsReport'
 
 export function AppRouter() {
   return (
@@ -100,6 +101,8 @@ export function AppRouter() {
       <Route path="/reports/sales" element={<AdminLayout><ReportsSales /></AdminLayout>} />
       <Route path="/reports/stock" element={<AdminLayout><ReportsStock /></AdminLayout>} />
       <Route path="/reports/financial" element={<AdminLayout><ReportsFinancial /></AdminLayout>} />
+      
+      <Route path="/reports/repairs" element={<AdminLayout><RepairsReport /></AdminLayout>} />
       <Route path="/envios/remises" element={<AdminLayout><Remises /></AdminLayout>} />
       <Route path="/notifications" element={<AdminLayout><Notifications /></AdminLayout>} />
       <Route path="/docs" element={<AdminLayout><Docs /></AdminLayout>} />
