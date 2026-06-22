@@ -1,6 +1,30 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Info, Package, DollarSign, Settings, Image, ChevronRight, Save, Trash2, X, CheckCircle, Cloud, Plus } from 'lucide-react'
+import { motion } from 'framer-motion'
+import {
+  Info,
+  Package,
+  DollarSign,
+  Settings,
+  Image,
+  ChevronRight,
+  Save,
+  Trash2,
+  X,
+  CheckCircle,
+  Cloud,
+  Plus,
+  Tag,
+  Layers,
+  Barcode,
+  MapPin,
+  Percent,
+} from 'lucide-react'
+import { Card, CardContent } from '@/shared/components/ui/card'
+import { Button } from '@/shared/components/ui/button'
+import { Input } from '@/shared/components/ui/input'
+import { Label } from '@/shared/components/ui/label'
+import { Badge } from '@/shared/components/ui/badge'
 
 export default function StockAdd() {
   const navigate = useNavigate()
@@ -49,304 +73,387 @@ export default function StockAdd() {
     navigate('/stock')
   }
 
+  // Animaciones
+  const containerVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.4, ease: 'easeOut' },
+    },
+  }
+
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 15 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.08, duration: 0.35, ease: 'easeOut' },
+    }),
+  }
+
+  const categories = [
+    { value: '', label: 'Seleccionar categoría' },
+    { value: 'screens', label: 'Pantallas' },
+    { value: 'batteries', label: 'Baterías' },
+    { value: 'charging-ports', label: 'Puertos de carga' },
+    { value: 'mainboards', label: 'Placas base' },
+    { value: 'cameras', label: 'Cámaras' },
+    { value: 'accessories', label: 'Accesorios' },
+  ]
+
   return (
-    <div className="min-h-screen bg-background-light dark:bg-background-dark flex flex-col">
-      {/* Header */}
-      
-
-      {/* Main Content */}
-      <main className="px-4 md:px-20 lg:px-40 flex flex-1 justify-center py-8">
-        <div className="flex flex-col max-w-[960px] flex-1 w-full">
-          {/* Breadcrumbs & Title */}
-          <div className="flex flex-col gap-2 mb-8">
-            
-            <div className="flex justify-between items-end mt-4">
-              <div>
-                <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Add New Stock Item</h1>
-                <p className="text-slate-500 mt-2">Specify technical details, pricing, and compatibility for the new part.</p>
-              </div>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => navigate('/stock')}
-                  className="px-6 py-2.5 rounded-lg font-bold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={e => handleSubmit(e, false)}
-                  className="px-6 py-2.5 rounded-lg font-bold text-white bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all"
-                >
-                  Save Item
-                </button>
-              </div>
-            </div>
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-800 flex flex-col"
+    >
+      <main className="flex-1 px-4 py-8 md:px-8 lg:px-16 xl:px-24 max-w-6xl mx-auto w-full">
+        {/* Encabezado */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
+              Agregar nuevo producto
+            </h1>
+            <p className="text-muted-foreground mt-1">
+              Completa los detalles técnicos, precios y compatibilidad del nuevo repuesto.
+            </p>
           </div>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" onClick={() => navigate('/stock')}>
+              Cancelar
+            </Button>
+            <Button onClick={(e) => handleSubmit(e, false)}>
+              <Save size={18} className="mr-2" />
+              Guardar producto
+            </Button>
+          </div>
+        </div>
 
-          <form onSubmit={e => handleSubmit(e, false)} className="space-y-12 pb-20">
-            {/* Section 1: General Info */}
-            <section>
-              <div className="flex items-center gap-2 mb-6 border-b border-slate-200 dark:border-slate-800 pb-2">
-                <Info size={20} className="text-primary" />
-                <h2 className="text-slate-900 dark:text-white text-xl font-bold">General Information</h2>
+        <form onSubmit={(e) => handleSubmit(e, false)} className="space-y-8 pb-16">
+          {/* Sección 1: Información General */}
+          <motion.section
+            variants={sectionVariants}
+            custom={0}
+            initial="hidden"
+            animate="visible"
+            className="bg-card rounded-xl border border-border shadow-sm overflow-hidden"
+          >
+            <div className="px-6 py-4 border-b border-border bg-muted/30 flex items-center gap-3">
+              <Info size={20} className="text-primary" />
+              <h2 className="text-lg font-bold text-foreground">Información general</h2>
+            </div>
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="itemName" className="text-sm font-semibold">
+                  Nombre del producto
+                </Label>
+                <Input
+                  id="itemName"
+                  value={form.itemName}
+                  onChange={(e) => handleChange('itemName', e.target.value)}
+                  placeholder="Ej. Pantalla OLED iPhone 13"
+                  className="h-11"
+                />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <label className="flex flex-col gap-2">
-                  <span className="text-slate-700 dark:text-slate-300 text-sm font-semibold">Item Name</span>
-                  <input
-                    value={form.itemName}
-                    onChange={e => handleChange('itemName', e.target.value)}
-                    className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary h-12 px-4"
-                    placeholder="e.g. iPhone 13 OLED Display"
-                    type="text"
-                  />
-                </label>
-                <label className="flex flex-col gap-2">
-                  <span className="text-slate-700 dark:text-slate-300 text-sm font-semibold">SKU</span>
-                  <input
-                    value={form.sku}
-                    onChange={e => handleChange('sku', e.target.value)}
-                    className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary h-12 px-4"
-                    placeholder="SCRN-IP13-OLED-01"
-                    type="text"
-                  />
-                </label>
-                <label className="flex flex-col gap-2">
-                  <span className="text-slate-700 dark:text-slate-300 text-sm font-semibold">Category</span>
-                  <select
-                    value={form.category}
-                    onChange={e => handleChange('category', e.target.value)}
-                    className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary h-12 px-4"
-                  >
-                    <option>Select Category</option>
-                    <option>Screens</option>
-                    <option>Batteries</option>
-                    <option>Charging Ports</option>
-                    <option>Mainboards</option>
-                  </select>
-                </label>
-                <label className="flex flex-col gap-2">
-                  <span className="text-slate-700 dark:text-slate-300 text-sm font-semibold">Brand</span>
-                  <input
-                    value={form.brand}
-                    onChange={e => handleChange('brand', e.target.value)}
-                    className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:border-primary focus:ring-1 focus:ring-primary h-12 px-4"
-                    placeholder="e.g. Apple OEM"
-                    type="text"
-                  />
-                </label>
+              <div className="space-y-2">
+                <Label htmlFor="sku" className="text-sm font-semibold flex items-center gap-1">
+                  <Barcode size={14} className="text-muted-foreground" />
+                  SKU
+                </Label>
+                <Input
+                  id="sku"
+                  value={form.sku}
+                  onChange={(e) => handleChange('sku', e.target.value)}
+                  placeholder="Ej. SCRN-IP13-OLED-01"
+                  className="h-11"
+                />
               </div>
-            </section>
-
-            {/* Section 2: Inventory Details */}
-            <section>
-              <div className="flex items-center gap-2 mb-6 border-b border-slate-200 dark:border-slate-800 pb-2">
-                <Package size={20} className="text-primary" />
-                <h2 className="text-slate-900 dark:text-white text-xl font-bold">Inventory Details</h2>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <label className="flex flex-col gap-2">
-                  <span className="text-slate-700 dark:text-slate-300 text-sm font-semibold">Initial Quantity</span>
-                  <input
-                    value={form.initialQuantity}
-                    onChange={e => handleChange('initialQuantity', e.target.value)}
-                    className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white h-12 px-4"
-                    placeholder="0"
-                    type="number"
-                  />
-                </label>
-                <label className="flex flex-col gap-2">
-                  <span className="text-slate-700 dark:text-slate-300 text-sm font-semibold">Min Stock Level (Alerts)</span>
-                  <input
-                    value={form.minStockLevel}
-                    onChange={e => handleChange('minStockLevel', e.target.value)}
-                    className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white h-12 px-4"
-                    placeholder="5"
-                    type="number"
-                  />
-                </label>
-                <label className="flex flex-col gap-2">
-                  <span className="text-slate-700 dark:text-slate-300 text-sm font-semibold">Storage Location / Shelf</span>
-                  <input
-                    value={form.storageLocation}
-                    onChange={e => handleChange('storageLocation', e.target.value)}
-                    className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white h-12 px-4"
-                    placeholder="Shelf A-12"
-                    type="text"
-                  />
-                </label>
-              </div>
-            </section>
-
-            {/* Section 3: Pricing */}
-            <section>
-              <div className="flex items-center gap-2 mb-6 border-b border-slate-200 dark:border-slate-800 pb-2">
-                <DollarSign size={20} className="text-primary" />
-                <h2 className="text-slate-900 dark:text-white text-xl font-bold">Pricing</h2>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <label className="flex flex-col gap-2">
-                  <span className="text-slate-700 dark:text-slate-300 text-sm font-semibold">Purchase Cost ($)</span>
-                  <div className="relative">
-                    <span className="absolute left-3 top-3 text-slate-500">$</span>
-                    <input
-                      value={form.purchaseCost}
-                      onChange={e => handleChange('purchaseCost', e.target.value)}
-                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white h-12 pl-8 pr-4"
-                      placeholder="0.00"
-                      type="text"
-                    />
-                  </div>
-                </label>
-                <label className="flex flex-col gap-2">
-                  <span className="text-slate-700 dark:text-slate-300 text-sm font-semibold">Selling Price ($)</span>
-                  <div className="relative">
-                    <span className="absolute left-3 top-3 text-slate-500">$</span>
-                    <input
-                      value={form.sellingPrice}
-                      onChange={e => handleChange('sellingPrice', e.target.value)}
-                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white h-12 pl-8 pr-4"
-                      placeholder="0.00"
-                      type="text"
-                    />
-                  </div>
-                </label>
-                <label className="flex flex-col gap-2">
-                  <span className="text-slate-700 dark:text-slate-300 text-sm font-semibold">Tax (%)</span>
-                  <div className="relative">
-                    <input
-                      value={form.tax}
-                      onChange={e => handleChange('tax', e.target.value)}
-                      className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white h-12 pl-4 pr-8"
-                      placeholder="0"
-                      type="text"
-                    />
-                    <span className="absolute right-3 top-3 text-slate-500">%</span>
-                  </div>
-                </label>
-              </div>
-            </section>
-
-            {/* Section 4: Compatibility Tags */}
-            <section>
-              <div className="flex items-center gap-2 mb-6 border-b border-slate-200 dark:border-slate-800 pb-2">
-                <Settings size={20} className="text-primary" />
-                <h2 className="text-slate-900 dark:text-white text-xl font-bold">Compatibility</h2>
-              </div>
-              <div className="flex flex-col gap-4">
-                <p className="text-slate-500 text-sm">Add devices this part is compatible with:</p>
-                <div className="flex flex-wrap gap-2 p-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-800/30">
-                  {compatibility.map(device => (
-                    <span key={device} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary border border-primary/20 rounded-full text-sm font-semibold">
-                      {device}
-                      <button
-                        type="button"
-                        onClick={() => removeCompatibility(device)}
-                        className="hover:text-red-500 transition-colors"
-                      >
-                        <X size={14} />
-                      </button>
-                    </span>
+              <div className="space-y-2">
+                <Label htmlFor="category" className="text-sm font-semibold flex items-center gap-1">
+                  <Layers size={14} className="text-muted-foreground" />
+                  Categoría
+                </Label>
+                <select
+                  id="category"
+                  value={form.category}
+                  onChange={(e) => handleChange('category', e.target.value)}
+                  className="w-full h-11 px-4 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                >
+                  {categories.map((cat) => (
+                    <option key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </option>
                   ))}
-                  <div className="flex items-center ml-2">
-                    <input
-                      value={compatibilityInput}
-                      onChange={e => setCompatibilityInput(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      className="bg-transparent border-none focus:ring-0 text-sm placeholder:text-slate-400 p-0 outline-none"
-                      placeholder="Type and press Enter..."
-                      type="text"
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => addCompatibility('iPhone 14')}
-                    className="px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded text-xs hover:bg-primary/20 hover:text-primary transition-all flex items-center gap-1"
-                  >
-                    <Plus size={14} /> Add iPhone 14
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => addCompatibility('PS5')}
-                    className="px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded text-xs hover:bg-primary/20 hover:text-primary transition-all flex items-center gap-1"
-                  >
-                    <Plus size={14} /> Add PS5
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => addCompatibility('Nintendo Switch')}
-                    className="px-3 py-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded text-xs hover:bg-primary/20 hover:text-primary transition-all flex items-center gap-1"
-                  >
-                    <Plus size={14} /> Add Nintendo Switch
-                  </button>
-                </div>
+                </select>
               </div>
-            </section>
-
-            {/* Section 5: Media Upload */}
-            <section>
-              <div className="flex items-center gap-2 mb-6 border-b border-slate-200 dark:border-slate-800 pb-2">
-                <Image size={20} className="text-primary" />
-                <h2 className="text-slate-900 dark:text-white text-xl font-bold">Item Media</h2>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                <div className="group relative aspect-video w-full rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 flex flex-col items-center justify-center cursor-pointer overflow-hidden hover:border-primary transition-all">
-                  <Cloud size={48} className="text-slate-300 group-hover:text-primary mb-2 transition-colors" />
-                  <p className="text-slate-600 dark:text-slate-400 font-medium">Click or drag photo here</p>
-                  <p className="text-slate-400 text-xs mt-1">PNG, JPG up to 10MB</p>
-                </div>
-                <div className="flex flex-col gap-4">
-                  <h3 className="font-bold text-slate-800 dark:text-slate-200">Image Guidelines:</h3>
-                  <ul className="text-sm space-y-2 text-slate-500">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle size={16} className="text-green-500 flex-shrink-0" />
-                      Clear, high-resolution photo on white background.
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle size={16} className="text-green-500 flex-shrink-0" />
-                      Show all connectors and cables clearly.
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle size={16} className="text-green-500 flex-shrink-0" />
-                      Include packaging if specific serials are visible.
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </section>
-
-            {/* Footer Action Buttons */}
-            <div className="flex items-center justify-between pt-8 border-t border-slate-200 dark:border-slate-800">
-              <button
-                type="button"
-                className="flex items-center gap-2 text-red-500 font-bold hover:bg-red-50 dark:hover:bg-red-500/10 px-4 py-2 rounded-lg transition-colors"
-              >
-                <Trash2 size={18} />
-                Discard Draft
-              </button>
-              <div className="flex gap-4">
-                <button
-                  type="button"
-                  onClick={e => handleSubmit(e, true)}
-                  className="px-8 py-3 rounded-xl font-bold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-                >
-                  Save as Draft
-                </button>
-                <button
-                  type="submit"
-                  className="px-10 py-3 rounded-xl font-bold text-white bg-primary hover:bg-primary/90 shadow-xl shadow-primary/30 transition-all flex items-center gap-2"
-                >
-                  <Save size={18} />
-                  Save and Publish Item
-                </button>
+              <div className="space-y-2">
+                <Label htmlFor="brand" className="text-sm font-semibold flex items-center gap-1">
+                  <Tag size={14} className="text-muted-foreground" />
+                  Marca
+                </Label>
+                <Input
+                  id="brand"
+                  value={form.brand}
+                  onChange={(e) => handleChange('brand', e.target.value)}
+                  placeholder="Ej. Apple OEM"
+                  className="h-11"
+                />
               </div>
             </div>
-          </form>
-        </div>
+          </motion.section>
+
+          {/* Sección 2: Detalles de inventario */}
+          <motion.section
+            variants={sectionVariants}
+            custom={1}
+            initial="hidden"
+            animate="visible"
+            className="bg-card rounded-xl border border-border shadow-sm overflow-hidden"
+          >
+            <div className="px-6 py-4 border-b border-border bg-muted/30 flex items-center gap-3">
+              <Package size={20} className="text-primary" />
+              <h2 className="text-lg font-bold text-foreground">Detalles de inventario</h2>
+            </div>
+            <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="initialQuantity" className="text-sm font-semibold">
+                  Cantidad inicial
+                </Label>
+                <Input
+                  id="initialQuantity"
+                  type="number"
+                  value={form.initialQuantity}
+                  onChange={(e) => handleChange('initialQuantity', e.target.value)}
+                  placeholder="0"
+                  className="h-11"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="minStockLevel" className="text-sm font-semibold">
+                  Nivel mínimo de stock
+                </Label>
+                <Input
+                  id="minStockLevel"
+                  type="number"
+                  value={form.minStockLevel}
+                  onChange={(e) => handleChange('minStockLevel', e.target.value)}
+                  placeholder="5"
+                  className="h-11"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="storageLocation" className="text-sm font-semibold flex items-center gap-1">
+                  <MapPin size={14} className="text-muted-foreground" />
+                  Ubicación / Estante
+                </Label>
+                <Input
+                  id="storageLocation"
+                  value={form.storageLocation}
+                  onChange={(e) => handleChange('storageLocation', e.target.value)}
+                  placeholder="Ej. Estante A-12"
+                  className="h-11"
+                />
+              </div>
+            </div>
+          </motion.section>
+
+          {/* Sección 3: Precios */}
+          <motion.section
+            variants={sectionVariants}
+            custom={2}
+            initial="hidden"
+            animate="visible"
+            className="bg-card rounded-xl border border-border shadow-sm overflow-hidden"
+          >
+            <div className="px-6 py-4 border-b border-border bg-muted/30 flex items-center gap-3">
+              <DollarSign size={20} className="text-primary" />
+              <h2 className="text-lg font-bold text-foreground">Precios</h2>
+            </div>
+            <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="purchaseCost" className="text-sm font-semibold">
+                  Costo de compra ($)
+                </Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                  <Input
+                    id="purchaseCost"
+                    value={form.purchaseCost}
+                    onChange={(e) => handleChange('purchaseCost', e.target.value)}
+                    placeholder="0.00"
+                    className="h-11 pl-8"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="sellingPrice" className="text-sm font-semibold">
+                  Precio de venta ($)
+                </Label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                  <Input
+                    id="sellingPrice"
+                    value={form.sellingPrice}
+                    onChange={(e) => handleChange('sellingPrice', e.target.value)}
+                    placeholder="0.00"
+                    className="h-11 pl-8"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="tax" className="text-sm font-semibold flex items-center gap-1">
+                  <Percent size={14} className="text-muted-foreground" />
+                  Impuesto (%)
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="tax"
+                    value={form.tax}
+                    onChange={(e) => handleChange('tax', e.target.value)}
+                    placeholder="0"
+                    className="h-11 pr-8"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">%</span>
+                </div>
+              </div>
+            </div>
+          </motion.section>
+
+          {/* Sección 4: Compatibilidad */}
+          <motion.section
+            variants={sectionVariants}
+            custom={3}
+            initial="hidden"
+            animate="visible"
+            className="bg-card rounded-xl border border-border shadow-sm overflow-hidden"
+          >
+            <div className="px-6 py-4 border-b border-border bg-muted/30 flex items-center gap-3">
+              <Settings size={20} className="text-primary" />
+              <h2 className="text-lg font-bold text-foreground">Compatibilidad</h2>
+            </div>
+            <div className="p-6 space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Agrega los dispositivos con los que este repuesto es compatible:
+              </p>
+              <div className="flex flex-wrap gap-2 p-4 border-2 border-dashed border-border rounded-xl bg-muted/30 min-h-[60px] items-center">
+                {compatibility.map((device) => (
+                  <Badge
+                    key={device}
+                    variant="secondary"
+                    className="px-3 py-1.5 text-sm font-medium flex items-center gap-1.5"
+                  >
+                    {device}
+                    <button
+                      type="button"
+                      onClick={() => removeCompatibility(device)}
+                      className="hover:text-destructive transition-colors"
+                    >
+                      <X size={14} />
+                    </button>
+                  </Badge>
+                ))}
+                <div className="flex items-center ml-1">
+                  <input
+                    value={compatibilityInput}
+                    onChange={(e) => setCompatibilityInput(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    className="bg-transparent border-none focus:ring-0 text-sm placeholder:text-muted-foreground p-1 outline-none min-w-[120px]"
+                    placeholder="Escribe y presiona Enter..."
+                    type="text"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {['iPhone 14', 'PS5', 'Nintendo Switch', 'iPad Pro'].map((device) => (
+                  <Button
+                    key={device}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => addCompatibility(device)}
+                    className="h-8 text-xs"
+                  >
+                    <Plus size={14} className="mr-1" />
+                    Agregar {device}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </motion.section>
+
+          {/* Sección 5: Imagen del producto */}
+          <motion.section
+            variants={sectionVariants}
+            custom={4}
+            initial="hidden"
+            animate="visible"
+            className="bg-card rounded-xl border border-border shadow-sm overflow-hidden"
+          >
+            <div className="px-6 py-4 border-b border-border bg-muted/30 flex items-center gap-3">
+              <Image size={20} className="text-primary" />
+              <h2 className="text-lg font-bold text-foreground">Imagen del producto</h2>
+            </div>
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="group relative aspect-video w-full rounded-2xl border-2 border-dashed border-border bg-muted/30 flex flex-col items-center justify-center cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-all overflow-hidden">
+                <Cloud size={48} className="text-muted-foreground group-hover:text-primary transition-colors mb-3" />
+                <p className="text-sm font-medium text-muted-foreground">Haz clic o arrastra una imagen</p>
+                <p className="text-xs text-muted-foreground/60 mt-1">PNG, JPG hasta 10MB</p>
+              </div>
+              <div className="flex flex-col justify-center space-y-3">
+                <h3 className="font-bold text-foreground">Recomendaciones:</h3>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle size={16} className="text-primary flex-shrink-0 mt-0.5" />
+                    Foto nítida y de alta resolución sobre fondo blanco.
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle size={16} className="text-primary flex-shrink-0 mt-0.5" />
+                    Muestra todos los conectores y cables claramente.
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle size={16} className="text-primary flex-shrink-0 mt-0.5" />
+                    Incluye el empaque si los números de serie son visibles.
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </motion.section>
+
+          {/* Botones de acción */}
+          <motion.div
+            variants={sectionVariants}
+            custom={5}
+            initial="hidden"
+            animate="visible"
+            className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-border"
+          >
+            <Button
+              type="button"
+              variant="ghost"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={() => navigate('/stock')}
+            >
+              <Trash2 size={18} className="mr-2" />
+              Descartar borrador
+            </Button>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={(e) => handleSubmit(e, true)}
+              >
+                Guardar como borrador
+              </Button>
+              <Button type="submit" size="lg">
+                <Save size={18} className="mr-2" />
+                Publicar producto
+              </Button>
+            </div>
+          </motion.div>
+        </form>
       </main>
-    </div>
+    </motion.div>
   )
 }
-
-
