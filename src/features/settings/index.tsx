@@ -3,7 +3,7 @@ import { Plus, Cloud, Clock, Bell, Key, Smartphone, Laptop, Monitor, Gamepad2, E
 import { MdContentCopy, MdDelete, MdLink, MdEdit, MdCalendarToday, MdEmail, MdBarChart } from 'react-icons/md'
 
 const sections = [
- { id: 'general', label: 'General', icon: <Cloud size={16} /> },
+  { id: 'general', label: 'General', icon: <Cloud size={16} /> },
   { id: 'business', label: 'Información del negocio', icon: <Clock size={16} /> },
   { id: 'Categoria', label: 'Categorías de reparación', icon: <Plus size={16} /> },
   { id: 'taxes', label: 'Impuestos y pagos', icon: <Key size={16} /> },
@@ -40,18 +40,20 @@ function LeftNav({ current, onChange }: { current: string; onChange: (id: string
 export default function Settings() {
   const [section, setSection] = useState('general')
 
+  // Función simulada para guardar cambios (conectar con API)
+  const handleSave = (sectionId: string) => {
+    alert(`Guardando cambios de la sección: ${sections.find(s => s.id === sectionId)?.label}`)
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 p-6 lg:p-8">
       <div className="max-w-7xl mx-auto flex gap-6">
         <LeftNav current={section} onChange={setSection} />
 
         <main className="flex-1">
-          <div className="flex items-center justify-between mb-6">
-            
-            <div className="flex items-center gap-3">
-              <button className="px-4 py-2 rounded-lg bg-white shadow text-slate-700">Cancelar</button>
-              <button className="px-4 py-2 rounded-lg bg-blue-600 text-white">Guardar todos los cambios</button>
-            </div>
+          {/* Header sin botones */}
+          <div className="mb-6">
+            {/* Eliminamos los botones del header */}
           </div>
 
           {/* Sections */}
@@ -202,8 +204,19 @@ export default function Settings() {
                   </div>
                 </div>
               </section>
+
+              {/* 🔽 Botón Guardar al final de la sección */}
+              <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
+                <button
+                  onClick={() => handleSave('general')}
+                  className="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-all shadow-md shadow-blue-600/20"
+                >
+                  Guardar cambios
+                </button>
+              </div>
             </div>
           )}
+
           {section === 'business' && (
             <div className="space-y-6">
               {/* Legal Information Section */}
@@ -280,10 +293,20 @@ export default function Settings() {
                   </div>
                 </div>
               </div>
+
+              {/* 🔽 Botón Guardar al final de la sección */}
+              <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
+                <button
+                  onClick={() => handleSave('business')}
+                  className="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-all shadow-md shadow-blue-600/20"
+                >
+                  Guardar cambios
+                </button>
+              </div>
             </div>
           )}
 
-          {section === 'categories' && (
+          {section === 'Categoria' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -323,6 +346,16 @@ export default function Settings() {
                   <Info size={18} className="text-primary flex-shrink-0" />
                   <p className="text-sm text-slate-300 max-w-xs">Define exactamente qué dispositivos acepta tu sistema para agilizar el proceso de admisión.</p>
                 </div>
+              </div>
+
+              {/* 🔽 Botón Guardar al final de la sección */}
+              <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
+                <button
+                  onClick={() => handleSave('Categoria')}
+                  className="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-all shadow-md shadow-blue-600/20"
+                >
+                  Guardar cambios
+                </button>
               </div>
             </div>
           )}
@@ -438,10 +471,20 @@ export default function Settings() {
                   </div>
                 </div>
               </div>
+
+              {/* 🔽 Botón Guardar al final de la sección */}
+              <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
+                <button
+                  onClick={() => handleSave('taxes')}
+                  className="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-all shadow-md shadow-blue-600/20"
+                >
+                  Guardar cambios
+                </button>
+              </div>
             </div>
           )}
 
-          {section === 'notifications' && (
+          {section === 'notificationes' && (
             <div className="space-y-6 pb-24">
               {/* Event Notifications */}
               <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
@@ -554,6 +597,16 @@ export default function Settings() {
                   </div>
                 </div>
               </div>
+
+              {/* 🔽 Botón Guardar al final de la sección */}
+              <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
+                <button
+                  onClick={() => handleSave('notificationes')}
+                  className="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-all shadow-md shadow-blue-600/20"
+                >
+                  Guardar cambios
+                </button>
+              </div>
             </div>
           )}
 
@@ -640,6 +693,16 @@ export default function Settings() {
                     </div>
                   ))}
                 </div>
+              </div>
+
+              {/* 🔽 Botón Guardar al final de la sección */}
+              <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
+                <button
+                  onClick={() => handleSave('api')}
+                  className="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-all shadow-md shadow-blue-600/20"
+                >
+                  Guardar cambios
+                </button>
               </div>
             </div>
           )}
