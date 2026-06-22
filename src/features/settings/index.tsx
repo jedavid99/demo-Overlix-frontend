@@ -62,7 +62,7 @@ export default function Settings() {
                 <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
                   <div>
                     <h2 className="text-lg font-bold text-slate-900 dark:text-white">Business Profile</h2>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">Public identity of your repair shop</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Psddy of your repair shop</p>
                   </div>
                   <Info size={18} className="text-slate-400 cursor-help" />
                 </div>
