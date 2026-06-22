@@ -53,7 +53,7 @@ export default function Providers() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight">Proveedores</h1>
-          <p className="text-muted-foreground">Gestiona sss todos los proveedores de hardware y servicios</p>
+          <p className="text-muted-foreground">Gestiona todos los proveedores de hardware y servicios</p>
         </div>
         <Button onClick={() => navigate('/providers/add')}>
           <UserPlus size={16} className="mr-2" />

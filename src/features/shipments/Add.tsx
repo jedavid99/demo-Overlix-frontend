@@ -1,175 +1,447 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronRight, Info, Phone, Tag, MapPin, Save } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { ChevronRight, Info, Phone, Tag, MapPin, Save, X, AlertCircle } from 'lucide-react'
+import { Card, CardContent } from '@/shared/components/ui/card'
+import { Button } from '@/shared/components/ui/button'
+import { Input } from '@/shared/components/ui/input'
+import { Label } from '@/shared/components/ui/label'
+import { Badge } from '@/shared/components/ui/badge'
 
 export default function ProviderAdd() {
   const navigate = useNavigate()
   const [form, setForm] = useState({
-    businessName: '', taxId: '', website: '', 
-    contactName: '', role: '', phone: '', email: '',
-    categories: [] as string[], parts: [] as string[],
-    address: '', city: '', postal: '', incoterms: '', leadTime: ''
+    businessName: '',
+    taxId: '',
+    website: '',
+    contactName: '',
+    role: '',
+    phone: '',
+    email: '',
+    categories: [] as string[],
+    parts: [] as string[],
+    address: '',
+    city: '',
+    postal: '',
+    incoterms: 'DDP',
+    leadTime: '2-3 Business Days',
   })
 
-  const handleChange = (field: string, value: any) => setForm(prev => ({ ...prev, [field]: value }))
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const handleChange = (field: string, value: any) => {
+    setForm((prev) => ({ ...prev, [field]: value }))
+    // Limpiar error del campo al modificar
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: '' }))
+    }
+  }
 
   const toggleCategory = (cat: string) => {
-    setForm(prev => ({
+    setForm((prev) => ({
       ...prev,
-      categories: prev.categories.includes(cat) ? prev.categories.filter(c => c !== cat) : [...prev.categories, cat]
+      categories: prev.categories.includes(cat)
+        ? prev.categories.filter((c) => c !== cat)
+        : [...prev.categories, cat],
     }))
+  }
+
+  const handlePartsChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value)
+    setForm((prev) => ({ ...prev, parts: selectedOptions }))
+  }
+
+  const validate = (): boolean => {
+    const newErrors: Record<string, string> = {}
+
+    if (!form.businessName.trim()) newErrors.businessName = 'El nombre del negocio es obligatorio'
+    if (!form.contactName.trim()) newErrors.contactName = 'El nombre del contacto es obligatorio'
+    if (!form.phone.trim()) newErrors.phone = 'El teléfono es obligatorio'
+    if (!form.email.trim()) {
+      newErrors.email = 'El correo electrónico es obligatorio'
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      newErrors.email = 'Correo electrónico inválido'
+    }
+    if (!form.address.trim()) newErrors.address = 'La dirección es obligatoria'
+    if (!form.city.trim()) newErrors.city = 'La ciudad es obligatoria'
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    if (!validate()) return
+
+    // Aquí iría la llamada a la API para guardar el proveedor
+    console.log('Proveedor guardado:', form)
+    // Simular guardado exitoso
+    alert('Proveedor guardado correctamente')
     navigate('/providers')
   }
 
-  const categories = ['Phones', 'PCs / Laptops', 'Consoles', 'Accessories']
-  const partOptions = ['LCD & OLED Screens', 'Replacement Batteries', 'Charging Ports', 'Motherboards', 'Internal Cooling Fans', 'Camera Modules', 'Housing / Chassis', 'Thermal Paste / Tools']
+  const categories = ['Teléfonos', 'PCs / Portátiles', 'Consolas', 'Accesorios']
+  const partOptions = [
+    'Pantallas LCD / OLED',
+    'Baterías de repuesto',
+    'Puertos de carga',
+    'Placas base',
+    'Ventiladores internos',
+    'Módulos de cámara',
+    'Carcasa / Chasis',
+    'Pasta térmica / Herramientas',
+    'Cables flex',
+    'Conectores',
+  ]
+
+  const incotermsOptions = ['DDP', 'EXW', 'FOB', 'CIF']
+  const leadTimeOptions = ['Entrega al día siguiente', '2-3 días hábiles', '1 semana', '2+ semanas (Internacional)']
 
   return (
-    <div className="min-h-screen bg-background-light dark:bg-background-dark">
-      
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-8"
+    >
+      <div className="max-w-3xl mx-auto">
+        {/* Encabezado */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Nuevo Proveedor</h1>
+          <p className="text-muted-foreground mt-1">
+            Crea un perfil de proveedor para gestionar compras y reposición de inventario.
+          </p>
+        </div>
 
-      <main className="flex justify-center py-10 px-4">
-        <div className="w-full max-w-3xl">
-          
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Información básica */}
+          <Card>
+            <CardContent className="p-6 space-y-6">
+              <div className="flex items-center gap-2 border-b border-border pb-3">
+                <Info size={20} className="text-primary" />
+                <h2 className="text-lg font-bold text-foreground">Información básica</h2>
+              </div>
 
-          <div className="mb-8">
-            <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100">Add New Supplier</h1>
-            <p className="text-slate-500 dark:text-slate-400 mt-2">Create a new vendor profile to manage procurement and inventory restocks.</p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Basic Information */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8 shadow-sm">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
-                <Info size={20} /> Basic Information
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="col-span-2">
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Business Name</label>
-                  <input value={form.businessName} onChange={e => handleChange('businessName', e.target.value)} placeholder="e.g. Global Tech Solutions" className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-primary" type="text" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2 space-y-2">
+                  <Label htmlFor="businessName" className="text-sm font-semibold">
+                    Nombre del negocio <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="businessName"
+                    value={form.businessName}
+                    onChange={(e) => handleChange('businessName', e.target.value)}
+                    placeholder="Ej. Soluciones Tecnológicas Globales"
+                    className={errors.businessName ? 'border-destructive' : ''}
+                  />
+                  {errors.businessName && (
+                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                      <AlertCircle size={14} /> {errors.businessName}
+                    </p>
+                  )}
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Tax ID / VAT Number</label>
-                  <input value={form.taxId} onChange={e => handleChange('taxId', e.target.value)} placeholder="XX-123456789" className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-primary" type="text" />
+
+                <div className="space-y-2">
+                  <Label htmlFor="taxId" className="text-sm font-semibold">
+                    NIF / CIF
+                  </Label>
+                  <Input
+                    id="taxId"
+                    value={form.taxId}
+                    onChange={(e) => handleChange('taxId', e.target.value)}
+                    placeholder="XX-123456789"
+                  />
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Website</label>
-                  <input value={form.website} onChange={e => handleChange('website', e.target.value)} placeholder="https://www.supplier.com" className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-primary" type="url" />
+
+                <div className="space-y-2">
+                  <Label htmlFor="website" className="text-sm font-semibold">
+                    Sitio web
+                  </Label>
+                  <Input
+                    id="website"
+                    value={form.website}
+                    onChange={(e) => handleChange('website', e.target.value)}
+                    placeholder="https://www.proveedor.com"
+                    type="url"
+                  />
                 </div>
               </div>
-            </div>
+            </CardContent>
+          </Card>
 
-            {/* Primary Contact Details */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8 shadow-sm">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
-                <Phone size={20} /> Primary Contact Details
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Contact Name</label>
-                  <input value={form.contactName} onChange={e => handleChange('contactName', e.target.value)} placeholder="John Smith" className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-primary" type="text" />
+          {/* Contacto principal */}
+          <Card>
+            <CardContent className="p-6 space-y-6">
+              <div className="flex items-center gap-2 border-b border-border pb-3">
+                <Phone size={20} className="text-primary" />
+                <h2 className="text-lg font-bold text-foreground">Contacto principal</h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="contactName" className="text-sm font-semibold">
+                    Nombre del contacto <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="contactName"
+                    value={form.contactName}
+                    onChange={(e) => handleChange('contactName', e.target.value)}
+                    placeholder="Juan Pérez"
+                    className={errors.contactName ? 'border-destructive' : ''}
+                  />
+                  {errors.contactName && (
+                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                      <AlertCircle size={14} /> {errors.contactName}
+                    </p>
+                  )}
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Role / Position</label>
-                  <input value={form.role} onChange={e => handleChange('role', e.target.value)} placeholder="Account Manager" className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-primary" type="text" />
+
+                <div className="space-y-2">
+                  <Label htmlFor="role" className="text-sm font-semibold">
+                    Cargo / Puesto
+                  </Label>
+                  <Input
+                    id="role"
+                    value={form.role}
+                    onChange={(e) => handleChange('role', e.target.value)}
+                    placeholder="Gerente de Cuentas"
+                  />
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Direct Phone</label>
-                  <input value={form.phone} onChange={e => handleChange('phone', e.target.value)} placeholder="+1 (555) 000-0000" className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-primary" type="tel" />
+
+                <div className="space-y-2">
+                  <Label htmlFor="phone" className="text-sm font-semibold">
+                    Teléfono directo <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="phone"
+                    value={form.phone}
+                    onChange={(e) => handleChange('phone', e.target.value)}
+                    placeholder="+34 600 000 000"
+                    className={errors.phone ? 'border-destructive' : ''}
+                  />
+                  {errors.phone && (
+                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                      <AlertCircle size={14} /> {errors.phone}
+                    </p>
+                  )}
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Email Address</label>
-                  <input value={form.email} onChange={e => handleChange('email', e.target.value)} placeholder="john@supplier.com" className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-primary" type="email" />
+
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-semibold">
+                    Correo electrónico <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="email"
+                    value={form.email}
+                    onChange={(e) => handleChange('email', e.target.value)}
+                    placeholder="juan@proveedor.com"
+                    type="email"
+                    className={errors.email ? 'border-destructive' : ''}
+                  />
+                  {errors.email && (
+                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                      <AlertCircle size={14} /> {errors.email}
+                    </p>
+                  )}
                 </div>
               </div>
-            </div>
+            </CardContent>
+          </Card>
 
-            {/* Categories & Parts */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8 shadow-sm">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
-                <Tag size={20} /> Categories & Parts
-              </h2>
-              <div className="space-y-6">
+          {/* Categorías y piezas */}
+          <Card>
+            <CardContent className="p-6 space-y-6">
+              <div className="flex items-center gap-2 border-b border-border pb-3">
+                <Tag size={20} className="text-primary" />
+                <h2 className="text-lg font-bold text-foreground">Categorías y piezas</h2>
+              </div>
+
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Supply Categories</label>
+                  <Label className="text-sm font-semibold block mb-3">
+                    Categorías de suministro
+                  </Label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    {categories.map(cat => (
-                      <label key={cat} className="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-800 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                        <input checked={form.categories.includes(cat)} onChange={() => toggleCategory(cat)} className="rounded text-primary focus:ring-primary h-4 w-4" type="checkbox" />
+                    {categories.map((cat) => (
+                      <label
+                        key={cat}
+                        className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all ${
+                          form.categories.includes(cat)
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:bg-muted/50'
+                        }`}
+                      >
+                        <input
+                          checked={form.categories.includes(cat)}
+                          onChange={() => toggleCategory(cat)}
+                          className="rounded text-primary focus:ring-primary h-4 w-4"
+                          type="checkbox"
+                        />
                         <span className="text-sm font-medium">{cat}</span>
                       </label>
                     ))}
                   </div>
                 </div>
+
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Specific Parts Supplied</label>
-                  <select multiple className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-primary min-h-[120px]">
-                    {partOptions.map(part => (
-                      <option key={part} value={part}>{part}</option>
+                  <Label htmlFor="parts" className="text-sm font-semibold block mb-2">
+                    Piezas específicas que suministra
+                  </Label>
+                  <select
+                    id="parts"
+                    multiple
+                    value={form.parts}
+                    onChange={handlePartsChange}
+                    className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all min-h-[140px]"
+                  >
+                    {partOptions.map((part) => (
+                      <option key={part} value={part}>
+                        {part}
+                      </option>
                     ))}
                   </select>
-                  <p className="text-xs text-slate-500 mt-2 italic">Hold Ctrl (Windows) or Command (Mac) to select multiple items.</p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Mantén presionada la tecla <kbd className="px-1 py-0.5 bg-muted rounded text-[10px] font-mono">Ctrl</kbd> (Windows) o <kbd className="px-1 py-0.5 bg-muted rounded text-[10px] font-mono">⌘</kbd> (Mac) para seleccionar múltiples opciones.
+                  </p>
+                  {form.parts.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {form.parts.map((part) => (
+                        <Badge key={part} variant="secondary" className="text-xs">
+                          {part}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setForm((prev) => ({
+                                ...prev,
+                                parts: prev.parts.filter((p) => p !== part),
+                              }))
+                            }}
+                            className="ml-1 hover:text-destructive transition-colors"
+                          >
+                            <X size={12} />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
+            </CardContent>
+          </Card>
 
-            {/* Physical Address & Shipping */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-8 shadow-sm">
-              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
-                <MapPin size={20} /> Physical Address & Shipping
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="col-span-2">
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Street Address</label>
-                  <input value={form.address} onChange={e => handleChange('address', e.target.value)} placeholder="123 Supply Lane, Industrial Park" className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-primary" type="text" />
+          {/* Dirección y envío */}
+          <Card>
+            <CardContent className="p-6 space-y-6">
+              <div className="flex items-center gap-2 border-b border-border pb-3">
+                <MapPin size={20} className="text-primary" />
+                <h2 className="text-lg font-bold text-foreground">Dirección y envío</h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2 space-y-2">
+                  <Label htmlFor="address" className="text-sm font-semibold">
+                    Dirección <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="address"
+                    value={form.address}
+                    onChange={(e) => handleChange('address', e.target.value)}
+                    placeholder="Calle, número, parque industrial"
+                    className={errors.address ? 'border-destructive' : ''}
+                  />
+                  {errors.address && (
+                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                      <AlertCircle size={14} /> {errors.address}
+                    </p>
+                  )}
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">City</label>
-                  <input value={form.city} onChange={e => handleChange('city', e.target.value)} placeholder="New York" className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-primary" type="text" />
+
+                <div className="space-y-2">
+                  <Label htmlFor="city" className="text-sm font-semibold">
+                    Ciudad <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="city"
+                    value={form.city}
+                    onChange={(e) => handleChange('city', e.target.value)}
+                    placeholder="Madrid"
+                    className={errors.city ? 'border-destructive' : ''}
+                  />
+                  {errors.city && (
+                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                      <AlertCircle size={14} /> {errors.city}
+                    </p>
+                  )}
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Postal Code</label>
-                  <input value={form.postal} onChange={e => handleChange('postal', e.target.value)} placeholder="10001" className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-primary" type="text" />
+
+                <div className="space-y-2">
+                  <Label htmlFor="postal" className="text-sm font-semibold">
+                    Código postal
+                  </Label>
+                  <Input
+                    id="postal"
+                    value={form.postal}
+                    onChange={(e) => handleChange('postal', e.target.value)}
+                    placeholder="28001"
+                  />
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Shipping Terms (Incoterms)</label>
-                  <select value={form.incoterms} onChange={e => handleChange('incoterms', e.target.value)} className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-primary">
-                    <option>DDP - Delivered Duty Paid</option>
-                    <option>EXW - Ex Works</option>
-                    <option>FOB - Free On Board</option>
-                    <option>CIF - Cost, Insurance and Freight</option>
+
+                <div className="space-y-2">
+                  <Label htmlFor="incoterms" className="text-sm font-semibold">
+                    Términos de envío (Incoterms)
+                  </Label>
+                  <select
+                    id="incoterms"
+                    value={form.incoterms}
+                    onChange={(e) => handleChange('incoterms', e.target.value)}
+                    className="w-full h-11 px-4 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                  >
+                    {incotermsOptions.map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
                   </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Default Lead Time</label>
-                  <select value={form.leadTime} onChange={e => handleChange('leadTime', e.target.value)} className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-primary">
-                    <option>Next Day Delivery</option>
-                    <option>2-3 Business Days</option>
-                    <option>1 Week</option>
-                    <option>2+ Weeks (International)</option>
+
+                <div className="space-y-2">
+                  <Label htmlFor="leadTime" className="text-sm font-semibold">
+                    Tiempo de entrega estimado
+                  </Label>
+                  <select
+                    id="leadTime"
+                    value={form.leadTime}
+                    onChange={(e) => handleChange('leadTime', e.target.value)}
+                    className="w-full h-11 px-4 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                  >
+                    {leadTimeOptions.map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
-            </div>
+            </CardContent>
+          </Card>
 
-            {/* Submit buttons */}
-            <div className="flex items-center justify-end gap-4 pt-6 border-t border-slate-200 dark:border-slate-800">
-              <button onClick={() => navigate('/providers')} className="px-6 h-12 rounded-lg text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" type="button">
-                Cancel
-              </button>
-              <button className="px-8 h-12 rounded-lg bg-primary text-white text-sm font-bold shadow-lg shadow-primary/25 hover:bg-primary/90 flex items-center gap-2" type="submit">
-                <Save size={16} /> Save Supplier
-              </button>
-            </div>
-          </form>
-        </div>
-      </main>
-    </div>
+          {/* Botones de acción */}
+          <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-4 border-t border-border">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate('/providers')}
+              className="w-full sm:w-auto"
+            >
+              Cancelar
+            </Button>
+            <Button type="submit" className="w-full sm:w-auto">
+              <Save size={16} className="mr-2" />
+              Guardar proveedor
+            </Button>
+          </div>
+        </form>
+      </div>
+    </motion.div>
   )
 }
-
-
