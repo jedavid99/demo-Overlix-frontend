@@ -1,7 +1,13 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ChevronRight, Info, CreditCard, Cloud, Save, X } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { ChevronRight, Info, CreditCard, Cloud, Save, X, AlertCircle, Calendar, Building2, Tag, DollarSign } from 'lucide-react'
 import { MdAdd, MdCreditCard, MdAttachFile } from 'react-icons/md'
+import { Card, CardContent } from '@/shared/components/ui/card'
+import { Button } from '@/shared/components/ui/button'
+import { Input } from '@/shared/components/ui/input'
+import { Label } from '@/shared/components/ui/label'
+import { Badge } from '@/shared/components/ui/badge'
 
 export default function ExpensesAdd() {
   const navigate = useNavigate()
@@ -15,9 +21,15 @@ export default function ExpensesAdd() {
     paymentMethod: 'cash',
   })
   const [file, setFile] = useState<File | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const handleChange = (field: string, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }))
+    // Limpiar error al modificar
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }))
+    }
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,200 +38,277 @@ export default function ExpensesAdd() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const validate = (): boolean => {
+    const newErrors: Record<string, string> = {}
+
+    if (!form.title.trim()) newErrors.title = 'La descripción es obligatoria'
+    if (!form.amount || parseFloat(form.amount) <= 0) newErrors.amount = 'El monto debe ser mayor a 0'
+    if (!form.date) newErrors.date = 'La fecha es obligatoria'
+    if (!form.category) newErrors.category = 'La categoría es obligatoria'
+    if (!form.supplier) newErrors.supplier = 'El proveedor es obligatorio'
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: persist data
+    if (!validate()) return
+
+    setIsLoading(true)
+    // Simular envío a API
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    console.log('Gasto guardado:', { ...form, file })
+    alert('Gasto registrado correctamente')
+    setIsLoading(false)
     navigate('/expenses')
   }
 
+  const categories = [
+    { value: 'spare_parts', label: 'Repuestos' },
+    { value: 'utilities', label: 'Servicios' },
+    { value: 'rent', label: 'Alquiler' },
+    { value: 'salaries', label: 'Salarios' },
+    { value: 'marketing', label: 'Marketing' },
+    { value: 'other', label: 'Otros' },
+  ]
+
+  const suppliers = [
+    { value: '1', label: 'Logística Global S.A.' },
+    { value: '2', label: 'Propiedades Main Street' },
+    { value: '3', label: 'Tech Supplies Co.' },
+    { value: '4', label: 'Red Eléctrica' },
+  ]
+
+  const currencies = [
+    { value: 'USD', label: 'USD - Dólar' },
+    { value: 'EUR', label: 'EUR - Euro' },
+    { value: 'GBP', label: 'GBP - Libra' },
+    { value: 'JPY', label: 'JPY - Yen' },
+  ]
+
   return (
-    <div className="flex flex-col min-h-screen bg-background-light dark:bg-background-dark">
-      {/* Header */}
-      
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-8"
+    >
+      <div className="max-w-3xl mx-auto">
+        {/* Encabezado */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Nuevo gasto</h1>
+          <p className="text-muted-foreground mt-1">
+            Registra una nueva transacción para el control de costos y contabilidad.
+          </p>
+        </div>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">
-        <div className="max-w-[960px] mx-auto w-full py-8 px-6">
-          {/* Breadcrumbs */}
-          
-          {/* Page Title */}
-          <div className="mb-8">
-            <h1 className="text-slate-900 dark:text-slate-100 text-3xl font-extrabold tracking-tight">Register New Expense</h1>
-            <p className="text-slate-500 dark:text-slate-400 mt-2">Record a new business transaction for tax reporting and accounting.</p>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Section: Transaction Details */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Información general */}
+          <Card>
+            <CardContent className="p-6 space-y-6">
+              <div className="flex items-center gap-2 border-b border-border pb-3">
                 <Info size={20} className="text-primary" />
-                General Information
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="col-span-1 md:col-span-2">
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                    Expense Title / Description
-                  </label>
-                  <input
+                <h2 className="text-lg font-bold text-foreground">Información general</h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2 space-y-2">
+                  <Label htmlFor="title" className="text-sm font-semibold">
+                    Título / Descripción <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="title"
                     value={form.title}
-                    onChange={e => handleChange('title', e.target.value)}
-                    className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-primary px-4 py-3"
-                    placeholder="e.g. Monthly Office Rent"
-                    type="text"
+                    onChange={(e) => handleChange('title', e.target.value)}
+                    placeholder="Ej. Alquiler mensual local"
+                    className={errors.title ? 'border-destructive' : ''}
                   />
+                  {errors.title && (
+                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                      <AlertCircle size={14} /> {errors.title}
+                    </p>
+                  )}
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                    Amount
-                  </label>
-                  <div className="relative flex">
-                    <span className="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-500 text-sm">
-                      $
-                    </span>
-                    <input
-                      value={form.amount}
-                      onChange={e => handleChange('amount', e.target.value)}
-                      className="w-full rounded-r-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-primary px-4 py-3"
-                      placeholder="0.00"
-                      step="0.01"
+
+                <div className="space-y-2">
+                  <Label htmlFor="amount" className="text-sm font-semibold">
+                    Monto <span className="text-destructive">*</span>
+                  </Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                    <Input
+                      id="amount"
                       type="number"
+                      step="0.01"
+                      value={form.amount}
+                      onChange={(e) => handleChange('amount', e.target.value)}
+                      placeholder="0.00"
+                      className={`pl-8 ${errors.amount ? 'border-destructive' : ''}`}
                     />
                   </div>
+                  {errors.amount && (
+                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                      <AlertCircle size={14} /> {errors.amount}
+                    </p>
+                  )}
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                    Currency
-                  </label>
-                  <select
-                    value={form.currency}
-                    onChange={e => handleChange('currency', e.target.value)}
-                    className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-primary px-4 py-3"
-                  >
-                    <option value="USD">USD - US Dollar</option>
-                    <option value="EUR">EUR - Euro</option>
-                    <option value="GBP">GBP - British Pound</option>
-                    <option value="JPY">JPY - Japanese Yen</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                    Date of Expense
-                  </label>
-                  <input
-                    value={form.date}
-                    onChange={e => handleChange('date', e.target.value)}
-                    className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-primary px-4 py-3"
-                    type="date"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                    Category
-                  </label>
-                  <select
-                    value={form.category}
-                    onChange={e => handleChange('category', e.target.value)}
-                    className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-primary px-4 py-3"
-                  >
-                    <option value="">Select Category</option>
-                    <option value="spare_parts">Spare Parts</option>
-                    <option value="utilities">Utilities</option>
-                    <option value="rent">Rent</option>
-                    <option value="salaries">Salaries</option>
-                    <option value="marketing">Marketing</option>
-                  </select>
-                </div>
-              </div>
-            </div>
 
-            {/* Section: Supplier & Payment */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
-                <CreditCard size={20} className="text-primary" />
-                Supplier &amp; Payment
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                    Supplier
-                  </label>
+                <div className="space-y-2">
+                  <Label htmlFor="currency" className="text-sm font-semibold">
+                    Moneda
+                  </Label>
                   <select
-                    value={form.supplier}
-                    onChange={e => handleChange('supplier', e.target.value)}
-                    className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-primary px-4 py-3"
+                    id="currency"
+                    value={form.currency}
+                    onChange={(e) => handleChange('currency', e.target.value)}
+                    className="w-full h-11 px-4 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                   >
-                    <option value="">Select from database</option>
-                    <option value="1">Global Logistics Inc.</option>
-                    <option value="2">Main Street Properties</option>
-                    <option value="3">Tech Supplies Co.</option>
-                    <option value="4">Utility Power Grid</option>
+                    {currencies.map((c) => (
+                      <option key={c.value} value={c.value}>
+                        {c.label}
+                      </option>
+                    ))}
                   </select>
-                  <p className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                    <MdAdd size={14} /> Add a new supplier
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="date" className="text-sm font-semibold">
+                    Fecha del gasto <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="date"
+                    type="date"
+                    value={form.date}
+                    onChange={(e) => handleChange('date', e.target.value)}
+                    className={errors.date ? 'border-destructive' : ''}
+                  />
+                  {errors.date && (
+                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                      <AlertCircle size={14} /> {errors.date}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="category" className="text-sm font-semibold">
+                    Categoría <span className="text-destructive">*</span>
+                  </Label>
+                  <select
+                    id="category"
+                    value={form.category}
+                    onChange={(e) => handleChange('category', e.target.value)}
+                    className={`w-full h-11 px-4 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${errors.category ? 'border-destructive' : ''}`}
+                  >
+                    <option value="">Seleccionar categoría</option>
+                    {categories.map((cat) => (
+                      <option key={cat.value} value={cat.value}>
+                        {cat.label}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.category && (
+                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                      <AlertCircle size={14} /> {errors.category}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="supplier" className="text-sm font-semibold">
+                    Proveedor <span className="text-destructive">*</span>
+                  </Label>
+                  <select
+                    id="supplier"
+                    value={form.supplier}
+                    onChange={(e) => handleChange('supplier', e.target.value)}
+                    className={`w-full h-11 px-4 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${errors.supplier ? 'border-destructive' : ''}`}
+                  >
+                    <option value="">Seleccionar proveedor</option>
+                    {suppliers.map((s) => (
+                      <option key={s.value} value={s.value}>
+                        {s.label}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.supplier && (
+                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                      <AlertCircle size={14} /> {errors.supplier}
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                    <MdAdd size={14} className="text-primary" />{' '}
+                    <button type="button" className="text-primary hover:underline">
+                      Agregar nuevo proveedor
+                    </button>
                   </p>
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                    Payment Method
-                  </label>
-                  <div className="grid grid-cols-3 gap-3">
-                    <label className="flex flex-col items-center justify-center p-3 border border-slate-300 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-primary/5 transition-all has-[:checked]:border-primary has-[:checked]:bg-primary/10">
-                      <input
-                        checked={form.paymentMethod === 'cash'}
-                        onChange={e => handleChange('paymentMethod', 'cash')}
-                        className="sr-only"
-                        name="payment_method"
-                        type="radio"
-                        value="cash"
-                      />
-                      <span className="text-xl mb-1">💵</span>
-                      <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Cash</span>
-                    </label>
-                    <label className="flex flex-col items-center justify-center p-3 border border-slate-300 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-primary/5 transition-all has-[:checked]:border-primary has-[:checked]:bg-primary/10">
-                      <input
-                        checked={form.paymentMethod === 'card'}
-                        onChange={e => handleChange('paymentMethod', 'card')}
-                        className="sr-only"
-                        name="payment_method"
-                        type="radio"
-                        value="card"
-                      />
-                      <MdCreditCard size={20} className="mb-1" />
-                      <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Card</span>
-                    </label>
-                    <label className="flex flex-col items-center justify-center p-3 border border-slate-300 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-primary/5 transition-all has-[:checked]:border-primary has-[:checked]:bg-primary/10">
-                      <input
-                        checked={form.paymentMethod === 'bank'}
-                        onChange={e => handleChange('paymentMethod', 'bank')}
-                        className="sr-only"
-                        name="payment_method"
-                        type="radio"
-                        value="bank"
-                      />
-                      <span className="text-xl mb-1">🏦</span>
-                      <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Transfer</span>
-                    </label>
-                  </div>
-                </div>
               </div>
-            </div>
+            </CardContent>
+          </Card>
 
-            {/* Section: Digital Record */}
-            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2">
+          {/* Método de pago */}
+          <Card>
+            <CardContent className="p-6 space-y-6">
+              <div className="flex items-center gap-2 border-b border-border pb-3">
+                <CreditCard size={20} className="text-primary" />
+                <h2 className="text-lg font-bold text-foreground">Método de pago</h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  { value: 'cash', label: 'Efectivo', icon: '💵' },
+                  { value: 'card', label: 'Tarjeta', icon: <MdCreditCard size={24} /> },
+                  { value: 'bank', label: 'Transferencia', icon: '🏦' },
+                ].map((method) => (
+                  <label
+                    key={method.value}
+                    className={`
+                      flex flex-col items-center gap-2 p-4 border-2 rounded-xl cursor-pointer transition-all
+                      ${form.paymentMethod === method.value
+                        ? 'border-primary bg-primary/5 shadow-md'
+                        : 'border-border hover:border-primary/50 hover:bg-muted/30'}
+                    `}
+                  >
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value={method.value}
+                      checked={form.paymentMethod === method.value}
+                      onChange={() => handleChange('paymentMethod', method.value)}
+                      className="sr-only"
+                    />
+                    <span className="text-2xl">{method.icon}</span>
+                    <span className="text-sm font-medium">{method.label}</span>
+                  </label>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Comprobante */}
+          <Card>
+            <CardContent className="p-6 space-y-6">
+              <div className="flex items-center gap-2 border-b border-border pb-3">
                 <Cloud size={20} className="text-primary" />
-                Receipt or Invoice
-              </h3>
-              <div className="flex items-center justify-center w-full">
-                <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-slate-300 dark:border-slate-700 border-dashed rounded-xl cursor-pointer bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                <h2 className="text-lg font-bold text-foreground">Comprobante o factura</h2>
+              </div>
+
+              <div className="flex flex-col items-center justify-center w-full">
+                <label
+                  className={`
+                    flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-xl cursor-pointer
+                    transition-all hover:bg-muted/30 hover:border-primary/50
+                    ${file ? 'border-primary/50 bg-muted/20' : 'border-border'}
+                  `}
+                >
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <Cloud size={48} className="text-slate-400 mb-3" />
-                    <p className="mb-2 text-sm text-slate-700 dark:text-slate-300 font-semibold tracking-tight">
-                      Click to upload or drag and drop
+                    <Cloud size={48} className="text-muted-foreground/50 mb-3" />
+                    <p className="mb-2 text-sm font-semibold text-foreground">
+                      Haz clic para subir o arrastra y suelta
                     </p>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 uppercase font-medium">
-                      PNG, JPG or PDF (MAX. 5MB)
+                    <p className="text-xs text-muted-foreground uppercase font-medium">
+                      PNG, JPG o PDF (máx. 5MB)
                     </p>
                   </div>
                   <input
@@ -229,58 +318,55 @@ export default function ExpensesAdd() {
                     accept=".png,.jpg,.jpeg,.pdf"
                   />
                 </label>
+
+                {file && (
+                  <div className="mt-4 w-full p-3 bg-muted/30 rounded-lg flex items-center justify-between border border-border">
+                    <span className="text-sm text-foreground flex items-center gap-2">
+                      <MdAttachFile size={16} className="text-primary" />
+                      {file.name}
+                      <Badge variant="outline" className="text-[10px]">
+                        {(file.size / 1024).toFixed(1)} KB
+                      </Badge>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setFile(null)}
+                      className="text-muted-foreground hover:text-destructive transition-colors"
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
+                )}
               </div>
-              {file && (
-                <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg flex items-center justify-between">
-                  <span className="text-sm text-slate-700 dark:text-slate-300 flex items-center gap-1"><MdAttachFile size={16} /> {file.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => setFile(null)}
-                    className="text-slate-400 hover:text-red-500 transition-colors"
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
+            </CardContent>
+          </Card>
+
+          {/* Botones de acción */}
+          <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-4 border-t border-border">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => navigate('/expenses')}
+              className="w-full sm:w-auto"
+            >
+              Cancelar
+            </Button>
+            <Button type="submit" className="w-full sm:w-auto" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <span className="animate-spin mr-2">⟳</span>
+                  Guardando...
+                </>
+              ) : (
+                <>
+                  <Save size={16} className="mr-2" />
+                  Guardar gasto
+                </>
               )}
-            </div>
-
-            {/* Form Actions */}
-            <div className="flex items-center justify-end gap-4 py-4 border-t border-slate-200 dark:border-slate-800">
-              <button
-                onClick={() => navigate('/expenses')}
-                className="px-6 py-3 rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                type="button"
-              >
-                Cancel
-              </button>
-              <button
-                className="px-8 py-3 rounded-lg bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20 transition-all flex items-center gap-2"
-                type="submit"
-              >
-                <Save size={18} />
-                Save Expense
-              </button>
-            </div>
-          </form>
-        </div>
-      </main>
-
-      {/* Footer */}
-      <footer className="mt-auto px-10 py-6 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-        <div className="max-w-[960px] mx-auto flex justify-between items-center text-sm text-slate-500 dark:text-slate-400">
-          <p>© 2024 ExpenseFlow Business Systems. All rights reserved.</p>
-          <div className="flex gap-4">
-            <a href="#/" className="hover:text-primary">
-              Support
-            </a>
-            <a href="#/" className="hover:text-primary">
-              Privacy Policy
-            </a>
+            </Button>
           </div>
-        </div>
-      </footer>
-    </div>
+        </form>
+      </div>
+    </motion.div>
   )
 }
-
-
