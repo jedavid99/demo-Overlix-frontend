@@ -4,8 +4,6 @@ import { motion } from 'framer-motion'
 import {
   Plus,
   Search,
-  Filter,
-  MoreVertical,
   Eye,
   Edit,
   Trash2,
@@ -14,25 +12,21 @@ import {
   MapPin,
   Navigation,
   CheckCircle,
-  Clock,
   AlertCircle,
-  TrendingUp,
-  TrendingDown,
-  Download,
   X,
   Phone,
-  Mail,
   Calendar,
   Wrench,
-  Shield,
   Fuel,
   Gauge,
-  Award,
+  Save,
 } from 'lucide-react'
 import { Card, CardContent } from '@/shared/components/ui/card'
 import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
 import { Skeleton } from '@/shared/components/ui/skeleton'
+import { Input } from '@/shared/components/ui/input'
+import { Label } from '@/shared/components/ui/label'
 
 interface Remise {
   id: string
@@ -52,18 +46,37 @@ interface Remise {
   notes?: string
 }
 
+// 📦 Datos vacíos – conectar con API real
+const initialRemises: Remise[] = []
+
 export default function Remises() {
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [loading, setLoading] = useState(false)
   const [selectedRemise, setSelectedRemise] = useState<Remise | null>(null)
-  const [showModal, setShowModal] = useState(false)
+  const [showDetailsModal, setShowDetailsModal] = useState(false)
+  const [showAddModal, setShowAddModal] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
+  const [remises, setRemises] = useState<Remise[]>(initialRemises)
 
-  // 📦 Datos vacíos – conectar con API real
-  const remises: Remise[] = []
+  // Estado del formulario para nuevo remise
+  const [newRemise, setNewRemise] = useState<Omit<Remise, 'id' | 'lastUpdate'>>({
+    plate: '',
+    driver: '',
+    driverPhone: '',
+    vehicle: '',
+    brand: '',
+    model: '',
+    year: new Date().getFullYear(),
+    status: 'disponible',
+    location: '',
+    fuelLevel: 80,
+    mileage: 0,
+    assignedTo: '',
+    notes: '',
+  })
 
   const filteredRemises = remises.filter((r) => {
     const matchesSearch =
@@ -81,7 +94,6 @@ export default function Remises() {
   )
   const totalPages = Math.ceil(filteredRemises.length / itemsPerPage)
 
-  // KPIs
   const totalRemises = remises.length
   const disponibles = remises.filter((r) => r.status === 'disponible').length
   const enRuta = remises.filter((r) => r.status === 'en_ruta').length
@@ -143,24 +155,68 @@ export default function Remises() {
 
   const openDetails = (remise: Remise) => {
     setSelectedRemise(remise)
-    setShowModal(true)
+    setShowDetailsModal(true)
   }
 
-  const closeModal = () => {
-    setShowModal(false)
+  const closeDetailsModal = () => {
+    setShowDetailsModal(false)
     setSelectedRemise(null)
+  }
+
+  // Manejar cambios en el formulario
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target
+    setNewRemise((prev) => ({
+      ...prev,
+      [name]: type === 'number' ? Number(value) : value,
+    }))
+  }
+
+  // Guardar nuevo remise (simulación)
+  const handleSaveRemise = () => {
+    // Validación básica
+    if (!newRemise.plate.trim() || !newRemise.driver.trim() || !newRemise.vehicle.trim()) {
+      alert('Por favor completa los campos obligatorios: Placa, Conductor y Vehículo.')
+      return
+    }
+
+    const newId = `REM-${String(remises.length + 1).padStart(4, '0')}`
+    const now = new Date().toLocaleString()
+
+    const remiseToAdd: Remise = {
+      ...newRemise,
+      id: newId,
+      lastUpdate: now,
+    }
+
+    setRemises((prev) => [...prev, remiseToAdd])
+    setShowAddModal(false)
+    setNewRemise({
+      plate: '',
+      driver: '',
+      driverPhone: '',
+      vehicle: '',
+      brand: '',
+      model: '',
+      year: new Date().getFullYear(),
+      status: 'disponible',
+      location: '',
+      fuelLevel: 80,
+      mileage: 0,
+      assignedTo: '',
+      notes: '',
+    })
+    alert(`Remise ${newId} agregado correctamente.`)
   }
 
   // Modal de detalles
   const DetailsModal = () => {
     if (!selectedRemise) return null
-
     return (
       <div className="fixed inset-0 z-50 overflow-y-auto">
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={closeModal} />
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={closeDetailsModal} />
         <div className="flex min-h-full items-center justify-center p-4">
           <div className="relative w-full max-w-3xl bg-card rounded-2xl shadow-2xl transform transition-all">
-            {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-border">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
@@ -171,17 +227,11 @@ export default function Remises() {
                   <p className="text-sm text-muted-foreground">{selectedRemise.vehicle}</p>
                 </div>
               </div>
-              <button
-                onClick={closeModal}
-                className="p-1.5 hover:bg-muted rounded-lg transition-colors"
-              >
+              <button onClick={closeDetailsModal} className="p-1.5 hover:bg-muted rounded-lg transition-colors">
                 <X size={20} className="text-muted-foreground" />
               </button>
             </div>
-
-            {/* Contenido */}
             <div className="p-6 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto">
-              {/* Estado y ubicación */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-muted/30 rounded-xl p-4">
                   <p className="text-xs text-muted-foreground font-medium">Estado</p>
@@ -198,8 +248,6 @@ export default function Remises() {
                   </div>
                 </div>
               </div>
-
-              {/* Conductor y vehículo */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-muted/30 rounded-xl p-4">
                   <p className="text-xs text-muted-foreground font-medium flex items-center gap-1">
@@ -221,8 +269,6 @@ export default function Remises() {
                   </p>
                 </div>
               </div>
-
-              {/* Detalles técnicos */}
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-muted/30 rounded-xl p-4 text-center">
                   <Fuel size={20} className="mx-auto text-muted-foreground mb-1" />
@@ -240,22 +286,18 @@ export default function Remises() {
                   <p className="text-xs text-muted-foreground">Última actualización</p>
                 </div>
               </div>
-
               {selectedRemise.assignedTo && (
                 <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4">
                   <p className="text-xs text-muted-foreground font-medium">Asignado a</p>
                   <p className="font-medium">{selectedRemise.assignedTo}</p>
                 </div>
               )}
-
               {selectedRemise.notes && (
                 <div className="bg-muted/30 rounded-xl p-4">
                   <p className="text-xs text-muted-foreground font-medium">Notas</p>
                   <p className="text-sm mt-1">{selectedRemise.notes}</p>
                 </div>
               )}
-
-              {/* Acciones */}
               <div className="flex gap-3 pt-2">
                 <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                   <Phone size={16} />
@@ -273,20 +315,182 @@ export default function Remises() {
     )
   }
 
-  if (loading) {
+  // Modal para agregar remise
+  const AddModal = () => {
     return (
-      <div className="p-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-10 w-32" />
+      <div className="fixed inset-0 z-50 overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowAddModal(false)} />
+        <div className="flex min-h-full items-center justify-center p-4">
+          <div className="relative w-full max-w-2xl bg-card rounded-2xl shadow-2xl transform transition-all">
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <Plus size={20} className="text-white" />
+                </div>
+                <h2 className="text-lg font-bold text-foreground">Nuevo Remise</h2>
+              </div>
+              <button onClick={() => setShowAddModal(false)} className="p-1.5 hover:bg-muted rounded-lg transition-colors">
+                <X size={20} className="text-muted-foreground" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="plate" className="text-sm font-medium">Placa *</Label>
+                  <Input
+                    id="plate"
+                    name="plate"
+                    value={newRemise.plate}
+                    onChange={handleInputChange}
+                    placeholder="ABC-1234"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="driver" className="text-sm font-medium">Conductor *</Label>
+                  <Input
+                    id="driver"
+                    name="driver"
+                    value={newRemise.driver}
+                    onChange={handleInputChange}
+                    placeholder="Nombre completo"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="driverPhone" className="text-sm font-medium">Teléfono del conductor</Label>
+                  <Input
+                    id="driverPhone"
+                    name="driverPhone"
+                    value={newRemise.driverPhone}
+                    onChange={handleInputChange}
+                    placeholder="+34 600 000 000"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="vehicle" className="text-sm font-medium">Vehículo *</Label>
+                  <Input
+                    id="vehicle"
+                    name="vehicle"
+                    value={newRemise.vehicle}
+                    onChange={handleInputChange}
+                    placeholder="Furgoneta, Camión, etc."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="brand" className="text-sm font-medium">Marca</Label>
+                  <Input
+                    id="brand"
+                    name="brand"
+                    value={newRemise.brand}
+                    onChange={handleInputChange}
+                    placeholder="Mercedes, Ford, etc."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="model" className="text-sm font-medium">Modelo</Label>
+                  <Input
+                    id="model"
+                    name="model"
+                    value={newRemise.model}
+                    onChange={handleInputChange}
+                    placeholder="Sprinter, Transit, etc."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="year" className="text-sm font-medium">Año</Label>
+                  <Input
+                    id="year"
+                    name="year"
+                    type="number"
+                    value={newRemise.year}
+                    onChange={handleInputChange}
+                    placeholder="2024"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="status" className="text-sm font-medium">Estado</Label>
+                  <select
+                    id="status"
+                    name="status"
+                    value={newRemise.status}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 rounded-lg border border-input bg-background text-foreground"
+                  >
+                    <option value="disponible">Disponible</option>
+                    <option value="en_ruta">En Ruta</option>
+                    <option value="mantenimiento">Mantenimiento</option>
+                    <option value="inactivo">Inactivo</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="location" className="text-sm font-medium">Ubicación</Label>
+                  <Input
+                    id="location"
+                    name="location"
+                    value={newRemise.location}
+                    onChange={handleInputChange}
+                    placeholder="Ciudad, dirección"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="fuelLevel" className="text-sm font-medium">Nivel de combustible (%)</Label>
+                  <Input
+                    id="fuelLevel"
+                    name="fuelLevel"
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={newRemise.fuelLevel}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="mileage" className="text-sm font-medium">Kilometraje</Label>
+                  <Input
+                    id="mileage"
+                    name="mileage"
+                    type="number"
+                    value={newRemise.mileage}
+                    onChange={handleInputChange}
+                    placeholder="0"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="assignedTo" className="text-sm font-medium">Asignado a</Label>
+                  <Input
+                    id="assignedTo"
+                    name="assignedTo"
+                    value={newRemise.assignedTo}
+                    onChange={handleInputChange}
+                    placeholder="Cliente o proyecto"
+                  />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="notes" className="text-sm font-medium">Notas</Label>
+                  <textarea
+                    id="notes"
+                    name="notes"
+                    value={newRemise.notes}
+                    onChange={handleInputChange}
+                    rows={2}
+                    className="w-full px-4 py-2 rounded-lg border border-input bg-background text-foreground"
+                    placeholder="Observaciones adicionales"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 p-4 border-t border-border">
+              <Button variant="outline" onClick={() => setShowAddModal(false)}>
+                Cancelar
+              </Button>
+              <Button onClick={handleSaveRemise} className="gap-2">
+                <Save size={16} />
+                Guardar remise
+              </Button>
+            </div>
+          </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
-            <Skeleton key={i} className="h-32" />
-          ))}
-        </div>
-        <Skeleton className="h-12" />
-        <Skeleton className="h-96" />
       </div>
     )
   }
@@ -304,7 +508,7 @@ export default function Remises() {
           <h1 className="text-3xl font-bold text-foreground">Remises</h1>
           <p className="text-muted-foreground">Gestión de vehículos de transporte</p>
         </div>
-        <Button onClick={() => navigate('/remises/add')} className="gap-2">
+        <Button onClick={() => setShowAddModal(true)} className="gap-2">
           <Plus size={18} />
           Nuevo remise
         </Button>
@@ -388,7 +592,7 @@ export default function Remises() {
               <Truck size={48} className="mx-auto mb-4 text-muted-foreground/40" />
               <p className="text-lg font-semibold text-foreground mb-1">No hay remises registrados</p>
               <p className="text-sm">Agrega un nuevo remise para comenzar.</p>
-              <Button className="mt-4" onClick={() => navigate('/remises/add')}>
+              <Button className="mt-4" onClick={() => setShowAddModal(true)}>
                 <Plus size={16} className="mr-2" />
                 Nuevo remise
               </Button>
@@ -404,7 +608,7 @@ export default function Remises() {
                       <th className="px-6 py-4 font-medium">Vehículo</th>
                       <th className="px-6 py-4 font-medium">Ubicación</th>
                       <th className="px-6 py-4 font-medium">Estado</th>
-                      <th className="px-6 py-4 font-medium text-right">Acciones</th>
+                      <th className="px-6 py-4 text-right">Acciones</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -473,8 +677,6 @@ export default function Remises() {
                   </tbody>
                 </table>
               </div>
-
-              {/* Paginación */}
               {totalPages > 1 && (
                 <div className="flex items-center justify-between px-6 py-4 border-t border-border">
                   <p className="text-sm text-muted-foreground">
@@ -506,8 +708,9 @@ export default function Remises() {
         </CardContent>
       </Card>
 
-      {/* Modal de detalles */}
-      {showModal && <DetailsModal />}
+      {/* Modales */}
+      {showDetailsModal && <DetailsModal />}
+      {showAddModal && <AddModal />}
     </motion.div>
   )
 }
