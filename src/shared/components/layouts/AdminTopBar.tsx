@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Menu, Bell, User, ChevronDown, ArrowRightToLine, LogOut } from 'lucide-react'
-import { MdSearch, MdSettings, MdBarChart, MdInventory2, MdAttachMoney, MdReceipt } from 'react-icons/md'
+import { MdSearch, MdSettings, MdBarChart, MdInventory2, MdAttachMoney, MdReceipt, MdLocalShipping } from 'react-icons/md'
 import { Button } from '../../components/ui/button'
 import { Badge } from '../../components/ui/badge'
 import {
@@ -22,13 +22,13 @@ import {
 import { SimpleNotifications, SimpleNotification } from '../notifications/SimpleNotifications'
 
 const categories = [
-  { value: 'all', label: 'Todo', placeholder: 'Buscar en Overlix...', route: '/dashboard' },
-  { value: 'sales', label: 'Ventas', placeholder: 'Buscar venta...', route: '/sales' },
-  { value: 'repairs', label: 'Reparaciones', placeholder: 'Buscar reparación...', route: '/reparaciones/list' },
-  { value: 'clients', label: 'Clientes', placeholder: 'Buscar cliente...', route: '/clients' },
-  { value: 'expenses', label: 'Gastos', placeholder: 'Buscar gasto...', route: '/expenses' },
-  { value: 'stock', label: 'Stock', placeholder: 'Buscar producto...', route: '/stock' },
-  { value: 'shipments', label: 'Envíos', placeholder: 'Buscar envío...', route: '/envios/tracking' },
+  { value: 'all', label: 'Todo', placeholder: 'Buscar en Overlix...', route: '/dashboard', icon: <MdSearch size={16} /> },
+  { value: 'sales', label: 'Ventas', placeholder: 'Buscar venta...', route: '/sales', icon: <MdReceipt size={16} /> },
+  { value: 'repairs', label: 'Reparaciones', placeholder: 'Buscar reparación...', route: '/reparaciones/list', icon: <MdSettings size={16} /> },
+  { value: 'clients', label: 'Clientes', placeholder: 'Buscar cliente...', route: '/clients', icon: <User size={16} /> },
+  { value: 'expenses', label: 'Gastos', placeholder: 'Buscar gasto...', route: '/expenses' , icon: <MdAttachMoney size={16} /> },
+  { value: 'stock', label: 'Stock', placeholder: 'Buscar producto...', route: '/stock' , icon: <MdInventory2 size={16} /> },
+  { value: 'shipments', label: 'Envíos', placeholder: 'Buscar envío...', route: '/envios/tracking'  , icon: <MdLocalShipping size={16} />  },
   { value: 'orders', label: 'Órdenes de Compra', placeholder: 'Buscar orden de compra...', route: '/providers/orders', icon: <MdReceipt size={16} /> },
   { value: 'reports-sales', label: 'Reporte Ventas', placeholder: 'Buscar en reporte de ventas...', route: '/reports/sales', icon: <MdBarChart size={16} /> },
   { value: 'reports-stock', label: 'Reporte Stock', placeholder: 'Buscar en reporte de stock...', route: '/reports/stock', icon: <MdInventory2 size={16} /> },
