@@ -4,6 +4,8 @@ import React, { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Check, X } from 'lucide-react'
 import { Button } from '../../ui/button'
+import { ScrollArea } from '../../ui/scroll-area'
+import { Separator } from '../../ui/separator'
 import { Notification, NotificationGroup } from './notification.types'
 import { NotificationItem } from './NotificationItem'
 
@@ -97,7 +99,7 @@ export const NotificationList: React.FC<NotificationListProps> = ({
       </div>
 
       {/* Lista con scroll */}
-      <div className="flex-1 overflow-y-auto">
+      <ScrollArea className="flex-1">
         {notifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4">
             <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
@@ -112,7 +114,12 @@ export const NotificationList: React.FC<NotificationListProps> = ({
           <div className="p-3 space-y-2">
             <AnimatePresence mode="popLayout">
               {groupedNotifications.map((group, groupIndex) => (
-                <div key={group.label}>
+                <motion.div
+                  key={group.label}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
                   {/* Etiqueta de grupo */}
                   <div className="sticky top-0 z-10 bg-card/95 backdrop-blur-sm px-3 py-2">
                     <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
@@ -131,12 +138,17 @@ export const NotificationList: React.FC<NotificationListProps> = ({
                       />
                     ))}
                   </div>
-                </div>
+
+                  {/* Separador entre grupos */}
+                  {groupIndex < groupedNotifications.length - 1 && (
+                    <Separator className="my-2" />
+                  )}
+                </motion.div>
               ))}
             </AnimatePresence>
           </div>
         )}
-      </div>
+      </ScrollArea>
 
       {/* Pie */}
       {notifications.length > 0 && (
