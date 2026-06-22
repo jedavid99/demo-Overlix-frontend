@@ -1,9 +1,5 @@
 import React, { useState } from 'react'
 import {
-  Search,
-  Bell,
-  Settings,
-  ChevronRight,
   Smartphone,
   Fingerprint,
   ShoppingCart,
@@ -13,16 +9,12 @@ import {
   Info,
   Save,
   X,
-  Plus,
-  Image,
   AlertCircle,
 } from 'lucide-react'
 import { Card, CardContent } from '@/shared/components/ui/card'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
-import { Badge } from '@/shared/components/ui/badge'
-import { Skeleton } from '@/shared/components/ui/skeleton'
 
 interface IPhoneFormData {
   model: string
@@ -64,7 +56,6 @@ export default function IPhoneInventory() {
 
   const handleInputChange = (field: keyof IPhoneFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
-    // Limpiar error al modificar
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: '' }))
     }
@@ -88,7 +79,6 @@ export default function IPhoneInventory() {
   const handleSubmit = () => {
     if (!validate()) return
     setIsSaving(true)
-    // Simular envío a API
     setTimeout(() => {
       alert('Producto agregado al inventario')
       setIsSaving(false)
@@ -106,7 +96,6 @@ export default function IPhoneInventory() {
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files) return
-    // Simular carga de fotos (convertir a URLs locales)
     Array.from(files).forEach((file) => {
       const reader = new FileReader()
       reader.onload = (ev) => {
@@ -116,6 +105,13 @@ export default function IPhoneInventory() {
       }
       reader.readAsDataURL(file)
     })
+    // Resetear el input para permitir seleccionar el mismo archivo de nuevo
+    e.target.value = ''
+  }
+
+  const removePhoto = (index: number, e: React.MouseEvent) => {
+    e.stopPropagation() // Evita que el clic llegue al label y abra el selector
+    setUploadedPhotos((prev) => prev.filter((_, i) => i !== index))
   }
 
   const colors = [
@@ -139,9 +135,7 @@ export default function IPhoneInventory() {
             <p className="text-sm text-muted-foreground">Completa las especificaciones técnicas y financieras para el nuevo stock.</p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm">
-              Guardar borrador
-            </Button>
+            <Button variant="outline" size="sm">Guardar borrador</Button>
             <Button onClick={handleSubmit} size="sm" disabled={isSaving}>
               {isSaving ? 'Guardando...' : 'Confirmar y agregar'}
             </Button>
@@ -397,7 +391,7 @@ export default function IPhoneInventory() {
               </CardContent>
             </Card>
 
-            {/* Sección 5: Multimedia */}
+            {/* Sección 5: Multimedia (CORREGIDA) */}
             <Card>
               <CardContent className="p-5 space-y-4">
                 <div className="flex items-center gap-2 border-b border-border pb-3">
@@ -405,25 +399,32 @@ export default function IPhoneInventory() {
                   <h2 className="text-sm font-bold text-foreground">5. Multimedia</h2>
                 </div>
                 <div>
-                  <div className="border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center justify-center gap-1 hover:border-primary/50 hover:bg-muted/20 transition-all cursor-pointer">
-                    <Upload size={28} className="text-muted-foreground/60" />
+                  {/* Área de carga – solo este div abre el selector */}
+                  <label
+                    htmlFor="photo-upload"
+                    className="block border-2 border-dashed border-border rounded-xl p-6 text-center cursor-pointer hover:border-primary/50 hover:bg-muted/20 transition-all"
+                  >
+                    <Upload size={28} className="mx-auto text-muted-foreground/60 mb-1" />
                     <p className="text-xs font-medium text-muted-foreground">Suelta imágenes aquí</p>
                     <p className="text-[10px] text-muted-foreground">PNG, JPG hasta 10MB</p>
                     <input
+                      id="photo-upload"
                       type="file"
                       accept="image/*"
                       multiple
                       onChange={handlePhotoUpload}
-                      className="absolute inset-0 opacity-0 cursor-pointer"
+                      className="hidden"
                     />
-                  </div>
+                  </label>
+
+                  {/* Previsualización de fotos */}
                   {uploadedPhotos.length > 0 && (
                     <div className="grid grid-cols-3 gap-2 mt-3">
                       {uploadedPhotos.map((photo, idx) => (
                         <div key={idx} className="aspect-square rounded-lg bg-muted border border-border overflow-hidden relative group">
                           <img src={photo} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover" />
                           <button
-                            onClick={() => setUploadedPhotos((prev) => prev.filter((_, i) => i !== idx))}
+                            onClick={(e) => removePhoto(idx, e)}
                             className="absolute top-1 right-1 p-0.5 bg-black/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                           >
                             <X size={12} className="text-white" />
@@ -432,6 +433,7 @@ export default function IPhoneInventory() {
                       ))}
                     </div>
                   )}
+
                   <div className="flex items-start gap-2 mt-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-900/40">
                     <Info size={14} className="text-blue-600 flex-shrink-0 mt-0.5" />
                     <p className="text-[10px] text-blue-700 dark:text-blue-300">Asegura que IMEI y Serie sean visibles en al menos una foto.</p>
@@ -440,7 +442,7 @@ export default function IPhoneInventory() {
               </CardContent>
             </Card>
 
-            {/* Acción rápida */}
+            {/* Botón de acción final */}
             <Button onClick={handleSubmit} className="w-full" disabled={isSaving}>
               {isSaving ? 'Guardando...' : 'Agregar al inventario'}
             </Button>
