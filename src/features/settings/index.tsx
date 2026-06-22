@@ -3,12 +3,12 @@ import { Plus, Cloud, Clock, Bell, Key, Smartphone, Laptop, Monitor, Gamepad2, E
 import { MdContentCopy, MdDelete, MdLink, MdEdit, MdCalendarToday, MdEmail, MdBarChart } from 'react-icons/md'
 
 const sections = [
-  { id: 'general', label: 'General', icon: <Cloud size={16} /> },
-  { id: 'business', label: 'Business Info', icon: <Clock size={16} /> },
-  { id: 'categories', label: 'Repair Categories', icon: <Plus size={16} /> },
-  { id: 'taxes', label: 'Taxes & Payments', icon: <Key size={16} /> },
-  { id: 'notifications', label: 'Notifications', icon: <Bell size={16} /> },
-  { id: 'api', label: 'API & Integrations', icon: <Cloud size={16} /> },
+ { id: 'general', label: 'General', icon: <Cloud size={16} /> },
+  { id: 'business', label: 'Información del negocio', icon: <Clock size={16} /> },
+  { id: 'Categoria', label: 'Categorías de reparación', icon: <Plus size={16} /> },
+  { id: 'taxes', label: 'Impuestos y pagos', icon: <Key size={16} /> },
+  { id: 'notificationes', label: 'Notificaciones', icon: <Bell size={16} /> },
+  { id: 'api', label: 'API e integraciones', icon: <Cloud size={16} /> },
 ]
 
 function LeftNav({ current, onChange }: { current: string; onChange: (id: string) => void }) {
