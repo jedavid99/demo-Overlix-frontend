@@ -10,7 +10,7 @@ import {
   Package, ClipboardList, Calendar, TrendingUp, Shield,
   Building2, HelpCircle, Bell, FileText, Printer, PanelLeft, Receipt
 } from 'lucide-react'
-import { Badge } from '../../../components/ui/badge'
+import { Badge } from '../../components/ui/badge'
 
 interface NavItem {
   title: string
@@ -420,3 +420,4 @@ export const AdminSidebar = ({
 }
 
 export default AdminSidebar
+

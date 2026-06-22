@@ -4,8 +4,8 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Menu, Bell, User, ChevronDown, ArrowRightToLine, LogOut } from 'lucide-react'
 import { MdSearch, MdSettings, MdBarChart, MdInventory2, MdAttachMoney, MdReceipt } from 'react-icons/md'
-import { Button } from '../../../components/ui/button'
-import { Badge } from '../../../components/ui/badge'
+import { Button } from '../../components/ui/button'
+import { Badge } from '../../components/ui/badge'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,12 +13,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../../../components/ui/dropdown-menu'
+} from '../../components/ui/dropdown-menu'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '../../../components/ui/popover'
+} from '../../components/ui/popover'
 import { NotificationList } from '../notifications/NotificationList'
 import { Notification } from '../notifications/notification.types'
 
@@ -275,3 +275,4 @@ export const AdminTopBar = ({
 }
 
 export default AdminTopBar
+
