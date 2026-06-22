@@ -3,60 +3,37 @@ import { Edit, Lock, Smartphone, ArrowUpRight, ArrowDownRight, Download } from '
 import { MdInfo, MdContentCopy, MdBarChart } from 'react-icons/md'
 
 export default function Profile() {
+  // 📦 Estado del usuario – vacío (cargar desde API)
   const [userData] = useState({
-    name: 'Alex Rivera',
-    role: 'Senior Hardware Technician & System Administrator',
-    employeeId: 'TR-9902',
-    department: 'Hardware Repair Dept.',
-    email: 'alex.rivera@techfix.com',
-    phone: '+1 (555) 123-4567',
-    rating: 4.9,
+    name: '',
+    role: '',
+    employeeId: '',
+    department: '',
+    email: '',
+    phone: '',
+    rating: 0,
     ratingMax: 5.0,
-    status: 'TOP PERFORMER',
+    status: '',
   })
 
-  const [activities] = useState([
-    {
-      time: '2 hours ago',
-      type: 'REPAIR',
-      entity: 'Ticket #821',
-      description: 'iPhone 15 Screen Replacement - Successfully completed final calibration.',
-      status: 'SUCCESS',
-    },
-    {
-      time: '5 hours ago',
-      type: 'ASSIGNMENT',
-      entity: 'Ticket #8630',
-      description: 'MacBook Pro Battery Swap - Priority assigned by Senior Manager',
-      status: 'PENDING',
-    },
-    {
-      time: 'Yesterday',
-      type: 'SYSTEM',
-      entity: 'Login Session',
-      description: 'New session initiated from IP: 192.168.1.55 (Desktop Client)',
-      status: 'AUDIT',
-    },
-  ])
+  // 📦 Actividad – vacía (cargar desde API)
+  const [activities] = useState<{
+    time: string
+    type: string
+    entity: string
+    description: string
+    status: string
+  }[]>([])
 
-  const [performanceData] = useState([
-    {
-      period: 'Current Month',
-      resolved: '126 tickets',
-      avgTime: '42 min',
-      compliance: '92',
-      rating: '4.9/5',
-      trend: '+12%',
-    },
-    {
-      period: 'Last Month',
-      resolved: '114 tickets',
-      avgTime: '45 min',
-      compliance: '88',
-      rating: '4.8/5',
-      trend: '+15%',
-    },
-  ])
+  // 📦 Rendimiento – vacío (cargar desde API)
+  const [performanceData] = useState<{
+    period: string
+    resolved: string
+    avgTime: string
+    compliance: string
+    rating: string
+    trend: string
+  }[]>([])
 
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark p-6 lg:p-8">
@@ -67,16 +44,16 @@ export default function Profile() {
             {/* Avatar & Info */}
             <div className="flex gap-6">
               <div className="w-24 h-24 lg:w-32 lg:h-32 rounded-full bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-white text-3xl font-bold flex-shrink-0">
-                AR
+                {userData.name ? userData.name.charAt(0) : '?'}
               </div>
               <div className="flex-1 pt-2">
                 <div className="flex items-start justify-between">
                   <div>
                     <h1 className="text-2xl lg:text-3xl font-bold text-foreground">
-                      {userData.name}
+                      {userData.name || 'Sin nombre'}
                     </h1>
                     <p className="text-sm lg:text-base text-muted-foreground mt-1">
-                      {userData.role}
+                      {userData.role || 'Sin rol asignado'}
                     </p>
                   </div>
                   <button className="p-2 rounded-full hover:bg-muted/50 text-muted-foreground">
@@ -84,20 +61,25 @@ export default function Profile() {
                   </button>
                 </div>
                 <div className="mt-3 text-xs lg:text-sm text-muted-foreground space-y-1">
-                  <p>🆔 {userData.employeeId} • {userData.department}</p>
+                  <p>
+                    {userData.employeeId ? `🆔 ${userData.employeeId}` : 'Sin ID de empleado'}
+                    {userData.department && ` • ${userData.department}`}
+                  </p>
                 </div>
               </div>
             </div>
 
             {/* Rating Card */}
             <div className="bg-gradient-to-br from-primary to-primary-hover rounded-lg p-6 flex flex-col items-center justify-center text-primary-foreground min-w-max">
-              <p className="text-xs font-medium text-primary-foreground/80 mb-2">MONTHLY RATING</p>
+              <p className="text-xs font-medium text-primary-foreground/80 mb-2">RATING MENSUAL</p>
               <div className="text-4xl lg:text-5xl font-bold">
-                {userData.rating}
-                <span className="text-2xl lg:text-3xl font-normal text-primary-foreground/80">/{userData.ratingMax}</span>
+                {userData.rating || '—'}
+                <span className="text-2xl lg:text-3xl font-normal text-primary-foreground/80">
+                  /{userData.ratingMax}
+                </span>
               </div>
               <div className="mt-3 px-3 py-1 bg-primary-foreground/20 rounded-full text-xs font-semibold">
-                {userData.status}
+                {userData.status || 'Sin calificación'}
               </div>
             </div>
           </div>
@@ -110,27 +92,33 @@ export default function Profile() {
               <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
                 <MdInfo size={12} className="text-primary" />
               </div>
-              <h2 className="text-lg font-semibold text-foreground">Information</h2>
+              <h2 className="text-lg font-semibold text-foreground">Información</h2>
             </div>
 
             <div className="space-y-6">
               <div>
                 <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                  FULL NAME
+                  NOMBRE COMPLETO
                 </label>
-                <p className="mt-2 text-foreground font-medium">{userData.name}</p>
+                <p className="mt-2 text-foreground font-medium">
+                  {userData.name || '—'}
+                </p>
               </div>
               <div>
                 <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                  EMPLOYEE ID
+                  ID DE EMPLEADO
                 </label>
-                <p className="mt-2 text-foreground font-medium">{userData.employeeId}</p>
+                <p className="mt-2 text-foreground font-medium">
+                  {userData.employeeId || '—'}
+                </p>
               </div>
               <div>
                 <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                  EMAIL ADDRESS
+                  CORREO ELECTRÓNICO
                 </label>
-                <p className="mt-2 text-foreground font-medium">{userData.email}</p>
+                <p className="mt-2 text-foreground font-medium">
+                  {userData.email || '—'}
+                </p>
               </div>
             </div>
           </div>
@@ -141,18 +129,20 @@ export default function Profile() {
               <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
                 <Lock size={14} className="text-primary" />
               </div>
-              <h2 className="text-lg font-semibold text-foreground">Security & Access</h2>
+              <h2 className="text-lg font-semibold text-foreground">Seguridad y Acceso</h2>
             </div>
 
             <div className="space-y-4">
               {/* Change Password */}
               <div className="flex items-center justify-between p-4 border border-border-light dark:border-border-dark rounded-lg hover:bg-muted/50 transition-colors">
                 <div>
-                  <p className="font-medium text-foreground">Change Password</p>
-                  <p className="text-xs text-muted-foreground mt-1">Updated 27 days ago</p>
+                  <p className="font-medium text-foreground">Cambiar Contraseña</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {userData.email ? 'Actualizado recientemente' : 'Sin actualizar'}
+                  </p>
                 </div>
                 <button className="text-primary hover:text-primary-hover text-sm font-medium">
-                  Manage
+                  Gestionar
                 </button>
               </div>
 
@@ -161,12 +151,12 @@ export default function Profile() {
                 <div className="flex items-center gap-3">
                   <Smartphone size={18} className="text-muted-foreground" />
                   <div>
-                    <p className="font-medium text-foreground">Two-Factor Auth</p>
-                    <p className="text-xs text-green-600 mt-1">ENABLED</p>
+                    <p className="font-medium text-foreground">Autenticación 2FA</p>
+                    <p className="text-xs text-muted-foreground mt-1">DESACTIVADO</p>
                   </div>
                 </div>
-                <div className="w-12 h-6 bg-green-500 rounded-full relative cursor-pointer">
-                  <div className="w-5 h-5 bg-white rounded-full absolute right-0.5 top-0.5"></div>
+                <div className="w-12 h-6 bg-muted rounded-full relative cursor-pointer">
+                  <div className="w-5 h-5 bg-white rounded-full absolute left-0.5 top-0.5"></div>
                 </div>
               </div>
             </div>
@@ -178,64 +168,71 @@ export default function Profile() {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <MdContentCopy size={20} />
-              <h2 className="text-lg font-semibold text-foreground">Detailed Activity Log</h2>
+              <h2 className="text-lg font-semibold text-foreground">Registro de Actividad</h2>
             </div>
             <button className="text-primary text-sm font-medium hover:underline">
-              All Activities ↓
+              Ver todas ↓
             </button>
           </div>
           <p className="text-xs text-muted-foreground mb-4">
-            Comprehensive history of all administrative and repair actions
+            Historial completo de acciones administrativas y de reparación
           </p>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border-light dark:border-border-dark">
-                  <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">TIME</th>
-                  <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">TYPE</th>
-                  <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">ENTITY</th>
-                  <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">DESCRIPTION</th>
-                  <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">STATUS</th>
-                </tr>
-              </thead>
-              <tbody>
-                {activities.map((activity, idx) => (
-                  <tr key={idx} className="border-b border-border-light dark:divide-border-dark hover:bg-muted/50">
-                    <td className="py-4 px-4 text-muted-foreground">{activity.time}</td>
-                    <td className="py-4 px-4">
-                      <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                        activity.type === 'REPAIR' ? 'bg-green-500/10 text-green-600' :
-                        activity.type === 'ASSIGNMENT' ? 'bg-primary/10 text-primary' :
-                        'bg-muted/50 text-muted-foreground'
-                      }`}>
-                        {activity.type}
-                      </span>
-                    </td>
-                    <td className="py-4 px-4 font-medium text-foreground">{activity.entity}</td>
-                    <td className="py-4 px-4 text-muted-foreground max-w-xs truncate">{activity.description}</td>
-                    <td className="py-4 px-4">
-                      <span className={`flex items-center gap-1 text-xs font-semibold ${
-                        activity.status === 'SUCCESS' ? 'text-green-600' :
-                        activity.status === 'PENDING' ? 'text-yellow-600' :
-                        'text-muted-foreground'
-                      }`}>
-                        <span className={`w-2 h-2 rounded-full ${
-                          activity.status === 'SUCCESS' ? 'bg-green-600' :
-                          activity.status === 'PENDING' ? 'bg-yellow-600' :
-                          'bg-muted-foreground'
-                        }`}></span>
-                        {activity.status}
-                      </span>
-                    </td>
+          {activities.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <p className="font-medium">No hay actividad registrada</p>
+              <p className="text-xs">Las acciones recientes aparecerán aquí</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border-light dark:border-border-dark">
+                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">HORA</th>
+                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">TIPO</th>
+                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">ENTIDAD</th>
+                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">DESCRIPCIÓN</th>
+                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">ESTADO</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {activities.map((activity, idx) => (
+                    <tr key={idx} className="border-b border-border-light dark:divide-border-dark hover:bg-muted/50">
+                      <td className="py-4 px-4 text-muted-foreground">{activity.time}</td>
+                      <td className="py-4 px-4">
+                        <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                          activity.type === 'REPAIR' ? 'bg-green-500/10 text-green-600' :
+                          activity.type === 'ASSIGNMENT' ? 'bg-primary/10 text-primary' :
+                          'bg-muted/50 text-muted-foreground'
+                        }`}>
+                          {activity.type}
+                        </span>
+                      </td>
+                      <td className="py-4 px-4 font-medium text-foreground">{activity.entity}</td>
+                      <td className="py-4 px-4 text-muted-foreground max-w-xs truncate">{activity.description}</td>
+                      <td className="py-4 px-4">
+                        <span className={`flex items-center gap-1 text-xs font-semibold ${
+                          activity.status === 'SUCCESS' ? 'text-green-600' :
+                          activity.status === 'PENDING' ? 'text-yellow-600' :
+                          'text-muted-foreground'
+                        }`}>
+                          <span className={`w-2 h-2 rounded-full ${
+                            activity.status === 'SUCCESS' ? 'bg-green-600' :
+                            activity.status === 'PENDING' ? 'bg-yellow-600' :
+                            'bg-muted-foreground'
+                          }`}></span>
+                          {activity.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
           <div className="mt-4 text-center">
             <button className="text-primary text-sm font-medium">
-              VIEW FULL AUDIT TRAIL →
+              VER AUDITORÍA COMPLETA →
             </button>
           </div>
         </div>
@@ -246,69 +243,81 @@ export default function Profile() {
             <div className="flex items-center gap-2">
               <MdBarChart size={20} />
               <div>
-                <h2 className="text-lg font-semibold text-foreground">Performance Analytics</h2>
-                <p className="text-xs text-muted-foreground">Historical efficiency data and technician scoring breakdown</p>
+                <h2 className="text-lg font-semibold text-foreground">Análisis de Rendimiento</h2>
+                <p className="text-xs text-muted-foreground">Datos históricos de eficiencia y puntuación del técnico</p>
               </div>
             </div>
             <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-primary hover:bg-primary/5 rounded-full">
               <Download size={16} />
-              Export CSV
+              Exportar CSV
             </button>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border-light dark:border-border-dark">
-                  <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">PERIOD</th>
-                  <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">RESOLVED</th>
-                  <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">AVG TIME</th>
-                  <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">SLA COMPLIANCE</th>
-                  <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">RATING</th>
-                  <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">TREND</th>
-                </tr>
-              </thead>
-              <tbody>
-                {performanceData.map((data, idx) => (
-                  <tr key={idx} className="border-b border-border-light dark:divide-border-dark hover:bg-muted/50">
-                    <td className="py-4 px-4 font-medium text-foreground">{data.period}</td>
-                    <td className="py-4 px-4 text-muted-foreground">{data.resolved}</td>
-                    <td className="py-4 px-4 text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        {data.avgTime === '42 min' ? (
-                          <ArrowDownRight size={16} className="text-green-600" />
-                        ) : (
-                          <ArrowUpRight size={16} className="text-muted-foreground" />
-                        )}
-                        {data.avgTime}
-                      </div>
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="flex items-center gap-2">
-                        <div className="h-2 w-32 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-gradient-to-r from-primary to-primary-hover"
-                            style={{ width: `${(parseInt(data.compliance) / 100) * 100}%` }}
-                          ></div>
-                        </div>
-                        <span className="font-medium text-foreground">{data.compliance}</span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-4 font-medium text-foreground">{data.rating}</td>
-                    <td className="py-4 px-4">
-                      <span className="flex items-center gap-1 text-green-600 font-medium">
-                        <ArrowUpRight size={14} />
-                        {data.trend}
-                      </span>
-                    </td>
+          {performanceData.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <p className="font-medium">No hay datos de rendimiento disponibles</p>
+              <p className="text-xs">Los datos se mostrarán una vez que haya actividad</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border-light dark:border-border-dark">
+                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">PERIODO</th>
+                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">RESUELTOS</th>
+                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">TIEMPO PROM.</th>
+                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">CUMPLIMIENTO SLA</th>
+                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">CALIFICACIÓN</th>
+                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">TENDENCIA</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {performanceData.map((data, idx) => (
+                    <tr key={idx} className="border-b border-border-light dark:divide-border-dark hover:bg-muted/50">
+                      <td className="py-4 px-4 font-medium text-foreground">{data.period}</td>
+                      <td className="py-4 px-4 text-muted-foreground">{data.resolved}</td>
+                      <td className="py-4 px-4 text-muted-foreground">
+                        <div className="flex items-center gap-2">
+                          {data.avgTime && (
+                            data.avgTime.includes('42') ? (
+                              <ArrowDownRight size={16} className="text-green-600" />
+                            ) : (
+                              <ArrowUpRight size={16} className="text-muted-foreground" />
+                            )
+                          )}
+                          {data.avgTime || '—'}
+                        </div>
+                      </td>
+                      <td className="py-4 px-4">
+                        {data.compliance ? (
+                          <div className="flex items-center gap-2">
+                            <div className="h-2 w-32 bg-muted rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-gradient-to-r from-primary to-primary-hover"
+                                style={{ width: `${Math.min(parseInt(data.compliance), 100)}%` }}
+                              ></div>
+                            </div>
+                            <span className="font-medium text-foreground">{data.compliance}</span>
+                          </div>
+                        ) : '—'}
+                      </td>
+                      <td className="py-4 px-4 font-medium text-foreground">{data.rating || '—'}</td>
+                      <td className="py-4 px-4">
+                        {data.trend && (
+                          <span className="flex items-center gap-1 text-green-600 font-medium">
+                            <ArrowUpRight size={14} />
+                            {data.trend}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </div>
   )
 }
-
