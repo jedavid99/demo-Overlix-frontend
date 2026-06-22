@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { ChevronRight, Info, CreditCard, Cloud, Save, X, AlertCircle, Calendar, Building2, Tag, DollarSign, LucideBanknote, Landmark } from 'lucide-react'
+import { Info, CreditCard, Cloud, Save, X, AlertCircle, LucideBanknote, Landmark } from 'lucide-react'
 import { MdAdd, MdCreditCard, MdAttachFile } from 'react-icons/md'
 import { Card, CardContent } from '@/shared/components/ui/card'
 import { Button } from '@/shared/components/ui/button'
@@ -26,7 +26,6 @@ export default function ExpensesAdd() {
 
   const handleChange = (field: string, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }))
-    // Limpiar error al modificar
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }))
     }
@@ -40,13 +39,11 @@ export default function ExpensesAdd() {
 
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {}
-
     if (!form.title.trim()) newErrors.title = 'La descripción es obligatoria'
     if (!form.amount || parseFloat(form.amount) <= 0) newErrors.amount = 'El monto debe ser mayor a 0'
     if (!form.date) newErrors.date = 'La fecha es obligatoria'
     if (!form.category) newErrors.category = 'La categoría es obligatoria'
     if (!form.supplier) newErrors.supplier = 'El proveedor es obligatorio'
-
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -54,9 +51,7 @@ export default function ExpensesAdd() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!validate()) return
-
     setIsLoading(true)
-    // Simular envío a API
     await new Promise(resolve => setTimeout(resolve, 1500))
     console.log('Gasto guardado:', { ...form, file })
     alert('Gasto registrado correctamente')
@@ -81,10 +76,10 @@ export default function ExpensesAdd() {
   ]
 
   const currencies = [
-    { value: 'USD', label: 'USD - Dólar' },
-    { value: 'EUR', label: 'EUR - Euro' },
-    { value: 'GBP', label: 'GBP - Libra' },
-    { value: 'JPY', label: 'JPY - Yen' },
+    { value: 'USD', label: 'USD' },
+    { value: 'EUR', label: 'EUR' },
+    { value: 'GBP', label: 'GBP' },
+    { value: 'JPY', label: 'JPY' },
   ]
 
   return (
@@ -92,51 +87,110 @@ export default function ExpensesAdd() {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-8"
+      className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-6"
     >
-      <div className="max-w-3xl mx-auto">
-        {/* Encabezado */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Nuevo gasto</h1>
-          <p className="text-muted-foreground mt-1">
-            Registra una nueva transacción para el control de costos y contabilidad.
-          </p>
+      <div className="max-w-7xl mx-auto">
+        {/* Encabezado compacto */}
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">Nuevo gasto</h1>
+            <p className="text-sm text-muted-foreground">Registra una nueva transacción para el control de costos.</p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => navigate('/expenses')} size="sm">
+              Cancelar
+            </Button>
+            <Button onClick={handleSubmit} size="sm" disabled={isLoading}>
+              {isLoading ? (
+                <span className="animate-spin mr-2">⟳</span>
+              ) : (
+                <Save size={16} className="mr-2" />
+              )}
+              {isLoading ? 'Guardando...' : 'Guardar'}
+            </Button>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Información general */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Tarjeta única con todos los campos */}
           <Card>
-            <CardContent className="p-6 space-y-6">
-              <div className="flex items-center gap-2 border-b border-border pb-3">
-                <Info size={20} className="text-primary" />
-                <h2 className="text-lg font-bold text-foreground">Información general</h2>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2 space-y-2">
-                  <Label htmlFor="title" className="text-sm font-semibold">
-                    Título / Descripción <span className="text-destructive">*</span>
+            <CardContent className="p-4 md:p-6 space-y-5">
+              {/* Fila 1: Título + Categoría + Proveedor */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="col-span-1 space-y-1">
+                  <Label htmlFor="title" className="text-xs font-semibold">
+                    Descripción <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="title"
                     value={form.title}
                     onChange={(e) => handleChange('title', e.target.value)}
-                    placeholder="Ej. Alquiler mensual local"
-                    className={errors.title ? 'border-destructive' : ''}
+                    placeholder="Ej. Alquiler mensual"
+                    className={`h-9 text-sm ${errors.title ? 'border-destructive' : ''}`}
                   />
                   {errors.title && (
-                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
-                      <AlertCircle size={14} /> {errors.title}
+                    <p className="text-[10px] text-destructive flex items-center gap-1">
+                      <AlertCircle size={12} /> {errors.title}
                     </p>
                   )}
                 </div>
+                <div className="space-y-1">
+                  <Label htmlFor="category" className="text-xs font-semibold">
+                    Categoría <span className="text-destructive">*</span>
+                  </Label>
+                  <select
+                    id="category"
+                    value={form.category}
+                    onChange={(e) => handleChange('category', e.target.value)}
+                    className={`w-full h-9 px-3 rounded-lg border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${errors.category ? 'border-destructive' : ''}`}
+                  >
+                    <option value="">Seleccionar</option>
+                    {categories.map((cat) => (
+                      <option key={cat.value} value={cat.value}>{cat.label}</option>
+                    ))}
+                  </select>
+                  {errors.category && (
+                    <p className="text-[10px] text-destructive flex items-center gap-1">
+                      <AlertCircle size={12} /> {errors.category}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="supplier" className="text-xs font-semibold">
+                    Proveedor <span className="text-destructive">*</span>
+                  </Label>
+                  <div className="flex gap-1">
+                    <select
+                      id="supplier"
+                      value={form.supplier}
+                      onChange={(e) => handleChange('supplier', e.target.value)}
+                      className={`flex-1 h-9 px-3 rounded-lg border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${errors.supplier ? 'border-destructive' : ''}`}
+                    >
+                      <option value="">Seleccionar</option>
+                      {suppliers.map((s) => (
+                        <option key={s.value} value={s.value}>{s.label}</option>
+                      ))}
+                    </select>
+                    <button type="button" className="h-9 px-3 rounded-lg border border-input bg-muted/30 hover:bg-muted flex items-center text-primary text-xs font-medium">
+                      <MdAdd size={16} />
+                    </button>
+                  </div>
+                  {errors.supplier && (
+                    <p className="text-[10px] text-destructive flex items-center gap-1">
+                      <AlertCircle size={12} /> {errors.supplier}
+                    </p>
+                  )}
+                </div>
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="amount" className="text-sm font-semibold">
+              {/* Fila 2: Monto + Moneda + Fecha + Método de pago */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="space-y-1">
+                  <Label htmlFor="amount" className="text-xs font-semibold">
                     Monto <span className="text-destructive">*</span>
                   </Label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
                     <Input
                       id="amount"
                       type="number"
@@ -144,225 +198,138 @@ export default function ExpensesAdd() {
                       value={form.amount}
                       onChange={(e) => handleChange('amount', e.target.value)}
                       placeholder="0.00"
-                      className={`pl-8 ${errors.amount ? 'border-destructive' : ''}`}
+                      className={`h-9 pl-7 text-sm ${errors.amount ? 'border-destructive' : ''}`}
                     />
                   </div>
                   {errors.amount && (
-                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
-                      <AlertCircle size={14} /> {errors.amount}
+                    <p className="text-[10px] text-destructive flex items-center gap-1">
+                      <AlertCircle size={12} /> {errors.amount}
                     </p>
                   )}
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="currency" className="text-sm font-semibold">
-                    Moneda
-                  </Label>
+                <div className="space-y-1">
+                  <Label htmlFor="currency" className="text-xs font-semibold">Moneda</Label>
                   <select
                     id="currency"
                     value={form.currency}
                     onChange={(e) => handleChange('currency', e.target.value)}
-                    className="w-full h-11 px-4 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    className="w-full h-9 px-3 rounded-lg border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                   >
                     {currencies.map((c) => (
-                      <option key={c.value} value={c.value}>
-                        {c.label}
-                      </option>
+                      <option key={c.value} value={c.value}>{c.label}</option>
                     ))}
                   </select>
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="date" className="text-sm font-semibold">
-                    Fecha del gasto <span className="text-destructive">*</span>
+                <div className="space-y-1">
+                  <Label htmlFor="date" className="text-xs font-semibold">
+                    Fecha <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="date"
                     type="date"
                     value={form.date}
                     onChange={(e) => handleChange('date', e.target.value)}
-                    className={errors.date ? 'border-destructive' : ''}
+                    className={`h-9 text-sm ${errors.date ? 'border-destructive' : ''}`}
                   />
                   {errors.date && (
-                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
-                      <AlertCircle size={14} /> {errors.date}
+                    <p className="text-[10px] text-destructive flex items-center gap-1">
+                      <AlertCircle size={12} /> {errors.date}
                     </p>
                   )}
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="category" className="text-sm font-semibold">
-                    Categoría <span className="text-destructive">*</span>
-                  </Label>
-                  <select
-                    id="category"
-                    value={form.category}
-                    onChange={(e) => handleChange('category', e.target.value)}
-                    className={`w-full h-11 px-4 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${errors.category ? 'border-destructive' : ''}`}
-                  >
-                    <option value="">Seleccionar categoría</option>
-                    {categories.map((cat) => (
-                      <option key={cat.value} value={cat.value}>
-                        {cat.label}
-                      </option>
+                <div className="space-y-1">
+                  <Label className="text-xs font-semibold">Método de pago</Label>
+                  <div className="grid grid-cols-3 gap-1">
+                    {[
+                      { value: 'cash', label: 'Efectivo', icon: <LucideBanknote size={16} /> },
+                      { value: 'card', label: 'Tarjeta', icon: <MdCreditCard size={16} /> },
+                      { value: 'bank', label: 'Transferencia', icon: <Landmark size={16} /> },
+                    ].map((method) => (
+                      <label
+                        key={method.value}
+                        className={`
+                          flex flex-col items-center justify-center gap-0.5 p-1.5 border rounded-lg cursor-pointer transition-all text-xs
+                          ${form.paymentMethod === method.value
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:border-primary/40 hover:bg-muted/30'}
+                        `}
+                      >
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value={method.value}
+                          checked={form.paymentMethod === method.value}
+                          onChange={() => handleChange('paymentMethod', method.value)}
+                          className="sr-only"
+                        />
+                        <span className="text-base">{method.icon}</span>
+                        <span className="font-medium">{method.label}</span>
+                      </label>
                     ))}
-                  </select>
-                  {errors.category && (
-                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
-                      <AlertCircle size={14} /> {errors.category}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="supplier" className="text-sm font-semibold">
-                    Proveedor <span className="text-destructive">*</span>
-                  </Label>
-                  <select
-                    id="supplier"
-                    value={form.supplier}
-                    onChange={(e) => handleChange('supplier', e.target.value)}
-                    className={`w-full h-11 px-4 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${errors.supplier ? 'border-destructive' : ''}`}
-                  >
-                    <option value="">Seleccionar proveedor</option>
-                    {suppliers.map((s) => (
-                      <option key={s.value} value={s.value}>
-                        {s.label}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.supplier && (
-                    <p className="text-xs text-destructive flex items-center gap-1 mt-1">
-                      <AlertCircle size={14} /> {errors.supplier}
-                    </p>
-                  )}
-                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                    <MdAdd size={14} className="text-primary" />{' '}
-                    <button type="button" className="text-primary hover:underline">
-                      Agregar nuevo proveedor
-                    </button>
-                  </p>
+                  </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
 
-          {/* Método de pago */}
-          <Card>
-            <CardContent className="p-6 space-y-6">
-              <div className="flex items-center gap-2 border-b border-border pb-3">
-                <CreditCard size={20} className="text-primary" />
-                <h2 className="text-lg font-bold text-foreground">Método de pago</h2>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {[
-                  { value: 'cash', label: 'Efectivo', icon: <LucideBanknote size={24} /> },
-                  { value: 'card', label: 'Tarjeta', icon: <MdCreditCard size={24} /> },
-                  { value: 'bank', label: 'Transferencia', icon: <Landmark size={24} /> },
-                ].map((method) => (
+              {/* Fila 3: Adjuntar comprobante (más compacto) */}
+              <div className="border-t border-border pt-4">
+                <div className="flex items-center gap-3">
+                  <Cloud size={18} className="text-primary flex-shrink-0" />
+                  <span className="text-sm font-medium text-foreground">Comprobante</span>
                   <label
-                    key={method.value}
                     className={`
-                      flex flex-col items-center gap-2 p-4 border-2 rounded-xl cursor-pointer transition-all
-                      ${form.paymentMethod === method.value
-                        ? 'border-primary bg-primary/5 shadow-md'
-                        : 'border-border hover:border-primary/50 hover:bg-muted/30'}
+                      flex-1 flex items-center justify-center gap-2 px-3 py-2 border-2 border-dashed rounded-lg cursor-pointer
+                      transition-all hover:border-primary/50 hover:bg-muted/20 text-sm
+                      ${file ? 'border-primary/50 bg-muted/20' : 'border-border'}
                     `}
                   >
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value={method.value}
-                      checked={form.paymentMethod === method.value}
-                      onChange={() => handleChange('paymentMethod', method.value)}
-                      className="sr-only"
-                    />
-                    <span className="text-2xl">{method.icon}</span>
-                    <span className="text-sm font-medium">{method.label}</span>
-                  </label>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Comprobante */}
-          <Card>
-            <CardContent className="p-6 space-y-6">
-              <div className="flex items-center gap-2 border-b border-border pb-3">
-                <Cloud size={20} className="text-primary" />
-                <h2 className="text-lg font-bold text-foreground">Comprobante o factura</h2>
-              </div>
-
-              <div className="flex flex-col items-center justify-center w-full">
-                <label
-                  className={`
-                    flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-xl cursor-pointer
-                    transition-all hover:bg-muted/30 hover:border-primary/50
-                    ${file ? 'border-primary/50 bg-muted/20' : 'border-border'}
-                  `}
-                >
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <Cloud size={48} className="text-muted-foreground/50 mb-3" />
-                    <p className="mb-2 text-sm font-semibold text-foreground">
-                      Haz clic para subir o arrastra y suelta
-                    </p>
-                    <p className="text-xs text-muted-foreground uppercase font-medium">
-                      PNG, JPG o PDF (máx. 5MB)
-                    </p>
-                  </div>
-                  <input
-                    onChange={handleFileChange}
-                    className="hidden"
-                    type="file"
-                    accept=".png,.jpg,.jpeg,.pdf"
-                  />
-                </label>
-
-                {file && (
-                  <div className="mt-4 w-full p-3 bg-muted/30 rounded-lg flex items-center justify-between border border-border">
-                    <span className="text-sm text-foreground flex items-center gap-2">
-                      <MdAttachFile size={16} className="text-primary" />
-                      {file.name}
-                      <Badge variant="outline" className="text-[10px]">
-                        {(file.size / 1024).toFixed(1)} KB
-                      </Badge>
+                    <Cloud size={18} className="text-muted-foreground/60" />
+                    <span className="text-muted-foreground">
+                      {file ? file.name : 'Subir factura o recibo (PNG, JPG, PDF)'}
                     </span>
-                    <button
+                    <input
+                      onChange={handleFileChange}
+                      className="hidden"
+                      type="file"
+                      accept=".png,.jpg,.jpeg,.pdf"
+                    />
+                  </label>
+                  {file && (
+                    <Button
                       type="button"
+                      variant="ghost"
+                      size="icon-sm"
                       onClick={() => setFile(null)}
-                      className="text-muted-foreground hover:text-destructive transition-colors"
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive"
                     >
-                      <X size={18} />
-                    </button>
+                      <X size={16} />
+                    </Button>
+                  )}
+                </div>
+                {file && (
+                  <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                    <MdAttachFile size={14} />
+                    <span>{file.name}</span>
+                    <Badge variant="outline" className="text-[10px]">
+                      {(file.size / 1024).toFixed(1)} KB
+                    </Badge>
                   </div>
                 )}
               </div>
             </CardContent>
           </Card>
 
-          {/* Botones de acción */}
-          <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-4 border-t border-border">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate('/expenses')}
-              className="w-full sm:w-auto"
-            >
+          {/* Botones de acción (ya están en el header, pero mantenemos uno al final para consistencia) */}
+          <div className="flex justify-end gap-2 pt-2 border-t border-border">
+            <Button variant="outline" onClick={() => navigate('/expenses')} size="sm">
               Cancelar
             </Button>
-            <Button type="submit" className="w-full sm:w-auto" disabled={isLoading}>
+            <Button type="submit" size="sm" disabled={isLoading}>
               {isLoading ? (
-                <>
-                  <span className="animate-spin mr-2">⟳</span>
-                  Guardando...
-                </>
+                <span className="animate-spin mr-2">⟳</span>
               ) : (
-                <>
-                  <Save size={16} className="mr-2" />
-                  Guardar gasto
-                </>
+                <Save size={16} className="mr-2" />
               )}
+              {isLoading ? 'Guardando...' : 'Guardar gasto'}
             </Button>
           </div>
         </form>
