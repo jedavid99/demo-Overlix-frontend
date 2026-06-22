@@ -25,15 +25,12 @@ interface Sale {
   category: string
 }
 
-interface KPICard {
-  title: string
-  value: string
-  trend: number
-  icon: React.ReactNode
-  color: string
-}
-
-// Datos mock eliminados - conectar con API real
+// Datos de ejemplo (comentados – descomentar para probar diseño)
+// const sampleSales: Sale[] = [
+//   { id: '1', date: new Date(2024, 0, 15), client: 'Cliente A', product: 'iPhone 13', quantity: 2, total: 1200, status: 'Completada', category: 'Celulares' },
+//   { id: '2', date: new Date(2024, 0, 16), client: 'Cliente B', product: 'Batería S22', quantity: 1, total: 45, status: 'Completada', category: 'Baterías' },
+//   { id: '3', date: new Date(2024, 0, 17), client: 'Cliente C', product: 'Pantalla OLED', quantity: 3, total: 360, status: 'Pendiente', category: 'Pantallas' },
+// ]
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
 
@@ -47,13 +44,22 @@ const SalesReport = () => {
   const [error, setError] = useState(false)
   const [period, setPeriod] = useState<'Hoy' | '7 días' | '30 días' | 'Este año' | 'Personalizado'>('30 días')
   const [customRange, setCustomRange] = useState({ start: '', end: '' })
-  const [sales, setSales] = useState<Sale[]>([])
+  const [sales, setSales] = useState<Sale[]>([]) // Inicialmente vacío
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
 
   useEffect(() => {
-    // Conectar con API real: api.get('/reports/sales')
-    setLoading(false)
+    // 🔌 Conectar con API real:
+    // api.get('/reports/sales').then(res => setSales(res.data)).catch(() => setError(true)).finally(() => setLoading(false))
+    
+    // 💡 Para probar el diseño, descomentar la línea de abajo y comentar la simulación
+    // setSales(sampleSales)
+    
+    // Simular carga (eliminar esto cuando conectes con la API)
+    setTimeout(() => {
+      // setSales(sampleSales) // Opcional: descomentar para ver datos de ejemplo
+      setLoading(false)
+    }, 800)
   }, [])
 
   // Filtrar ventas por período
@@ -151,7 +157,6 @@ const SalesReport = () => {
     exportToCSV(csvData, 'reporte-ventas')
   }
 
-  // Reintentar en caso de error
   const handleRetry = () => {
     setError(false)
     setLoading(true)
@@ -177,7 +182,11 @@ const SalesReport = () => {
           ))}
         </div>
         <Skeleton className="h-80" />
-        <Skeleton className="h-96" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Skeleton className="h-96" />
+          <Skeleton className="h-96" />
+        </div>
+        <Skeleton className="h-64" />
       </motion.div>
     )
   }
@@ -200,23 +209,6 @@ const SalesReport = () => {
     )
   }
 
-  if (filteredSales.length === 0) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="p-6"
-      >
-        <Card className="p-12 text-center">
-          <MdBarChart size={64} className="mx-auto text-muted-foreground mb-4" />
-          <h2 className="text-xl font-semibold mb-2">No hay datos de ventas</h2>
-          <p className="text-muted-foreground">No se encontraron ventas para el período seleccionado.</p>
-        </Card>
-      </motion.div>
-    )
-  }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -230,7 +222,7 @@ const SalesReport = () => {
           <h1 className="text-3xl font-bold text-foreground mb-2">Reporte de Ventas</h1>
           <p className="text-muted-foreground">Análisis detallado de las ventas del período</p>
         </div>
-        <Button onClick={handleExport} variant="outline" className="gap-2">
+        <Button onClick={handleExport} variant="outline" className="gap-2" disabled={filteredSales.length === 0}>
           <MdFileDownload size={18} />
           Exportar
         </Button>
@@ -277,10 +269,12 @@ const SalesReport = () => {
               <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <MdTrendingUp className="h-5 w-5 text-primary" />
               </div>
-              <Badge variant="success" size="sm" className="gap-1">
-                <MdTrendingUp size={12} />
-                +12%
-              </Badge>
+              {filteredSales.length > 0 && (
+                <Badge variant="success" size="sm" className="gap-1">
+                  <MdTrendingUp size={12} />
+                  +12%
+                </Badge>
+              )}
             </div>
             <p className="text-2xl font-bold text-foreground">{formatCurrency(totalRevenue)}</p>
             <p className="text-sm text-muted-foreground">Total de ingresos</p>
@@ -293,10 +287,12 @@ const SalesReport = () => {
               <div className="h-10 w-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
                 <MdSell className="h-5 w-5 text-emerald-600" />
               </div>
-              <Badge variant="success" size="sm" className="gap-1">
-                <MdTrendingUp size={12} />
-                +8%
-              </Badge>
+              {filteredSales.length > 0 && (
+                <Badge variant="success" size="sm" className="gap-1">
+                  <MdTrendingUp size={12} />
+                  +8%
+                </Badge>
+              )}
             </div>
             <p className="text-2xl font-bold text-foreground">{totalSales}</p>
             <p className="text-sm text-muted-foreground">Cantidad de ventas</p>
@@ -309,10 +305,12 @@ const SalesReport = () => {
               <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
                 <MdTrendingUp className="h-5 w-5 text-blue-600" />
               </div>
-              <Badge variant="destructive" size="sm" className="gap-1">
-                <MdTrendingDown size={12} />
-                -3%
-              </Badge>
+              {filteredSales.length > 0 && (
+                <Badge variant="destructive" size="sm" className="gap-1">
+                  <MdTrendingDown size={12} />
+                  -3%
+                </Badge>
+              )}
             </div>
             <p className="text-2xl font-bold text-foreground">{formatCurrency(avgTicket)}</p>
             <p className="text-sm text-muted-foreground">Ticket promedio</p>
@@ -326,8 +324,8 @@ const SalesReport = () => {
                 <MdSell className="h-5 w-5 text-violet-600" />
               </div>
             </div>
-            <p className="text-lg font-bold text-foreground">{topProduct?.[0] || 'N/A'}</p>
-            <p className="text-sm text-muted-foreground">Producto más vendido ({topProduct?.[1] || 0} u.)</p>
+            <p className="text-lg font-bold text-foreground">{topProduct?.[0] || '—'}</p>
+            <p className="text-sm text-muted-foreground">Producto más vendido {topProduct ? `(${topProduct[1]} u.)` : ''}</p>
           </CardContent>
         </Card>
       </div>
@@ -338,40 +336,47 @@ const SalesReport = () => {
           <CardTitle>Evolución de Ingresos</CardTitle>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={evolutionData}>
-              <defs>
-                <linearGradient id="colorPrimary" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
-                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-              <XAxis dataKey="date" className="text-xs" />
-              <YAxis className="text-xs" tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`} />
-              <Tooltip
-                content={({ active, payload }) => {
-                  if (active && payload && payload.length) {
-                    const value = payload[0].value as number
-                    return (
-                      <Card className="p-3 shadow-lg">
-                        <p className="text-sm font-semibold">{payload[0].payload.date}</p>
-                        <p className="text-sm text-muted-foreground">{formatCurrency(value)}</p>
-                      </Card>
-                    )
-                  }
-                  return null
-                }}
-              />
-              <Area
-                type="monotone"
-                dataKey="amount"
-                stroke="hsl(var(--primary))"
-                fillOpacity={1}
-                fill="url(#colorPrimary)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+          {evolutionData.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <MdBarChart size={48} className="mx-auto mb-4 text-muted-foreground/40" />
+              <p>No hay datos de ventas para mostrar</p>
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart data={evolutionData}>
+                <defs>
+                  <linearGradient id="colorPrimary" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                <XAxis dataKey="date" className="text-xs" />
+                <YAxis className="text-xs" tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`} />
+                <Tooltip
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const value = payload[0].value as number
+                      return (
+                        <Card className="p-3 shadow-lg">
+                          <p className="text-sm font-semibold">{payload[0].payload.date}</p>
+                          <p className="text-sm text-muted-foreground">{formatCurrency(value)}</p>
+                        </Card>
+                      )
+                    }
+                    return null
+                  }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="amount"
+                  stroke="hsl(var(--primary))"
+                  fillOpacity={1}
+                  fill="url(#colorPrimary)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          )}
         </CardContent>
       </Card>
 
@@ -383,66 +388,74 @@ const SalesReport = () => {
             <CardTitle>Ventas Recientes</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-card/80 backdrop-blur-md sticky top-0">
-                  <tr className="text-left text-sm text-muted-foreground">
-                    <th className="pb-3 font-medium">Fecha</th>
-                    <th className="pb-3 font-medium">Cliente</th>
-                    <th className="pb-3 font-medium">Producto</th>
-                    <th className="pb-3 font-medium text-right">Total</th>
-                    <th className="pb-3 font-medium text-center">Estado</th>
-                  </tr>
-                </thead>
-                <tbody className="text-sm">
-                  {paginatedSales.map((sale) => (
-                    <tr
-                      key={sale.id}
-                      className={`border-b border-border hover:bg-muted/50 cursor-pointer transition-colors ${sale.status === 'Completada' ? 'bg-success/5' : ''}`}
-                      onClick={() => navigate(`/sales/${sale.id}`)}
-                    >
-                      <td className="py-3">{format(sale.date, 'dd/MM/yyyy', { locale: es })}</td>
-                      <td className="py-3">{sale.client}</td>
-                      <td className="py-3">{sale.product}</td>
-                      <td className="py-3 text-right font-semibold">{formatCurrency(sale.total)}</td>
-                      <td className="py-3 text-center">
-                        <Badge
-                          variant={sale.status === 'Completada' ? 'success' : sale.status === 'Pendiente' ? 'warning' : 'destructive'}
-                          size="sm"
-                        >
-                          {sale.status}
-                        </Badge>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            
-            {/* Paginación */}
-            <div className="flex items-center justify-between mt-4">
-              <p className="text-sm text-muted-foreground">
-                Mostrando {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredSales.length)} de {filteredSales.length}
-              </p>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                >
-                  Anterior
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                >
-                  Siguiente
-                </Button>
+            {filteredSales.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <MdBarChart size={48} className="mx-auto mb-4 text-muted-foreground/40" />
+                <p>No hay ventas en el período seleccionado</p>
               </div>
-            </div>
+            ) : (
+              <>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-card/80 backdrop-blur-md sticky top-0">
+                      <tr className="text-left text-sm text-muted-foreground">
+                        <th className="pb-3 font-medium">Fecha</th>
+                        <th className="pb-3 font-medium">Cliente</th>
+                        <th className="pb-3 font-medium">Producto</th>
+                        <th className="pb-3 font-medium text-right">Total</th>
+                        <th className="pb-3 font-medium text-center">Estado</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-sm">
+                      {paginatedSales.map((sale) => (
+                        <tr
+                          key={sale.id}
+                          className={`border-b border-border hover:bg-muted/50 cursor-pointer transition-colors ${sale.status === 'Completada' ? 'bg-success/5' : ''}`}
+                          onClick={() => navigate(`/sales/${sale.id}`)}
+                        >
+                          <td className="py-3">{format(sale.date, 'dd/MM/yyyy', { locale: es })}</td>
+                          <td className="py-3">{sale.client}</td>
+                          <td className="py-3">{sale.product}</td>
+                          <td className="py-3 text-right font-semibold">{formatCurrency(sale.total)}</td>
+                          <td className="py-3 text-center">
+                            <Badge
+                              variant={sale.status === 'Completada' ? 'success' : sale.status === 'Pendiente' ? 'warning' : 'destructive'}
+                              size="sm"
+                            >
+                              {sale.status}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {/* Paginación */}
+                <div className="flex items-center justify-between mt-4">
+                  <p className="text-sm text-muted-foreground">
+                    Mostrando {(currentPage - 1) * itemsPerPage + 1} - {Math.min(currentPage * itemsPerPage, filteredSales.length)} de {filteredSales.length}
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                    >
+                      Anterior
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                    >
+                      Siguiente
+                    </Button>
+                  </div>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -452,53 +465,61 @@ const SalesReport = () => {
             <CardTitle>Ventas por Categoría</CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={categoryData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={90}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {categoryData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            {categoryData.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <MdBarChart size={48} className="mx-auto mb-4 text-muted-foreground/40" />
+                <p>Sin datos de categorías</p>
+              </div>
+            ) : (
+              <>
+                <ResponsiveContainer width="100%" height={250}>
+                  <PieChart>
+                    <Pie
+                      data={categoryData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {categoryData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          const total = categoryData.reduce((sum, cat) => sum + cat.value, 0)
+                          const value = payload[0].value as number
+                          const percentage = ((value / total) * 100).toFixed(1)
+                          return (
+                            <Card className="p-3 shadow-lg">
+                              <p className="text-sm font-semibold">{payload[0].name}</p>
+                              <p className="text-sm text-muted-foreground">{formatCurrency(value)}</p>
+                              <p className="text-xs text-muted-foreground">{percentage}%</p>
+                            </Card>
+                          )
+                        }
+                        return null
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+                {/* Leyenda */}
+                <div className="mt-4 space-y-2">
+                  {categoryData.map((cat, index) => (
+                    <div key={cat.name} className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                        <span>{cat.name}</span>
+                      </div>
+                      <span className="font-semibold">{formatCurrency(cat.value)}</span>
+                    </div>
                   ))}
-                </Pie>
-                <Tooltip
-                  content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      const total = categoryData.reduce((sum, cat) => sum + cat.value, 0)
-                      const value = payload[0].value as number
-                      const percentage = ((value / total) * 100).toFixed(1)
-                      return (
-                        <Card className="p-3 shadow-lg">
-                          <p className="text-sm font-semibold">{payload[0].name}</p>
-                          <p className="text-sm text-muted-foreground">{formatCurrency(value)}</p>
-                          <p className="text-xs text-muted-foreground">{percentage}%</p>
-                        </Card>
-                      )
-                    }
-                    return null
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-            
-            {/* Leyenda */}
-            <div className="mt-4 space-y-2">
-              {categoryData.map((cat, index) => (
-                <div key={cat.name} className="flex items-center justify-between text-sm">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                    <span>{cat.name}</span>
-                  </div>
-                  <span className="font-semibold">{formatCurrency(cat.value)}</span>
                 </div>
-              ))}
-            </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -509,27 +530,33 @@ const SalesReport = () => {
           <CardTitle>Top 5 Productos Más Vendidos</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {topProducts.map((product) => (
-              <div key={product.name} className="flex items-center gap-4">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary">
-                  {product.position}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-medium">{product.name}</span>
-                    <span className="text-sm text-muted-foreground">{product.quantity} u.</span>
+          {topProducts.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>No hay productos vendidos en el período</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {topProducts.map((product) => (
+                <div key={product.name} className="flex items-center gap-4">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary">
+                    {product.position}
                   </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary transition-all duration-300"
-                      style={{ width: `${(product.quantity / maxQuantity) * 100}%` }}
-                    />
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-medium">{product.name}</span>
+                      <span className="text-sm text-muted-foreground">{product.quantity} u.</span>
+                    </div>
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary transition-all duration-300"
+                        style={{ width: `${(product.quantity / maxQuantity) * 100}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </motion.div>
