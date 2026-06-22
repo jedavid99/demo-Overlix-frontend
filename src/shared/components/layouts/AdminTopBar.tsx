@@ -25,12 +25,12 @@ import { Notification } from '../notifications/notification.types'
 const categories = [
   { value: 'all', label: 'Todo', placeholder: 'Buscar en Overlix...', route: '/dashboard' },
   { value: 'sales', label: 'Ventas', placeholder: 'Buscar venta...', route: '/sales' },
-  { value: 'repairs', label: 'Reparaciones', placeholder: 'Buscar reparación...', route: '/reparaciones/list' },
+  { value: 'repairs', label: 'Reparaciones', placeholder: 'Buscar reparaciÃ³n...', route: '/reparaciones/list' },
   { value: 'clients', label: 'Clientes', placeholder: 'Buscar cliente...', route: '/clients' },
   { value: 'expenses', label: 'Gastos', placeholder: 'Buscar gasto...', route: '/expenses' },
   { value: 'stock', label: 'Stock', placeholder: 'Buscar producto...', route: '/stock' },
-  { value: 'shipments', label: 'Envíos', placeholder: 'Buscar envío...', route: '/envios/tracking' },
-  { value: 'orders', label: 'Órdenes de Compra', placeholder: 'Buscar orden de compra...', route: '/providers/orders', icon: <MdReceipt size={16} /> },
+  { value: 'shipments', label: 'EnvÃ­os', placeholder: 'Buscar envÃ­o...', route: '/envios/tracking' },
+  { value: 'orders', label: 'Ã“rdenes de Compra', placeholder: 'Buscar orden de compra...', route: '/providers/orders', icon: <MdReceipt size={16} /> },
   { value: 'reports-sales', label: 'Reporte Ventas', placeholder: 'Buscar en reporte de ventas...', route: '/reports/sales', icon: <MdBarChart size={16} /> },
   { value: 'reports-stock', label: 'Reporte Stock', placeholder: 'Buscar en reporte de stock...', route: '/reports/stock', icon: <MdInventory2 size={16} /> },
   { value: 'reports-financial', label: 'Reporte Financiero', placeholder: 'Buscar en reporte financiero...', route: '/reports/financial', icon: <MdAttachMoney size={16} /> },
@@ -53,7 +53,7 @@ export const AdminTopBar = ({
   const navigateL = useNavigate()
 
   const handleLogout = () => {
-    // Limpiar sesión aquí si es necesario
+    // Limpiar sesiÃ³n aquÃ­ si es necesario
     navigateL('/')
   }
 
@@ -73,7 +73,7 @@ export const AdminTopBar = ({
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && searchQuery.trim()) {
       const route = currentCategory.route
-      navigate(${route}?search=)
+      navigate(`${route}?search=${encodeURIComponent(searchQuery.trim())}`)
       setSearchQuery('')
     }
   }
@@ -82,9 +82,9 @@ export const AdminTopBar = ({
     { 
       id: 1, 
       title: 'Nueva venta registrada', 
-      description: 'Venta #SALE-4567 por ,299.00',
+      description: 'Venta #SALE-4567 por $1,299.00',
       time: 'Hace 5 min', 
-      icon: '??', 
+      icon: 'ðŸ’°', 
       color: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400',
       read: false,
       type: 'sale',
@@ -95,7 +95,7 @@ export const AdminTopBar = ({
       title: 'Stock bajo: iPhone 15', 
       description: 'Solo 3 unidades disponibles',
       time: 'Hace 1 h', 
-      icon: '??', 
+      icon: 'ðŸ“¦', 
       color: 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400',
       read: false,
       type: 'stock',
@@ -103,10 +103,10 @@ export const AdminTopBar = ({
     },
     { 
       id: 3, 
-      title: 'Reparación completada', 
+      title: 'ReparaciÃ³n completada', 
       description: 'iPhone 14 Pro - Pantalla reemplazada',
       time: 'Hace 2 h', 
-      icon: '??', 
+      icon: 'ðŸ”§', 
       color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
       read: false,
       type: 'repair',
@@ -115,9 +115,9 @@ export const AdminTopBar = ({
     { 
       id: 4, 
       title: 'Nuevo cliente registrado', 
-      description: 'María González - Cliente VIP',
+      description: 'MarÃ­a GonzÃ¡lez - Cliente VIP',
       time: 'Hace 3 h', 
-      icon: '??', 
+      icon: 'ðŸ‘¤', 
       color: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
       read: true,
       type: 'client',
@@ -128,7 +128,7 @@ export const AdminTopBar = ({
       title: 'Pedido enviado #ORD-1234', 
       description: 'En camino al cliente',
       time: 'Hace 4 h', 
-      icon: '??', 
+      icon: 'ðŸšš', 
       color: 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400',
       read: true,
       type: 'shipment',
@@ -167,7 +167,7 @@ export const AdminTopBar = ({
           <Menu size={18} />
         </Button>
         <Button onClick={onToggleCollapse} variant="ghost" size="icon-sm" className="hidden lg:inline-flex">
-          <ArrowRightToLine size={18} className={	ransition-transform } />
+          <ArrowRightToLine size={18} className={`transition-transform ${sidebarCollapsed ? 'rotate-180' : ''}`} />
         </Button>
       </div>
 
@@ -207,12 +207,12 @@ export const AdminTopBar = ({
               onKeyDown={handleSearch}
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setSearchFocused(false)}
-              className={h-9 w-full rounded-r-full border border-input bg-muted/50 pl-9 pr-4 text-sm placeholder:text-muted-foreground focus-visible:outline-none transition-all duration-150 }
+              className={`h-9 w-full rounded-r-full border border-input bg-muted/50 pl-9 pr-4 text-sm placeholder:text-muted-foreground focus-visible:outline-none transition-all duration-150 ${searchFocused ? 'ring-1 ring-primary/20 border-primary' : ''}`}
             />
           </div>
         </div>
 
-        {/* ?? Notificaciones mejoradas con NotificationList */}
+        {/* ðŸªŸ Notificaciones mejoradas con NotificationList */}
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="ghost" size="icon-sm" className="relative">
@@ -257,13 +257,13 @@ export const AdminTopBar = ({
             <DropdownMenuItem asChild>
               <Link to="/settings" className="cursor-pointer">
                 <MdSettings size={16} className="mr-2" />
-                Configuración
+                ConfiguraciÃ³n
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-destructive cursor-pointer">
               <button onClick={handleLogout} className="flex items-center gap-2 w-full">
-                Cerrar sesión <LogOut size={18} />
+                Cerrar sesiÃ³n <LogOut size={18} />
               </button>
             </DropdownMenuItem>
           </DropdownMenuContent>
