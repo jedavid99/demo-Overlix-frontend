@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Plus,
@@ -56,6 +57,7 @@ const categories = ['all', 'phone', 'pc', 'console']
 const statusOptions = ['all', 'good', 'low', 'out']
 
 export default function Stock() {
+  const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
   const [activeCategory, setActiveCategory] = useState('all')
   const [activeStatus, setActiveStatus] = useState('all')
@@ -192,7 +194,7 @@ export default function Stock() {
             <Download size={16} className="mr-2" />
             Exportar
           </Button>
-          <Button onClick={h}>
+          <Button onClick={() => navigate('/stock/add')}>
             <Plus size={16} className="mr-2" />
             Agregar producto
           </Button>
@@ -361,7 +363,7 @@ export default function Stock() {
             No se encontraron productos con los filtros actuales. Prueba a ajustar tu búsqueda o
             agrega un nuevo producto.
           </p>
-          <Button variant="outline" className="mt-4">
+          <Button variant="outline" className="mt-4" onClick={() => navigate('/stock/add')}>
             <Plus size={16} className="mr-2" />
             Agregar producto
           </Button>
