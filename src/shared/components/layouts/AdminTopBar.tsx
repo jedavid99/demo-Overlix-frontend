@@ -49,7 +49,6 @@ export const AdminTopBar = ({
   const navigateL = useNavigate()
 
   const handleLogout = () => {
-    // Limpiar sesión aquí si es necesario
     navigateL('/')
   }
 
@@ -90,48 +89,8 @@ export const AdminTopBar = ({
     }
   }
 
-  const [notifications, setNotifications] = useState<SimpleNotification[]>([
-    { 
-      id: 1, 
-      title: 'Nueva venta registrada', 
-      description: 'Venta #SALE-4567 por $1,299.00',
-      time: 'Hace 5 min', 
-      icon: '💰', 
-      read: false
-    },
-    { 
-      id: 2, 
-      title: 'Stock bajo: iPhone 15', 
-      description: 'Solo 3 unidades disponibles',
-      time: 'Hace 1 h', 
-      icon: '📦', 
-      read: false
-    },
-    { 
-      id: 3, 
-      title: 'Reparación completada', 
-      description: 'iPhone 14 Pro - Pantalla reemplazada',
-      time: 'Hace 2 h', 
-      icon: '🔧', 
-      read: false
-    },
-    { 
-      id: 4, 
-      title: 'Nuevo cliente registrado', 
-      description: 'María González - Cliente VIP',
-      time: 'Hace 3 h', 
-      icon: '👤', 
-      read: true
-    },
-    { 
-      id: 5, 
-      title: 'Pedido enviado #ORD-1234', 
-      description: 'En camino al cliente',
-      time: 'Hace 4 h', 
-      icon: '🚚', 
-      read: true
-    },
-  ])
+  // 📦 ESTADO DE NOTIFICACIONES – VACÍO (conectar con API)
+  const [notifications, setNotifications] = useState<SimpleNotification[]>([])
 
   const unreadCount = notifications.filter(n => !n.read).length
 
@@ -151,10 +110,6 @@ export const AdminTopBar = ({
     setNotifications(prev => 
       prev.map(notif => ({ ...notif, read: true }))
     )
-  }
-
-  const handleViewAll = () => {
-    navigate('/notifications')
   }
 
   return (
@@ -209,7 +164,7 @@ export const AdminTopBar = ({
           </div>
         </div>
 
-        {/* 🪟 Notificaciones mejoradas */}
+        {/* 🪟 Notificaciones – vacías por defecto */}
         <div className="relative" ref={notificationsRef}>
           <Button 
             variant="ghost" 
@@ -270,7 +225,6 @@ export const AdminTopBar = ({
               </button>
             </DropdownMenuItem>
           </DropdownMenuContent>
-          
         </DropdownMenu>
       </div>
     </header>
@@ -278,4 +232,3 @@ export const AdminTopBar = ({
 }
 
 export default AdminTopBar
-
