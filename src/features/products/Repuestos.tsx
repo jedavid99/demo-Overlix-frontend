@@ -24,7 +24,6 @@ import {
   Zap,
   Monitor,
   Cpu,
-  Fingerprint,
 } from 'lucide-react'
 import { Card, CardContent } from '@/shared/components/ui/card'
 import { Button } from '@/shared/components/ui/button'
@@ -53,74 +52,8 @@ interface RepuestoItem {
   color: string
 }
 
-// 📦 Datos de ejemplo (cargar desde API)
-const repuestosData: RepuestoItem[] = [
-  {
-    id: 1,
-    name: 'Pantalla OLED iPhone 14 Pro',
-    description: 'Pantalla original con True Tone',
-    sku: 'SCR-IP14P-001',
-    category: 'Pantallas',
-    quantity: 23,
-    status: 'Good',
-    price: 189.0,
-    compatibleWith: ['iPhone 14 Pro', 'iPhone 14 Pro Max'],
-    icon: Monitor,
-    color: 'blue',
-  },
-  {
-    id: 2,
-    name: 'Batería Galaxy S23 Ultra',
-    description: 'Batería de litio 5000mAh',
-    sku: 'BAT-S23U-002',
-    category: 'Baterías',
-    quantity: 4,
-    status: 'Low',
-    price: 45.5,
-    compatibleWith: ['Galaxy S23 Ultra'],
-    icon: Battery,
-    color: 'indigo',
-  },
-  {
-    id: 3,
-    name: 'Lector de Huellas Pixel 7',
-    description: 'Sensor óptico de huellas',
-    sku: 'FPR-PX7-003',
-    category: 'Componentes',
-    quantity: 0,
-    status: 'Out',
-    price: 12.0,
-    compatibleWith: ['Pixel 7', 'Pixel 7 Pro'],
-    icon: Fingerprint,
-    color: 'purple',
-  },
-  {
-    id: 4,
-    name: 'Cable Flex Home Button',
-    description: 'Flex para botón Home',
-    sku: 'FLX-HOME-004',
-    category: 'Cables',
-    quantity: 120,
-    status: 'Good',
-    price: 6.99,
-    compatibleWith: ['iPhone 8', 'iPhone SE 2'],
-    icon: Zap,
-    color: 'green',
-  },
-  {
-    id: 5,
-    name: 'Ventilador PS5',
-    description: 'Ventilador de refrigeración',
-    sku: 'FAN-PS5-005',
-    category: 'Ventiladores',
-    quantity: 8,
-    status: 'Good',
-    price: 24.99,
-    compatibleWith: ['PS5'],
-    icon: Cpu,
-    color: 'amber',
-  },
-]
+// 📦 Datos de muestra ELIMINADOS – array vacío (conectar con API)
+const repuestosData: RepuestoItem[] = []
 
 // Categorías y estados para filtros
 const categories = ['all', 'pantallas', 'baterías', 'componentes', 'cables', 'ventiladores']
@@ -150,7 +83,7 @@ export default function Repuestos() {
     })
   }, [searchTerm, activeCategory, activeStatus])
 
-  // KPIs
+  // KPIs (todos en 0 o valores genéricos)
   const totalItems = repuestosData.length
   const totalCategories = new Set(repuestosData.map((i) => i.category)).size
   const lowStockItems = repuestosData.filter((i) => i.quantity < 5 && i.quantity > 0).length
@@ -163,7 +96,7 @@ export default function Repuestos() {
     return { variant: 'success' as const, label: 'En stock' }
   }
 
-  // Mapeo de colores por categoría
+  // Mapeo de colores por categoría (se mantiene para cuando haya datos)
   const categoryColorMap: Record<string, string> = {
     Pantallas: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
     Baterías: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300',
@@ -177,15 +110,15 @@ export default function Repuestos() {
       label: 'Repuestos totales',
       value: totalItems,
       icon: Package,
-      trend: '+8% vs mes anterior',
-      trendUp: true,
+      trend: 'Sin datos',
+      trendUp: false,
       color: 'text-blue-600',
     },
     {
       label: 'Categorías',
       value: totalCategories,
       icon: Filter,
-      trend: `${totalCategories} activas`,
+      trend: 'Sin datos',
       trendUp: false,
       color: 'text-indigo-600',
     },
@@ -193,7 +126,7 @@ export default function Repuestos() {
       label: 'Stock bajo',
       value: lowStockItems,
       icon: AlertCircle,
-      trend: lowStockItems > 0 ? '⚠️ Revisar' : '✅ OK',
+      trend: 'Sin datos',
       trendUp: false,
       color: 'text-amber-600',
     },
@@ -201,8 +134,8 @@ export default function Repuestos() {
       label: 'Valor total',
       value: `$${totalValue.toFixed(2)}`,
       icon: DollarSign,
-      trend: '+12% vs mes anterior',
-      trendUp: true,
+      trend: 'Sin datos',
+      trendUp: false,
       color: 'text-emerald-600',
     },
   ]
@@ -302,16 +235,22 @@ export default function Repuestos() {
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 mt-3 text-xs">
-                    {kpi.trendUp ? (
-                      <>
-                        <TrendingUp size={14} className="text-emerald-500" />
-                        <span className="text-emerald-600">{kpi.trend}</span>
-                      </>
+                    {kpi.trend !== 'Sin datos' ? (
+                      kpi.trendUp ? (
+                        <>
+                          <TrendingUp size={14} className="text-emerald-500" />
+                          <span className="text-emerald-600">{kpi.trend}</span>
+                        </>
+                      ) : (
+                        <>
+                          <TrendingDown size={14} className="text-muted-foreground" />
+                          <span className="text-muted-foreground">{kpi.trend}</span>
+                        </>
+                      )
                     ) : (
-                      <>
-                        <TrendingDown size={14} className="text-muted-foreground" />
-                        <span className="text-muted-foreground">{kpi.trend}</span>
-                      </>
+                      <span className="text-muted-foreground/60 italic text-[10px]">
+                        Sin datos disponibles
+                      </span>
                     )}
                   </div>
                 </CardContent>
@@ -404,7 +343,7 @@ export default function Repuestos() {
         </div>
       </div>
 
-      {/* Tabla de repuestos */}
+      {/* Estado vacío */}
       {loading ? (
         <div className="space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -562,7 +501,6 @@ export default function Repuestos() {
             </table>
           </div>
 
-          {/* Footer de la tabla */}
           <div className="flex items-center justify-between px-4 py-3 bg-muted/10 border-t border-border text-xs text-muted-foreground">
             <span>
               Mostrando <strong className="text-foreground">{filteredItems.length}</strong> de{' '}
