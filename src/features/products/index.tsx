@@ -195,7 +195,7 @@ export default function Stock() {
             <Download size={16} className="mr-2" />
             Exportar
           </Button>
-          <Button onClick={() => navigate('/add')}>
+          <Button onClick={() => navigate('/stock/add')}>
             <Plus size={16} className="mr-2" />
             Agregar producto
           </Button>
