@@ -68,57 +68,14 @@ export default function Tracking() {
     }
   }, [location.state])
 
-  const openTrackingModal = (shipment: Shipment) => {
-    setSelectedShipment(shipment)
-    setShowModal(true)
-    setModalView('details')
-  }
+  // 📦 Datos vacíos – conectar con API real
+  const shipments: Shipment[] = []
 
-  // Mock data
-  const shipments: Shipment[] = [
-    { 
-      id: '#TRK90210', customer: 'John Doe', type: 'Repair', provider: 'FedEx', location: 'Memphis, TN', progress: 75,
-      status: 'transit', estimatedDelivery: 'Oct 25, 2024', origin: 'Nashville, TN', destination: 'Miami, FL',
-      weight: '2.5 kg', items: 3, lat: 35.1495, lng: -90.0490, lastUpdate: '10:45 AM',
-      driver: 'Mike Johnson', vehicle: 'FedEx Truck #442', signature: false,
-      description: 'iPhone 14 Pro Max - Reparación de pantalla', value: '$1,299.00'
-    },
-    { 
-      id: '#TRK88432', customer: 'Jane Smith', type: 'Sale', provider: 'DHL Express', location: 'Cincinnati, OH', progress: 40,
-      status: 'transit', estimatedDelivery: 'Oct 26, 2024', origin: 'Chicago, IL', destination: 'Atlanta, GA',
-      weight: '1.8 kg', items: 2, lat: 39.1031, lng: -84.5120, lastUpdate: '09:30 AM',
-      driver: 'Sarah Williams', vehicle: 'DHL Van #128', signature: false,
-      description: 'Samsung Galaxy S23 Ultra - Venta', value: '$1,499.00'
-    },
-    { 
-      id: '#TRK77211', customer: 'Tech Corp', type: 'Repair', provider: 'UPS', location: 'Louisville, KY', progress: 90,
-      status: 'delivery', estimatedDelivery: 'Oct 24, 2024', origin: 'Dallas, TX', destination: 'New York, NY',
-      weight: '3.2 kg', items: 5, lat: 38.2527, lng: -85.7585, lastUpdate: '11:15 AM',
-      driver: 'Robert Brown', vehicle: 'UPS Truck #789', signature: false,
-      description: 'MacBook Pro 16" - Reparación de teclado', value: '$2,499.00'
-    },
-    { 
-      id: '#TRK66543', customer: 'Alice Brown', type: 'Sale', provider: 'FedEx', location: 'Dallas, TX', progress: 20,
-      status: 'preparation', estimatedDelivery: 'Oct 28, 2024', origin: 'Los Angeles, CA', destination: 'Phoenix, AZ',
-      weight: '1.2 kg', items: 1, lat: 32.7767, lng: -96.7970, lastUpdate: '08:45 AM',
-      driver: 'Pending', vehicle: 'Pending', signature: false,
-      description: 'iPad Pro 12.9" - Venta', value: '$1,099.00'
-    },
-    { 
-      id: '#TRK55123', customer: 'Robert Wilson', type: 'Repair', provider: 'USPS', location: 'Denver, CO', progress: 100,
-      status: 'delivered', estimatedDelivery: 'Oct 23, 2024', origin: 'Seattle, WA', destination: 'Denver, CO',
-      weight: '4.1 kg', items: 2, lat: 39.7392, lng: -104.9903, lastUpdate: '02:30 PM',
-      driver: 'Tom Davis', vehicle: 'USPS Truck #231', signature: true,
-      description: 'iMac 24" - Reparación de pantalla', value: '$1,899.00'
-    },
-  ]
-
-  // KPI cards
   const kpiCards = [
-    { title: 'En Preparación', value: 12, change: 2, icon: <Package size={20} />, color: 'text-amber-600', bgColor: 'bg-amber-100' },
-    { title: 'En Tránsito', value: 45, change: 5, icon: <Truck size={20} />, color: 'text-blue-600', bgColor: 'bg-blue-100' },
-    { title: 'En Reparto', value: 8, change: -1, icon: <Navigation size={20} />, color: 'text-purple-600', bgColor: 'bg-purple-100' },
-    { title: 'Entregados', value: 124, change: 12, icon: <CheckCircle size={20} />, color: 'text-green-600', bgColor: 'bg-green-100' },
+    { title: 'En Preparación', value: shipments.filter(s => s.status === 'preparation').length, change: 0, icon: <Package size={20} />, color: 'text-amber-600', bgColor: 'bg-amber-100' },
+    { title: 'En Tránsito', value: shipments.filter(s => s.status === 'transit').length, change: 0, icon: <Truck size={20} />, color: 'text-blue-600', bgColor: 'bg-blue-100' },
+    { title: 'En Reparto', value: shipments.filter(s => s.status === 'delivery').length, change: 0, icon: <Navigation size={20} />, color: 'text-purple-600', bgColor: 'bg-purple-100' },
+    { title: 'Entregados', value: shipments.filter(s => s.status === 'delivered').length, change: 0, icon: <CheckCircle size={20} />, color: 'text-green-600', bgColor: 'bg-green-100' },
   ]
 
   const filteredShipments = shipments.filter(s => {
@@ -166,19 +123,21 @@ export default function Tracking() {
   }
 
   const getTrackingLog = (shipmentId: string): LogEvent[] => {
-    return [
-      { title: 'Arrived at Sort Facility', detail: 'Memphis, TN', completed: true, time: 'Oct 24, 10:45 AM', icon: <Package size={14} className="text-green-600" /> },
-      { title: 'Departed Origin Hub', detail: 'Nashville, TN', completed: true, time: 'Oct 23, 08:30 PM', icon: <Truck size={14} className="text-blue-600" /> },
-      { title: 'Picked Up by Carrier', detail: 'Nashville, TN', completed: true, time: 'Oct 23, 03:15 PM', icon: <User size={14} className="text-purple-600" /> },
-      { title: 'Label Created', detail: 'Logistics Hub', completed: true, time: 'Oct 22, 11:20 AM', icon: <FileText size={14} className="text-foreground" /> },
-    ]
+    // Conectar con API real: api.get(`/shipments/${shipmentId}/log`)
+    return []
   }
 
   const getMapUrl = (lat: number, lng: number, zoom: number) => {
     return `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lng}&zoom=${zoom}&size=800x500&markers=${lat},${lng},red-pin`
   }
 
-  // Modal mejorado (más pequeño y pulido)
+  const openTrackingModal = (shipment: Shipment) => {
+    setSelectedShipment(shipment)
+    setShowModal(true)
+    setModalView('details')
+  }
+
+  // Modal (solo se renderiza si hay shipment seleccionado)
   const TrackingModal = () => {
     if (!selectedShipment) return null
 
@@ -187,8 +146,7 @@ export default function Tracking() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onClick={() => setShowModal(false)} />
         <div className="flex min-h-full items-center justify-center p-4">
           <div className="relative w-full max-w-4xl bg-card rounded-2xl shadow-2xl transform transition-all animate-slideUp">
-            
-            {/* Cabecera reducida */}
+            {/* Cabecera */}
             <div className="flex items-center justify-between p-4 border-b border-border">
               <div className="flex items-center gap-3">
                 <div className="relative">
@@ -235,11 +193,11 @@ export default function Tracking() {
               </div>
             </div>
 
-            {/* Contenido compacto */}
+            {/* Contenido */}
             <div className="p-4 max-h-[calc(100vh-160px)] overflow-y-auto">
               {modalView === 'details' && (
                 <div className="space-y-4">
-                  {/* Barra de progreso compacta */}
+                  {/* Progreso */}
                   <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl p-4 text-white">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs font-medium">Progreso</span>
@@ -256,7 +214,7 @@ export default function Tracking() {
                     </div>
                   </div>
 
-                  {/* Grid de información compacta */}
+                  {/* Grid de información */}
                   <div className="grid grid-cols-2 gap-3">
                     <div className="bg-gray-50 dark:bg-muted/50 rounded-xl p-4">
                       <h4 className="text-xs font-semibold text-foreground mb-3 flex items-center gap-1.5">
@@ -314,7 +272,7 @@ export default function Tracking() {
                     </div>
                   </div>
 
-                  {/* Acciones rápidas compactas */}
+                  {/* Acciones */}
                   <div className="flex gap-2 pt-2">
                     <button className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
                       <Phone size={14} /> Contactar
@@ -368,39 +326,17 @@ export default function Tracking() {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5"><Activity size={16} className="text-blue-600" /><h3 className="text-sm font-semibold">Historial de seguimiento</h3></div>
-                    <span className="text-xs text-muted-foreground">6 eventos</span>
+                    <span className="text-xs text-muted-foreground">0 eventos</span>
                   </div>
-                  <div className="relative pl-6">
-                    <div className="absolute left-2 top-0 bottom-0 w-0.5 bg-muted"></div>
-                    {getTrackingLog(selectedShipment.id).map((log, index) => (
-                      <div key={index} className="relative flex gap-3 pb-4 last:pb-0">
-                        <div className="relative z-10 mt-1 w-8 h-8 rounded-xl flex items-center justify-center bg-muted/50">
-                          {log.icon || <Clock size={14} className="text-muted-foreground" />}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between"><p className="text-sm font-semibold">{log.title}</p><span className="text-[10px] text-muted-foreground">{log.time}</span></div>
-                          <p className="text-xs text-muted-foreground flex items-center gap-0.5"><MapPin size={10} /> {log.detail}</p>
-                        </div>
-                      </div>
-                    ))}
-                    <div className="relative flex gap-3 pt-1">
-                      <div className="relative z-10 mt-1 w-8 h-8 rounded-xl flex items-center justify-center bg-blue-100 dark:bg-blue-900/20 animate-pulse"><Navigation size={14} className="text-blue-600" /></div>
-                      <div className="flex-1"><p className="text-sm font-semibold">En camino a destino final</p><p className="text-xs text-muted-foreground"><MapPin size={10} /> Próxima parada: {selectedShipment.destination}</p></div>
-                    </div>
-                    <div className="relative flex gap-3 pt-1 opacity-50">
-                      <div className="relative z-10 mt-1 w-8 h-8 rounded-xl flex items-center justify-center bg-muted"><CheckCircle size={14} className="text-muted-foreground" /></div>
-                      <div className="flex-1"><p className="text-sm font-semibold text-muted-foreground">Entrega programada</p><p className="text-xs text-muted-foreground">{selectedShipment.destination} • {selectedShipment.estimatedDelivery}</p></div>
-                    </div>
-                  </div>
-                  <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3 flex items-start gap-2 text-xs">
-                    <Info size={14} className="text-blue-600 mt-0.5" />
-                    <div><p className="font-medium text-blue-900 dark:text-blue-300">¿Necesitas más información?</p><p className="text-blue-700 dark:text-blue-400">Contacta con atención al cliente.</p></div>
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Package size={32} className="mx-auto mb-2 text-muted-foreground/40" />
+                    <p className="text-sm">No hay eventos de seguimiento disponibles</p>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Footer reducido */}
+            {/* Footer */}
             <div className="flex items-center justify-end gap-2 p-3 border-t border-border">
               <button onClick={() => setShowModal(false)} className="px-3 py-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50">Cerrar</button>
               <button className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">Descargar comprobante</button>
@@ -411,22 +347,188 @@ export default function Tracking() {
     )
   }
 
-  // Componente Minus
-  const Minus = (props: any) => (
-    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /></svg>
-  )
+  // Componentes auxiliares para zoom
   const Plus = (props: any) => (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+  )
+  const Minus = (props: any) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /></svg>
   )
 
   return (
     <div className="min-h-screen bg-background">
       <main className="p-6">
-        <div className="max-w-7xl mx-auto">
-          {/* Header y KPIs (mantén tu código existente) */}
+        <div className="max-w-7xl mx-auto space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Seguimiento de Envíos</h1>
+              <p className="text-muted-foreground">Monitorea el estado de tus envíos en tiempo real</p>
+            </div>
+            <div className="flex gap-3">
+              <Button variant="outline" className="gap-2">
+                <Filter size={16} />
+                Filtros
+              </Button>
+              <Button className="gap-2">
+                <Plus size={16} />
+                Nuevo envío
+              </Button>
+            </div>
+          </div>
 
-          {/* Tabla de envíos (mantén tu código existente) */}
-          {/* ... */}
+          {/* KPIs */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {kpiCards.map((kpi, index) => (
+              <Card key={index} variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className={`h-10 w-10 rounded-lg ${kpi.bgColor} flex items-center justify-center`}>
+                      <div className={kpi.color}>{kpi.icon}</div>
+                    </div>
+                    <Badge variant={kpi.change >= 0 ? 'success' : 'destructive'} size="sm">
+                      {kpi.change >= 0 ? '+' : ''}{kpi.change}%
+                    </Badge>
+                  </div>
+                  <p className="text-2xl font-bold text-foreground">{kpi.value}</p>
+                  <p className="text-sm text-muted-foreground">{kpi.title}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Búsqueda y filtros */}
+          <Card className="p-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="relative flex-1 min-w-[200px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                <input
+                  type="text"
+                  placeholder="Buscar por ID, cliente, ubicación o transportista..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                />
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {['all', 'preparation', 'transit', 'delivery', 'delivered'].map((status) => (
+                  <Badge
+                    key={status}
+                    variant={filterStatus === status ? 'default' : 'outline'}
+                    className="cursor-pointer hover:bg-primary/20 transition-colors"
+                    onClick={() => setFilterStatus(status)}
+                  >
+                    {status === 'all' ? 'Todos' : getStatusText(status)}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          </Card>
+
+          {/* Tabla de envíos */}
+          <Card>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                {filteredShipments.length === 0 ? (
+                  <div className="text-center py-16 text-muted-foreground">
+                    <Package size={48} className="mx-auto mb-4 text-muted-foreground/40" />
+                    <p className="text-lg font-semibold text-foreground mb-1">No hay envíos registrados</p>
+                    <p className="text-sm">Los envíos aparecerán aquí una vez que se creen.</p>
+                  </div>
+                ) : (
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-border text-left text-sm text-muted-foreground">
+                        <th className="px-6 py-4 font-medium">ID</th>
+                        <th className="px-6 py-4 font-medium">Cliente</th>
+                        <th className="px-6 py-4 font-medium">Tipo</th>
+                        <th className="px-6 py-4 font-medium">Transportista</th>
+                        <th className="px-6 py-4 font-medium">Ubicación</th>
+                        <th className="px-6 py-4 font-medium">Estado</th>
+                        <th className="px-6 py-4 font-medium">Progreso</th>
+                        <th className="px-6 py-4 font-medium text-right">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {filteredShipments.map((shipment) => (
+                        <tr
+                          key={shipment.id}
+                          className="group hover:bg-muted/50 cursor-pointer transition-all"
+                          onClick={() => openTrackingModal(shipment)}
+                        >
+                          <td className="px-6 py-4">
+                            <span className="font-mono text-sm font-bold text-blue-600">{shipment.id}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 rounded-lg flex items-center justify-center">
+                                <User size={14} className="text-foreground dark:text-muted-foreground" />
+                              </div>
+                              <span className="text-sm font-medium text-foreground">{shipment.customer}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium ${
+                              shipment.type === 'Repair'
+                                ? 'bg-orange-100 text-orange-700'
+                                : 'bg-blue-100 text-blue-700'
+                            }`}>
+                              {shipment.type === 'Repair' ? <Wrench size={12} /> : <ShoppingBag size={12} />}
+                              {shipment.type}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 bg-muted dark:bg-muted rounded flex items-center justify-center">
+                                <Package size={12} className="text-muted-foreground" />
+                              </div>
+                              <span className="text-sm text-foreground dark:text-gray-300">{shipment.provider}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-1">
+                              <MapPin size={14} className="text-muted-foreground" />
+                              <span className="text-sm text-foreground dark:text-muted-foreground">{shipment.location}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium border ${getStatusColor(shipment.status)}`}>
+                              {getStatusIcon(shipment.status)}
+                              {getStatusText(shipment.status)}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-24 h-2 bg-muted dark:bg-gray-700 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-500"
+                                  style={{ width: `${shipment.progress}%` }}
+                                />
+                              </div>
+                              <span className="text-xs font-semibold text-foreground dark:text-gray-300">
+                                {shipment.progress}%
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                openTrackingModal(shipment)
+                              }}
+                              className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors opacity-0 group-hover:opacity-100"
+                            >
+                              <Eye size={16} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </main>
 
