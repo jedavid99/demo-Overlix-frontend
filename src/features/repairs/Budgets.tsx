@@ -17,11 +17,26 @@ import {
   MdVisibility,
   MdEdit,
   MdDelete,
+  MdSave,
+  MdPerson,
+  MdPhone,
+  MdDevices,
+  MdBuild,
+  MdAttachMoney,
 } from 'react-icons/md'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card'
 import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
 import { Skeleton } from '@/shared/components/ui/skeleton'
+import { Input } from '@/shared/components/ui/input'
+import { Label } from '@/shared/components/ui/label'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/shared/components/ui/dialog'
 import { exportToCSV } from '@/shared/lib/export'
 
 // Tipos
@@ -60,6 +75,20 @@ const Budgets = () => {
   const [budgets, setBudgets] = useState<Budget[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
+
+  // Estado del modal
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [newBudget, setNewBudget] = useState({
+    clientName: '',
+    clientPhone: '',
+    device: '',
+    deviceType: '',
+    issue: '',
+    total: 0,
+    technician: '',
+  })
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     // 🔌 Conectar con API real:
@@ -140,6 +169,59 @@ const Budgets = () => {
     return variants[status] as 'warning' | 'success' | 'destructive' | 'default'
   }
 
+  // Manejadores del modal
+  const handleNewBudgetChange = (field: string, value: string | number) => {
+    setNewBudget((prev) => ({ ...prev, [field]: value }))
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: '' }))
+    }
+  }
+
+  const validateNewBudget = (): boolean => {
+    const newErrors: Record<string, string> = {}
+    if (!newBudget.clientName.trim()) newErrors.clientName = 'El nombre del cliente es obligatorio'
+    if (!newBudget.clientPhone.trim()) newErrors.clientPhone = 'El teléfono es obligatorio'
+    if (!newBudget.device.trim()) newErrors.device = 'El dispositivo es obligatorio'
+    if (!newBudget.deviceType.trim()) newErrors.deviceType = 'El tipo de dispositivo es obligatorio'
+    if (!newBudget.issue.trim()) newErrors.issue = 'El problema es obligatorio'
+    if (!newBudget.total || newBudget.total <= 0) newErrors.total = 'El total debe ser mayor a 0'
+    if (!newBudget.technician.trim()) newErrors.technician = 'El técnico es obligatorio'
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleSaveBudget = async () => {
+    if (!validateNewBudget()) return
+    setIsSubmitting(true)
+    
+    // Simular llamada a la API
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    
+    const budget: Budget = {
+      id: `BUD-${Date.now()}`,
+      ...newBudget,
+      status: 'Pendiente',
+      date: new Date(),
+    }
+    
+    setBudgets((prev) => [budget, ...prev])
+    setIsModalOpen(false)
+    setNewBudget({
+      clientName: '',
+      clientPhone: '',
+      device: '',
+      deviceType: '',
+      issue: '',
+      total: 0,
+      technician: '',
+    })
+    setErrors({})
+    setIsSubmitting(false)
+  }
+
+  const deviceTypes = ['Celular', 'Tablet', 'Portátil', 'Consola', 'Smartwatch', 'Otro']
+  const technicians = ['Carlos López', 'Ana Martínez', 'Pedro Sánchez', 'Laura Díaz']
+
   if (loading) {
     return (
       <motion.div
@@ -199,7 +281,7 @@ const Budgets = () => {
             <MdFileDownload size={18} />
             Exportar
           </Button>
-          <Button onClick={() => navigate('/budgets/add')} className="gap-2">
+          <Button onClick={() => setIsModalOpen(true)} className="gap-2">
             <MdAdd size={18} />
             Nuevo presupuesto
           </Button>
@@ -491,6 +573,199 @@ const Budgets = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Modal para agregar nuevo presupuesto */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold flex items-center gap-2">
+              <MdAdd size={20} className="text-primary" />
+              Nuevo Presupuesto
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Datos del cliente */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Datos del Cliente</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label htmlFor="clientName" className="text-xs font-semibold">
+                    Nombre <span className="text-destructive">*</span>
+                  </Label>
+                  <div className="relative">
+                    <MdPerson size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="clientName"
+                      value={newBudget.clientName}
+                      onChange={(e) => handleNewBudgetChange('clientName', e.target.value)}
+                      placeholder="Juan Pérez"
+                      className={`pl-9 h-9 text-sm ${errors.clientName ? 'border-destructive' : ''}`}
+                    />
+                  </div>
+                  {errors.clientName && (
+                    <p className="text-[10px] text-destructive flex items-center gap-1">
+                      <MdErrorOutline size={12} /> {errors.clientName}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="clientPhone" className="text-xs font-semibold">
+                    Teléfono <span className="text-destructive">*</span>
+                  </Label>
+                  <div className="relative">
+                    <MdPhone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="clientPhone"
+                      value={newBudget.clientPhone}
+                      onChange={(e) => handleNewBudgetChange('clientPhone', e.target.value)}
+                      placeholder="+54 11 1234-5678"
+                      className={`pl-9 h-9 text-sm ${errors.clientPhone ? 'border-destructive' : ''}`}
+                    />
+                  </div>
+                  {errors.clientPhone && (
+                    <p className="text-[10px] text-destructive flex items-center gap-1">
+                      <MdErrorOutline size={12} /> {errors.clientPhone}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Datos del dispositivo */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Datos del Dispositivo</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label htmlFor="device" className="text-xs font-semibold">
+                    Dispositivo <span className="text-destructive">*</span>
+                  </Label>
+                  <div className="relative">
+                    <MdDevices size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="device"
+                      value={newBudget.device}
+                      onChange={(e) => handleNewBudgetChange('device', e.target.value)}
+                      placeholder="iPhone 13 Pro"
+                      className={`pl-9 h-9 text-sm ${errors.device ? 'border-destructive' : ''}`}
+                    />
+                  </div>
+                  {errors.device && (
+                    <p className="text-[10px] text-destructive flex items-center gap-1">
+                      <MdErrorOutline size={12} /> {errors.device}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="deviceType" className="text-xs font-semibold">
+                    Tipo <span className="text-destructive">*</span>
+                  </Label>
+                  <select
+                    id="deviceType"
+                    value={newBudget.deviceType}
+                    onChange={(e) => handleNewBudgetChange('deviceType', e.target.value)}
+                    className={`w-full h-9 px-3 rounded-lg border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${errors.deviceType ? 'border-destructive' : ''}`}
+                  >
+                    <option value="">Seleccionar tipo</option>
+                    {deviceTypes.map((type) => (
+                      <option key={type} value={type}>{type}</option>
+                    ))}
+                  </select>
+                  {errors.deviceType && (
+                    <p className="text-[10px] text-destructive flex items-center gap-1">
+                      <MdErrorOutline size={12} /> {errors.deviceType}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="issue" className="text-xs font-semibold">
+                  Problema <span className="text-destructive">*</span>
+                </Label>
+                <div className="relative">
+                  <MdBuild size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    id="issue"
+                    value={newBudget.issue}
+                    onChange={(e) => handleNewBudgetChange('issue', e.target.value)}
+                    placeholder="Pantalla rota, no enciende, etc."
+                    className={`pl-9 h-9 text-sm ${errors.issue ? 'border-destructive' : ''}`}
+                  />
+                </div>
+                {errors.issue && (
+                  <p className="text-[10px] text-destructive flex items-center gap-1">
+                    <MdErrorOutline size={12} /> {errors.issue}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Costo y técnico */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Costo y Asignación</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label htmlFor="total" className="text-xs font-semibold">
+                    Total ($)<span className="text-destructive">*</span>
+                  </Label>
+                  <div className="relative">
+                    <MdAttachMoney size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="total"
+                      type="number"
+                      step="0.01"
+                      value={newBudget.total}
+                      onChange={(e) => handleNewBudgetChange('total', parseFloat(e.target.value) || 0)}
+                      placeholder="0.00"
+                      className={`pl-9 h-9 text-sm ${errors.total ? 'border-destructive' : ''}`}
+                    />
+                  </div>
+                  {errors.total && (
+                    <p className="text-[10px] text-destructive flex items-center gap-1">
+                      <MdErrorOutline size={12} /> {errors.total}
+                    </p>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="technician" className="text-xs font-semibold">
+                    Técnico <span className="text-destructive">*</span>
+                  </Label>
+                  <select
+                    id="technician"
+                    value={newBudget.technician}
+                    onChange={(e) => handleNewBudgetChange('technician', e.target.value)}
+                    className={`w-full h-9 px-3 rounded-lg border border-input bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${errors.technician ? 'border-destructive' : ''}`}
+                  >
+                    <option value="">Seleccionar técnico</option>
+                    {technicians.map((tech) => (
+                      <option key={tech} value={tech}>{tech}</option>
+                    ))}
+                  </select>
+                  {errors.technician && (
+                    <p className="text-[10px] text-destructive flex items-center gap-1">
+                      <MdErrorOutline size={12} /> {errors.technician}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsModalOpen(false)} disabled={isSubmitting}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSaveBudget} disabled={isSubmitting} className="gap-2">
+              {isSubmitting ? (
+                <span className="animate-spin">⟳</span>
+              ) : (
+                <MdSave size={16} />
+              )}
+              {isSubmitting ? 'Guardando...' : 'Guardar presupuesto'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   )
 }
