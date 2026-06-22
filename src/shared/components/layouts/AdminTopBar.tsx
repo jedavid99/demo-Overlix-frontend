@@ -19,8 +19,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '../../components/ui/popover'
-import { NotificationList } from '../notifications/NotificationList'
-import { Notification } from '../notifications/notification.types'
+import { SimpleNotifications, SimpleNotification } from '../notifications/SimpleNotifications'
 
 const categories = [
   { value: 'all', label: 'Todo', placeholder: 'Buscar en Overlix...', route: '/dashboard' },
@@ -78,17 +77,14 @@ export const AdminTopBar = ({
     }
   }
 
-  const [notifications, setNotifications] = useState<Notification[]>([
+  const [notifications, setNotifications] = useState<SimpleNotification[]>([
     { 
       id: 1, 
       title: 'Nueva venta registrada', 
       description: 'Venta #SALE-4567 por $1,299.00',
       time: 'Hace 5 min', 
       icon: '💰', 
-      color: 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400',
-      read: false,
-      type: 'sale',
-      link: '/sales'
+      read: false
     },
     { 
       id: 2, 
@@ -96,10 +92,7 @@ export const AdminTopBar = ({
       description: 'Solo 3 unidades disponibles',
       time: 'Hace 1 h', 
       icon: '📦', 
-      color: 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400',
-      read: false,
-      type: 'stock',
-      link: '/stock'
+      read: false
     },
     { 
       id: 3, 
@@ -107,10 +100,7 @@ export const AdminTopBar = ({
       description: 'iPhone 14 Pro - Pantalla reemplazada',
       time: 'Hace 2 h', 
       icon: '🔧', 
-      color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
-      read: false,
-      type: 'repair',
-      link: '/reparaciones/list'
+      read: false
     },
     { 
       id: 4, 
@@ -118,10 +108,7 @@ export const AdminTopBar = ({
       description: 'María González - Cliente VIP',
       time: 'Hace 3 h', 
       icon: '👤', 
-      color: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
-      read: true,
-      type: 'client',
-      link: '/clients'
+      read: true
     },
     { 
       id: 5, 
@@ -129,10 +116,7 @@ export const AdminTopBar = ({
       description: 'En camino al cliente',
       time: 'Hace 4 h', 
       icon: '🚚', 
-      color: 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400',
-      read: true,
-      type: 'shipment',
-      link: '/envios/tracking'
+      read: true
     },
   ])
 
@@ -224,13 +208,13 @@ export const AdminTopBar = ({
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent align="end" className="w-[400px] p-0 max-h-[70vh] overflow-hidden z-50">
-            <NotificationList
+          <PopoverContent align="end" className="p-0 z-50">
+            <SimpleNotifications
               notifications={notifications}
-              onNotificationRead={handleNotificationRead}
-              onNotificationDelete={handleNotificationDelete}
+              onRead={handleNotificationRead}
+              onDelete={handleNotificationDelete}
               onMarkAllRead={handleMarkAllRead}
-              onViewAll={handleViewAll}
+              unreadCount={unreadCount}
             />
           </PopoverContent>
         </Popover>
