@@ -9,73 +9,53 @@ export default function Expenses() {
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [paymentFilter, setPaymentFilter] = useState('all')
 
-  const expenses = [
-    {
-      id: 1,
-      date: 'Oct 24, 2023',
-      description: 'OLED Screens (iPhone 13)',
-      category: 'Parts',
-      categoryColor: 'blue',
-      supplier: 'TechDistri Co.',
-      amount: 1250.00,
-      status: 'Paid',
-    },
-    {
-      id: 2,
-      date: 'Oct 22, 2023',
-      description: 'Main Shop Monthly Rent',
-      category: 'Rent',
-      categoryColor: 'purple',
-      supplier: 'Skyline Realty',
-      amount: 3500.00,
-      status: 'Pending',
-    },
-    {
-      id: 3,
-      date: 'Oct 20, 2023',
-      description: 'Bi-weekly Staff Salaries',
-      category: 'Salaries',
-      categoryColor: 'rose',
-      supplier: 'Internal Payroll',
-      amount: 4800.00,
-      status: 'Paid',
-    },
-    {
-      id: 4,
-      date: 'Oct 18, 2023',
-      description: 'Advanced Microsoldering Station',
-      category: 'Tools',
-      categoryColor: 'amber',
-      supplier: 'PrecisionTools Inc.',
-      amount: 850.00,
-      status: 'Paid',
-    },
-    {
-      id: 5,
-      date: 'Oct 15, 2023',
-      description: 'Logitech Mouse/Keyboard Bulk',
-      category: 'Parts',
-      categoryColor: 'blue',
-      supplier: 'LogiSupplies',
-      amount: 620.00,
-      status: 'Pending',
-    },
-  ]
+  // 📦 Datos de muestra ELIMINADOS – array vacío (cargar desde API)
+  const expenses: {
+    id: number
+    date: string
+    description: string
+    category: string
+    categoryColor: string
+    supplier: string
+    amount: number
+    status: string
+  }[] = []
+
+  // KPIs calculados (todos en 0)
+  const totalMonth = expenses.reduce((sum, e) => sum + e.amount, 0)
+  const pendingCount = expenses.filter(e => e.status === 'Pending').length
+  const pendingApproval = expenses.filter(e => e.status === 'Pending').length // simplificado
+
+  // Agrupar por categoría para el gráfico (vacío)
+  const categoryTotals: Record<string, number> = {}
+  expenses.forEach(e => {
+    categoryTotals[e.category] = (categoryTotals[e.category] || 0) + e.amount
+  })
+  const categories = Object.keys(categoryTotals)
+  const totalSpent = Object.values(categoryTotals).reduce((a, b) => a + b, 0)
+
+  // Colores para el gráfico (solo si hay datos)
+  const categoryColors: Record<string, string> = {
+    Parts: 'text-primary',
+    Rent: 'text-purple-500',
+    Salaries: 'text-rose-500',
+    Tools: 'text-amber-500',
+  }
 
   const getCategoryBadge = (color: string) => {
     switch (color) {
-      case 'blue': return { variant: 'default' as const };
-      case 'purple': return { variant: 'secondary' as const };
-      case 'rose': return { variant: 'destructive' as const };
-      case 'amber': return { variant: 'warning' as const };
-      default: return { variant: 'outline' as const };
+      case 'blue': return { variant: 'default' as const }
+      case 'purple': return { variant: 'secondary' as const }
+      case 'rose': return { variant: 'destructive' as const }
+      case 'amber': return { variant: 'warning' as const }
+      default: return { variant: 'outline' as const }
     }
   }
 
   const getStatusBadge = (status: string) => {
-    return status === 'Paid' 
+    return status === 'Paid'
       ? { variant: 'success' as const }
-      : { variant: 'warning' as const };
+      : { variant: 'warning' as const }
   }
 
   return (
@@ -100,10 +80,9 @@ export default function Expenses() {
                 <AlertCircle className="h-5 w-5 text-primary" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-foreground mb-2">$12,450.00</p>
-            <div className="flex items-center gap-1 text-green-600 text-sm mt-2">
-              <TrendingUp size={16} />
-              <span>+12.5% vs mes anterior</span>
+            <p className="text-3xl font-bold text-foreground mb-2">${totalMonth.toFixed(2)}</p>
+            <div className="flex items-center gap-1 text-muted-foreground text-sm mt-2">
+              <span>Sin datos disponibles</span>
             </div>
           </CardContent>
         </Card>
@@ -116,8 +95,8 @@ export default function Expenses() {
                 <Clock className="h-5 w-5 text-orange-500" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-foreground mb-2">8 Pagos</p>
-            <p className="text-muted-foreground text-sm mt-2">Esperando aprobación: 3</p>
+            <p className="text-3xl font-bold text-foreground mb-2">{pendingCount}</p>
+            <p className="text-muted-foreground text-sm mt-2">Esperando aprobación: {pendingApproval}</p>
           </CardContent>
         </Card>
 
@@ -129,8 +108,8 @@ export default function Expenses() {
                 <PieChart className="h-5 w-5 text-purple-500" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-foreground mb-2">Partes</p>
-            <p className="text-muted-foreground text-sm mt-2">42% del gasto mensual</p>
+            <p className="text-3xl font-bold text-foreground mb-2">—</p>
+            <p className="text-muted-foreground text-sm mt-2">Sin datos</p>
           </CardContent>
         </Card>
       </div>
@@ -189,47 +168,63 @@ export default function Expenses() {
 
           <Card>
             <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-muted/30 border-b border-border">
-                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Fecha</th>
-                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Descripción</th>
-                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Categoría</th>
-                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Proveedor</th>
-                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Monto</th>
-                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-center">Estado</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {expenses.map(expense => (
-                      <tr key={expense.id} className="hover:bg-muted/50 transition-colors">
-                        <td className="px-6 py-4 text-sm text-muted-foreground">{expense.date}</td>
-                        <td className="px-6 py-4 text-sm font-semibold text-foreground">{expense.description}</td>
-                        <td className="px-6 py-4 text-sm">
-                          <Badge variant={getCategoryBadge(expense.categoryColor).variant}>
-                            {expense.category}
-                          </Badge>
-                        </td>
-                        <td className="px-6 py-4 text-sm text-muted-foreground">{expense.supplier}</td>
-                        <td className="px-6 py-4 text-sm font-semibold text-foreground">${expense.amount.toFixed(2)}</td>
-                        <td className="px-6 py-4 text-center">
-                          <Badge variant={getStatusBadge(expense.status).variant}>
-                            {expense.status}
-                          </Badge>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className="p-4 border-t border-border flex items-center justify-between">
-                <p className="text-xs text-muted-foreground font-medium">Mostrando 5 de 42 gastos</p>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" disabled>Anterior</Button>
-                  <Button variant="default" size="sm">Siguiente</Button>
+              {expenses.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-center">
+                  <AlertCircle size={48} className="text-muted-foreground/40 mb-4" />
+                  <p className="text-lg font-semibold text-foreground mb-1">No hay gastos</p>
+                  <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                    Aún no hay gastos registrados. Agrega tu primer gasto para comenzar a monitorear los costos.
+                  </p>
+                  <Button variant="outline" className="mt-4">
+                    <Plus size={16} className="mr-2" />
+                    Nuevo gasto
+                  </Button>
                 </div>
-              </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-muted/30 border-b border-border">
+                        <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Fecha</th>
+                        <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Descripción</th>
+                        <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Categoría</th>
+                        <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Proveedor</th>
+                        <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Monto</th>
+                        <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground text-center">Estado</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {expenses.map(expense => (
+                        <tr key={expense.id} className="hover:bg-muted/50 transition-colors">
+                          <td className="px-6 py-4 text-sm text-muted-foreground">{expense.date}</td>
+                          <td className="px-6 py-4 text-sm font-semibold text-foreground">{expense.description}</td>
+                          <td className="px-6 py-4 text-sm">
+                            <Badge variant={getCategoryBadge(expense.categoryColor).variant}>
+                              {expense.category}
+                            </Badge>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-muted-foreground">{expense.supplier}</td>
+                          <td className="px-6 py-4 text-sm font-semibold text-foreground">${expense.amount.toFixed(2)}</td>
+                          <td className="px-6 py-4 text-center">
+                            <Badge variant={getStatusBadge(expense.status).variant}>
+                              {expense.status}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              {expenses.length > 0 && (
+                <div className="p-4 border-t border-border flex items-center justify-between">
+                  <p className="text-xs text-muted-foreground font-medium">Mostrando {expenses.length} de {expenses.length} gastos</p>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" disabled>Anterior</Button>
+                    <Button variant="default" size="sm">Siguiente</Button>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -242,48 +237,37 @@ export default function Expenses() {
                 Distribución por Categoría
               </h3>
 
-              <div className="relative w-48 h-48 mx-auto mb-8">
-                <svg className="w-full h-full" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="18" className="text-primary" strokeDasharray="94 345" />
-                  <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="18" className="text-purple-500" strokeDasharray="91 345" strokeDashoffset="-94" />
-                  <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="18" className="text-rose-500" strokeDasharray="125 345" strokeDashoffset="-185" />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center flex-col">
-                  <span className="text-xs font-semibold text-muted-foreground">Total</span>
-                  <span className="text-xl font-bold text-foreground">$12.4k</span>
+              {expenses.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p className="font-medium">Sin datos</p>
+                  <p className="text-sm">Agrega gastos para ver la distribución</p>
                 </div>
-              </div>
+              ) : (
+                <>
+                  <div className="relative w-48 h-48 mx-auto mb-8">
+                    <svg className="w-full h-full" viewBox="0 0 100 100">
+                      {/* Aquí iría el gráfico dinámico con los datos reales */}
+                      <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="18" className="text-muted/30" />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center flex-col">
+                      <span className="text-xs font-semibold text-muted-foreground">Total</span>
+                      <span className="text-xl font-bold text-foreground">${totalSpent.toFixed(2)}</span>
+                    </div>
+                  </div>
 
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="size-3 rounded-full bg-rose-500" />
-                    <span className="text-sm font-medium text-foreground">Salarios</span>
+                  <div className="space-y-4">
+                    {categories.map(cat => (
+                      <div key={cat} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className={`size-3 rounded-full ${categoryColors[cat] || 'bg-muted'}`} />
+                          <span className="text-sm font-medium text-foreground">{cat}</span>
+                        </div>
+                        <span className="text-sm font-semibold text-foreground">${categoryTotals[cat]?.toFixed(2)}</span>
+                      </div>
+                    ))}
                   </div>
-                  <span className="text-sm font-semibold text-foreground">$4,800</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="size-3 rounded-full bg-purple-500" />
-                    <span className="text-sm font-medium text-foreground">Renta</span>
-                  </div>
-                  <span className="text-sm font-semibold text-foreground">$3,500</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="size-3 rounded-full bg-primary" />
-                    <span className="text-sm font-medium text-foreground">Partes</span>
-                  </div>
-                  <span className="text-sm font-semibold text-foreground">$3,300</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="size-3 rounded-full bg-amber-500" />
-                    <span className="text-sm font-medium text-foreground">Herramientas</span>
-                  </div>
-                  <span className="text-sm font-semibold text-foreground">$850</span>
-                </div>
-              </div>
+                </>
+              )}
 
               <Button variant="outline" className="w-full mt-6">
                 Ver reporte detallado
@@ -297,20 +281,19 @@ export default function Expenses() {
                 <Info size={16} />
                 Insights Rápidos
               </h4>
-              <ul className="space-y-4">
-                <li className="flex gap-3">
-                  <Info size={20} className="text-primary flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-foreground">
-                    Gastos en partes <span className="font-semibold text-primary">15% más altos</span> que el promedio esta semana.
-                  </p>
-                </li>
-                <li className="flex gap-3">
-                  <Info size={20} className="text-primary flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-foreground">
-                    Ahorraste <span className="font-semibold text-primary">$200</span> en renta por pago anticipado.
-                  </p>
-                </li>
-              </ul>
+              {expenses.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Sin insights disponibles. Registra gastos para obtener análisis.</p>
+              ) : (
+                <ul className="space-y-4">
+                  {/* Aquí irían insights reales basados en datos */}
+                  <li className="flex gap-3">
+                    <Info size={20} className="text-primary flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-foreground">
+                      <span className="font-semibold text-primary">Sin análisis</span> aún. Conecta datos reales para obtener insights.
+                    </p>
+                  </li>
+                </ul>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -318,4 +301,3 @@ export default function Expenses() {
     </div>
   )
 }
-
