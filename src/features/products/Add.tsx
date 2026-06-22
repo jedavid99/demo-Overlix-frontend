@@ -16,7 +16,6 @@ import {
   Plus,
   Tag,
   Layers,
-  Barcode,
   MapPin,
   Percent,
 } from 'lucide-react'
@@ -25,6 +24,7 @@ import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
 import { Badge } from '@/shared/components/ui/badge'
+import { MdBarcodeReader } from 'react-icons/md'
 
 export default function StockAdd() {
   const navigate = useNavigate()
@@ -159,7 +159,7 @@ export default function StockAdd() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="sku" className="text-sm font-semibold flex items-center gap-1">
-                  <Barcode size={14} className="text-muted-foreground" />
+                  <MdBarcodeReader size={14} className="text-muted-foreground" />
                   SKU
                 </Label>
                 <Input
