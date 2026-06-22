@@ -271,10 +271,7 @@ export default function Repuestos() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm">
-              <Download size={16} className="mr-2" />
-              Exportar
-            </Button>
+           
             <Button onClick={() => setIsModalOpen(true)}>
               <Plus size={16} className="mr-2" />
               Agregar repuesto
