@@ -33,7 +33,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu'
-import { useNavigate } from 'react-router-dom'
 
 // Types
 interface StockItem {
@@ -55,8 +54,6 @@ const stockItems: StockItem[] = []
 // Categorías y estados para filtros
 const categories = ['all', 'phone', 'pc', 'console']
 const statusOptions = ['all', 'good', 'low', 'out']
-
-  const navigate = useNavigate()
 
 export default function Stock() {
   const [searchTerm, setSearchTerm] = useState('')
@@ -195,7 +192,7 @@ export default function Stock() {
             <Download size={16} className="mr-2" />
             Exportar
           </Button>
-          <Button onClick={() => navigate('/stock/add')}>
+          <Button onClick={h}>
             <Plus size={16} className="mr-2" />
             Agregar producto
           </Button>
