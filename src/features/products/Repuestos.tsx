@@ -31,7 +31,6 @@ import { Input } from '@/shared/components/ui/input'
 import { Badge } from '@/shared/components/ui/badge'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Label } from '@/shared/components/ui/label'
-import { Textarea } from '@/shared/components/ui/textarea'
 import {
   Dialog,
   DialogContent,
@@ -185,7 +184,7 @@ export default function Repuestos() {
     }))
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault()
       addCompatibility(compatibilityInput)
@@ -680,17 +679,20 @@ export default function Repuestos() {
               </div>
             </div>
 
-            {/* Descripción */}
+            {/* Descripción - usando textarea nativo para evitar errores de importación */}
             <div className="space-y-2">
               <Label htmlFor="description" className="text-sm font-semibold">
                 Descripción
               </Label>
-              <Textarea
+              <textarea
                 id="description"
                 value={newRepuesto.description}
-                onChange={(e) => handleNewRepuestoChange('description', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  handleNewRepuestoChange('description', e.target.value)
+                }
                 placeholder="Detalles adicionales del repuesto..."
                 rows={3}
+                className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
               />
             </div>
 
