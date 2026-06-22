@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   Search,
   Bell,
@@ -13,10 +13,35 @@ import {
   Info,
   Save,
   X,
-} from 'lucide-react';
+  Plus,
+  Image,
+  AlertCircle,
+} from 'lucide-react'
+import { Card, CardContent } from '@/shared/components/ui/card'
+import { Button } from '@/shared/components/ui/button'
+import { Input } from '@/shared/components/ui/input'
+import { Label } from '@/shared/components/ui/label'
+import { Badge } from '@/shared/components/ui/badge'
+import { Skeleton } from '@/shared/components/ui/skeleton'
+
+interface IPhoneFormData {
+  model: string
+  storage: string
+  color: string
+  condition: 'New' | 'Refurbished'
+  imei1: string
+  imei2: string
+  serialNumber: string
+  partNumber: string
+  supplier: string
+  purchaseDate: string
+  purchaseCost: string
+  retailPrice: string
+  taxRate: string
+}
 
 export default function IPhoneInventory() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<IPhoneFormData>({
     model: 'iPhone 15 Pro Max',
     storage: '256 GB',
     color: 'Titanium Black',
@@ -30,345 +55,399 @@ export default function IPhoneInventory() {
     purchaseCost: '',
     retailPrice: '1199.00',
     taxRate: '8.5',
-  });
+  })
 
-  const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([]);
-  const [autoSaveTime] = useState('14:24');
+  const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([])
+  const [autoSaveTime] = useState('14:24')
+  const [isSaving, setIsSaving] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  const handleInputChange = (field: keyof IPhoneFormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+    // Limpiar error al modificar
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: '' }))
+    }
+  }
+
+  const validate = (): boolean => {
+    const newErrors: Record<string, string> = {}
+    if (!formData.model) newErrors.model = 'Selecciona un modelo'
+    if (!formData.storage) newErrors.storage = 'Selecciona capacidad'
+    if (!formData.imei1 || formData.imei1.length < 14) {
+      newErrors.imei1 = 'IMEI inválido (15 dígitos)'
+    }
+    if (!formData.serialNumber) newErrors.serialNumber = 'Número de serie requerido'
+    if (!formData.purchaseCost || parseFloat(formData.purchaseCost) <= 0) {
+      newErrors.purchaseCost = 'Costo de compra inválido'
+    }
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleSubmit = () => {
+    if (!validate()) return
+    setIsSaving(true)
+    // Simular envío a API
+    setTimeout(() => {
+      alert('Producto agregado al inventario')
+      setIsSaving(false)
+    }, 1500)
+  }
 
   const calculatedMargin = formData.retailPrice && formData.purchaseCost
     ? (((parseFloat(formData.retailPrice) - parseFloat(formData.purchaseCost)) / parseFloat(formData.retailPrice)) * 100).toFixed(1)
-    : '0.0';
+    : '0.0'
 
   const projectedProfit = formData.retailPrice && formData.purchaseCost
     ? (parseFloat(formData.retailPrice) - parseFloat(formData.purchaseCost)).toFixed(2)
-    : '0.00';
+    : '0.00'
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files) return
+    // Simular carga de fotos (convertir a URLs locales)
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader()
+      reader.onload = (ev) => {
+        if (ev.target?.result) {
+          setUploadedPhotos((prev) => [...prev, ev.target!.result as string])
+        }
+      }
+      reader.readAsDataURL(file)
+    })
+  }
+
+  const colors = [
+    { name: 'Titanium Black', value: 'Titanium Black', class: 'bg-slate-800' },
+    { name: 'Natural Titanium', value: 'Natural Titanium', class: 'bg-slate-200' },
+    { name: 'Blue Titanium', value: 'Blue Titanium', class: 'bg-blue-200' },
+    { name: 'White Titanium', value: 'White Titanium', class: 'bg-white' },
+  ]
+
+  const models = ['iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15 Plus', 'iPhone 15']
+  const storageOptions = ['128 GB', '256 GB', '512 GB', '1 TB']
+  const suppliers = ['Apple Inc. Official', 'Tech Distribution Co.', 'Global Wholesale']
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col">
-      {/* Navigation */}
-      
-
-      <main className="flex-1 flex justify-center py-8">
-        <div className="max-w-5xl flex-1 px-4">
-          {/* Breadcrumbs */}
-         
-
-          {/* Header */}
-          <div className="flex flex-wrap justify-between items-end gap-4 mb-8">
-            <div className="flex flex-col gap-2">
-              <h1 className="text-4xl font-black text-slate-900 dark:text-white">Add iPhone to Inventory</h1>
-              <p className="text-slate-500 dark:text-slate-400 text-base">Complete the technical and financial specifications for new stock.</p>
-            </div>
-            <div className="flex gap-3">
-              <button className="flex items-center justify-center rounded-lg h-10 px-4 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-sm font-bold hover:bg-slate-300 dark:hover:bg-slate-700">
-                Save as Draft
-              </button>
-              <button className="flex items-center justify-center rounded-lg h-10 px-6 bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 shadow-lg shadow-blue-600/20">
-                Confirm & Add to Stock
-              </button>
-            </div>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">Agregar iPhone al Inventario</h1>
+            <p className="text-sm text-muted-foreground">Completa las especificaciones técnicas y financieras para el nuevo stock.</p>
           </div>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="sm">
+              Guardar borrador
+            </Button>
+            <Button onClick={handleSubmit} size="sm" disabled={isSaving}>
+              {isSaving ? 'Guardando...' : 'Confirmar y agregar'}
+            </Button>
+          </div>
+        </div>
 
-          {/* Form Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            {/* Left Column */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* 1. Model & Specifications */}
-              <section className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="size-8 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-lg">
-                    <Smartphone size={20} />
-                  </div>
-                  <h2 className="text-slate-900 dark:text-white text-lg font-bold">1. Model & Specifications</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Columna izquierda (2/3) */}
+          <div className="lg:col-span-2 space-y-4">
+            {/* Sección 1: Modelo y especificaciones */}
+            <Card>
+              <CardContent className="p-5 space-y-4">
+                <div className="flex items-center gap-2 border-b border-border pb-3">
+                  <Smartphone size={18} className="text-primary" />
+                  <h2 className="text-sm font-bold text-foreground">1. Modelo y especificaciones</h2>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">iPhone Model</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <Label htmlFor="model" className="text-xs font-semibold">Modelo</Label>
                     <select
+                      id="model"
                       value={formData.model}
                       onChange={(e) => handleInputChange('model', e.target.value)}
-                      className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full h-9 px-3 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     >
-                      <option>iPhone 15 Pro Max</option>
-                      <option>iPhone 15 Pro</option>
-                      <option>iPhone 15 Plus</option>
-                      <option>iPhone 15</option>
+                      {models.map((m) => (
+                        <option key={m} value={m}>{m}</option>
+                      ))}
                     </select>
+                    {errors.model && (
+                      <p className="text-[10px] text-destructive flex items-center gap-1"><AlertCircle size={12} /> {errors.model}</p>
+                    )}
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Storage Capacity</label>
+                  <div className="space-y-1">
+                    <Label htmlFor="storage" className="text-xs font-semibold">Capacidad</Label>
                     <select
+                      id="storage"
                       value={formData.storage}
                       onChange={(e) => handleInputChange('storage', e.target.value)}
-                      className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full h-9 px-3 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     >
-                      <option>128 GB</option>
-                      <option>256 GB</option>
-                      <option>512 GB</option>
-                      <option>1 TB</option>
+                      {storageOptions.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
                     </select>
+                    {errors.storage && (
+                      <p className="text-[10px] text-destructive flex items-center gap-1"><AlertCircle size={12} /> {errors.storage}</p>
+                    )}
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Finish / Color</label>
-                    <div className="flex gap-2 mt-1">
-                      <button
-                        onClick={() => handleInputChange('color', 'Titanium Black')}
-                        className={`size-8 rounded-full bg-slate-800 border-2 ring-2 transition-all ${
-                          formData.color === 'Titanium Black' ? 'border-blue-600 ring-blue-600' : 'border-slate-300 ring-white dark:ring-slate-900'
-                        }`}
-                        title="Titanium Black"
-                      />
-                      <button
-                        onClick={() => handleInputChange('color', 'Natural Titanium')}
-                        className={`size-8 rounded-full bg-slate-200 border-2 transition-all ${
-                          formData.color === 'Natural Titanium' ? 'border-blue-600 ring-2 ring-blue-600' : 'border-slate-300'
-                        }`}
-                        title="Natural Titanium"
-                      />
-                      <button
-                        onClick={() => handleInputChange('color', 'Blue Titanium')}
-                        className={`size-8 rounded-full bg-blue-200 border-2 transition-all ${
-                          formData.color === 'Blue Titanium' ? 'border-blue-600 ring-2 ring-blue-600' : 'border-slate-300'
-                        }`}
-                        title="Blue Titanium"
-                      />
-                      <button
-                        onClick={() => handleInputChange('color', 'White Titanium')}
-                        className={`size-8 rounded-full bg-white border-2 transition-all ${
-                          formData.color === 'White Titanium' ? 'border-blue-600 ring-2 ring-blue-600' : 'border-slate-300'
-                        }`}
-                        title="White Titanium"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Condition</label>
+                  <div className="space-y-1">
+                    <Label className="text-xs font-semibold">Color</Label>
                     <div className="flex gap-2">
-                      <button
-                        onClick={() => handleInputChange('condition', 'New')}
-                        className={`flex-1 py-2 px-3 text-sm font-medium rounded-lg transition-all ${
-                          formData.condition === 'New'
-                            ? 'border-2 border-blue-600 bg-blue-50 dark:bg-blue-900/20 text-blue-600'
-                            : 'border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-                        }`}
-                      >
-                        New
-                      </button>
-                      <button
-                        onClick={() => handleInputChange('condition', 'Refurbished')}
-                        className={`flex-1 py-2 px-3 text-sm font-medium rounded-lg transition-all ${
-                          formData.condition === 'Refurbished'
-                            ? 'border-2 border-blue-600 bg-blue-50 dark:bg-blue-900/20 text-blue-600'
-                            : 'border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400'
-                        }`}
-                      >
-                        Refurbished
-                      </button>
+                      {colors.map((c) => (
+                        <button
+                          key={c.value}
+                          onClick={() => handleInputChange('color', c.value)}
+                          className={`w-8 h-8 rounded-full border-2 transition-all ${
+                            formData.color === c.value
+                              ? 'border-primary ring-2 ring-primary/30'
+                              : 'border-border hover:border-primary/50'
+                          }`}
+                          style={{ backgroundColor: c.value.includes('White') ? '#f5f5f5' : undefined }}
+                          title={c.name}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs font-semibold">Condición</Label>
+                    <div className="flex gap-2">
+                      {['New', 'Refurbished'].map((cond) => (
+                        <button
+                          key={cond}
+                          onClick={() => handleInputChange('condition', cond as 'New' | 'Refurbished')}
+                          className={`flex-1 py-1.5 px-3 text-xs font-medium rounded-lg border transition-all ${
+                            formData.condition === cond
+                              ? 'border-primary bg-primary/5 text-primary'
+                              : 'border-border text-muted-foreground hover:border-primary/40'
+                          }`}
+                        >
+                          {cond === 'New' ? 'Nuevo' : 'Reacondicionado'}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>
-              </section>
+              </CardContent>
+            </Card>
 
-              {/* 2. Unique Identification */}
-              <section className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="size-8 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-lg">
-                    <Fingerprint size={20} />
-                  </div>
-                  <h2 className="text-slate-900 dark:text-white text-lg font-bold">2. Unique Identification</h2>
+            {/* Sección 2: Identificación única */}
+            <Card>
+              <CardContent className="p-5 space-y-4">
+                <div className="flex items-center gap-2 border-b border-border pb-3">
+                  <Fingerprint size={18} className="text-primary" />
+                  <h2 className="text-sm font-bold text-foreground">2. Identificación única</h2>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">IMEI 1</label>
-                    <input
-                      type="text"
-                      placeholder="15-digit number"
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <Label htmlFor="imei1" className="text-xs font-semibold">IMEI 1</Label>
+                    <Input
+                      id="imei1"
                       value={formData.imei1}
                       onChange={(e) => handleInputChange('imei1', e.target.value)}
-                      className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="15 dígitos"
+                      className="h-9 text-sm"
                     />
+                    {errors.imei1 && (
+                      <p className="text-[10px] text-destructive flex items-center gap-1"><AlertCircle size={12} /> {errors.imei1}</p>
+                    )}
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">IMEI 2 (Digital/eSIM)</label>
-                    <input
-                      type="text"
-                      placeholder="Optional"
+                  <div className="space-y-1">
+                    <Label htmlFor="imei2" className="text-xs font-semibold">IMEI 2 (eSIM)</Label>
+                    <Input
+                      id="imei2"
                       value={formData.imei2}
                       onChange={(e) => handleInputChange('imei2', e.target.value)}
-                      className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Opcional"
+                      className="h-9 text-sm"
                     />
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Serial Number</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. G6TXXXXXXX"
+                  <div className="space-y-1">
+                    <Label htmlFor="serialNumber" className="text-xs font-semibold">Número de serie</Label>
+                    <Input
+                      id="serialNumber"
                       value={formData.serialNumber}
                       onChange={(e) => handleInputChange('serialNumber', e.target.value)}
-                      className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Ej. G6TXXXXXXX"
+                      className="h-9 text-sm"
                     />
+                    {errors.serialNumber && (
+                      <p className="text-[10px] text-destructive flex items-center gap-1"><AlertCircle size={12} /> {errors.serialNumber}</p>
+                    )}
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Part Number (MPN)</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. MU7A3LL/A"
+                  <div className="space-y-1">
+                    <Label htmlFor="partNumber" className="text-xs font-semibold">Número de pieza (MPN)</Label>
+                    <Input
+                      id="partNumber"
                       value={formData.partNumber}
                       onChange={(e) => handleInputChange('partNumber', e.target.value)}
-                      className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Ej. MU7A3LL/A"
+                      className="h-9 text-sm"
                     />
                   </div>
                 </div>
-              </section>
+              </CardContent>
+            </Card>
 
-              {/* 3. Sourcing */}
-              <section className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="size-8 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-lg">
-                    <ShoppingCart size={20} />
-                  </div>
-                  <h2 className="text-slate-900 dark:text-white text-lg font-bold">3. Sourcing</h2>
+            {/* Sección 3: Abastecimiento */}
+            <Card>
+              <CardContent className="p-5 space-y-4">
+                <div className="flex items-center gap-2 border-b border-border pb-3">
+                  <ShoppingCart size={18} className="text-primary" />
+                  <h2 className="text-sm font-bold text-foreground">3. Abastecimiento</h2>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Supplier</label>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-1">
+                    <Label htmlFor="supplier" className="text-xs font-semibold">Proveedor</Label>
                     <select
+                      id="supplier"
                       value={formData.supplier}
                       onChange={(e) => handleInputChange('supplier', e.target.value)}
-                      className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full h-9 px-3 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     >
-                      <option>Apple Inc. Official</option>
-                      <option>Tech Distribution Co.</option>
-                      <option>Global Wholesale</option>
+                      {suppliers.map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
                     </select>
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Purchase Date</label>
-                    <input
+                  <div className="space-y-1">
+                    <Label htmlFor="purchaseDate" className="text-xs font-semibold">Fecha de compra</Label>
+                    <Input
+                      id="purchaseDate"
                       type="date"
                       value={formData.purchaseDate}
                       onChange={(e) => handleInputChange('purchaseDate', e.target.value)}
-                      className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="h-9 text-sm"
                     />
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Purchase Cost (USD)</label>
+                  <div className="space-y-1">
+                    <Label htmlFor="purchaseCost" className="text-xs font-semibold">Costo de compra (USD)</Label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">$</span>
-                      <input
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+                      <Input
+                        id="purchaseCost"
                         type="number"
-                        placeholder="0.00"
+                        step="0.01"
                         value={formData.purchaseCost}
                         onChange={(e) => handleInputChange('purchaseCost', e.target.value)}
-                        className="w-full pl-7 pr-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="0.00"
+                        className="h-9 pl-7 text-sm"
                       />
                     </div>
+                    {errors.purchaseCost && (
+                      <p className="text-[10px] text-destructive flex items-center gap-1"><AlertCircle size={12} /> {errors.purchaseCost}</p>
+                    )}
                   </div>
                 </div>
-              </section>
-            </div>
+              </CardContent>
+            </Card>
+          </div>
 
-            {/* Right Column */}
-            <div className="space-y-6">
-              {/* 4. Retail Info */}
-              <section className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="size-8 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-lg">
-                    <Tag size={20} />
-                  </div>
-                  <h2 className="text-slate-900 dark:text-white text-lg font-bold">4. Retail Info</h2>
+          {/* Columna derecha (1/3) */}
+          <div className="space-y-4">
+            {/* Sección 4: Información de venta */}
+            <Card>
+              <CardContent className="p-5 space-y-4">
+                <div className="flex items-center gap-2 border-b border-border pb-3">
+                  <Tag size={18} className="text-primary" />
+                  <h2 className="text-sm font-bold text-foreground">4. Información de venta</h2>
                 </div>
-                <div className="space-y-4">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Retail Price (SRP)</label>
+                <div className="space-y-3">
+                  <div className="space-y-1">
+                    <Label htmlFor="retailPrice" className="text-xs font-semibold">Precio de venta (SRP)</Label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">$</span>
-                      <input
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
+                      <Input
+                        id="retailPrice"
                         type="number"
+                        step="0.01"
                         value={formData.retailPrice}
                         onChange={(e) => handleInputChange('retailPrice', e.target.value)}
-                        className="w-full pl-7 pr-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="0.00"
+                        className="h-9 pl-7 text-sm"
                       />
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Tax (%)</label>
-                    <input
+                  <div className="space-y-1">
+                    <Label htmlFor="taxRate" className="text-xs font-semibold">Impuesto (%)</Label>
+                    <Input
+                      id="taxRate"
                       type="number"
+                      step="0.1"
                       value={formData.taxRate}
                       onChange={(e) => handleInputChange('taxRate', e.target.value)}
-                      className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="0"
+                      className="h-9 text-sm"
                     />
                   </div>
-
-                  {/* Profit Projection Card */}
-                  <div className="mt-4 p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="text-xs font-medium text-slate-500">Projected Margin</span>
-                      <span className="text-xs font-bold text-green-600">+{calculatedMargin}%</span>
+                  <div className="mt-3 p-3 rounded-lg bg-muted/50 border border-border">
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-xs text-muted-foreground">Margen proyectado</span>
+                      <span className="text-xs font-bold text-success">+{calculatedMargin}%</span>
                     </div>
-                    <div className="text-2xl font-black text-slate-900 dark:text-white">${projectedProfit}</div>
-                    <div className="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full mt-3">
+                    <div className="text-xl font-bold text-foreground">${projectedProfit}</div>
+                    <div className="w-full h-1.5 bg-muted rounded-full mt-2 overflow-hidden">
                       <div
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                        className="h-full bg-primary transition-all duration-300"
                         style={{ width: `${Math.min(Math.max(parseFloat(calculatedMargin) / 50 * 100, 0), 100)}%` }}
-                      ></div>
+                      />
                     </div>
                   </div>
                 </div>
-              </section>
+              </CardContent>
+            </Card>
 
-              {/* 5. Media */}
-              <section className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="size-8 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 text-blue-600 rounded-lg">
-                    <Camera size={20} />
-                  </div>
-                  <h2 className="text-slate-900 dark:text-white text-lg font-bold">5. Media</h2>
+            {/* Sección 5: Multimedia */}
+            <Card>
+              <CardContent className="p-5 space-y-4">
+                <div className="flex items-center gap-2 border-b border-border pb-3">
+                  <Camera size={18} className="text-primary" />
+                  <h2 className="text-sm font-bold text-foreground">5. Multimedia</h2>
                 </div>
-                <div className="space-y-4">
-                  <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-8 flex flex-col items-center justify-center gap-2 hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all cursor-pointer">
-                    <Upload size={32} className="text-slate-400" />
-                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400">Drop high-res photos here</p>
-                    <p className="text-xs text-slate-400">PNG, JPG up to 10MB</p>
+                <div>
+                  <div className="border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center justify-center gap-1 hover:border-primary/50 hover:bg-muted/20 transition-all cursor-pointer">
+                    <Upload size={28} className="text-muted-foreground/60" />
+                    <p className="text-xs font-medium text-muted-foreground">Suelta imágenes aquí</p>
+                    <p className="text-[10px] text-muted-foreground">PNG, JPG hasta 10MB</p>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handlePhotoUpload}
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                    />
                   </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="aspect-square rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 group relative overflow-hidden hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all cursor-pointer">
-                      <Camera size={24} />
+                  {uploadedPhotos.length > 0 && (
+                    <div className="grid grid-cols-3 gap-2 mt-3">
+                      {uploadedPhotos.map((photo, idx) => (
+                        <div key={idx} className="aspect-square rounded-lg bg-muted border border-border overflow-hidden relative group">
+                          <img src={photo} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover" />
+                          <button
+                            onClick={() => setUploadedPhotos((prev) => prev.filter((_, i) => i !== idx))}
+                            className="absolute top-1 right-1 p-0.5 bg-black/60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X size={12} className="text-white" />
+                          </button>
+                        </div>
+                      ))}
                     </div>
-                    <div className="aspect-square rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 group relative overflow-hidden hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all cursor-pointer">
-                      <Camera size={24} />
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-900/40">
-                    <Info size={16} className="text-blue-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-xs text-blue-700 dark:text-blue-300">Ensure IMEI and Serial labels are clearly visible in at least one photo for verification.</p>
+                  )}
+                  <div className="flex items-start gap-2 mt-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-900/40">
+                    <Info size={14} className="text-blue-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-[10px] text-blue-700 dark:text-blue-300">Asegura que IMEI y Serie sean visibles en al menos una foto.</p>
                   </div>
                 </div>
-              </section>
-            </div>
-          </div>
+              </CardContent>
+            </Card>
 
-          {/* Footer Actions */}
-          <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 flex justify-end items-center gap-4 pb-12 flex-wrap">
-            <span className="text-sm text-slate-500">Last auto-saved at {autoSaveTime}</span>
-            <button className="px-6 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-              Cancel
-            </button>
-            <button className="px-10 py-2 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-600/20 transition-colors">
-              Add to Stock
-            </button>
+            {/* Acción rápida */}
+            <Button onClick={handleSubmit} className="w-full" disabled={isSaving}>
+              {isSaving ? 'Guardando...' : 'Agregar al inventario'}
+            </Button>
+            <p className="text-center text-[10px] text-muted-foreground">Último auto-guardado a las {autoSaveTime}</p>
           </div>
         </div>
-      </main>
+      </div>
     </div>
-  );
+  )
 }
-
-
