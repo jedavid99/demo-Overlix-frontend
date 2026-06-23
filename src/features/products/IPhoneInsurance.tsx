@@ -132,7 +132,7 @@ export default function IPhoneInsurance() {
             <p className="text-sm text-muted-foreground">Registra la información del seguro del dispositivo</p>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" onClick={() => navigate('/products/inventory')}>
+            <Button variant="outline" size="sm" onClick={() => navigate('/iphone/insurance')}>
               Cancelar
             </Button>
             <Button onClick={handleSubmit} size="sm" disabled={isSaving}>
