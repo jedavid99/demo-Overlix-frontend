@@ -381,21 +381,21 @@ export default function SimpleCodeGenerator() {
                 <Label htmlFor="paymentMethod" className="text-xs text-[#727785] mb-1 block">
                   Forma de Pago *
                 </Label>
-                <Select
-                  value={companyData.paymentMethod}
-                  onValueChange={(value) => setCompanyData({ ...companyData, paymentMethod: value })}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecciona forma de pago" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="efectivo">Efectivo</SelectItem>
-                    <SelectItem value="transferencia">Transferencia Bancaria</SelectItem>
-                    <SelectItem value="tarjeta">Tarjeta de Crédito/Débito</SelectItem>
-                    <SelectItem value="mercadopago">MercadoPago</SelectItem>
-                    <SelectItem value="cheque">Cheque</SelectItem>
-                  </SelectContent>
-                </Select>
+               <select
+  value={companyData.workshopType}
+  onChange={(e) => setCompanyData({ ...companyData, workshopType: e.target.value })}
+  className="w-full h-10 px-3 rounded-lg border border-[#c2c6d6] bg-white text-[#191b23] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be] transition-all"
+>
+  <option value="">Selecciona tipo</option>
+  <option value="electronica">Electrónica</option>
+  <option value="mecanica">Mecánica Automotriz</option>
+  <option value="computacion">Computación/IT</option>
+  <option value="celulares">Celulares</option>
+  <option value="electrodomesticos">Electrodomésticos</option>
+  <option value="bicicletas">Bicicletas</option>
+  <option value="general">General/Mixto</option>
+  <option value="otro">Otro</option>
+</select>
               </div>
             </div>
           </div>
