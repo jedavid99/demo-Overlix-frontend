@@ -11,7 +11,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select'
-import CreateUserModal from './CreateUserModal'
 
 export default function Profile() {
   // 📦 Estado del usuario – vacío (cargar desde API)
@@ -45,14 +44,6 @@ export default function Profile() {
     rating: string
     trend: string
   }[]>([])
-
-    // Estado del modal de crear usuario
-  const [showUserModal, setShowUserModal] = useState(false)
-
-  const handleCreateUser = (user: any) => {
-    console.log('Usuario creado:', user)
-    // Aquí iría la lógica para guardar el usuario en la API
-  }
 
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark p-6 lg:p-8">
@@ -328,14 +319,6 @@ export default function Profile() {
                             {data.trend}
                           </span>
                         )}
-                                {/* Create User Button */}
-        <Button
-          onClick={() => setShowUserModal(true)}
-          className="w-full bg-[#0058be] hover:bg-[#2170e4] flex items-center justify-center gap-2"
-        >
-          <UserPlus size={18} />
-          Agregar Nuevo Usuario
-        </Button>
                       </td>
                     </tr>
                   ))}
@@ -344,12 +327,6 @@ export default function Profile() {
             </div>
           )}
         </div>
-              {/* Create User Modal */}
-      <CreateUserModal
-        isOpen={showUserModal}
-        onClose={() => setShowUserModal(false)}
-        onCreateUser={handleCreateUser}
-      />
       </div>
     </div>
   )
