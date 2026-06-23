@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Key, 
-  Copy, 
-  Plus, 
-  Trash2, 
+import {
+  Key,
+  Copy,
+  Plus,
+  Trash2,
   LogOut,
   RefreshCw,
   CheckCircle2,
@@ -13,20 +13,26 @@ import {
   Clock,
   MessageCircle,
   Mail,
-  Calendar
+  Calendar,
 } from 'lucide-react';
-import { Button } from '../../shared/components/ui/button';
-import { Card } from '../../shared/components/ui/card';
-import { Label } from '../../shared/components/ui/label';
-import logo from '/ovelix-claro.png';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@radix-ui/react-select';
+import { Button } from '@/shared/components/ui/button';
+import { Card } from '@/shared/components/ui/card';
+import { Label } from '@/shared/components/ui/label';
 import { Input } from '@/shared/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/shared/components/ui/select';
+import logo from '/ovelix-claro.png';
 
 // Subscription plans
 const SUBSCRIPTION_PLANS = {
   monthly: { name: 'Mensual', duration: 30, price: '$29.99' },
   quarterly: { name: 'Trimestral', duration: 90, price: '$79.99' },
-  annual: { name: 'Anual', duration: 365, price: '$299.99' }
+  annual: { name: 'Anual', duration: 365, price: '$299.99' },
 };
 
 interface ActivationCode {
@@ -67,7 +73,7 @@ export default function SimpleCodeGenerator() {
     cuit: '',
     owner: '',
     workshopType: '',
-    paymentMethod: ''
+    paymentMethod: '',
   });
 
   // Check admin session
@@ -86,25 +92,27 @@ export default function SimpleCodeGenerator() {
   useEffect(() => {
     const updateStatuses = () => {
       const now = new Date();
-      const updatedCodes = codes.map(code => {
+      const updatedCodes = codes.map((code) => {
         const expiresAt = new Date(code.expiresAt);
-        const daysUntilExpiry = Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-        
+        const daysUntilExpiry = Math.ceil(
+          (expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+        );
+
         let status: 'active' | 'expired' | 'expiring_soon' = 'active';
         if (daysUntilExpiry <= 0) {
           status = 'expired';
         } else if (daysUntilExpiry <= 7) {
           status = 'expiring_soon';
         }
-        
+
         return { ...code, status };
       });
-      
+
       setCodes(updatedCodes);
     };
 
     updateStatuses();
-  }, [codes.length]); // Only re-run when codes length changes
+  }, [codes.length]);
 
   // Load codes from localStorage
   const loadCodes = () => {
@@ -117,13 +125,13 @@ export default function SimpleCodeGenerator() {
   // Generate activation code
   const generateCode = () => {
     setIsGenerating(true);
-    
+
     setTimeout(() => {
       const code = 'OVERLIX-' + Math.random().toString(36).substring(2, 8).toUpperCase();
       const plan = SUBSCRIPTION_PLANS[selectedPlan];
       const createdAt = new Date();
       const expiresAt = new Date(createdAt.getTime() + plan.duration * 24 * 60 * 60 * 1000);
-      
+
       const newActivationCode: ActivationCode = {
         id: Date.now().toString(),
         code,
@@ -141,8 +149,8 @@ export default function SimpleCodeGenerator() {
           cuit: companyData.cuit,
           owner: companyData.owner,
           paymentMethod: companyData.paymentMethod,
-          workshopType: companyData.workshopType
-        }
+          workshopType: companyData.workshopType,
+        },
       };
 
       const updatedCodes = [newActivationCode, ...codes];
@@ -162,7 +170,7 @@ export default function SimpleCodeGenerator() {
 
   // Delete code
   const deleteCode = (id: string) => {
-    const updatedCodes = codes.filter(c => c.id !== id);
+    const updatedCodes = codes.filter((c) => c.id !== id);
     localStorage.setItem('activation_codes', JSON.stringify(updatedCodes));
     setCodes(updatedCodes);
     setShowDeleteConfirm(null);
@@ -170,7 +178,9 @@ export default function SimpleCodeGenerator() {
 
   // Send WhatsApp reminder
   const sendWhatsAppReminder = (code: ActivationCode) => {
-    const message = `Hola ${code.userName || 'usuario'}, tu código de activación ${code.code} vence el ${new Date(code.expiresAt).toLocaleDateString()}. Por favor renueva tu suscripción para continuar usando Overlix.`;
+    const message = `Hola ${code.userName || 'usuario'}, tu código de activación ${code.code} vence el ${new Date(
+      code.expiresAt
+    ).toLocaleDateString()}. Por favor renueva tu suscripción para continuar usando Overlix.`;
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -178,8 +188,12 @@ export default function SimpleCodeGenerator() {
   // Send Gmail reminder
   const sendGmailReminder = (code: ActivationCode) => {
     const subject = 'Recordatorio: Tu suscripción de Overlix está por vencer';
-    const body = `Hola ${code.userName || 'usuario'},\n\nTu código de activación ${code.code} vence el ${new Date(code.expiresAt).toLocaleDateString()}.\n\nPor favor renueva tu suscripción para continuar usando Overlix.\n\nSaludos,\nEquipo de Overlix`;
-    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const body = `Hola ${code.userName || 'usuario'},\n\nTu código de activación ${code.code} vence el ${new Date(
+      code.expiresAt
+    ).toLocaleDateString()}.\n\nPor favor renueva tu suscripción para continuar usando Overlix.\n\nSaludos,\nEquipo de Overlix`;
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
     window.open(gmailUrl, '_blank');
   };
 
@@ -217,11 +231,7 @@ export default function SimpleCodeGenerator() {
               <p className="text-xs text-[#727785]">Códigos de Activación</p>
             </div>
           </div>
-          <Button
-            variant="outline"
-            onClick={handleLogout}
-            className="flex items-center gap-2"
-          >
+          <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2">
             <LogOut className="w-4 h-4" />
             Salir
           </Button>
@@ -249,7 +259,9 @@ export default function SimpleCodeGenerator() {
                 <CheckCircle2 className="w-6 h-6 text-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[#191b23]">{codes.filter(c => c.status === 'active' && !c.used).length}</p>
+                <p className="text-2xl font-bold text-[#191b23]">
+                  {codes.filter((c) => c.status === 'active' && !c.used).length}
+                </p>
                 <p className="text-sm text-[#727785]">Activos</p>
               </div>
             </div>
@@ -261,7 +273,9 @@ export default function SimpleCodeGenerator() {
                 <Clock className="w-6 h-6 text-orange-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[#191b23]">{codes.filter(c => c.status === 'expiring_soon').length}</p>
+                <p className="text-2xl font-bold text-[#191b23]">
+                  {codes.filter((c) => c.status === 'expiring_soon').length}
+                </p>
                 <p className="text-sm text-[#727785]">Por vencer</p>
               </div>
             </div>
@@ -273,7 +287,9 @@ export default function SimpleCodeGenerator() {
                 <AlertCircle className="w-6 h-6 text-red-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[#191b23]">{codes.filter(c => c.status === 'expired').length}</p>
+                <p className="text-2xl font-bold text-[#191b23]">
+                  {codes.filter((c) => c.status === 'expired').length}
+                </p>
                 <p className="text-sm text-[#727785]">Vencidos</p>
               </div>
             </div>
@@ -284,7 +300,9 @@ export default function SimpleCodeGenerator() {
         <Card className="p-6 bg-white border border-[#c2c6d6]/60 mb-8">
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-[#191b23] mb-1">Generar Nuevo Código</h2>
-            <p className="text-sm text-[#727785]">Selecciona el plan de suscripción, ingresa los datos de la empresa y genera el código</p>
+            <p className="text-sm text-[#727785]">
+              Selecciona el plan de suscripción, ingresa los datos de la empresa y genera el código
+            </p>
           </div>
 
           <div className="mb-6">
@@ -315,7 +333,9 @@ export default function SimpleCodeGenerator() {
             <Label className="text-sm font-semibold text-[#191b23] mb-3 block">Datos de la Empresa</Label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="cuit" className="text-xs text-[#727785] mb-1 block">CUIT *</Label>
+                <Label htmlFor="cuit" className="text-xs text-[#727785] mb-1 block">
+                  CUIT *
+                </Label>
                 <Input
                   id="cuit"
                   placeholder="Ej: 20-12345678-9"
@@ -324,7 +344,9 @@ export default function SimpleCodeGenerator() {
                 />
               </div>
               <div>
-                <Label htmlFor="owner" className="text-xs text-[#727785] mb-1 block">Dueño / Responsable *</Label>
+                <Label htmlFor="owner" className="text-xs text-[#727785] mb-1 block">
+                  Dueño / Responsable *
+                </Label>
                 <Input
                   id="owner"
                   placeholder="Ej: Juan Pérez"
@@ -333,7 +355,9 @@ export default function SimpleCodeGenerator() {
                 />
               </div>
               <div>
-                <Label htmlFor="workshopType" className="text-xs text-[#727785] mb-1 block">Tipo de Taller *</Label>
+                <Label htmlFor="workshopType" className="text-xs text-[#727785] mb-1 block">
+                  Tipo de Taller *
+                </Label>
                 <Select
                   value={companyData.workshopType}
                   onValueChange={(value) => setCompanyData({ ...companyData, workshopType: value })}
@@ -354,7 +378,9 @@ export default function SimpleCodeGenerator() {
                 </Select>
               </div>
               <div>
-                <Label htmlFor="paymentMethod" className="text-xs text-[#727785] mb-1 block">Forma de Pago *</Label>
+                <Label htmlFor="paymentMethod" className="text-xs text-[#727785] mb-1 block">
+                  Forma de Pago *
+                </Label>
                 <Select
                   value={companyData.paymentMethod}
                   onValueChange={(value) => setCompanyData({ ...companyData, paymentMethod: value })}
@@ -376,7 +402,8 @@ export default function SimpleCodeGenerator() {
 
           <div className="flex items-center justify-between">
             <div className="text-sm text-[#727785]">
-              <span className="font-medium text-[#191b23]">Plan seleccionado:</span> {SUBSCRIPTION_PLANS[selectedPlan].name} ({SUBSCRIPTION_PLANS[selectedPlan].duration} días)
+              <span className="font-medium text-[#191b23]">Plan seleccionado:</span>{' '}
+              {SUBSCRIPTION_PLANS[selectedPlan].name} ({SUBSCRIPTION_PLANS[selectedPlan].duration} días)
             </div>
             <Button
               onClick={generateCode}
@@ -452,25 +479,36 @@ export default function SimpleCodeGenerator() {
             ) : (
               codes.map((code) => {
                 const expiresAt = new Date(code.expiresAt);
-                const daysUntilExpiry = Math.ceil((expiresAt.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-                
+                const daysUntilExpiry = Math.ceil(
+                  (expiresAt.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
+                );
+
                 return (
                   <motion.div
                     key={code.id}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className={`p-4 hover:bg-slate-50 transition-colors ${
-                      code.status === 'expired' ? 'bg-red-50/30' : 
-                      code.status === 'expiring_soon' ? 'bg-orange-50/30' : ''
+                      code.status === 'expired'
+                        ? 'bg-red-50/30'
+                        : code.status === 'expiring_soon'
+                        ? 'bg-orange-50/30'
+                        : ''
                     }`}
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-4 flex-1">
-                        <div className={`p-2 rounded-lg shrink-0 ${
-                          code.status === 'expired' ? 'bg-red-100' :
-                          code.status === 'expiring_soon' ? 'bg-orange-100' :
-                          code.used ? 'bg-gray-100' : 'bg-green-100'
-                        }`}>
+                        <div
+                          className={`p-2 rounded-lg shrink-0 ${
+                            code.status === 'expired'
+                              ? 'bg-red-100'
+                              : code.status === 'expiring_soon'
+                              ? 'bg-orange-100'
+                              : code.used
+                              ? 'bg-gray-100'
+                              : 'bg-green-100'
+                          }`}
+                        >
                           {code.status === 'expired' ? (
                             <AlertCircle className="w-5 h-5 text-red-600" />
                           ) : code.status === 'expiring_soon' ? (
@@ -484,20 +522,32 @@ export default function SimpleCodeGenerator() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <p className="font-mono font-bold text-[#191b23]">{code.code}</p>
-                            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                              code.status === 'expired' ? 'bg-red-100 text-red-700' :
-                              code.status === 'expiring_soon' ? 'bg-orange-100 text-orange-700' :
-                              code.used ? 'bg-gray-100 text-gray-700' : 'bg-green-100 text-green-700'
-                            }`}>
-                              {code.status === 'expired' ? 'Vencido' :
-                               code.status === 'expiring_soon' ? `Vence en ${daysUntilExpiry} días` :
-                               code.used ? 'Usado' : 'Activo'}
+                            <span
+                              className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                                code.status === 'expired'
+                                  ? 'bg-red-100 text-red-700'
+                                  : code.status === 'expiring_soon'
+                                  ? 'bg-orange-100 text-orange-700'
+                                  : code.used
+                                  ? 'bg-gray-100 text-gray-700'
+                                  : 'bg-green-100 text-green-700'
+                              }`}
+                            >
+                              {code.status === 'expired'
+                                ? 'Vencido'
+                                : code.status === 'expiring_soon'
+                                ? `Vence en ${daysUntilExpiry} días`
+                                : code.used
+                                ? 'Usado'
+                                : 'Activo'}
                             </span>
                           </div>
                           <div className="space-y-0.5 text-xs text-[#727785]">
                             <div className="flex items-center gap-2">
                               <Calendar className="w-3 h-3" />
-                              <span>Plan: {SUBSCRIPTION_PLANS[code.plan].name} ({SUBSCRIPTION_PLANS[code.plan].price})</span>
+                              <span>
+                                Plan: {SUBSCRIPTION_PLANS[code.plan].name} ({SUBSCRIPTION_PLANS[code.plan].price})
+                              </span>
                             </div>
                             <div className="flex items-center gap-2">
                               <Clock className="w-3 h-3" />
@@ -505,19 +555,33 @@ export default function SimpleCodeGenerator() {
                             </div>
                             {code.userName && (
                               <div className="flex items-center gap-2">
-                                <span>Usuario: {code.userName} ({code.userEmail})</span>
+                                <span>
+                                  Usuario: {code.userName} ({code.userEmail})
+                                </span>
                               </div>
                             )}
                             {code.companyDetails && (
                               <div className="mt-2 pt-2 border-t border-gray-200">
                                 <p className="font-medium text-[#191b23] mb-1">Datos de la empresa:</p>
                                 <div className="space-y-0.5">
-                                  <p><strong>Razón Social:</strong> {code.companyDetails.razonSocial}</p>
-                                  <p><strong>Nombre Fantasía:</strong> {code.companyDetails.nombreFantasia}</p>
-                                  <p><strong>CUIT:</strong> {code.companyDetails.cuit}</p>
-                                  <p><strong>Dueño:</strong> {code.companyDetails.owner}</p>
-                                  <p><strong>Tipo:</strong> {code.companyDetails.workshopType}</p>
-                                  <p><strong>Pago:</strong> {code.companyDetails.paymentMethod}</p>
+                                  <p>
+                                    <strong>Razón Social:</strong> {code.companyDetails.razonSocial}
+                                  </p>
+                                  <p>
+                                    <strong>Nombre Fantasía:</strong> {code.companyDetails.nombreFantasia}
+                                  </p>
+                                  <p>
+                                    <strong>CUIT:</strong> {code.companyDetails.cuit}
+                                  </p>
+                                  <p>
+                                    <strong>Dueño:</strong> {code.companyDetails.owner}
+                                  </p>
+                                  <p>
+                                    <strong>Tipo:</strong> {code.companyDetails.workshopType}
+                                  </p>
+                                  <p>
+                                    <strong>Pago:</strong> {code.companyDetails.paymentMethod}
+                                  </p>
                                 </div>
                               </div>
                             )}
@@ -546,7 +610,7 @@ export default function SimpleCodeGenerator() {
                             )}
                           </Button>
                         )}
-                        
+
                         {code.status === 'expiring_soon' && (
                           <>
                             <Button
@@ -569,7 +633,7 @@ export default function SimpleCodeGenerator() {
                             </Button>
                           </>
                         )}
-                        
+
                         <Button
                           variant="outline"
                           size="sm"
@@ -593,18 +657,10 @@ export default function SimpleCodeGenerator() {
                           ¿Estás seguro de que deseas eliminar este código?
                         </p>
                         <div className="flex gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setShowDeleteConfirm(null)}
-                          >
+                          <Button variant="outline" size="sm" onClick={() => setShowDeleteConfirm(null)}>
                             Cancelar
                           </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => deleteCode(code.id)}
-                          >
+                          <Button variant="destructive" size="sm" onClick={() => deleteCode(code.id)}>
                             Eliminar
                           </Button>
                         </div>
