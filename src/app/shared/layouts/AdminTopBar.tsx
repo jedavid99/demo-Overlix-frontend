@@ -47,14 +47,13 @@ export const AdminTopBar = ({
   sidebarCollapsed?: boolean
   sidebarOpen?: boolean
 }) => {
+  const navigate = useNavigate()
+  const { logout } = useAuth()
   const [searchFocused, setSearchFocused] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const searchInputRef = useRef<HTMLInputElement>(null)
-  const navigate = useNavigate()
-navigate = useNavigate()
-  const { logout } = useAuth()
-  const 
+
   const currentCategory = categories.find(cat => cat.value === selectedCategory) || categories[0]
 
   useEffect(() => {
