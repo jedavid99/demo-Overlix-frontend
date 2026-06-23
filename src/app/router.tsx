@@ -40,6 +40,7 @@ import IphoneCanje from '../features/sales/iphone/Canje'
 import CanjeNew from '../features/sales/iphone/CanjeNew'
 import IPhoneInventory from '../features/products/IPhoneInventory'
 import IPhoneInventoryList from '../features/products/IPhoneInventoryList'
+import IPhoneInsurance from '../features/products/IPhoneInsurance'
 import StockRepuestos from '../features/products/Repuestos'
 import StockAdjustments from '../features/products/Adjustments'
 import Notifications from '../features/settings/notifications'
@@ -91,6 +92,7 @@ export function AppRouter() {
       <Route path="/iphone-canje/new" element={<AdminLayout><CanjeNew /></AdminLayout>} />
       <Route path="/stock/iphone" element={<AdminLayout><IPhoneInventoryList /></AdminLayout>} />
       <Route path="/stock/iphone-add" element={<AdminLayout><IPhoneInventory /></AdminLayout>} />
+      <Route path="/stock/iphone-insurance" element={<AdminLayout><IPhoneInsurance /></AdminLayout>} />
       <Route path="/stock/repuestos" element={<AdminLayout><StockRepuestos /></AdminLayout>} />
       <Route path="/stock/adjustments" element={<AdminLayout><StockAdjustments /></AdminLayout>} />
       <Route path="/providers/orders" element={<AdminLayout><OrdersList /></AdminLayout>} />
