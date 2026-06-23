@@ -49,8 +49,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const response = await loginService(email, password, codigoEmpresa);
     console.log('Respuesta del login:', response);
     
-    if (response.access_token) {
-      localStorage.setItem('access_token', response.access_token);
+    // El token está en response.data.access_token
+    const token = response.data?.access_token || response.access_token;
+    
+    if (token) {
+      localStorage.setItem('access_token', token);
       console.log('Token guardado en localStorage');
       
       const currentUser = await getMe();
