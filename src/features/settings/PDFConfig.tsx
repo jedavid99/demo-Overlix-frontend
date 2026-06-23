@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
 import {
-  FileText,
   Download,
   Eye,
   Save,
@@ -12,23 +11,17 @@ import {
   Building,
   Award,
   Calendar,
-  Clock,
   Phone,
   Mail,
   MapPin,
-  Printer,
-  CheckCircle,
-  AlertCircle,
   Settings,
-  Plus,
-  Trash2,
+  Printer,
 } from 'lucide-react'
 import { Card, CardContent } from '@/shared/components/ui/card'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
 import { Badge } from '@/shared/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/components/ui/tabs'
 import jsPDF from 'jspdf'
 
 // ============================================================================
@@ -40,7 +33,6 @@ interface ServiceOrderData {
   companyAddress: string
   companyPhone: string
   companyEmail: string
-  companyLogo: string
 
   // Orden
   orderNumber: string
@@ -64,9 +56,8 @@ interface ServiceOrderData {
   // Reparación
   repairDescription: string
   repairDiagnostic: string
-  repairPrice: string
-  partsCost: string
   laborCost: string
+  partsCost: string
   totalPrice: string
 
   // Garantía
@@ -101,16 +92,15 @@ interface ServiceOrderData {
 }
 
 // ============================================================================
-// Valores por defecto
+// Valores por defecto (con datos de ejemplo de la imagen)
 // ============================================================================
 const defaultData: ServiceOrderData = {
   companyName: 'TechFix Reparaciones',
   companyAddress: 'Av. Corrientes 1234, CABA, Argentina',
   companyPhone: '+54 11 4321-1234',
   companyEmail: 'info@techfix.com',
-  companyLogo: 'TF',
 
-  orderNumber: `OS-${String(Math.floor(Math.random() * 9000) + 1000)}`,
+  orderNumber: 'OS-9771',
   orderDate: new Date().toLocaleDateString('es-AR', {
     year: 'numeric',
     month: '2-digit',
@@ -132,10 +122,9 @@ const defaultData: ServiceOrderData = {
 
   repairDescription: '',
   repairDiagnostic: '',
-  repairPrice: '',
-  partsCost: '',
-  laborCost: '',
-  totalPrice: '',
+  laborCost: '0',
+  partsCost: '0',
+  totalPrice: '0',
 
   warrantyMonths: '12',
   warrantyTerms:
@@ -180,7 +169,7 @@ export default function PDFConfig() {
   }
 
   // ============================================================================
-  // Lógica de renderizado en canvas (previsualización)
+  // Renderizado en canvas (previsualización)
   // ============================================================================
   const renderPreview = () => {
     const canvas = canvasRef.current
@@ -200,19 +189,22 @@ export default function PDFConfig() {
 
     let y = m
 
-    // ---- Encabezado ----
+    // ---- ENCABEZADO ----
     if (data.showHeader) {
+      // Fondo degradado
       const grad = ctx.createLinearGradient(0, 0, w, 0)
       grad.addColorStop(0, '#1e293b')
       grad.addColorStop(1, '#334155')
       ctx.fillStyle = grad
       ctx.fillRect(m, y, w - m * 2, 50)
 
+      // Logo (simulado con texto)
       ctx.fillStyle = '#ffffff'
       ctx.font = `bold ${fs + 6}px Arial`
       ctx.textAlign = 'left'
-      ctx.fillText(data.companyLogo || 'LOGO', m + 12, y + 32)
+      ctx.fillText('TF', m + 12, y + 32)
 
+      // Línea separadora
       ctx.strokeStyle = '#475569'
       ctx.lineWidth = 0.5
       ctx.beginPath()
@@ -220,9 +212,10 @@ export default function PDFConfig() {
       ctx.lineTo(m + 45, y + 42)
       ctx.stroke()
 
+      // Nombre empresa
       ctx.fillStyle = '#ffffff'
       ctx.font = `bold ${fs + 4}px Arial`
-      ctx.fillText(data.companyName || 'Mi Empresa', m + 55, y + 22)
+      ctx.fillText(data.companyName || 'TechFix Reparaciones', m + 55, y + 22)
       ctx.fillStyle = '#94a3b8'
       ctx.font = `${fs - 1}px Arial`
       ctx.fillText(data.companyAddress || '', m + 55, y + 38)
@@ -232,6 +225,7 @@ export default function PDFConfig() {
         y + 46
       )
 
+      // Número de orden y fecha (derecha)
       ctx.textAlign = 'right'
       ctx.fillStyle = '#e2e8f0'
       ctx.font = `bold ${fs}px Arial`
@@ -258,23 +252,26 @@ export default function PDFConfig() {
     const colTop = y
     const footerH = 30
 
-    // ---- Columna izquierda: Cliente ----
+    // ---- COLUMNA IZQUIERDA: CLIENTE ----
     if (data.showClientSection) {
       const x = m
       let cy = colTop
 
+      // Título
       ctx.fillStyle = '#0f172a'
       ctx.font = `bold ${fs + 2}px Arial`
       ctx.textAlign = 'left'
       ctx.fillText('👤 DATOS DEL CLIENTE', x, cy)
       cy += 18
 
+      // Recuadro con borde
       ctx.strokeStyle = '#e2e8f0'
       ctx.lineWidth = 1
       ctx.strokeRect(x, cy - 4, colW, 120)
       ctx.fillStyle = '#f8fafc'
       ctx.fillRect(x + 1, cy - 3, colW - 2, 118)
 
+      // Datos del cliente
       ctx.fillStyle = '#1e293b'
       ctx.font = `${fs}px Arial`
       const clientLines = [
@@ -289,18 +286,21 @@ export default function PDFConfig() {
       })
       cy += 120 + 6
 
+      // Garantía
       if (data.showWarrantyTerms) {
         ctx.fillStyle = '#0f172a'
         ctx.font = `bold ${fs + 1}px Arial`
         ctx.fillText('🛡️ GARANTÍA', x, cy + 6)
         cy += 18
 
+        // Recuadro verde claro
         ctx.strokeStyle = '#d1fae5'
         ctx.lineWidth = 1
         ctx.fillStyle = '#ecfdf5'
         ctx.fillRect(x, cy - 4, colW, 70)
         ctx.strokeRect(x, cy - 4, colW, 70)
 
+        // Términos (viñetas)
         ctx.fillStyle = '#065f46'
         ctx.font = `${fs - 0.5}px Arial`
         ctx.textAlign = 'left'
@@ -311,12 +311,14 @@ export default function PDFConfig() {
         })
         cy += 70 + 8
 
+        // Vigencia
         ctx.fillStyle = '#0f172a'
         ctx.font = `bold ${fs}px Arial`
         ctx.fillText(`Vigencia: ${data.warrantyMonths || '0'} meses`, x + 8, cy + 4)
         cy += 20
       }
 
+      // Firma del cliente
       if (data.showSignatures) {
         cy += 10
         ctx.strokeStyle = '#94a3b8'
@@ -335,17 +337,19 @@ export default function PDFConfig() {
       }
     }
 
-    // ---- Columna derecha: Técnico ----
+    // ---- COLUMNA DERECHA: TÉCNICO ----
     if (data.showTechnicianSection) {
       const x = m + colW + m / 2
       let ty = colTop
 
+      // Título
       ctx.fillStyle = '#0f172a'
       ctx.font = `bold ${fs + 2}px Arial`
       ctx.textAlign = 'left'
       ctx.fillText('🔧 INFORMACIÓN TÉCNICA', x, ty)
       ty += 18
 
+      // Dispositivo
       ctx.fillStyle = '#1e293b'
       ctx.font = `bold ${fs}px Arial`
       ctx.fillText('Dispositivo', x, ty)
@@ -366,6 +370,7 @@ export default function PDFConfig() {
       })
       ty += 4
 
+      // Reparación
       ctx.fillStyle = '#1e293b'
       ctx.font = `bold ${fs}px Arial`
       ctx.fillText('Reparación', x, ty)
@@ -377,6 +382,7 @@ export default function PDFConfig() {
       ctx.fillText(`Diagnóstico: ${data.repairDiagnostic || ''}`, x, ty)
       ty += 14
 
+      // Precios
       ctx.fillStyle = '#1e293b'
       ctx.font = `bold ${fs}px Arial`
       ctx.fillText('Precios', x, ty)
@@ -392,6 +398,7 @@ export default function PDFConfig() {
       ctx.fillText(`Total: $${data.totalPrice || '0'}`, x, ty)
       ty += 20
 
+      // Seguridad
       if (data.showSecurityInfo && data.securityType !== 'none') {
         ctx.fillStyle = '#1e293b'
         ctx.font = `bold ${fs}px Arial`
@@ -419,6 +426,7 @@ export default function PDFConfig() {
         ty += 4
       }
 
+      // Técnico
       ctx.fillStyle = '#1e293b'
       ctx.font = `bold ${fs}px Arial`
       ctx.fillText('Técnico', x, ty)
@@ -440,6 +448,7 @@ export default function PDFConfig() {
         ty += 14
       }
 
+      // Firma del técnico
       if (data.showSignatures) {
         ty += 12
         ctx.strokeStyle = '#94a3b8'
@@ -467,7 +476,7 @@ export default function PDFConfig() {
     ctx.stroke()
     ctx.setLineDash([])
 
-    // ---- Pie de página ----
+    // ---- PIE DE PÁGINA ----
     if (data.showFooter) {
       const fY = h - m - 6
       ctx.strokeStyle = '#e2e8f0'
@@ -498,20 +507,22 @@ export default function PDFConfig() {
       const fs = data.fontSize
       let y = m
 
-      // ---- Encabezado ----
+      // ---- ENCABEZADO ----
       if (data.showHeader) {
         doc.setFillColor(30, 41, 59)
         doc.rect(m, y, w, 40, 'F')
         doc.setTextColor(255, 255, 255)
         doc.setFontSize(fs + 6)
         doc.setFont(undefined, 'bold')
-        doc.text(data.companyName || 'Mi Empresa', m + 12, y + 18)
+        doc.text('TF', m + 12, y + 18)
+        doc.setFontSize(fs + 4)
+        doc.text(data.companyName || 'TechFix Reparaciones', m + 45, y + 18)
         doc.setFontSize(fs)
         doc.setTextColor(148, 163, 184)
-        doc.text(data.companyAddress || '', m + 12, y + 30)
+        doc.text(data.companyAddress || '', m + 45, y + 30)
         doc.text(
           (data.companyPhone || '') + ' | ' + (data.companyEmail || ''),
-          m + 12,
+          m + 45,
           y + 38
         )
 
@@ -533,7 +544,7 @@ export default function PDFConfig() {
 
       const colTop = y
 
-      // ---- Columna izquierda: Cliente ----
+      // ---- COLUMNA IZQUIERDA: CLIENTE ----
       if (data.showClientSection) {
         let cy = colTop
         doc.setFontSize(fs + 2)
@@ -606,7 +617,7 @@ export default function PDFConfig() {
         }
       }
 
-      // ---- Columna derecha: Técnico ----
+      // ---- COLUMNA DERECHA: TÉCNICO ----
       if (data.showTechnicianSection) {
         const x = m + colW + m / 2
         let ty = colTop
@@ -730,7 +741,7 @@ export default function PDFConfig() {
       doc.line(105, colTop, 105, 270)
       doc.setLineDash([], 0)
 
-      // ---- Pie de página ----
+      // ---- PIE DE PÁGINA ----
       if (data.showFooter) {
         const fY = 280 - m
         doc.setDrawColor(220, 220, 220)
@@ -740,7 +751,7 @@ export default function PDFConfig() {
         doc.text(data.footerText || '', 105, fY + 4, { align: 'center' })
       }
 
-      doc.save('orden-servicio-profesional.pdf')
+      doc.save('orden-servicio.pdf')
     } catch (error) {
       console.error('Error al generar el PDF:', error)
       alert('Ocurrió un error al generar el PDF. Por favor, inténtalo de nuevo.')
@@ -757,324 +768,6 @@ export default function PDFConfig() {
   // ============================================================================
   // UI del panel de configuración
   // ============================================================================
-  const renderConfigPanel = () => (
-    <div className="space-y-4">
-      {/* Datos de la empresa */}
-      <Card>
-        <CardContent className="p-4 space-y-3">
-          <h3 className="font-bold text-foreground flex items-center gap-2">
-            <Building size={16} className="text-primary" /> Empresa
-          </h3>
-          <Input
-            value={data.companyName}
-            onChange={(e) => handleChange('companyName', e.target.value)}
-            placeholder="Nombre de la empresa"
-          />
-          <Input
-            value={data.companyAddress}
-            onChange={(e) => handleChange('companyAddress', e.target.value)}
-            placeholder="Dirección"
-          />
-          <Input
-            value={data.companyPhone}
-            onChange={(e) => handleChange('companyPhone', e.target.value)}
-            placeholder="Teléfono"
-          />
-          <Input
-            value={data.companyEmail}
-            onChange={(e) => handleChange('companyEmail', e.target.value)}
-            placeholder="Email"
-          />
-          <div className="flex gap-2">
-            <Input
-              value={data.orderNumber}
-              onChange={(e) => handleChange('orderNumber', e.target.value)}
-              placeholder="N° Orden"
-              className="flex-1"
-            />
-            <Input
-              type="date"
-              value={data.orderDate}
-              onChange={(e) => handleChange('orderDate', e.target.value)}
-              className="w-32"
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Datos del cliente */}
-      <Card>
-        <CardContent className="p-4 space-y-3">
-          <h3 className="font-bold text-foreground flex items-center gap-2">
-            <User size={16} className="text-primary" /> Cliente
-          </h3>
-          <Input
-            value={data.clientName}
-            onChange={(e) => handleChange('clientName', e.target.value)}
-            placeholder="Nombre completo"
-          />
-          <Input
-            value={data.clientPhone}
-            onChange={(e) => handleChange('clientPhone', e.target.value)}
-            placeholder="Teléfono"
-          />
-          <Input
-            value={data.clientEmail}
-            onChange={(e) => handleChange('clientEmail', e.target.value)}
-            placeholder="Email"
-          />
-          <Input
-            value={data.clientAddress}
-            onChange={(e) => handleChange('clientAddress', e.target.value)}
-            placeholder="Dirección"
-          />
-          <Input
-            value={data.clientId}
-            onChange={(e) => handleChange('clientId', e.target.value)}
-            placeholder="Documento"
-          />
-        </CardContent>
-      </Card>
-
-      {/* Datos del dispositivo y reparación */}
-      <Card>
-        <CardContent className="p-4 space-y-3">
-          <h3 className="font-bold text-foreground flex items-center gap-2">
-            <Smartphone size={16} className="text-primary" /> Dispositivo
-          </h3>
-          <Input
-            value={data.deviceModel}
-            onChange={(e) => handleChange('deviceModel', e.target.value)}
-            placeholder="Modelo"
-          />
-          <Input
-            value={data.deviceImei}
-            onChange={(e) => handleChange('deviceImei', e.target.value)}
-            placeholder="IMEI"
-          />
-          <Input
-            value={data.deviceSerial}
-            onChange={(e) => handleChange('deviceSerial', e.target.value)}
-            placeholder="Serial"
-          />
-          <Input
-            value={data.deviceColor}
-            onChange={(e) => handleChange('deviceColor', e.target.value)}
-            placeholder="Color"
-          />
-          <Input
-            value={data.deviceStorage}
-            onChange={(e) => handleChange('deviceStorage', e.target.value)}
-            placeholder="Almacenamiento"
-          />
-          <Input
-            value={data.deviceDescription}
-            onChange={(e) => handleChange('deviceDescription', e.target.value)}
-            placeholder="Descripción del dispositivo"
-          />
-          <div className="border-t border-border pt-3 mt-2">
-            <Label className="text-sm font-medium">Reparación</Label>
-            <Input
-              value={data.repairDescription}
-              onChange={(e) => handleChange('repairDescription', e.target.value)}
-              placeholder="Descripción de la reparación"
-              className="mt-1"
-            />
-            <Input
-              value={data.repairDiagnostic}
-              onChange={(e) => handleChange('repairDiagnostic', e.target.value)}
-              placeholder="Diagnóstico"
-              className="mt-1"
-            />
-            <div className="grid grid-cols-3 gap-2 mt-1">
-              <Input
-                value={data.laborCost}
-                onChange={(e) => handleChange('laborCost', e.target.value)}
-                placeholder="Mano obra"
-              />
-              <Input
-                value={data.partsCost}
-                onChange={(e) => handleChange('partsCost', e.target.value)}
-                placeholder="Repuestos"
-              />
-              <Input
-                value={data.totalPrice}
-                onChange={(e) => handleChange('totalPrice', e.target.value)}
-                placeholder="Total"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Seguridad y técnico */}
-      <Card>
-        <CardContent className="p-4 space-y-3">
-          <h3 className="font-bold text-foreground flex items-center gap-2">
-            <Shield size={16} className="text-primary" /> Seguridad y Técnico
-          </h3>
-          <select
-            value={data.securityType}
-            onChange={(e) => handleChange('securityType', e.target.value as any)}
-            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
-          >
-            <option value="none">Ninguno</option>
-            <option value="pin">PIN</option>
-            <option value="pattern">Patrón</option>
-            <option value="fingerprint">Huella</option>
-          </select>
-          {data.securityType === 'pin' && (
-            <Input
-              value={data.securityPin}
-              onChange={(e) => handleChange('securityPin', e.target.value)}
-              placeholder="PIN"
-            />
-          )}
-          {data.securityType === 'pattern' && (
-            <Input
-              value={data.securityPattern}
-              onChange={(e) => handleChange('securityPattern', e.target.value)}
-              placeholder="Descripción del patrón"
-            />
-          )}
-          <Input
-            value={data.securityNotes}
-            onChange={(e) => handleChange('securityNotes', e.target.value)}
-            placeholder="Notas de seguridad"
-          />
-          <Input
-            value={data.technicianName}
-            onChange={(e) => handleChange('technicianName', e.target.value)}
-            placeholder="Técnico asignado"
-          />
-          <Input
-            value={data.estimatedTime}
-            onChange={(e) => handleChange('estimatedTime', e.target.value)}
-            placeholder="Tiempo estimado"
-          />
-          <textarea
-            value={data.technicianNotes}
-            onChange={(e) => handleChange('technicianNotes', e.target.value)}
-            placeholder="Notas internas"
-            rows={2}
-            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm resize-none"
-          />
-        </CardContent>
-      </Card>
-
-      {/* Garantía */}
-      <Card>
-        <CardContent className="p-4 space-y-3">
-          <h3 className="font-bold text-foreground flex items-center gap-2">
-            <Award size={16} className="text-primary" /> Garantía
-          </h3>
-          <Input
-            value={data.warrantyMonths}
-            onChange={(e) => handleChange('warrantyMonths', e.target.value)}
-            placeholder="Meses de garantía"
-          />
-          <textarea
-            value={data.warrantyTerms}
-            onChange={(e) => handleChange('warrantyTerms', e.target.value)}
-            placeholder="Términos y condiciones"
-            rows={3}
-            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm resize-none"
-          />
-        </CardContent>
-      </Card>
-
-      {/* Visibilidad y formato */}
-      <Card>
-        <CardContent className="p-4 space-y-3">
-          <h3 className="font-bold text-foreground flex items-center gap-2">
-            <Settings size={16} className="text-primary" /> Configuración visual
-          </h3>
-          <div className="space-y-2">
-            {[
-              { key: 'showHeader', label: 'Mostrar encabezado' },
-              { key: 'showFooter', label: 'Mostrar pie de página' },
-              { key: 'showClientSection', label: 'Mostrar sección cliente' },
-              { key: 'showTechnicianSection', label: 'Mostrar sección técnico' },
-              { key: 'showSecurityInfo', label: 'Mostrar información de seguridad' },
-              { key: 'showWarrantyTerms', label: 'Mostrar términos de garantía' },
-              { key: 'showSignatures', label: 'Mostrar espacios de firma' },
-            ].map((item) => (
-              <div key={item.key} className="flex items-center justify-between">
-                <span className="text-sm">{item.label}</span>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={data[item.key as keyof ServiceOrderData] as boolean}
-                    onChange={(e) =>
-                      handleChange(item.key as keyof ServiceOrderData, e.target.checked)
-                    }
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                </label>
-              </div>
-            ))}
-          </div>
-          <div className="pt-2 border-t border-border">
-            <Input
-              value={data.headerText}
-              onChange={(e) => handleChange('headerText', e.target.value)}
-              placeholder="Texto del encabezado"
-            />
-            <Input
-              value={data.footerText}
-              onChange={(e) => handleChange('footerText', e.target.value)}
-              placeholder="Texto del pie"
-              className="mt-2"
-            />
-            <div className="flex items-center gap-4 mt-2">
-              <span className="text-sm font-medium">Fuente: {data.fontSize}px</span>
-              <input
-                type="range"
-                min="8"
-                max="14"
-                value={data.fontSize}
-                onChange={(e) => handleChange('fontSize', parseInt(e.target.value))}
-                className="flex-1"
-              />
-            </div>
-            <div className="flex items-center gap-4 mt-1">
-              <span className="text-sm font-medium">Margen: {data.margin}px</span>
-              <input
-                type="range"
-                min="12"
-                max="30"
-                value={data.margin}
-                onChange={(e) => handleChange('margin', parseInt(e.target.value))}
-                className="flex-1"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Button
-        onClick={() => {
-          setData(defaultData)
-          alert('Configuración restablecida a valores predeterminados.')
-        }}
-        variant="outline"
-        className="w-full"
-      >
-        <RefreshCw size={16} className="mr-2" />
-        Restablecer predeterminados
-      </Button>
-
-      <Button onClick={() => alert('Configuración guardada localmente.')} className="w-full">
-        <Save size={16} className="mr-2" />
-        Guardar configuración
-      </Button>
-    </div>
-  )
-
-  // ============================================================================
-  // Renderizado principal
-  // ============================================================================
   return (
     <div className="space-y-6 pb-24">
       <div className="flex items-center justify-between">
@@ -1082,29 +775,336 @@ export default function PDFConfig() {
           <h2 className="text-2xl font-bold text-foreground">Generador de Orden de Servicio</h2>
           <p className="text-muted-foreground">Personaliza y genera documentos profesionales para tus clientes</p>
         </div>
-        <Button
-          onClick={generatePDF}
-          disabled={isGenerating}
-          className="gap-2"
-        >
-          {isGenerating ? (
-            <RefreshCw size={18} className="animate-spin" />
-          ) : (
-            <Download size={18} />
-          )}
-          {isGenerating ? 'Generando...' : 'Descargar PDF'}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setData(defaultData)
+              alert('Configuración restablecida.')
+            }}
+          >
+            <RefreshCw size={16} className="mr-2" />
+            Restablecer
+          </Button>
+          <Button onClick={generatePDF} disabled={isGenerating} className="gap-2">
+            {isGenerating ? (
+              <RefreshCw size={18} className="animate-spin" />
+            ) : (
+              <Download size={18} />
+            )}
+            {isGenerating ? 'Generando...' : 'Descargar PDF'}
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Panel de configuración */}
+        {/* Panel de configuración (columna izquierda) */}
         <div className="lg:col-span-1">
-          <div className="sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto pr-2 scrollbar-thin">
-            {renderConfigPanel()}
+          <div className="sticky top-24 max-h-[calc(100vh-140px)] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-muted-foreground/20">
+            <div className="space-y-4">
+              {/* Empresa */}
+              <Card>
+                <CardContent className="p-4 space-y-3">
+                  <h3 className="font-bold text-foreground flex items-center gap-2">
+                    <Building size={16} className="text-primary" /> Empresa
+                  </h3>
+                  <Input
+                    value={data.companyName}
+                    onChange={(e) => handleChange('companyName', e.target.value)}
+                    placeholder="Nombre de la empresa"
+                  />
+                  <Input
+                    value={data.companyAddress}
+                    onChange={(e) => handleChange('companyAddress', e.target.value)}
+                    placeholder="Dirección"
+                  />
+                  <Input
+                    value={data.companyPhone}
+                    onChange={(e) => handleChange('companyPhone', e.target.value)}
+                    placeholder="Teléfono"
+                  />
+                  <Input
+                    value={data.companyEmail}
+                    onChange={(e) => handleChange('companyEmail', e.target.value)}
+                    placeholder="Email"
+                  />
+                  <div className="flex gap-2">
+                    <Input
+                      value={data.orderNumber}
+                      onChange={(e) => handleChange('orderNumber', e.target.value)}
+                      placeholder="N° Orden"
+                      className="flex-1"
+                    />
+                    <Input
+                      type="date"
+                      value={data.orderDate}
+                      onChange={(e) => handleChange('orderDate', e.target.value)}
+                      className="w-32"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Cliente */}
+              <Card>
+                <CardContent className="p-4 space-y-3">
+                  <h3 className="font-bold text-foreground flex items-center gap-2">
+                    <User size={16} className="text-primary" /> Cliente
+                  </h3>
+                  <Input
+                    value={data.clientName}
+                    onChange={(e) => handleChange('clientName', e.target.value)}
+                    placeholder="Nombre completo"
+                  />
+                  <Input
+                    value={data.clientPhone}
+                    onChange={(e) => handleChange('clientPhone', e.target.value)}
+                    placeholder="Teléfono"
+                  />
+                  <Input
+                    value={data.clientEmail}
+                    onChange={(e) => handleChange('clientEmail', e.target.value)}
+                    placeholder="Email"
+                  />
+                  <Input
+                    value={data.clientAddress}
+                    onChange={(e) => handleChange('clientAddress', e.target.value)}
+                    placeholder="Dirección"
+                  />
+                  <Input
+                    value={data.clientId}
+                    onChange={(e) => handleChange('clientId', e.target.value)}
+                    placeholder="Documento"
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Dispositivo y reparación */}
+              <Card>
+                <CardContent className="p-4 space-y-3">
+                  <h3 className="font-bold text-foreground flex items-center gap-2">
+                    <Smartphone size={16} className="text-primary" /> Dispositivo
+                  </h3>
+                  <Input
+                    value={data.deviceModel}
+                    onChange={(e) => handleChange('deviceModel', e.target.value)}
+                    placeholder="Modelo"
+                  />
+                  <Input
+                    value={data.deviceImei}
+                    onChange={(e) => handleChange('deviceImei', e.target.value)}
+                    placeholder="IMEI"
+                  />
+                  <Input
+                    value={data.deviceSerial}
+                    onChange={(e) => handleChange('deviceSerial', e.target.value)}
+                    placeholder="Serial"
+                  />
+                  <Input
+                    value={data.deviceColor}
+                    onChange={(e) => handleChange('deviceColor', e.target.value)}
+                    placeholder="Color"
+                  />
+                  <Input
+                    value={data.deviceStorage}
+                    onChange={(e) => handleChange('deviceStorage', e.target.value)}
+                    placeholder="Almacenamiento"
+                  />
+                  <Input
+                    value={data.deviceDescription}
+                    onChange={(e) => handleChange('deviceDescription', e.target.value)}
+                    placeholder="Descripción del dispositivo"
+                  />
+                  <div className="border-t border-border pt-3 mt-2">
+                    <Label className="text-sm font-medium">Reparación</Label>
+                    <Input
+                      value={data.repairDescription}
+                      onChange={(e) => handleChange('repairDescription', e.target.value)}
+                      placeholder="Descripción de la reparación"
+                      className="mt-1"
+                    />
+                    <Input
+                      value={data.repairDiagnostic}
+                      onChange={(e) => handleChange('repairDiagnostic', e.target.value)}
+                      placeholder="Diagnóstico"
+                      className="mt-1"
+                    />
+                    <div className="grid grid-cols-3 gap-2 mt-1">
+                      <Input
+                        value={data.laborCost}
+                        onChange={(e) => handleChange('laborCost', e.target.value)}
+                        placeholder="Mano obra"
+                      />
+                      <Input
+                        value={data.partsCost}
+                        onChange={(e) => handleChange('partsCost', e.target.value)}
+                        placeholder="Repuestos"
+                      />
+                      <Input
+                        value={data.totalPrice}
+                        onChange={(e) => handleChange('totalPrice', e.target.value)}
+                        placeholder="Total"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Seguridad y técnico */}
+              <Card>
+                <CardContent className="p-4 space-y-3">
+                  <h3 className="font-bold text-foreground flex items-center gap-2">
+                    <Shield size={16} className="text-primary" /> Seguridad y Técnico
+                  </h3>
+                  <select
+                    value={data.securityType}
+                    onChange={(e) => handleChange('securityType', e.target.value as any)}
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+                  >
+                    <option value="none">Ninguno</option>
+                    <option value="pin">PIN</option>
+                    <option value="pattern">Patrón</option>
+                    <option value="fingerprint">Huella</option>
+                  </select>
+                  {data.securityType === 'pin' && (
+                    <Input
+                      value={data.securityPin}
+                      onChange={(e) => handleChange('securityPin', e.target.value)}
+                      placeholder="PIN"
+                    />
+                  )}
+                  {data.securityType === 'pattern' && (
+                    <Input
+                      value={data.securityPattern}
+                      onChange={(e) => handleChange('securityPattern', e.target.value)}
+                      placeholder="Descripción del patrón"
+                    />
+                  )}
+                  <Input
+                    value={data.securityNotes}
+                    onChange={(e) => handleChange('securityNotes', e.target.value)}
+                    placeholder="Notas de seguridad"
+                  />
+                  <Input
+                    value={data.technicianName}
+                    onChange={(e) => handleChange('technicianName', e.target.value)}
+                    placeholder="Técnico asignado"
+                  />
+                  <Input
+                    value={data.estimatedTime}
+                    onChange={(e) => handleChange('estimatedTime', e.target.value)}
+                    placeholder="Tiempo estimado"
+                  />
+                  <textarea
+                    value={data.technicianNotes}
+                    onChange={(e) => handleChange('technicianNotes', e.target.value)}
+                    placeholder="Notas internas"
+                    rows={2}
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm resize-none"
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Garantía */}
+              <Card>
+                <CardContent className="p-4 space-y-3">
+                  <h3 className="font-bold text-foreground flex items-center gap-2">
+                    <Award size={16} className="text-primary" /> Garantía
+                  </h3>
+                  <Input
+                    value={data.warrantyMonths}
+                    onChange={(e) => handleChange('warrantyMonths', e.target.value)}
+                    placeholder="Meses de garantía"
+                  />
+                  <textarea
+                    value={data.warrantyTerms}
+                    onChange={(e) => handleChange('warrantyTerms', e.target.value)}
+                    placeholder="Términos y condiciones"
+                    rows={3}
+                    className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm resize-none"
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Visibilidad y formato */}
+              <Card>
+                <CardContent className="p-4 space-y-3">
+                  <h3 className="font-bold text-foreground flex items-center gap-2">
+                    <Settings size={16} className="text-primary" /> Configuración visual
+                  </h3>
+                  <div className="space-y-2">
+                    {[
+                      { key: 'showHeader', label: 'Mostrar encabezado' },
+                      { key: 'showFooter', label: 'Mostrar pie de página' },
+                      { key: 'showClientSection', label: 'Mostrar sección cliente' },
+                      { key: 'showTechnicianSection', label: 'Mostrar sección técnico' },
+                      { key: 'showSecurityInfo', label: 'Mostrar información de seguridad' },
+                      { key: 'showWarrantyTerms', label: 'Mostrar términos de garantía' },
+                      { key: 'showSignatures', label: 'Mostrar espacios de firma' },
+                    ].map((item) => (
+                      <div key={item.key} className="flex items-center justify-between">
+                        <span className="text-sm">{item.label}</span>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={data[item.key as keyof ServiceOrderData] as boolean}
+                            onChange={(e) =>
+                              handleChange(item.key as keyof ServiceOrderData, e.target.checked)
+                            }
+                            className="sr-only peer"
+                          />
+                          <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="pt-2 border-t border-border">
+                    <Input
+                      value={data.headerText}
+                      onChange={(e) => handleChange('headerText', e.target.value)}
+                      placeholder="Texto del encabezado"
+                    />
+                    <Input
+                      value={data.footerText}
+                      onChange={(e) => handleChange('footerText', e.target.value)}
+                      placeholder="Texto del pie"
+                      className="mt-2"
+                    />
+                    <div className="flex items-center gap-4 mt-2">
+                      <span className="text-sm font-medium">Fuente: {data.fontSize}px</span>
+                      <input
+                        type="range"
+                        min="8"
+                        max="14"
+                        value={data.fontSize}
+                        onChange={(e) => handleChange('fontSize', parseInt(e.target.value))}
+                        className="flex-1"
+                      />
+                    </div>
+                    <div className="flex items-center gap-4 mt-1">
+                      <span className="text-sm font-medium">Margen: {data.margin}px</span>
+                      <input
+                        type="range"
+                        min="12"
+                        max="30"
+                        value={data.margin}
+                        onChange={(e) => handleChange('margin', parseInt(e.target.value))}
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Button onClick={() => alert('Configuración guardada localmente.')} className="w-full">
+                <Save size={16} className="mr-2" />
+                Guardar configuración
+              </Button>
+            </div>
           </div>
         </div>
 
-        {/* Vista previa */}
+        {/* Vista previa (columna derecha) */}
         <div className="lg:col-span-2">
           <Card>
             <CardContent className="p-4">
