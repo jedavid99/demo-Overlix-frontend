@@ -49,11 +49,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const response = await loginService(email, password, codigoEmpresa);
     console.log('Respuesta completa del login:', response);
     console.log('response.data:', response.data);
-    console.log('response.data.access_token:', response.data?.access_token);
-    console.log('response.access_token:', response.access_token);
+    console.log('response.data.data:', response.data?.data);
+    console.log('response.data.data.access_token:', response.data?.data?.access_token);
     
-    // El token está en response.data.access_token
-    const token = response.data?.access_token || response.access_token;
+    // El token está en response.data.data.access_token
+    const token = response.data?.data?.access_token || response.data?.access_token || response.access_token;
     
     if (token) {
       localStorage.setItem('access_token', token);
