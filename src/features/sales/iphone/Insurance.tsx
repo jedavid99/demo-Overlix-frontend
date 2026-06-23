@@ -1,463 +1,360 @@
-﻿import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import {
-  Shield,
-  Smartphone,
-  Calendar,
-  DollarSign,
-  FileText,
-  Save,
-  X,
-  AlertCircle,
-  CheckCircle,
-  Info,
-} from 'lucide-react'
-import { Card, CardContent } from '@/shared/components/ui/card'
-import { Button } from '@/shared/components/ui/button'
-import { Input } from '@/shared/components/ui/input'
-import { Label } from '@/shared/components/ui/label'
-import { Badge } from '@/shared/components/ui/badge'
+﻿    import React, { useState } from 'react';
+    import {
+      Search,
+      Download,
+      Plus,
+      ChevronRight,
+      ChevronLeft,
+      FilterX,
+      X,
+      Shield,
+      Smartphone,
+      Calendar,
+      DollarSign,
+    } from 'lucide-react';
+    import { Card, CardContent } from '@/shared/components/ui/card';
+    import { Button } from '@/shared/components/ui/button';
+    import { Badge } from '@/shared/components/ui/badge';
+    import { useNavigate } from 'react-router-dom';
 
-interface InsuranceFormData {
-  imei: string
-  serialNumber: string
-  model: string
-  insuranceProvider: string
-  policyNumber: string
-  coverageType: 'screen' | 'theft' | 'full' | 'custom'
-  startDate: string
-  endDate: string
-  premium: string
-  deductible: string
-  coverageAmount: string
-  notes: string
-}
+    interface Device {
+      id: string;
+      saleId: string;
+      customer: string;
+      email: string;
+      model: string;
+      imei: string;
+      saleDate: string;
+      status: 'active' | 'expired' | 'none';
+      policyId?: string;
+      planType?: string;
+      startDate?: string;
+      expiryDate?: string;
+      claims?: {
+        id: string;
+        type: string;
+        date: string;
+        status: string;
+        center: string;
+      }[];
+    }
 
-export default function IPhoneInsurance() {
-  const navigate = useNavigate()
-  const [formData, setFormData] = useState<InsuranceFormData>({
-    imei: '',
-    serialNumber: '',
-    model: '',
-    insuranceProvider: '',
-    policyNumber: '',
-    coverageType: 'full',
-    startDate: '',
-    endDate: '',
-    premium: '',
-    deductible: '',
-    coverageAmount: '',
-    notes: '',
-  })
+    export default function IPhoneInsurance() {
+      const navigate = useNavigate()  
+      const [searchQuery, setSearchQuery] = useState('');
+      const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
+      const [modelFilter, setModelFilter] = useState('All Series');
+      const [insuranceFilter, setInsuranceFilter] = useState('Active Status');
+      const [expirationFilter, setExpirationFilter] = useState('Expiring Soon');
+      const [currentPage, setCurrentPage] = useState(1);
+      const [showAddModal, setShowAddModal] = useState(false);
+      const [insuranceStep, setInsuranceStep] = useState(0);
+      const [searchEmail, setSearchEmail] = useState('');
+      const [foundClient, setFoundClient] = useState<Device | null>(null);
+      const [clientNotFound, setClientNotFound] = useState(false);
+      const [showRegisterClient, setShowRegisterClient] = useState(false);
+      const [newClient, setNewClient] = useState({
+        name: '',
+        email: '',
+        phone: '',
+      });
+      const [newInsurance, setNewInsurance] = useState({
+        deviceId: '',
+        planType: '',
+        coverage: '',
+        premium: 0,
+        startDate: new Date().toISOString().split('T')[0],
+        expiryDate: '',
+      });
 
-  const [isSaving, setIsSaving] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string>>({})
+      // 📦 Lista de dispositivos – vacía (cargar desde API)
+      const devices: Device[] = [];
 
-  const handleInputChange = (field: keyof InsuranceFormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: '' }))
-    }
-  }
+      const handleSearchClient = () => {
+        const foundDevices = devices.filter(d => d.email.toLowerCase() === searchEmail.toLowerCase());
+        if (foundDevices.length > 0) {
+          setFoundClient(foundDevices[0]);
+          setClientNotFound(false);
+          setShowRegisterClient(false);
+          setInsuranceStep(1);
+        } else {
+          setFoundClient(null);
+          setClientNotFound(true);
+          setShowRegisterClient(false);
+        }
+      };
 
-  const validate = (): boolean => {
-    const newErrors: Record<string, string> = {}
-    if (!formData.imei || formData.imei.length < 14) {
-      newErrors.imei = 'IMEI inválido (15 dígitos)'
-    }
-    if (!formData.serialNumber) {
-      newErrors.serialNumber = 'Número de serie requerido'
-    }
-    if (!formData.model) {
-      newErrors.model = 'Selecciona un modelo'
-    }
-    if (!formData.insuranceProvider) {
-      newErrors.insuranceProvider = 'Proveedor requerido'
-    }
-    if (!formData.policyNumber) {
-      newErrors.policyNumber = 'Número de póliza requerido'
-    }
-    if (!formData.startDate) {
-      newErrors.startDate = 'Fecha de inicio requerida'
-    }
-    if (!formData.endDate) {
-      newErrors.endDate = 'Fecha de fin requerida'
-    }
-    if (!formData.premium || parseFloat(formData.premium) <= 0) {
-      newErrors.premium = 'Prima inválida'
-    }
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+      const handleRegisterNewClient = () => {
+        const newDevice: Device = {
+          id: String(devices.length + 1),
+          saleId: `#SL-${Math.floor(Math.random() * 10000)}`,
+          customer: newClient.name,
+          email: newClient.email,
+          model: '',
+          imei: '',
+          saleDate: new Date().toLocaleDateString(),
+          status: 'none',
+        };
+        setFoundClient(newDevice);
+        setClientNotFound(false);
+        setShowRegisterClient(false);
+        setInsuranceStep(1);
+        setNewClient({ name: '', email: '', phone: '' });
+      };
 
-  const handleSubmit = () => {
-    if (!validate()) return
-    setIsSaving(true)
-    setTimeout(() => {
-      alert('Seguro agregado correctamente')
-      setIsSaving(false)
-      navigate('/products/inventory')
-    }, 1500)
-  }
+      const getStatusBadge = (status: string) => {
+        switch (status) {
+          case 'active':
+            return <Badge variant="success">Activo</Badge>;
+          case 'expired':
+            return <Badge variant="destructive">Expirado</Badge>;
+          case 'none':
+            return <Badge variant="outline">Sin seguro</Badge>;
+          default:
+            return <Badge variant="outline">Desconocido</Badge>;
+        }
+      };
 
-  const models = ['iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15 Plus', 'iPhone 15', 'iPhone 14 Pro Max', 'iPhone 14 Pro', 'iPhone 14 Plus', 'iPhone 14']
-  const providers = ['AppleCare+', 'Asurion', 'SquareTrade', 'Seguros Atlas', 'Seguros Sura', 'Otro']
-  const coverageTypes = [
-    { value: 'screen', label: 'Pantalla', description: 'Rotura de pantalla' },
-    { value: 'theft', label: 'Robo', description: 'Robo del dispositivo' },
-    { value: 'full', label: 'Completo', description: 'Daños y robo' },
-    { value: 'custom', label: 'Personalizado', description: 'Cobertura a medida' },
-  ]
-
-  const calculateDuration = () => {
-    if (!formData.startDate || !formData.endDate) return '—'
-    const start = new Date(formData.startDate)
-    const end = new Date(formData.endDate)
-    const diffTime = Math.abs(end.getTime() - start.getTime())
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-    const years = Math.floor(diffDays / 365)
-    const months = Math.floor((diffDays % 365) / 30)
-    if (years > 0) return `${years} año(s)`
-    if (months > 0) return `${months} mes(es)`
-    return `${diffDays} días`
-  }
-
-  return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-6">
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">Agregar Seguro de iPhone</h1>
-            <p className="text-sm text-muted-foreground">Registra la información del seguro del dispositivo</p>
+      return (
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex flex-wrap justify-between items-end gap-4">
+            <div className="flex flex-col gap-2">
+              <h1 className="text-2xl font-bold text-foreground tracking-tight">Dispositivos Vendidos y Asegurados</h1>
+              <p className="text-muted-foreground text-base max-w-lg">
+                Gestione registros de ventas detallados, rastree pólizas de seguro activas y monitoree fechas de vencimiento para todas las unidades iPhone.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button onClick={() => navigate('/stock/iphone-insurance')}
+                    variant="outline"
+                    className="w-full gap-2 bg-primary text-primary-foreground"
+                  >
+                    <Shield size={16} />
+                    Agregar seguro
+                  </Button>
+            </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" onClick={() => navigate('/iphone/insurance')}>
-              Cancelar
-            </Button>
-            <Button onClick={handleSubmit} size="sm" disabled={isSaving}>
-              {isSaving ? 'Guardando...' : 'Guardar seguro'}
-            </Button>
+
+          {/* Filters */}
+          <div className="flex gap-3 flex-wrap items-center">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card border border-input">
+              <span className="text-xs font-semibold uppercase text-muted-foreground">Modelo:</span>
+              <select
+                value={modelFilter}
+                onChange={(e) => setModelFilter(e.target.value)}
+                className="bg-transparent border-none focus:outline-none text-sm font-semibold text-foreground cursor-pointer"
+              >
+                <option>Todas las Series</option>
+                <option>iPhone 15 Pro</option>
+                <option>iPhone 15</option>
+                <option>iPhone 14</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card border border-input">
+              <span className="text-xs font-semibold uppercase text-muted-foreground">Seguro:</span>
+              <select
+                value={insuranceFilter}
+                onChange={(e) => setInsuranceFilter(e.target.value)}
+                className="bg-transparent border-none focus:outline-none text-sm font-semibold text-foreground cursor-pointer"
+              >
+                <option>Estado Activo</option>
+                <option>Activo</option>
+                <option>Expirado</option>
+                <option>Sin Seguro</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card border border-input">
+              <span className="text-xs font-semibold uppercase text-muted-foreground">Vencimiento:</span>
+              <select
+                value={expirationFilter}
+                onChange={(e) => setExpirationFilter(e.target.value)}
+                className="bg-transparent border-none focus:outline-none text-sm font-semibold text-foreground cursor-pointer"
+              >
+                <option>Próximo a Vencer</option>
+                <option>Expirado</option>
+                <option>Activo</option>
+              </select>
+            </div>
+
+            <button className="ml-auto text-primary text-sm font-semibold flex items-center gap-1 hover:opacity-80">
+              <FilterX size={16} />
+              Limpiar Filtros
+            </button>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Columna principal (2/3) */}
-          <div className="lg:col-span-2 space-y-4">
-            {/* Información del dispositivo */}
-            <Card>
-              <CardContent className="p-4 space-y-4">
-                <div className="flex items-center gap-2 border-b border-border pb-2">
-                  <Smartphone size={16} className="text-primary" />
-                  <h2 className="text-sm font-bold text-foreground">Información del Dispositivo</h2>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div className="space-y-1">
-                    <Label htmlFor="imei" className="text-xs font-semibold">IMEI *</Label>
-                    <Input
-                      id="imei"
-                      value={formData.imei}
-                      onChange={(e) => handleInputChange('imei', e.target.value)}
-                      placeholder="15 dígitos"
-                      className="h-8 text-sm"
-                    />
-                    {errors.imei && (
-                      <p className="text-[10px] text-destructive flex items-center gap-1">
-                        <AlertCircle size={12} /> {errors.imei}
-                      </p>
+          {/* Table */}
+          <Card>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="bg-muted/50 border-b border-border">
+                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">ID Venta</th>
+                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Cliente</th>
+                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Modelo iPhone</th>
+                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">IMEI</th>
+                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Fecha Venta</th>
+                      <th className="px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Estado Seguro</th>
+                      <th className="px-6 py-4"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {devices.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
+                          <Smartphone size={48} className="mx-auto text-muted-foreground/40 mb-4" />
+                          <p className="font-medium">No hay dispositivos registrados</p>
+                          <p className="text-sm">Agrega ventas desde el panel de administración</p>
+                        </td>
+                      </tr>
+                    ) : (
+                      devices.map(device => (
+                        <tr
+                          key={device.id}
+                          onClick={() => setSelectedDevice(device)}
+                          className="hover:bg-muted/30 transition-colors cursor-pointer group"
+                        >
+                          <td className="px-6 py-5 text-sm font-semibold text-foreground">{device.saleId}</td>
+                          <td className="px-6 py-5">
+                            <div className="flex flex-col">
+                              <span className="text-sm font-semibold text-foreground">{device.customer}</span>
+                              <span className="text-xs text-muted-foreground">{device.email}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-5 text-sm font-medium text-foreground">{device.model}</td>
+                          <td className="px-6 py-5 text-sm font-mono text-muted-foreground">{device.imei}</td>
+                          <td className="px-6 py-5 text-sm text-muted-foreground">{device.saleDate}</td>
+                          <td className="px-6 py-5">{getStatusBadge(device.status)}</td>
+                          <td className="px-6 py-5 text-right">
+                            <ChevronRight size={18} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                          </td>
+                        </tr>
+                      ))
                     )}
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="serialNumber" className="text-xs font-semibold">Número de Serie *</Label>
-                    <Input
-                      id="serialNumber"
-                      value={formData.serialNumber}
-                      onChange={(e) => handleInputChange('serialNumber', e.target.value)}
-                      placeholder="Ej. G6TXXXXXXX"
-                      className="h-8 text-sm"
-                    />
-                    {errors.serialNumber && (
-                      <p className="text-[10px] text-destructive flex items-center gap-1">
-                        <AlertCircle size={12} /> {errors.serialNumber}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="model" className="text-xs font-semibold">Modelo *</Label>
-                    <select
-                      id="model"
-                      value={formData.model}
-                      onChange={(e) => handleInputChange('model', e.target.value)}
-                      className="w-full h-8 px-3 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    >
-                      <option value="">Seleccionar</option>
-                      {models.map((m) => (
-                        <option key={m} value={m}>{m}</option>
-                      ))}
-                    </select>
-                    {errors.model && (
-                      <p className="text-[10px] text-destructive flex items-center gap-1">
-                        <AlertCircle size={12} /> {errors.model}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                  </tbody>
+                </table>
+              </div>
 
-            {/* Información del seguro */}
-            <Card>
-              <CardContent className="p-4 space-y-4">
-                <div className="flex items-center gap-2 border-b border-border pb-2">
-                  <Shield size={16} className="text-primary" />
-                  <h2 className="text-sm font-bold text-foreground">Información del Seguro</h2>
+              {/* Pagination */}
+              <div className="flex items-center justify-between px-6 py-4 bg-muted/30 border-t border-border">
+                <span className="text-sm text-muted-foreground">Mostrando {devices.length} de {devices.length} entradas</span>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="icon-sm">
+                    <ChevronLeft size={16} />
+                  </Button>
+                  <Button variant="default" size="icon-sm">1</Button>
+                  <Button variant="outline" size="icon-sm">
+                    <ChevronRight size={16} />
+                  </Button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div className="space-y-1">
-                    <Label htmlFor="insuranceProvider" className="text-xs font-semibold">Proveedor *</Label>
-                    <select
-                      id="insuranceProvider"
-                      value={formData.insuranceProvider}
-                      onChange={(e) => handleInputChange('insuranceProvider', e.target.value)}
-                      className="w-full h-8 px-3 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    >
-                      <option value="">Seleccionar</option>
-                      {providers.map((p) => (
-                        <option key={p} value={p}>{p}</option>
-                      ))}
-                    </select>
-                    {errors.insuranceProvider && (
-                      <p className="text-[10px] text-destructive flex items-center gap-1">
-                        <AlertCircle size={12} /> {errors.insuranceProvider}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="policyNumber" className="text-xs font-semibold">Número de Póliza *</Label>
-                    <Input
-                      id="policyNumber"
-                      value={formData.policyNumber}
-                      onChange={(e) => handleInputChange('policyNumber', e.target.value)}
-                      placeholder="Ej. POL-123456789"
-                      className="h-8 text-sm"
-                    />
-                    {errors.policyNumber && (
-                      <p className="text-[10px] text-destructive flex items-center gap-1">
-                        <AlertCircle size={12} /> {errors.policyNumber}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs font-semibold">Tipo de Cobertura</Label>
-                    <select
-                      value={formData.coverageType}
-                      onChange={(e) => handleInputChange('coverageType', e.target.value)}
-                      className="w-full h-8 px-3 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                    >
-                      {coverageTypes.map((type) => (
-                        <option key={type.value} value={type.value}>{type.label}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-                {/* Grid de coberturas (versión compacta) */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                  {coverageTypes.map((type) => (
-                    <button
-                      key={type.value}
-                      onClick={() => handleInputChange('coverageType', type.value as any)}
-                      className={`p-2 rounded-lg border text-center transition-all ${
-                        formData.coverageType === type.value
-                          ? 'border-primary bg-primary/5 ring-1 ring-primary'
-                          : 'border-border hover:border-primary/40'
-                      }`}
-                    >
-                      <div className="flex items-center justify-center gap-1.5 mb-0.5">
-                        <div className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center ${
-                          formData.coverageType === type.value ? 'border-primary bg-primary' : 'border-border'
-                        }`}>
-                          {formData.coverageType === type.value && <CheckCircle size={8} className="text-white" />}
+          {/* Side Drawer */}
+          {selectedDevice && (
+            <>
+              <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setSelectedDevice(null)}></div>
+              <div className="fixed inset-y-0 right-0 w-full md:w-96 bg-card shadow-2xl border-l border-border z-50 overflow-y-auto">
+                <div className="flex flex-col h-full">
+                  {/* Drawer Header */}
+                  <div className="p-6 border-b border-border flex justify-between items-center bg-muted/30 sticky top-0">
+                    <div>
+                      <h3 className="text-lg font-bold text-foreground">Detalles de Póliza</h3>
+                      <p className="text-sm text-muted-foreground">Venta {selectedDevice.saleId} • {selectedDevice.customer}</p>
+                    </div>
+                    <Button variant="ghost" size="icon-sm" onClick={() => setSelectedDevice(null)}>
+                      <X size={20} />
+                    </Button>
+                  </div>
+
+                  {/* Drawer Content */}
+                  <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                    {/* Insurance Policy */}
+                    {selectedDevice.status !== 'none' && (
+                      <section>
+                        <div className="flex justify-between items-center mb-4">
+                          <h4 className="text-sm font-bold uppercase tracking-widest text-primary">Póliza de Seguro</h4>
+                          <Badge variant={selectedDevice.status === 'active' ? 'success' : 'destructive'}>
+                            {selectedDevice.status === 'active' ? 'ACTIVO' : 'EXPIRADO'}
+                          </Badge>
                         </div>
-                        <span className="text-xs font-semibold">{type.label}</span>
+                        <Card className="bg-primary/5 border-primary/20">
+                          <CardContent className="p-5">
+                            <div className="grid grid-cols-2 gap-y-4">
+                              <div>
+                                <p className="text-[10px] text-muted-foreground font-bold uppercase">Tipo de Plan</p>
+                                <p className="text-sm font-semibold text-foreground">{selectedDevice.planType || '—'}</p>
+                              </div>
+                              <div>
+                                <p className="text-[10px] text-muted-foreground font-bold uppercase">ID de Póliza</p>
+                                <p className="text-sm font-semibold text-foreground">{selectedDevice.policyId || '—'}</p>
+                              </div>
+                              <div>
+                                <p className="text-[10px] text-muted-foreground font-bold uppercase">Fecha Inicio</p>
+                                <p className="text-sm font-semibold text-foreground">{selectedDevice.startDate || '—'}</p>
+                              </div>
+                              <div>
+                                <p className="text-[10px] text-muted-foreground font-bold uppercase">Expira</p>
+                                <p className="text-sm font-semibold text-foreground">{selectedDevice.expiryDate || '—'}</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </section>
+                    )}
+
+                    {/* Device Details */}
+                    <section>
+                      <h4 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-4 flex items-center gap-2">
+                        <Smartphone size={16} /> Info Hardware
+                      </h4>
+                      <div className="space-y-3">
+                        <div className="flex justify-between border-b border-border pb-2">
+                          <span className="text-sm text-muted-foreground">Modelo</span>
+                          <span className="text-sm font-medium text-foreground">{selectedDevice.model || '—'}</span>
+                        </div>
+                        <div className="flex justify-between border-b border-border pb-2">
+                          <span className="text-sm text-muted-foreground">IMEI</span>
+                          <span className="text-sm font-mono text-foreground">{selectedDevice.imei || '—'}</span>
+                        </div>
+                        <div className="flex justify-between border-b border-border pb-2">
+                          <span className="text-sm text-muted-foreground">Fecha Venta</span>
+                          <span className="text-sm font-medium text-foreground">{selectedDevice.saleDate || '—'}</span>
+                        </div>
                       </div>
-                      <p className="text-[10px] text-muted-foreground">{type.description}</p>
-                    </button>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    </section>
 
-            {/* Fechas y montos */}
-            <Card>
-              <CardContent className="p-4 space-y-4">
-                <div className="flex items-center gap-2 border-b border-border pb-2">
-                  <Calendar size={16} className="text-primary" />
-                  <h2 className="text-sm font-bold text-foreground">Fechas y Montos</h2>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <div className="space-y-1">
-                    <Label htmlFor="startDate" className="text-xs font-semibold">Inicio *</Label>
-                    <Input
-                      id="startDate"
-                      type="date"
-                      value={formData.startDate}
-                      onChange={(e) => handleInputChange('startDate', e.target.value)}
-                      className="h-8 text-sm"
-                    />
-                    {errors.startDate && (
-                      <p className="text-[10px] text-destructive flex items-center gap-1">
-                        <AlertCircle size={12} /> {errors.startDate}
-                      </p>
+                    {/* Claims */}
+                    {selectedDevice.claims && selectedDevice.claims.length > 0 && (
+                      <section>
+                        <h4 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-4 flex items-center gap-2">
+                          <Shield size={16} /> Reclamaciones
+                        </h4>
+                        <div className="space-y-3">
+                          {selectedDevice.claims.map(claim => (
+                            <Card key={claim.id}>
+                              <CardContent className="p-4">
+                                <div className="flex justify-between items-start mb-2">
+                                  <p className="font-semibold text-foreground">{claim.type}</p>
+                                  <Badge variant="outline" className="text-xs">{claim.status}</Badge>
+                                </div>
+                                <p className="text-xs text-muted-foreground">{claim.date}</p>
+                                <p className="text-xs text-muted-foreground">{claim.center}</p>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </section>
                     )}
                   </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="endDate" className="text-xs font-semibold">Fin *</Label>
-                    <Input
-                      id="endDate"
-                      type="date"
-                      value={formData.endDate}
-                      onChange={(e) => handleInputChange('endDate', e.target.value)}
-                      className="h-8 text-sm"
-                    />
-                    {errors.endDate && (
-                      <p className="text-[10px] text-destructive flex items-center gap-1">
-                        <AlertCircle size={12} /> {errors.endDate}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="premium" className="text-xs font-semibold">Prima Anual ($) *</Label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
-                      <Input
-                        id="premium"
-                        type="number"
-                        step="0.01"
-                        value={formData.premium}
-                        onChange={(e) => handleInputChange('premium', e.target.value)}
-                        placeholder="0.00"
-                        className="h-8 pl-7 text-sm"
-                      />
-                    </div>
-                    {errors.premium && (
-                      <p className="text-[10px] text-destructive flex items-center gap-1">
-                        <AlertCircle size={12} /> {errors.premium}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="deductible" className="text-xs font-semibold">Deducible ($)</Label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
-                      <Input
-                        id="deductible"
-                        type="number"
-                        step="0.01"
-                        value={formData.deductible}
-                        onChange={(e) => handleInputChange('deductible', e.target.value)}
-                        placeholder="0.00"
-                        className="h-8 pl-7 text-sm"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-1 md:col-span-2">
-                    <Label htmlFor="coverageAmount" className="text-xs font-semibold">Cobertura Máxima ($) *</Label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">$</span>
-                      <Input
-                        id="coverageAmount"
-                        type="number"
-                        step="0.01"
-                        value={formData.coverageAmount}
-                        onChange={(e) => handleInputChange('coverageAmount', e.target.value)}
-                        placeholder="0.00"
-                        className="h-8 pl-7 text-sm"
-                      />
-                    </div>
-                  </div>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Notas adicionales */}
-            <Card>
-              <CardContent className="p-4 space-y-4">
-                <div className="flex items-center gap-2 border-b border-border pb-2">
-                  <FileText size={16} className="text-primary" />
-                  <h2 className="text-sm font-bold text-foreground">Notas Adicionales</h2>
-                </div>
-                <div className="space-y-1">
-                  <Label htmlFor="notes" className="text-xs font-semibold">Observaciones</Label>
-                  <textarea
-                    id="notes"
-                    value={formData.notes}
-                    onChange={(e) => handleInputChange('notes', e.target.value)}
-                    rows={2}
-                    placeholder="Detalles adicionales sobre el seguro..."
-                    className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Columna derecha (1/3) – Resumen */}
-          <div className="space-y-4">
-            <Card>
-              <CardContent className="p-4 space-y-4">
-                <div className="flex items-center gap-2 border-b border-border pb-2">
-                  <Shield size={16} className="text-primary" />
-                  <h2 className="text-sm font-bold text-foreground">Resumen</h2>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">Duración</span>
-                    <Badge variant="outline" className="text-xs font-mono">
-                      {calculateDuration()}
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">Costo mensual</span>
-                    <span className="text-sm font-bold text-success">
-                      {formData.premium ? `$${(parseFloat(formData.premium) / 12).toFixed(2)}` : '—'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">Cobertura</span>
-                    <span className="text-xs font-medium">
-                      {coverageTypes.find((t) => t.value === formData.coverageType)?.label || '—'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-muted-foreground">Deducible</span>
-                    <span className="text-xs font-medium">
-                      {formData.deductible ? `$${formData.deductible}` : '—'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center pt-2 border-t border-border">
-                    <span className="text-xs text-muted-foreground">Prima anual</span>
-                    <span className="text-sm font-bold text-foreground">
-                      {formData.premium ? `$${formData.premium}` : '—'}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-900/40">
-                  <Info size={14} className="text-blue-600 flex-shrink-0 mt-0.5" />
-                  <p className="text-[10px] text-blue-700 dark:text-blue-300">
-                    Guarda el número de póliza y contacto del proveedor para futuras reclamaciones.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Button onClick={handleSubmit} className="w-full" disabled={isSaving}>
-              {isSaving ? 'Guardando...' : 'Guardar seguro'}
-            </Button>
-          </div>
+              </div>
+            </>
+          )}
         </div>
-      </div>
-    </div>
-  )
-}
+      );
+    }
