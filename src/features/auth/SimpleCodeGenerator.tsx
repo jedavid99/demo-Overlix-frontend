@@ -358,44 +358,44 @@ export default function SimpleCodeGenerator() {
                 <Label htmlFor="workshopType" className="text-xs text-[#727785] mb-1 block">
                   Tipo de Taller *
                 </Label>
-                <Select
-                  value={companyData.workshopType}
-                  onValueChange={(value) => setCompanyData({ ...companyData, workshopType: value })}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Selecciona tipo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="electronica">Electrónica</SelectItem>
-                    <SelectItem value="mecanica">Mecánica Automotriz</SelectItem>
-                    <SelectItem value="computacion">Computación/IT</SelectItem>
-                    <SelectItem value="celulares">Celulares</SelectItem>
-                    <SelectItem value="electrodomesticos">Electrodomésticos</SelectItem>
-                    <SelectItem value="bicicletas">Bicicletas</SelectItem>
-                    <SelectItem value="general">General/Mixto</SelectItem>
-                    <SelectItem value="otro">Otro</SelectItem>
-                  </SelectContent>
-                </Select>
+               <Select
+  value={companyData.workshopType}
+  onValueChange={(value) => setCompanyData({ ...companyData, workshopType: value })}
+>
+  <SelectTrigger className="w-full bg-white dark:bg-slate-800 border border-input shadow-sm">
+    <SelectValue placeholder="Selecciona tipo" />
+  </SelectTrigger>
+  <SelectContent className="bg-white dark:bg-slate-800 border border-input shadow-lg">
+    <SelectItem value="electronica">Electrónica</SelectItem>
+    <SelectItem value="mecanica">Mecánica Automotriz</SelectItem>
+    <SelectItem value="computacion">Computación/IT</SelectItem>
+    <SelectItem value="celulares">Celulares</SelectItem>
+    <SelectItem value="electrodomesticos">Electrodomésticos</SelectItem>
+    <SelectItem value="bicicletas">Bicicletas</SelectItem>
+    <SelectItem value="general">General/Mixto</SelectItem>
+    <SelectItem value="otro">Otro</SelectItem>
+  </SelectContent>
+</Select>
               </div>
               <div>
                 <Label htmlFor="paymentMethod" className="text-xs text-[#727785] mb-1 block">
                   Forma de Pago *
                 </Label>
-               <select
-  value={companyData.workshopType}
-  onChange={(e) => setCompanyData({ ...companyData, workshopType: e.target.value })}
-  className="w-full h-10 px-3 rounded-lg border border-[#c2c6d6] bg-white text-[#191b23] focus:outline-none focus:ring-2 focus:ring-[#0058be]/20 focus:border-[#0058be] transition-all"
+                <Select
+  value={companyData.paymentMethod}
+  onValueChange={(value) => setCompanyData({ ...companyData, paymentMethod: value })}
 >
-  <option value="">Selecciona tipo</option>
-  <option value="electronica">Electrónica</option>
-  <option value="mecanica">Mecánica Automotriz</option>
-  <option value="computacion">Computación/IT</option>
-  <option value="celulares">Celulares</option>
-  <option value="electrodomesticos">Electrodomésticos</option>
-  <option value="bicicletas">Bicicletas</option>
-  <option value="general">General/Mixto</option>
-  <option value="otro">Otro</option>
-</select>
+  <SelectTrigger className="w-full bg-white dark:bg-slate-800 border border-input shadow-sm">
+    <SelectValue placeholder="Selecciona forma de pago" />
+  </SelectTrigger>
+  <SelectContent className="bg-white dark:bg-slate-800 border border-input shadow-lg">
+    <SelectItem value="efectivo">Efectivo</SelectItem>
+    <SelectItem value="transferencia">Transferencia Bancaria</SelectItem>
+    <SelectItem value="tarjeta">Tarjeta de Crédito/Débito</SelectItem>
+    <SelectItem value="mercadopago">MercadoPago</SelectItem>
+    <SelectItem value="cheque">Cheque</SelectItem>
+  </SelectContent>
+</Select>
               </div>
             </div>
           </div>
