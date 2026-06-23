@@ -690,25 +690,64 @@ export default function Register() {
                   </div>
 
                   <form onSubmit={(e) => { e.preventDefault(); handleNextStep(); }} className="space-y-4">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="companySelect">Empresa *</Label>
-                      <Select
-                        value={userData.companyId}
-                        onValueChange={(value) => setUserData({ ...userData, companyId: value })}
-                      >
-                        <SelectTrigger id="companySelect" className={errors.companyId ? 'border-destructive' : ''}>
-                          <SelectValue placeholder="Selecciona una empresa" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {EXISTING_COMPANIES.map((company) => (
-                            <SelectItem key={company.id} value={company.id}>
-                              {company.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                    <div className="space-y-3">
+                      <Label htmlFor="companySelect" className="flex items-center gap-2 text-sm font-semibold">
+                        <Building2 size={16} className="text-[#0058be]" />
+                        Empresa <span className="text-destructive">*</span>
+                      </Label>
+                      
+                      <div className="grid gap-3">
+                        {EXISTING_COMPANIES.map((company) => (
+                          <motion.button
+                            key={company.id}
+                            type="button"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => setUserData({ ...userData, companyId: company.id })}
+                            className={`p-4 border-2 rounded-xl text-left transition-all ${
+                              userData.companyId === company.id
+                                ? 'border-[#0058be] bg-blue-50/50 shadow-md'
+                                : 'border-[#c2c6d6] hover:border-[#0058be]/50 hover:bg-slate-50'
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className={`p-2.5 rounded-lg transition-colors ${
+                                userData.companyId === company.id
+                                  ? 'bg-[#0058be] text-white'
+                                  : 'bg-gray-100 text-gray-600'
+                              }`}>
+                                <Building2 size={20} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="font-semibold text-[#191b23] truncate">
+                                    {company.name}
+                                  </span>
+                                  {userData.companyId === company.id && (
+                                    <Check className="w-4 h-4 text-[#0058be] shrink-0" />
+                                  )}
+                                </div>
+                                <div className="space-y-0.5">
+                                  <div className="flex items-center gap-1.5 text-xs text-[#424754]">
+                                    <MapPin size={12} className="shrink-0" />
+                                    <span className="truncate">{company.address}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1.5 text-xs text-[#424754]">
+                                    <Phone size={12} className="shrink-0" />
+                                    <span className="truncate">{company.phone}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </motion.button>
+                        ))}
+                      </div>
+                      
                       {errors.companyId && (
-                        <p className="text-xs text-destructive font-medium mt-1">{errors.companyId}</p>
+                        <p className="text-xs text-destructive font-medium flex items-center gap-1">
+                          <span>⚠️</span>
+                          {errors.companyId}
+                        </p>
                       )}
                     </div>
 
