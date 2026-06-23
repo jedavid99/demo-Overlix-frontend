@@ -189,25 +189,7 @@ export default function Login() {
               </button>
             </form>
 
-            {/* Social login y demás (mantener igual) */}
-            <div className="relative my-7">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-[#c2c6d6]/60"></div>
-              </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="bg-white px-3 text-[#727785] lowercase">Iniciar sesión con</span>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <button className="flex items-center justify-center gap-2 py-3 px-4 bg-white border border-[#c2c6d6] rounded-xl font-medium text-xs text-[#191b23] hover:bg-slate-50 transition-all cursor-pointer">
-                Google
-              </button>
-              <button className="flex items-center justify-center gap-2 py-3 px-4 bg-white border border-[#c2c6d6] rounded-xl font-medium text-xs text-[#191b23] hover:bg-slate-50 transition-all cursor-pointer">
-                Microsoft
-              </button>
-            </div>
-          </div>
-                      <div className="text-center mt-6">
+          <div className="text-center mt-6">
               <p className="text-sm text-[#424754]">
                 ¿No tienes una cuenta?{' '}
                 <button
@@ -218,6 +200,7 @@ export default function Login() {
                 </button>
               </p>
             </div>
+          </div>
         </div>
       </section>
     </main>
