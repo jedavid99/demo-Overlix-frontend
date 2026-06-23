@@ -1,5 +1,11 @@
 import React, { useState } from 'react'
-import { X, UserPlus } from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/shared/components/ui/dialog'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
@@ -10,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/components/ui/select'
+import { AlertCircle, UserPlus, X } from 'lucide-react'
 
 interface CreateUserModalProps {
   isOpen: boolean
@@ -17,165 +24,220 @@ interface CreateUserModalProps {
   onCreateUser: (user: any) => void
 }
 
-export default function CreateUserModal({ isOpen, onClose, onCreateUser }: CreateUserModalProps) {
-  const [newUser, setNewUser] = useState({
+const CreateUserModal: React.FC<CreateUserModalProps> = ({
+  isOpen,
+  onClose,
+  onCreateUser,
+}) => {
+  const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
+    role: '',
+    department: '',
     password: '',
     confirmPassword: '',
-    role: ''
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const validate = (): boolean => {
+    const newErrors: Record<string, string> = {}
+    if (!formData.fullName.trim()) newErrors.fullName = 'El nombre completo es obligatorio'
+    if (!formData.email.trim()) newErrors.email = 'El email es obligatorio'
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'Email inválido'
+    if (!formData.phone.trim()) newErrors.phone = 'El teléfono es obligatorio'
+    if (!formData.role) newErrors.role = 'El rol es obligatorio'
+    if (!formData.password) newErrors.password = 'La contraseña es obligatoria'
+    else if (formData.password.length < 6) newErrors.password = 'Debe tener al menos 6 caracteres'
+    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden'
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    const newErrors: Record<string, string> = {}
-
-    if (!newUser.fullName.trim()) newErrors.fullName = 'El nombre es obligatorio'
-    if (!newUser.email.trim()) newErrors.email = 'El email es obligatorio'
-    if (!newUser.phone.trim()) newErrors.phone = 'El teléfono es obligatorio'
-    if (!newUser.password) newErrors.password = 'La contraseña es obligatoria'
-    if (!newUser.confirmPassword) newErrors.confirmPassword = 'Confirma la contraseña'
-    if (newUser.password !== newUser.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden'
-    if (!newUser.role) newErrors.role = 'El rol es obligatorio'
-
-    setErrors(newErrors)
-
-    if (Object.keys(newErrors).length === 0) {
-      onCreateUser(newUser)
-      setNewUser({
+    if (!validate()) return
+    setIsSubmitting(true)
+    // Simular envío a API
+    setTimeout(() => {
+      onCreateUser(formData)
+      setIsSubmitting(false)
+      onClose()
+      setFormData({
         fullName: '',
         email: '',
         phone: '',
+        role: '',
+        department: '',
         password: '',
         confirmPassword: '',
-        role: ''
       })
-      setErrors({})
-    }
+    }, 1000)
   }
 
-  if (!isOpen) return null
-
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <UserPlus className="w-5 h-5 text-[#0058be]" />
-              <h2 className="text-xl font-bold text-[#191b23]">Crear Nuevo Usuario</h2>
-            </div>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <X className="w-5 h-5 text-gray-500" />
-            </button>
-          </div>
-        </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-xl font-bold">
+            <UserPlus size={22} className="text-primary" />
+            Crear Nuevo Usuario
+          </DialogTitle>
+        </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+          {/* Nombre completo */}
           <div className="space-y-1.5">
-            <Label htmlFor="fullName">Nombre completo *</Label>
+            <Label htmlFor="fullName" className="text-sm font-semibold">
+              Nombre completo <span className="text-destructive">*</span>
+            </Label>
             <Input
               id="fullName"
+              value={formData.fullName}
+              onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
               placeholder="Ej: Juan Pérez"
-              value={newUser.fullName}
-              onChange={(e) => setNewUser({ ...newUser, fullName: e.target.value })}
-              error={errors.fullName}
+              className={errors.fullName ? 'border-destructive' : ''}
             />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="email">Email *</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="Ej: juan@empresa.com"
-              value={newUser.email}
-              onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-              error={errors.email}
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="phone">Teléfono *</Label>
-            <Input
-              id="phone"
-              placeholder="Ej: +34 600 123 456"
-              value={newUser.phone}
-              onChange={(e) => setNewUser({ ...newUser, phone: e.target.value })}
-              error={errors.phone}
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="role">Rol en la empresa *</Label>
-            <Select
-              value={newUser.role}
-              onValueChange={(value) => setNewUser({ ...newUser, role: value })}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Selecciona el rol" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="admin">Administrador</SelectItem>
-                <SelectItem value="tecnico">Técnico</SelectItem>
-                <SelectItem value="recepcionista">Recepcionista</SelectItem>
-                <SelectItem value="gerente">Gerente</SelectItem>
-                <SelectItem value="contador">Contador</SelectItem>
-                <SelectItem value="otro">Otro</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.role && (
-              <p className="text-xs text-red-500 mt-1">{errors.role}</p>
+            {errors.fullName && (
+              <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                <AlertCircle size={12} /> {errors.fullName}
+              </p>
             )}
           </div>
 
+          {/* Email */}
           <div className="space-y-1.5">
-            <Label htmlFor="password">Contraseña *</Label>
+            <Label htmlFor="email" className="text-sm font-semibold">
+              Email <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              placeholder="Ej: juan@empresa.com"
+              className={errors.email ? 'border-destructive' : ''}
+            />
+            {errors.email && (
+              <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                <AlertCircle size={12} /> {errors.email}
+              </p>
+            )}
+          </div>
+
+          {/* Teléfono */}
+          <div className="space-y-1.5">
+            <Label htmlFor="phone" className="text-sm font-semibold">
+              Teléfono <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              id="phone"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              placeholder="Ej: +34 600 123 456"
+              className={errors.phone ? 'border-destructive' : ''}
+            />
+            {errors.phone && (
+              <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                <AlertCircle size={12} /> {errors.phone}
+              </p>
+            )}
+          </div>
+
+          {/* Rol */}
+          <div className="space-y-1.5">
+            <Label htmlFor="role" className="text-sm font-semibold">
+              Rol en la empresa <span className="text-destructive">*</span>
+            </Label>
+            <Select
+              value={formData.role}
+              onValueChange={(value) => setFormData({ ...formData, role: value })}
+            >
+              <SelectTrigger className={errors.role ? 'border-destructive' : ''}>
+                <SelectValue placeholder="Selecciona el rol" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Administrador">Administrador</SelectItem>
+                <SelectItem value="Técnico">Técnico</SelectItem>
+                <SelectItem value="Recepcionista">Recepcionista</SelectItem>
+                <SelectItem value="Gerente">Gerente</SelectItem>
+                <SelectItem value="Contador">Contador</SelectItem>
+                <SelectItem value="Otro">Otro</SelectItem>
+              </SelectContent>
+            </Select>
+            {errors.role && (
+              <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                <AlertCircle size={12} /> {errors.role}
+              </p>
+            )}
+          </div>
+
+          {/* Departamento (opcional) */}
+          <div className="space-y-1.5">
+            <Label htmlFor="department" className="text-sm font-semibold">
+              Departamento <span className="text-muted-foreground text-xs font-normal">(opcional)</span>
+            </Label>
+            <Input
+              id="department"
+              value={formData.department}
+              onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+              placeholder="Ej: Taller, Ventas, Administración"
+            />
+          </div>
+
+          {/* Contraseña */}
+          <div className="space-y-1.5">
+            <Label htmlFor="password" className="text-sm font-semibold">
+              Contraseña <span className="text-destructive">*</span>
+            </Label>
             <Input
               id="password"
               type="password"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               placeholder="Mínimo 6 caracteres"
-              value={newUser.password}
-              onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-              error={errors.password}
+              className={errors.password ? 'border-destructive' : ''}
             />
+            {errors.password && (
+              <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                <AlertCircle size={12} /> {errors.password}
+              </p>
+            )}
           </div>
 
+          {/* Confirmar contraseña */}
           <div className="space-y-1.5">
-            <Label htmlFor="confirmPassword">Confirmar contraseña *</Label>
+            <Label htmlFor="confirmPassword" className="text-sm font-semibold">
+              Confirmar contraseña <span className="text-destructive">*</span>
+            </Label>
             <Input
               id="confirmPassword"
               type="password"
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
               placeholder="Repite tu contraseña"
-              value={newUser.confirmPassword}
-              onChange={(e) => setNewUser({ ...newUser, confirmPassword: e.target.value })}
-              error={errors.confirmPassword}
+              className={errors.confirmPassword ? 'border-destructive' : ''}
             />
+            {errors.confirmPassword && (
+              <p className="text-xs text-destructive flex items-center gap-1 mt-1">
+                <AlertCircle size={12} /> {errors.confirmPassword}
+              </p>
+            )}
           </div>
 
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="flex-1"
-            >
+          <DialogFooter className="gap-2 pt-2">
+            <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              className="flex-1 bg-[#0058be] hover:bg-[#2170e4]"
-            >
-              Crear Usuario
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Creando...' : 'Crear Usuario'}
             </Button>
-          </div>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }
+
+export default CreateUserModal
