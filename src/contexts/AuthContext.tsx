@@ -77,7 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
     setIsAuthenticated(false);
     // Redirigir al login
-    window.location.href = '/login';
+    window.location.href = '/';
   };
 
   return (
