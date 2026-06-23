@@ -239,11 +239,12 @@ export default function Register() {
   const handleActivationSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateActivationCode()) {
-      // If company already registered, skip to user registration
+      // Auto-detect: if company already registered, go to user registration
+      // Otherwise, go to company registration
       if (hasCompanyRegistered) {
-        setStep(3); // Skip to user registration step
+        setStep(2); // Go directly to user registration
       } else {
-        handleNextStep();
+        handleNextStep(); // Go to company registration
       }
     }
   };
@@ -266,7 +267,7 @@ export default function Register() {
       };
       localStorage.setItem('newCompany', JSON.stringify(newCompany));
       localStorage.setItem('companyDetails', JSON.stringify(companyData));
-      handleNextStep();
+      setStep(3); // Go to user registration
     }
   };
 
@@ -321,13 +322,20 @@ export default function Register() {
 
   // Stepper component
   const Stepper = () => {
-    const steps = [
-      { number: 1, label: 'Solicitar' },
-      { number: 2, label: 'Activación' },
-      { number: 3, label: 'Empresa' },
-      { number: 4, label: 'Usuario' },
-      { number: 5, label: 'Confirmación' }
-    ];
+    const steps = hasCompanyRegistered
+      ? [
+          { number: 1, label: 'Solicitar' },
+          { number: 2, label: 'Activación' },
+          { number: 3, label: 'Usuario' },
+          { number: 4, label: 'Confirmación' }
+        ]
+      : [
+          { number: 1, label: 'Solicitar' },
+          { number: 2, label: 'Activación' },
+          { number: 3, label: 'Empresa' },
+          { number: 4, label: 'Usuario' },
+          { number: 5, label: 'Confirmación' }
+        ];
 
     const getStepStatus = (stepNumber: number) => {
       if (stepNumber < step + 1) return 'completed';
@@ -566,8 +574,8 @@ export default function Register() {
                 </motion.div>
               )}
 
-              {/* Step 2: Registration Type Selection */}
-              {step === 2 && (
+              {/* Step 2: Company Registration Form (only if no company registered) */}
+              {step === 2 && !hasCompanyRegistered && (
                 <motion.div
                   key="step2"
                   custom={direction}
@@ -580,72 +588,181 @@ export default function Register() {
                 >
                   <div className="mb-8">
                     <h2 className="text-2xl font-bold text-[#191b23] tracking-tight mb-2">
-                      Tipo de registro
+                      Datos de la empresa
                     </h2>
                     <p className="text-sm text-[#424754]">
-                      ¿Cómo deseas registrarte en Overlix?
+                      Ingresa la información de tu negocio.
                     </p>
                   </div>
 
-                  <div className="space-y-4">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleRegistrationTypeSelect('new')}
-                      className="w-full p-6 border-2 border-[#c2c6d6] rounded-xl hover:border-[#0058be] hover:bg-blue-50/50 transition-all text-left group"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="p-3 bg-blue-100 rounded-lg group-hover:bg-[#0058be] transition-colors">
-                          <Building2 className="w-6 h-6 text-[#0058be] group-hover:text-white transition-colors" />
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-[#191b23] mb-1">
-                            Registrar nueva empresa
-                          </h3>
-                          <p className="text-sm text-[#424754]">
-                            Tu negocio aún no está en el sistema y deseas crear una nueva empresa.
-                          </p>
-                        </div>
-                        <ArrowRight className="w-5 h-5 text-[#727785] group-hover:text-[#0058be] transition-colors" />
-                      </div>
-                    </motion.button>
+                  <form onSubmit={handleCompanySubmit} className="space-y-4">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="razonSocial">Razón Social *</Label>
+                      <Input
+                        id="razonSocial"
+                        placeholder="Ej: TechFix S.A."
+                        value={companyData.razonSocial}
+                        onChange={(e) => setCompanyData({ ...companyData, razonSocial: e.target.value })}
+                        leftIcon={<Building2 className="w-5 h-5" />}
+                        error={errors.razonSocial}
+                      />
+                    </div>
 
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => handleRegistrationTypeSelect('existing')}
-                      className="w-full p-6 border-2 border-[#c2c6d6] rounded-xl hover:border-[#0058be] hover:bg-blue-50/50 transition-all text-left group"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="p-3 bg-green-100 rounded-lg group-hover:bg-green-500 transition-colors">
-                          <UserPlus className="w-6 h-6 text-green-600 group-hover:text-white transition-colors" />
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-[#191b23] mb-1">
-                            Agregar usuario a empresa existente
-                          </h3>
-                          <p className="text-sm text-[#424754]">
-                            Tu empresa ya existe y deseas agregar un nuevo usuario con el código de empresa.
-                          </p>
-                        </div>
-                        <ArrowRight className="w-5 h-5 text-[#727785] group-hover:text-[#0058be] transition-colors" />
-                      </div>
-                    </motion.button>
-                  </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="nombreFantasia">Nombre de Fantasía *</Label>
+                      <Input
+                        id="nombreFantasia"
+                        placeholder="Ej: TechFix"
+                        value={companyData.nombreFantasia}
+                        onChange={(e) => setCompanyData({ ...companyData, nombreFantasia: e.target.value })}
+                        leftIcon={<Building2 className="w-5 h-5" />}
+                        error={errors.nombreFantasia}
+                      />
+                    </div>
 
-                  <Button
-                    variant="outline"
-                    onClick={handlePreviousStep}
-                    className="w-full mt-6"
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Atrás
-                  </Button>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="companyAddress">Dirección *</Label>
+                      <Input
+                        id="companyAddress"
+                        placeholder="Ej: Calle Principal 123"
+                        value={companyData.address}
+                        onChange={(e) => setCompanyData({ ...companyData, address: e.target.value })}
+                        leftIcon={<MapPin className="w-5 h-5" />}
+                        error={errors.address}
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="companyPhone">Teléfono *</Label>
+                      <Input
+                        id="companyPhone"
+                        placeholder="Ej: +34 600 123 456"
+                        value={companyData.phone}
+                        onChange={(e) => setCompanyData({ ...companyData, phone: e.target.value })}
+                        leftIcon={<Phone className="w-5 h-5" />}
+                        error={errors.phone}
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="companyEmail">Email *</Label>
+                      <Input
+                        id="companyEmail"
+                        type="email"
+                        placeholder="Ej: info@empresa.com"
+                        value={companyData.email}
+                        onChange={(e) => setCompanyData({ ...companyData, email: e.target.value })}
+                        leftIcon={<Mail className="w-5 h-5" />}
+                        error={errors.email}
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="cuit">CUIT *</Label>
+                      <Input
+                        id="cuit"
+                        placeholder="Ej: 20-12345678-9"
+                        value={companyData.cuit}
+                        onChange={(e) => setCompanyData({ ...companyData, cuit: e.target.value })}
+                        leftIcon={<FileText className="w-5 h-5" />}
+                        error={errors.cuit}
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="owner">Dueño / Responsable *</Label>
+                      <Input
+                        id="owner"
+                        placeholder="Ej: Juan Pérez"
+                        value={companyData.owner}
+                        onChange={(e) => setCompanyData({ ...companyData, owner: e.target.value })}
+                        leftIcon={<UserPlus className="w-5 h-5" />}
+                        error={errors.owner}
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="paymentMethod">Forma de Pago *</Label>
+                      <Select
+                        value={companyData.paymentMethod}
+                        onValueChange={(value) => setCompanyData({ ...companyData, paymentMethod: value })}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Selecciona forma de pago" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="efectivo">Efectivo</SelectItem>
+                          <SelectItem value="transferencia">Transferencia Bancaria</SelectItem>
+                          <SelectItem value="tarjeta">Tarjeta de Crédito/Débito</SelectItem>
+                          <SelectItem value="mercadopago">MercadoPago</SelectItem>
+                          <SelectItem value="cheque">Cheque</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {errors.paymentMethod && (
+                        <p className="text-xs text-destructive mt-1">{errors.paymentMethod}</p>
+                      )}
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="workshopType">Tipo de Taller *</Label>
+                      <Select
+                        value={companyData.workshopType}
+                        onValueChange={(value) => setCompanyData({ ...companyData, workshopType: value })}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Selecciona tipo de taller" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="electronica">Electrónica</SelectItem>
+                          <SelectItem value="mecanica">Mecánica Automotriz</SelectItem>
+                          <SelectItem value="computacion">Computación/IT</SelectItem>
+                          <SelectItem value="celulares">Celulares</SelectItem>
+                          <SelectItem value="electrodomesticos">Electrodomésticos</SelectItem>
+                          <SelectItem value="bicicletas">Bicicletas</SelectItem>
+                          <SelectItem value="general">General/Mixto</SelectItem>
+                          <SelectItem value="otro">Otro</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {errors.workshopType && (
+                        <p className="text-xs text-destructive mt-1">{errors.workshopType}</p>
+                      )}
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="companyNif">NIF/CIF (opcional)</Label>
+                      <Input
+                        id="companyNif"
+                        placeholder="Ej: B12345678"
+                        value={companyData.nif}
+                        onChange={(e) => setCompanyData({ ...companyData, nif: e.target.value })}
+                        leftIcon={<FileText className="w-5 h-5" />}
+                      />
+                    </div>
+
+                    <div className="flex gap-3 pt-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handlePreviousStep}
+                        className="flex-1"
+                      >
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        Atrás
+                      </Button>
+                      <Button
+                        type="submit"
+                        className="flex-1 bg-[#0058be] hover:bg-[#2170e4]"
+                      >
+                        Continuar
+                        <ArrowRight className="w-4 h-4 ml-2" />
+                      </Button>
+                    </div>
+                  </form>
                 </motion.div>
               )}
 
-              {/* Step 3a: Company Registration Form */}
-              {step === 3 && registrationType === 'new' && (
+              {/* Step 3: User Registration Form */}
+              {step === 3 && (
                 <motion.div
                   key="step2a"
                   custom={direction}
@@ -831,70 +948,10 @@ export default function Register() {
                 </motion.div>
               )}
 
-              {/* Step 3b: Company Code Input */}
-              {step === 3 && registrationType === 'existing' && (
-                <motion.div
-                  key="step3b"
-                  custom={direction}
-                  variants={stepVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ duration: 0.3 }}
-                  className="bg-white rounded-2xl shadow-xl border border-[#c2c6d6]/60 p-8 lg:p-10"
-                >
-                  <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-[#191b23] tracking-tight mb-2">
-                      Código de empresa
-                    </h2>
-                    <p className="text-sm text-[#424754]">
-                      Ingresa el código de tu empresa para asociarte a ella.
-                    </p>
-                  </div>
+              {/* Step 3b: Company Code Input - REMOVED (now automatic) */}
 
-                  <form onSubmit={(e) => { e.preventDefault(); handleNextStep(); }} className="space-y-4">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="companyCode" className="flex items-center gap-2 text-sm font-semibold">
-                        <Building2 size={16} className="text-[#0058be]" />
-                        Código de empresa <span className="text-destructive">*</span>
-                      </Label>
-                      <Input
-                        id="companyCode"
-                        placeholder="Ej: AA2348"
-                        value={userData.codigoEmpresa}
-                        onChange={(e) => setUserData({ ...userData, codigoEmpresa: e.target.value })}
-                        leftIcon={<Key className="w-5 h-5" />}
-                        error={errors.codigoEmpresa}
-                      />
-                      <p className="text-xs text-[#727785]">
-                        Este código lo proporciona el administrador de tu empresa.
-                      </p>
-                    </div>
-
-                    <div className="flex gap-3 pt-4">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={handlePreviousStep}
-                        className="flex-1"
-                      >
-                        <ArrowLeft className="w-4 h-4 mr-2" />
-                        Atrás
-                      </Button>
-                      <Button
-                        type="submit"
-                        className="flex-1 bg-[#0058be] hover:bg-[#2170e4]"
-                      >
-                        Continuar
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Button>
-                    </div>
-                  </form>
-                </motion.div>
-              )}
-
-              {/* Step 4: User Registration Form */}
-              {step === 4 && (
+              {/* Step 3: User Registration Form */}
+              {step === 3 && (
                 <motion.div
                   key="step3"
                   custom={direction}
@@ -1036,8 +1093,8 @@ export default function Register() {
                 </motion.div>
               )}
 
-              {/* Step 5: Confirmation */}
-              {step === 5 && (
+              {/* Step 4: Confirmation */}
+              {step === 4 && (
                 <motion.div
                   key="step4"
                   custom={direction}
