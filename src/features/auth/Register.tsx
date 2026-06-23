@@ -171,7 +171,7 @@ export default function Register() {
     }
 
     // Check if code has company registered (allow reuse for new users)
-    if (codeData.used && codeData.companyDetails) {
+    if (codeData.used && codeData.companyDetails && codeData.companyDetails.razonSocial) {
       setHasCompanyRegistered(true);
       setExistingCompanyData(codeData.companyDetails);
     } else {
