@@ -24,9 +24,10 @@ api.interceptors.request.use(
   }
 );
 
-// Función para limpiar el token (usada en logout)
+// Función para limpiar el token de localStorage y headers de Axios
 export const clearAuthToken = () => {
   localStorage.removeItem('access_token');
+  delete api.defaults.headers.common['Authorization'];
 };
 
 // Rutas públicas que no deben redirigir en caso de 401

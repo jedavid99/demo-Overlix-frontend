@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { login as loginService, logout as logoutService, getMe } from '../services/auth.service';
-import { setAuthToken } from '../services/api';
+import { clearAuthToken } from '../services/api';
 
 interface User {
   [key: string]: any;
@@ -31,7 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser(currentUser);
           setIsAuthenticated(true);
         } catch (error) {
-          localStorage.removeItem('access_token');
+          clearAuthToken();
           setIsAuthenticated(false);
         }
       } else {
