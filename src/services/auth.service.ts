@@ -11,7 +11,6 @@ export const login = async (email: string, password: string, codigoEmpresa: stri
     const response = await api.post('/auth/login', payload);
     return response.data;
   } catch (error: any) {
-    console.error('Error en login:', error.response?.data);
     throw error;
   }
 };
@@ -26,7 +25,6 @@ export const register = async (data: any) => {
     const response = await api.post('/auth/register', data);
     return response.data;
   } catch (error: any) {
-    console.error('Error en register:', error.response?.data);
     throw error;
   }
 };

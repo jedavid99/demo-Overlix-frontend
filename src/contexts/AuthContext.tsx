@@ -32,7 +32,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser(currentUser);
           setIsAuthenticated(true);
         } catch (error) {
-          console.error('Error al obtener usuario:', error);
           localStorage.removeItem('access_token');
           setAuthToken(null);
           setIsAuthenticated(false);

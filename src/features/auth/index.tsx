@@ -37,7 +37,7 @@ export default function Login() {
       );
       navigate('/dashboard');
     } catch (error: any) {
-      console.error('Error de login:', error);
+      
       // Mostrar mensaje detallado del backend
       const mensaje = error.response?.data?.message || 'Error al iniciar sesión. Verifica tus credenciales.';
       alert(mensaje);
