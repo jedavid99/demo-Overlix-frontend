@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react'
-import { FileText, Download, Settings as SettingsIcon, Move, Image, AlignCenter, Eye, Save, RefreshCw } from 'lucide-react'
+import { FileText, Download, Settings as SettingsIcon, Move, Image, AlignCenter, Eye, Save, RefreshCw, User, Wrench, Calendar, Clock, CheckCircle, FileSignature } from 'lucide-react'
 import jsPDF from 'jspdf'
 
 interface PDFConfig {
@@ -12,6 +12,8 @@ interface PDFConfig {
   showRepairDetails: boolean
   showPricing: boolean
   showWarranty: boolean
+  showCustomerOrder: boolean
+  showTechnicianOrder: boolean
   headerText: string
   footerText: string
   fontSize: number
@@ -28,6 +30,8 @@ const defaultConfig: PDFConfig = {
   showRepairDetails: true,
   showPricing: true,
   showWarranty: true,
+  showCustomerOrder: true,
+  showTechnicianOrder: true,
   headerText: 'ORDEN DE SERVICIO',
   footerText: 'Gracias por su confianza',
   fontSize: 12,
@@ -137,6 +141,78 @@ export default function PDFConfig() {
       currentY += 30
     }
 
+    // Customer Order Section
+    if (config.showCustomerOrder) {
+      currentY += 20
+      ctx.fillStyle = '#1e293b'
+      ctx.fillRect(margin, currentY, canvas.width - margin * 2, 30)
+      ctx.fillStyle = '#ffffff'
+      ctx.font = `bold ${config.fontSize + 2}px Arial`
+      ctx.textAlign = 'center'
+      ctx.fillText('ORDEN DE SERVICIO - CLIENTE', canvas.width / 2, currentY + 20)
+      currentY += 40
+
+      ctx.textAlign = 'left'
+      ctx.fillStyle = '#64748b'
+      ctx.font = `${config.fontSize}px Arial`
+      ctx.fillText('N° Orden: #ORD-2024-00123', margin, currentY)
+      ctx.fillText('Fecha: 22/06/2024', margin, currentY + 20)
+      ctx.fillText('Estado: En proceso', margin, currentY + 40)
+      currentY += 60
+
+      ctx.fillStyle = '#1e293b'
+      ctx.font = `bold ${config.fontSize}px Arial`
+      ctx.fillText('Firma del cliente:', margin, currentY)
+      ctx.fillStyle = '#64748b'
+      ctx.font = `${config.fontSize - 2}px Arial`
+      ctx.fillText('__________________________', margin, currentY + 25)
+      currentY += 40
+    }
+
+    // Technician Order Section
+    if (config.showTechnicianOrder) {
+      currentY += 20
+      ctx.fillStyle = '#1e293b'
+      ctx.fillRect(margin, currentY, canvas.width - margin * 2, 30)
+      ctx.fillStyle = '#ffffff'
+      ctx.font = `bold ${config.fontSize + 2}px Arial`
+      ctx.textAlign = 'center'
+      ctx.fillText('ORDEN DE SERVICIO - TÉCNICO', canvas.width / 2, currentY + 20)
+      currentY += 40
+
+      ctx.textAlign = 'left'
+      ctx.fillStyle = '#64748b'
+      ctx.font = `${config.fontSize}px Arial`
+      ctx.fillText('Técnico asignado: Carlos García', margin, currentY)
+      ctx.fillText('Tiempo estimado: 2 horas', margin, currentY + 20)
+      ctx.fillText('Prioridad: Normal', margin, currentY + 40)
+      currentY += 60
+
+      ctx.fillStyle = '#1e293b'
+      ctx.font = `bold ${config.fontSize}px Arial`
+      ctx.fillText('Diagnóstico:', margin, currentY)
+      ctx.fillStyle = '#64748b'
+      ctx.font = `${config.fontSize - 2}px Arial`
+      ctx.fillText('Pantalla dañada con líneas verticales', margin, currentY + 25)
+      currentY += 50
+
+      ctx.fillStyle = '#1e293b'
+      ctx.font = `bold ${config.fontSize}px Arial`
+      ctx.fillText('Piezas requeridas:', margin, currentY)
+      ctx.fillStyle = '#64748b'
+      ctx.font = `${config.fontSize - 2}px Arial`
+      ctx.fillText('- Pantalla OLED iPhone 15 Pro Max', margin, currentY + 25)
+      currentY += 50
+
+      ctx.fillStyle = '#1e293b'
+      ctx.font = `bold ${config.fontSize}px Arial`
+      ctx.fillText('Firma del técnico:', margin, currentY)
+      ctx.fillStyle = '#64748b'
+      ctx.font = `${config.fontSize - 2}px Arial`
+      ctx.fillText('__________________________', margin, currentY + 25)
+      currentY += 40
+    }
+
     // Footer
     if (config.showFooter) {
       ctx.fillStyle = '#64748b'
@@ -218,6 +294,78 @@ export default function PDFConfig() {
       doc.setFont(undefined, 'normal')
       doc.text('Garantía: 90 días', config.margin, y)
       y += 15
+    }
+
+    // Customer Order Section
+    if (config.showCustomerOrder) {
+      y += 10
+      doc.setFillColor(30, 41, 59)
+      doc.rect(config.margin, y, 190 - config.margin * 2, 10, 'F')
+      doc.setTextColor(255, 255, 255)
+      doc.setFontSize(config.fontSize + 2)
+      doc.setFont(undefined, 'bold')
+      doc.text('ORDEN DE SERVICIO - CLIENTE', 105, y + 7, { align: 'center' })
+      y += 15
+
+      doc.setTextColor(100, 116, 139)
+      doc.setFontSize(config.fontSize)
+      doc.setFont(undefined, 'normal')
+      doc.text('N° Orden: #ORD-2024-00123', config.margin, y)
+      doc.text('Fecha: 22/06/2024', config.margin, y + 7)
+      doc.text('Estado: En proceso', config.margin, y + 14)
+      y += 25
+
+      doc.setTextColor(30, 41, 59)
+      doc.setFont(undefined, 'bold')
+      doc.text('Firma del cliente:', config.margin, y)
+      doc.setTextColor(100, 116, 139)
+      doc.setFont(undefined, 'normal')
+      doc.text('__________________________', config.margin, y + 10)
+      y += 20
+    }
+
+    // Technician Order Section
+    if (config.showTechnicianOrder) {
+      y += 10
+      doc.setFillColor(30, 41, 59)
+      doc.rect(config.margin, y, 190 - config.margin * 2, 10, 'F')
+      doc.setTextColor(255, 255, 255)
+      doc.setFontSize(config.fontSize + 2)
+      doc.setFont(undefined, 'bold')
+      doc.text('ORDEN DE SERVICIO - TÉCNICO', 105, y + 7, { align: 'center' })
+      y += 15
+
+      doc.setTextColor(100, 116, 139)
+      doc.setFontSize(config.fontSize)
+      doc.setFont(undefined, 'normal')
+      doc.text('Técnico asignado: Carlos García', config.margin, y)
+      doc.text('Tiempo estimado: 2 horas', config.margin, y + 7)
+      doc.text('Prioridad: Normal', config.margin, y + 14)
+      y += 25
+
+      doc.setTextColor(30, 41, 59)
+      doc.setFont(undefined, 'bold')
+      doc.text('Diagnóstico:', config.margin, y)
+      doc.setTextColor(100, 116, 139)
+      doc.setFont(undefined, 'normal')
+      doc.text('Pantalla dañada con líneas verticales', config.margin, y + 10)
+      y += 20
+
+      doc.setTextColor(30, 41, 59)
+      doc.setFont(undefined, 'bold')
+      doc.text('Piezas requeridas:', config.margin, y)
+      doc.setTextColor(100, 116, 139)
+      doc.setFont(undefined, 'normal')
+      doc.text('- Pantalla OLED iPhone 15 Pro Max', config.margin, y + 10)
+      y += 20
+
+      doc.setTextColor(30, 41, 59)
+      doc.setFont(undefined, 'bold')
+      doc.text('Firma del técnico:', config.margin, y)
+      doc.setTextColor(100, 116, 139)
+      doc.setFont(undefined, 'normal')
+      doc.text('__________________________', config.margin, y + 10)
+      y += 20
     }
 
     // Footer
@@ -332,6 +480,46 @@ export default function PDFConfig() {
                   </label>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Órdenes de Servicio */}
+          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
+            <div className="flex items-center gap-2 mb-4">
+              <FileSignature size={18} className="text-primary" />
+              <h3 className="font-bold text-slate-900 dark:text-white">Órdenes de Servicio</h3>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <User size={16} className="text-slate-400" />
+                  <span className="text-sm text-slate-700 dark:text-slate-300">Orden del cliente</span>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={config.showCustomerOrder}
+                    onChange={(e) => handleConfigChange('showCustomerOrder', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                </label>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Wrench size={16} className="text-slate-400" />
+                  <span className="text-sm text-slate-700 dark:text-slate-300">Orden del técnico</span>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={config.showTechnicianOrder}
+                    onChange={(e) => handleConfigChange('showTechnicianOrder', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                </label>
+              </div>
             </div>
           </div>
 
