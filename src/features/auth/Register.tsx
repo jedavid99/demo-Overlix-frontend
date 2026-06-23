@@ -47,6 +47,7 @@ interface UserData {
   password: string;
   confirmPassword: string;
   codigoEmpresa?: string;
+  role?: string;
 }
 
 interface CompanyData {
@@ -96,6 +97,8 @@ export default function Register() {
   const [activationCode, setActivationCode] = useState('');
   const [activationError, setActivationError] = useState('');
   const [registrationType, setRegistrationType] = useState<'new' | 'existing' | null>(null);
+  const [hasCompanyRegistered, setHasCompanyRegistered] = useState(false);
+  const [existingCompanyData, setExistingCompanyData] = useState<CompanyData | null>(null);
   const [companyData, setCompanyData] = useState<CompanyData>({
     razonSocial: '',
     nombreFantasia: '',
@@ -159,18 +162,21 @@ export default function Register() {
       return false;
     }
 
-    // Check if code is already used
-    if (codeData.used) {
-      setActivationError('Este código ya ha sido utilizado');
-      return false;
-    }
-
     // Check if code is expired
     const expiresAt = new Date(codeData.expiresAt);
     const now = new Date();
     if (expiresAt < now) {
       setActivationError('Este código de activación ha vencido');
       return false;
+    }
+
+    // Check if code has company registered (allow reuse for new users)
+    if (codeData.used && codeData.companyDetails) {
+      setHasCompanyRegistered(true);
+      setExistingCompanyData(codeData.companyDetails);
+    } else {
+      setHasCompanyRegistered(false);
+      setExistingCompanyData(null);
     }
 
     setActivationError('');
@@ -210,6 +216,11 @@ export default function Register() {
     if (!userData.confirmPassword) newErrors.confirmPassword = 'Confirma tu contraseña';
     else if (userData.password !== userData.confirmPassword) newErrors.confirmPassword = 'Las contraseñas no coinciden';
     
+    // Role is required when registering to existing company
+    if (hasCompanyRegistered && !userData.role) {
+      newErrors.role = 'El rol es obligatorio';
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -228,7 +239,12 @@ export default function Register() {
   const handleActivationSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateActivationCode()) {
-      handleNextStep();
+      // If company already registered, skip to user registration
+      if (hasCompanyRegistered) {
+        setStep(3); // Skip to user registration step
+      } else {
+        handleNextStep();
+      }
     }
   };
 
@@ -273,7 +289,8 @@ export default function Register() {
                 usedAt: new Date().toISOString(),
                 userEmail: userData.email,
                 userName: userData.fullName,
-                companyDetails: registrationType === 'new' ? companyData : null
+                userRole: userData.role,
+                companyDetails: registrationType === 'new' ? companyData : (c.companyDetails || null)
               };
             }
             return c;
@@ -283,8 +300,8 @@ export default function Register() {
 
         const registrationData = {
           userData,
-          companyData: registrationType === 'new' ? companyData : null,
-          registrationType,
+          companyData: registrationType === 'new' ? companyData : existingCompanyData,
+          registrationType: hasCompanyRegistered ? 'existing' : registrationType,
           activationCode,
           timestamp: new Date().toISOString()
         };
@@ -895,6 +912,16 @@ export default function Register() {
                     <p className="text-sm text-[#424754]">
                       Completa tu información personal.
                     </p>
+                    {hasCompanyRegistered && existingCompanyData && (
+                      <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <p className="text-sm font-medium text-[#191b23] mb-2">
+                          Empresa ya registrada: {existingCompanyData.razonSocial}
+                        </p>
+                        <p className="text-xs text-[#727785]">
+                          Estás registrando un nuevo usuario en esta empresa existente.
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   <form onSubmit={handleUserSubmit} className="space-y-4">
@@ -933,6 +960,31 @@ export default function Register() {
                         error={errors.phone}
                       />
                     </div>
+
+                    {hasCompanyRegistered && (
+                      <div className="space-y-1.5">
+                        <Label htmlFor="role">Rol en la empresa *</Label>
+                        <Select
+                          value={userData.role}
+                          onValueChange={(value) => setUserData({ ...userData, role: value })}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Selecciona tu rol" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="admin">Administrador</SelectItem>
+                            <SelectItem value="tecnico">Técnico</SelectItem>
+                            <SelectItem value="recepcionista">Recepcionista</SelectItem>
+                            <SelectItem value="gerente">Gerente</SelectItem>
+                            <SelectItem value="contador">Contador</SelectItem>
+                            <SelectItem value="otro">Otro</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {errors.role && (
+                          <p className="text-xs text-destructive mt-1">{errors.role}</p>
+                        )}
+                      </div>
+                    )}
 
                     <div className="space-y-1.5">
                       <Label htmlFor="password">Contraseña *</Label>
