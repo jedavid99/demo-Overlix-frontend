@@ -48,24 +48,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log('AuthContext.login llamado con:', { email, codigoEmpresa });
     const response = await loginService(email, password, codigoEmpresa);
     console.log('Respuesta completa del login:', response);
-    console.log('response.data:', response.data);
-    console.log('response.data.data:', response.data?.data);
-    console.log('response.data.data.access_token:', response.data?.data?.access_token);
     
-    // El backend envuelve la respuesta en {success: true, data: {...}}
-    // Por lo tanto el token está en response.data.data.access_token
-    const token = response.data?.data?.access_token || response.data?.access_token || response.access_token;
+    // El backend envuelve la respuesta en {success: true, data: {token, refreshToken, usuario}}
+    // Por lo tanto el token está en response.data.data.token
+    const token = response.data?.data?.token;
     
     if (token) {
       localStorage.setItem('access_token', token);
       console.log('Token guardado en localStorage:', token);
       
-      const currentUser = await getMe();
-      console.log('Usuario obtenido:', currentUser);
-      setUser(currentUser);
+      // El usuario ya viene en la respuesta, no necesitamos llamar a getMe
+      const usuario = response.data?.data?.usuario;
+      console.log('Usuario obtenido de la respuesta:', usuario);
+      setUser(usuario);
       setIsAuthenticated(true);
     } else {
-      console.error('No se recibió access_token en la respuesta');
+      console.error('No se recibió token en la respuesta');
       console.error('Estructura completa de response:', JSON.stringify(response, null, 2));
     }
   };
