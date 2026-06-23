@@ -295,7 +295,7 @@ export default function Register() {
     <main className="flex min-h-screen flex-col lg:flex-row bg-[#f9f9ff] text-[#191b23] select-none">
       {/* Left section - branding */}
       <section className="hidden lg:flex lg:w-1/2 relative overflow-hidden items-center justify-center p-12">
-        <div className="absolute inset-0 z-0 bg-cover bg-center" style={{ backgroundImage: "url('...')" }} />
+        <div className="absolute inset-0 z-0 bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1588515603140-81bd9f7d1db0?q=80&w=1469&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')" }} />
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent/95 to-transparent/70 z-10"></div>
         <div className="relative z-20 max-w-lg text-white flex flex-col justify-center items-center h-full text-center py-16">
           <div className="flex flex-col items-center space-y-6">
