@@ -4,6 +4,8 @@ import Home from '../features/dashboard/home'
 import Login from '../features/auth/index'
 import Register from '../features/auth/Register'
 import AdminActivationCodes from '../features/auth/AdminActivationCodes'
+import AdminLogin from '../features/auth/AdminLogin'
+import SimpleCodeGenerator from '../features/auth/SimpleCodeGenerator'
 import Dashboard from '../features/dashboard/index'
 import Clients from '../features/clients/index'
 import Sales from '../features/sales/index'
@@ -60,6 +62,8 @@ export function AppRouter() {
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/admin/generate-codes" element={<SimpleCodeGenerator />} />
       <Route path="/admin/activation-codes" element={<AdminActivationCodes />} />
       <Route path="/home" element={<Home />} />
 
