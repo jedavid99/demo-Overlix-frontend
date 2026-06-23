@@ -204,16 +204,10 @@ export const AdminTopBar = ({
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-             <button
-              onClick={handleLogout}
-          
-            >
-              <LogOut size={18} className="h-5 w-5 flex items-center justify-center shrink-0" />
-              
-                <span className="flex-1 text-left">Cerrar sesión</span>
-            
-            </button>
-           
+            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+              <LogOut size={16} className="mr-2" />
+              Cerrar sesión
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

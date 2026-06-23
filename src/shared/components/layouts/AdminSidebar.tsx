@@ -206,6 +206,7 @@ export const AdminSidebar = ({
     return section
   })
   const navigate = useNavigate()
+  const { logout } = useAuth()
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({})
 
   const toggleSection = (key: string) => {
@@ -213,8 +214,7 @@ export const AdminSidebar = ({
   }
 
   const handleLogout = () => {
-    // Limpiar sesión aquí si es necesario
-    navigate('/')
+    logout()
   }
 
   // Auto-expandir secciones basado en la ruta actual
