@@ -49,6 +49,7 @@ interface ActivationCode {
     razonSocial: string;
     nombreFantasia: string;
     address: string;
+    googleMapsLink?: string;
     phone: string;
     email: string;
     cuit: string;
@@ -570,6 +571,22 @@ export default function SimpleCodeGenerator() {
                                   <p>
                                     <strong>Nombre Fantasía:</strong> {code.companyDetails.nombreFantasia}
                                   </p>
+                                  <p>
+                                    <strong>Dirección:</strong> {code.companyDetails.address}
+                                  </p>
+                                  {code.companyDetails.googleMapsLink && (
+                                    <p>
+                                      <strong>Google Maps:</strong>{' '}
+                                      <a
+                                        href={code.companyDetails.googleMapsLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 hover:underline"
+                                      >
+                                        Ver ubicación
+                                      </a>
+                                    </p>
+                                  )}
                                   <p>
                                     <strong>CUIT:</strong> {code.companyDetails.cuit}
                                   </p>

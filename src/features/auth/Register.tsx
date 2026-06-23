@@ -54,6 +54,7 @@ interface CompanyData {
   razonSocial: string;
   nombreFantasia: string;
   address: string;
+  googleMapsLink?: string;
   phone: string;
   email: string;
   cuit: string;
@@ -103,6 +104,7 @@ export default function Register() {
     razonSocial: '',
     nombreFantasia: '',
     address: '',
+    googleMapsLink: '',
     phone: '',
     email: '',
     cuit: '',
@@ -609,7 +611,7 @@ export default function Register() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <Label htmlFor="nombreFantasia">Nombre de Fantasía *</Label>
+                      <Label htmlFor="nombreFantasia">Nombre del taller *</Label>
                       <Input
                         id="nombreFantasia"
                         placeholder="Ej: TechFix"
@@ -629,6 +631,17 @@ export default function Register() {
                         onChange={(e) => setCompanyData({ ...companyData, address: e.target.value })}
                         leftIcon={<MapPin className="w-5 h-5" />}
                         error={errors.address}
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="googleMapsLink">Link de Google Maps (opcional)</Label>
+                      <Input
+                        id="googleMapsLink"
+                        placeholder="Ej: https://maps.google.com/..."
+                        value={companyData.googleMapsLink}
+                        onChange={(e) => setCompanyData({ ...companyData, googleMapsLink: e.target.value })}
+                        leftIcon={<MapPin className="w-5 h-5" />}
                       />
                     </div>
 
@@ -657,76 +670,12 @@ export default function Register() {
                       />
                     </div>
 
-                    <div className="space-y-1.5">
-                      <Label htmlFor="cuit">CUIT *</Label>
-                      <Input
-                        id="cuit"
-                        placeholder="Ej: 20-12345678-9"
-                        value={companyData.cuit}
-                        onChange={(e) => setCompanyData({ ...companyData, cuit: e.target.value })}
-                        leftIcon={<FileText className="w-5 h-5" />}
-                        error={errors.cuit}
-                      />
-                    </div>
+                    
 
-                    <div className="space-y-1.5">
-                      <Label htmlFor="owner">Dueño / Responsable *</Label>
-                      <Input
-                        id="owner"
-                        placeholder="Ej: Juan Pérez"
-                        value={companyData.owner}
-                        onChange={(e) => setCompanyData({ ...companyData, owner: e.target.value })}
-                        leftIcon={<UserPlus className="w-5 h-5" />}
-                        error={errors.owner}
-                      />
-                    </div>
+                   
 
-                    <div className="space-y-1.5">
-                      <Label htmlFor="paymentMethod">Forma de Pago *</Label>
-                      <Select
-                        value={companyData.paymentMethod}
-                        onValueChange={(value) => setCompanyData({ ...companyData, paymentMethod: value })}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Selecciona forma de pago" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="efectivo">Efectivo</SelectItem>
-                          <SelectItem value="transferencia">Transferencia Bancaria</SelectItem>
-                          <SelectItem value="tarjeta">Tarjeta de Crédito/Débito</SelectItem>
-                          <SelectItem value="mercadopago">MercadoPago</SelectItem>
-                          <SelectItem value="cheque">Cheque</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {errors.paymentMethod && (
-                        <p className="text-xs text-destructive mt-1">{errors.paymentMethod}</p>
-                      )}
-                    </div>
+                   
 
-                    <div className="space-y-1.5">
-                      <Label htmlFor="workshopType">Tipo de Taller *</Label>
-                      <Select
-                        value={companyData.workshopType}
-                        onValueChange={(value) => setCompanyData({ ...companyData, workshopType: value })}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Selecciona tipo de taller" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="electronica">Electrónica</SelectItem>
-                          <SelectItem value="mecanica">Mecánica Automotriz</SelectItem>
-                          <SelectItem value="computacion">Computación/IT</SelectItem>
-                          <SelectItem value="celulares">Celulares</SelectItem>
-                          <SelectItem value="electrodomesticos">Electrodomésticos</SelectItem>
-                          <SelectItem value="bicicletas">Bicicletas</SelectItem>
-                          <SelectItem value="general">General/Mixto</SelectItem>
-                          <SelectItem value="otro">Otro</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      {errors.workshopType && (
-                        <p className="text-xs text-destructive mt-1">{errors.workshopType}</p>
-                      )}
-                    </div>
 
                     <div className="space-y-1.5">
                       <Label htmlFor="companyNif">NIF/CIF (opcional)</Label>
