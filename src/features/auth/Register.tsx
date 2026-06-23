@@ -767,14 +767,14 @@ export default function Register() {
                         error={errors.fullName}
                       />
                     </div>
-<div className="space-y-1.5">
+                      <div className="space-y-1.5">
                       <Label htmlFor="fullName">Codigo de la empresa *</Label>
                       <Input
                         id="codigoEmpresa"
                         placeholder="AA2348"
                         value={userData.codigoEmpresa}
                         onChange={(e) => setUserData({ ...userData, codigoEmpresa: e.target.value })}
-                        leftIcon={<UserPlus className="w-5 h-5" />}
+                        leftIcon={<Building2 className="w-5 h-5" />}
                         error={errors.codigoEmpresa}
                       />
                     </div>
