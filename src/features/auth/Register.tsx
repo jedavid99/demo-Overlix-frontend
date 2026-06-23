@@ -189,16 +189,12 @@ export default function Register() {
     const newErrors: Record<string, string> = {};
     
     if (!companyData.razonSocial.trim()) newErrors.razonSocial = 'La razón social es obligatoria';
-    if (!companyData.nombreFantasia.trim()) newErrors.nombreFantasia = 'El nombre de fantasía es obligatorio';
+    if (!companyData.nombreFantasia.trim()) newErrors.nombreFantasia = 'El nombre del taller es obligatorio';
     if (!companyData.address.trim()) newErrors.address = 'La dirección es obligatoria';
     if (!companyData.phone.trim()) newErrors.phone = 'El teléfono es obligatorio';
     else if (!validatePhone(companyData.phone)) newErrors.phone = 'Teléfono inválido';
     if (!companyData.email.trim()) newErrors.email = 'El email es obligatorio';
     else if (!validateEmail(companyData.email)) newErrors.email = 'Email inválido';
-    if (!companyData.cuit.trim()) newErrors.cuit = 'El CUIT es obligatorio';
-    if (!companyData.owner.trim()) newErrors.owner = 'El nombre del dueño es obligatorio';
-    if (!companyData.paymentMethod) newErrors.paymentMethod = 'La forma de pago es obligatoria';
-    if (!companyData.workshopType) newErrors.workshopType = 'El tipo de taller es obligatorio';
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
