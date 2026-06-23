@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, Building2, ArrowRight } from 'lucide-react';
-import { login } from '../../services/auth.service';
+import { useAuth } from '../../contexts/AuthContext';
 import logo from '/ovelix-claro.png';
 import { motion } from 'framer-motion';
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -29,7 +30,7 @@ export default function Login() {
     setIsLoading(true);
     
     try {
-      // Llamamos al servicio con los tres campos
+      // Llamamos al login del AuthContext
       await login(
         formData.email,
         formData.password,
