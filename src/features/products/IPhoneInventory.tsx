@@ -11,6 +11,7 @@ import {
   Save,
   X,
   AlertCircle,
+  Shield,  // ← AGREGAR ESTA LÍNEA
 } from 'lucide-react'
 import { Card, CardContent } from '@/shared/components/ui/card'
 import { Button } from '@/shared/components/ui/button'
@@ -34,6 +35,7 @@ interface IPhoneFormData {
 }
 
 export default function IPhoneInventory() {
+  const navigate = useNavigate()  // ← AGREGAR ESTA LÍNEA
   const [formData, setFormData] = useState<IPhoneFormData>({
     model: 'iPhone 15 Pro Max',
     storage: '256 GB',
@@ -444,11 +446,19 @@ export default function IPhoneInventory() {
             </Card>
 
             {/* Botón de acción final */}
+                       {/* Botón de acción final */}
             <Button onClick={handleSubmit} className="w-full" disabled={isSaving}>
               {isSaving ? 'Guardando...' : 'Agregar al inventario'}
             </Button>
-            <p className="text-center text-[10px] text-muted-foreground">Último auto-guardado a las {autoSaveTime}</p>
-          </div>
+            <Button
+              onClick={() => navigate('/stock/iphone-insurance')}
+              variant="outline"
+              className="w-full gap-2"
+            >
+              <Shield size={16} />
+              Agregar seguro
+            </Button>
+            <p className="text-center text-[10px] text-muted-foreground">Último auto-guardado a las {autoSaveTime}</p> </div>
         </div>
       </div>
     </div>
