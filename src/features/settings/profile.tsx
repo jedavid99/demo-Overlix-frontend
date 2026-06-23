@@ -434,13 +434,12 @@ export default function Profile() {
         </div>
 
         {/* Modal de creación de usuario */}
-      
-      </div>
         <CreateUserModal
           isOpen={showUserModal}
           onClose={() => setShowUserModal(false)}
           onCreateUser={handleCreateUser}
         />
+      </div>
     </div>
   )
 }
