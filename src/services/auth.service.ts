@@ -1,17 +1,14 @@
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+import api, { setAuthToken } from './api';
 
 export const login = async (email: string, password: string, codigoEmpresa: string) => {
-  // Construimos el payload con los nombres exactos que espera el backend
   const payload = {
     email,
-    contraseña: password,   // OJO: el backend espera "contraseña" con tilde
+    contraseña: password,
     codigo_empresa: codigoEmpresa
   };
 
   try {
-    const response = await axios.post(`${API_URL}/auth/login`, payload);
+    const response = await api.post('/auth/login', payload);
     return response.data;
   } catch (error: any) {
     console.error('Error en login:', error.response?.data);
@@ -19,10 +16,22 @@ export const login = async (email: string, password: string, codigoEmpresa: stri
   }
 };
 
-// Función para obtener el perfil (si la necesitas)
-export const getMe = async (token: string) => {
-  const response = await axios.get(`${API_URL}/auth/me`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+export const getMe = async () => {
+  const response = await api.get('/auth/me');
   return response.data;
+};
+
+export const register = async (data: any) => {
+  try {
+    const response = await api.post('/auth/register', data);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error en register:', error.response?.data);
+    throw error;
+  }
+};
+
+export const logout = () => {
+  localStorage.removeItem('access_token');
+  setAuthToken(null);
 };
