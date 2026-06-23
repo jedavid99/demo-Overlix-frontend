@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Edit, Lock, Smartphone, ArrowUpRight, ArrowDownRight, Download, UserPlus, X } from 'lucide-react'
+import { Edit, Lock, Smartphone, ArrowUpRight, ArrowDownRight, Download, UserPlus, X, Users } from 'lucide-react'
 import { MdInfo, MdContentCopy, MdBarChart } from 'react-icons/md'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
@@ -13,8 +13,19 @@ import {
 } from '@/shared/components/ui/select'
 import CreateUserModal from './CreateUserModal'
 
+// Tipos
+interface User {
+  id: string
+  name: string
+  email: string
+  role: string
+  department: string
+  status: 'active' | 'inactive'
+  joinDate: string
+}
+
 export default function Profile() {
-  // 📦 Estado del usuario – vacío (cargar desde API)
+  // 📦 Estado del usuario logueado – vacío (cargar desde API)
   const [userData] = useState({
     name: '',
     role: '',
@@ -46,12 +57,27 @@ export default function Profile() {
     trend: string
   }[]>([])
 
-    // Estado del modal de crear usuario
+  // 📦 Lista de usuarios – vacía (cargar desde API)
+  const [users, setUsers] = useState<User[]>([])
+
+  // Estado del modal de crear usuario
   const [showUserModal, setShowUserModal] = useState(false)
 
   const handleCreateUser = (user: any) => {
     console.log('Usuario creado:', user)
     // Aquí iría la lógica para guardar el usuario en la API
+    // Simulamos agregar a la lista local
+    const newUser: User = {
+      id: Date.now().toString(),
+      name: user.fullName,
+      email: user.email,
+      role: user.role || 'Técnico',
+      department: user.department || 'Taller',
+      status: 'active',
+      joinDate: new Date().toLocaleDateString('es-AR'),
+    }
+    setUsers([...users, newUser])
+    setShowUserModal(false)
   }
 
   return (
@@ -328,14 +354,6 @@ export default function Profile() {
                             {data.trend}
                           </span>
                         )}
-                                {/* Create User Button */}
-        <Button
-          onClick={() => setShowUserModal(true)}
-          className="w-full bg-[#0058be] hover:bg-[#2170e4] flex items-center justify-center gap-2"
-        >
-          <UserPlus size={18} />
-          Agregar Nuevo Usuario
-        </Button>
                       </td>
                     </tr>
                   ))}
@@ -344,12 +362,83 @@ export default function Profile() {
             </div>
           )}
         </div>
-              {/* Create User Modal */}
-      <CreateUserModal
-        isOpen={showUserModal}
-        onClose={() => setShowUserModal(false)}
-        onCreateUser={handleCreateUser}
-      />
+
+        {/* ========== NUEVA SECCIÓN: USUARIOS DEL SISTEMA ========== */}
+        <div className="bg-card-light dark:bg-card-dark rounded-lg p-6 shadow-md">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <Users size={20} />
+              <h2 className="text-lg font-semibold text-foreground">Usuarios del Sistema</h2>
+              <span className="bg-muted text-muted-foreground text-xs px-2 py-1 rounded-full">
+                {users.length}
+              </span>
+            </div>
+            <Button
+              onClick={() => setShowUserModal(true)}
+              className="bg-[#0058be] hover:bg-[#2170e4] flex items-center gap-2"
+              size="sm"
+            >
+              <UserPlus size={16} />
+              Agregar Usuario
+            </Button>
+          </div>
+
+          {users.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Users size={48} className="mx-auto text-muted-foreground/40 mb-3" />
+              <p className="font-medium">No hay usuarios registrados</p>
+              <p className="text-xs">Agrega usuarios para gestionar el acceso al sistema</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border-light dark:border-border-dark">
+                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">NOMBRE</th>
+                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">EMAIL</th>
+                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">ROL</th>
+                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">DEPARTAMENTO</th>
+                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">ESTADO</th>
+                    <th className="text-left py-3 px-4 font-semibold text-muted-foreground text-xs">FECHA DE REGISTRO</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user) => (
+                    <tr key={user.id} className="border-b border-border-light dark:divide-border-dark hover:bg-muted/50">
+                      <td className="py-3 px-4 font-medium text-foreground">{user.name}</td>
+                      <td className="py-3 px-4 text-muted-foreground">{user.email}</td>
+                      <td className="py-3 px-4">
+                        <span className={`px-2 py-1 rounded text-xs font-semibold ${
+                          user.role === 'Administrador' ? 'bg-primary/10 text-primary' :
+                          user.role === 'Técnico' ? 'bg-green-500/10 text-green-600' :
+                          'bg-muted/50 text-muted-foreground'
+                        }`}>
+                          {user.role}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-muted-foreground">{user.department}</td>
+                      <td className="py-3 px-4">
+                        <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                          user.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                        }`}>
+                          {user.status === 'active' ? 'Activo' : 'Inactivo'}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-muted-foreground">{user.joinDate}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Modal de creación de usuario */}
+        <CreateUserModal
+          isOpen={showUserModal}
+          onClose={() => setShowUserModal(false)}
+          onCreateUser={handleCreateUser}
+        />
       </div>
     </div>
   )
