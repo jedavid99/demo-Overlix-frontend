@@ -272,7 +272,8 @@ export default function Register() {
                 used: true,
                 usedAt: new Date().toISOString(),
                 userEmail: userData.email,
-                userName: userData.fullName
+                userName: userData.fullName,
+                companyDetails: registrationType === 'new' ? companyData : null
               };
             }
             return c;

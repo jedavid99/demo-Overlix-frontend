@@ -37,6 +37,17 @@ interface ActivationCode {
   usedAt?: string;
   userEmail?: string;
   userName?: string;
+  companyDetails?: {
+    razonSocial: string;
+    nombreFantasia: string;
+    address: string;
+    phone: string;
+    email: string;
+    cuit: string;
+    owner: string;
+    paymentMethod: string;
+    workshopType: string;
+  };
   status: 'active' | 'expired' | 'expiring_soon';
 }
 
@@ -412,7 +423,20 @@ export default function SimpleCodeGenerator() {
                             </div>
                             {code.userName && (
                               <div className="flex items-center gap-2">
-                                <span>Usuario: {code.userName}</span>
+                                <span>Usuario: {code.userName} ({code.userEmail})</span>
+                              </div>
+                            )}
+                            {code.companyDetails && (
+                              <div className="mt-2 pt-2 border-t border-gray-200">
+                                <p className="font-medium text-[#191b23] mb-1">Datos de la empresa:</p>
+                                <div className="space-y-0.5">
+                                  <p><strong>Razón Social:</strong> {code.companyDetails.razonSocial}</p>
+                                  <p><strong>Nombre Fantasía:</strong> {code.companyDetails.nombreFantasia}</p>
+                                  <p><strong>CUIT:</strong> {code.companyDetails.cuit}</p>
+                                  <p><strong>Dueño:</strong> {code.companyDetails.owner}</p>
+                                  <p><strong>Tipo:</strong> {code.companyDetails.workshopType}</p>
+                                  <p><strong>Pago:</strong> {code.companyDetails.paymentMethod}</p>
+                                </div>
                               </div>
                             )}
                           </div>
