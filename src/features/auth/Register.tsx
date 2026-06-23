@@ -133,10 +133,36 @@ export default function Register() {
       setActivationError('Por favor, ingresa el código de activación');
       return false;
     }
-    if (activationCode !== VALID_ACTIVATION_CODE) {
+    
+    // Check if code exists in admin-generated codes
+    const storedCodes = localStorage.getItem('activation_codes');
+    if (!storedCodes) {
       setActivationError('Código de activación inválido');
       return false;
     }
+
+    const codes = JSON.parse(storedCodes);
+    const codeData = codes.find((c: any) => c.code === activationCode);
+    
+    if (!codeData) {
+      setActivationError('Código de activación inválido');
+      return false;
+    }
+
+    // Check if code is already used
+    if (codeData.used) {
+      setActivationError('Este código ya ha sido utilizado');
+      return false;
+    }
+
+    // Check if code is expired
+    const expiresAt = new Date(codeData.expiresAt);
+    const now = new Date();
+    if (expiresAt < now) {
+      setActivationError('Este código de activación ha vencido');
+      return false;
+    }
+
     setActivationError('');
     return true;
   };
@@ -216,10 +242,30 @@ export default function Register() {
       
       // Simulate API call
       setTimeout(() => {
+        // Mark activation code as used and save user info
+        const storedCodes = localStorage.getItem('activation_codes');
+        if (storedCodes) {
+          const codes = JSON.parse(storedCodes);
+          const updatedCodes = codes.map((c: any) => {
+            if (c.code === activationCode) {
+              return {
+                ...c,
+                used: true,
+                usedAt: new Date().toISOString(),
+                userEmail: userData.email,
+                userName: userData.fullName
+              };
+            }
+            return c;
+          });
+          localStorage.setItem('activation_codes', JSON.stringify(updatedCodes));
+        }
+
         const registrationData = {
           userData,
           companyData: registrationType === 'new' ? companyData : null,
           registrationType,
+          activationCode,
           timestamp: new Date().toISOString()
         };
         
