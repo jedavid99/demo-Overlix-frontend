@@ -22,7 +22,7 @@ import jsPDF from 'jspdf'
 import ServiceOrderPreview from '@/features/settings/ServiceOrderPreview'
 
 // ============================================================================
-// Tipos e interfaces (mismos que antes)
+// Tipos e interfaces
 // ============================================================================
 interface ServiceOrderData {
   companyName: string
@@ -67,6 +67,8 @@ interface ServiceOrderData {
   showSecurityInfo: boolean
   showWarrantyTerms: boolean
   showSignatures: boolean
+  showWatermark: boolean
+  watermarkUrl: string
 }
 
 // ============================================================================
@@ -120,6 +122,8 @@ const defaultData: ServiceOrderData = {
   showSecurityInfo: true,
   showWarrantyTerms: true,
   showSignatures: true,
+  showWatermark: false,
+  watermarkUrl: '',
 }
 
 // ============================================================================
@@ -130,9 +134,6 @@ export default function PDFConfig() {
   const [isGenerating, setIsGenerating] = useState(false)
   const previewRef = useRef<HTMLDivElement>(null)
 
-  // ============================================================================
-  // Manejadores de cambios
-  // ============================================================================
   const handleChange = <K extends keyof ServiceOrderData>(key: K, value: ServiceOrderData[K]) => {
     setData((prev) => ({ ...prev, [key]: value }))
   }
@@ -146,9 +147,8 @@ export default function PDFConfig() {
     setIsGenerating(true)
 
     try {
-      // Capturar el componente de previsualización
       const canvas = await html2canvas(previewRef.current, {
-        scale: 2, // Alta calidad
+        scale: 2,
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
@@ -176,7 +176,7 @@ export default function PDFConfig() {
   }
 
   // ============================================================================
-  // Renderizado del panel de configuración (reducido para brevedad)
+  // Renderizado del panel de configuración (completo)
   // ============================================================================
   const renderConfigPanel = () => (
     <div className="space-y-4">
@@ -224,13 +224,164 @@ export default function PDFConfig() {
       </Card>
 
       {/* Cliente */}
-    
+      <Card>
+        <CardContent className="p-4 space-y-3">
+          <h3 className="font-bold text-foreground flex items-center gap-2">
+            <User size={16} className="text-primary" /> Cliente
+          </h3>
+          <Input
+            value={data.clientName}
+            onChange={(e) => handleChange('clientName', e.target.value)}
+            placeholder="Nombre completo"
+          />
+          <Input
+            value={data.clientPhone}
+            onChange={(e) => handleChange('clientPhone', e.target.value)}
+            placeholder="Teléfono"
+          />
+          <Input
+            value={data.clientEmail}
+            onChange={(e) => handleChange('clientEmail', e.target.value)}
+            placeholder="Email"
+          />
+          <Input
+            value={data.clientAddress}
+            onChange={(e) => handleChange('clientAddress', e.target.value)}
+            placeholder="Dirección"
+          />
+          <Input
+            value={data.clientId}
+            onChange={(e) => handleChange('clientId', e.target.value)}
+            placeholder="Documento"
+          />
+        </CardContent>
+      </Card>
 
-      {/* Dispositivo y reparación */}
-      
+      {/* Dispositivo y Reparación */}
+      <Card>
+        <CardContent className="p-4 space-y-3">
+          <h3 className="font-bold text-foreground flex items-center gap-2">
+            <Smartphone size={16} className="text-primary" /> Dispositivo
+          </h3>
+          <Input
+            value={data.deviceModel}
+            onChange={(e) => handleChange('deviceModel', e.target.value)}
+            placeholder="Modelo"
+          />
+          <Input
+            value={data.deviceImei}
+            onChange={(e) => handleChange('deviceImei', e.target.value)}
+            placeholder="IMEI"
+          />
+          <Input
+            value={data.deviceSerial}
+            onChange={(e) => handleChange('deviceSerial', e.target.value)}
+            placeholder="Serial"
+          />
+          <Input
+            value={data.deviceColor}
+            onChange={(e) => handleChange('deviceColor', e.target.value)}
+            placeholder="Color"
+          />
+          <Input
+            value={data.deviceStorage}
+            onChange={(e) => handleChange('deviceStorage', e.target.value)}
+            placeholder="Almacenamiento"
+          />
+          <Input
+            value={data.deviceDescription}
+            onChange={(e) => handleChange('deviceDescription', e.target.value)}
+            placeholder="Descripción del dispositivo"
+          />
+          <div className="border-t border-border pt-3 mt-2">
+            <Label className="text-sm font-medium">Reparación</Label>
+            <Input
+              value={data.repairDescription}
+              onChange={(e) => handleChange('repairDescription', e.target.value)}
+              placeholder="Descripción de la reparación"
+              className="mt-1"
+            />
+            <Input
+              value={data.repairDiagnostic}
+              onChange={(e) => handleChange('repairDiagnostic', e.target.value)}
+              placeholder="Diagnóstico"
+              className="mt-1"
+            />
+            <div className="grid grid-cols-3 gap-2 mt-1">
+              <Input
+                value={data.laborCost}
+                onChange={(e) => handleChange('laborCost', e.target.value)}
+                placeholder="Mano de obra"
+              />
+              <Input
+                value={data.partsCost}
+                onChange={(e) => handleChange('partsCost', e.target.value)}
+                placeholder="Repuestos"
+              />
+              <Input
+                value={data.totalPrice}
+                onChange={(e) => handleChange('totalPrice', e.target.value)}
+                placeholder="Total"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Seguridad y técnico */}
-     
+      {/* Seguridad y Técnico */}
+      <Card>
+        <CardContent className="p-4 space-y-3">
+          <h3 className="font-bold text-foreground flex items-center gap-2">
+            <Shield size={16} className="text-primary" /> Seguridad y Técnico
+          </h3>
+          <select
+            value={data.securityType}
+            onChange={(e) => handleChange('securityType', e.target.value as any)}
+            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+          >
+            <option value="none">Ninguno</option>
+            <option value="pin">PIN</option>
+            <option value="pattern">Patrón</option>
+            <option value="fingerprint">Huella</option>
+          </select>
+          {data.securityType === 'pin' && (
+            <Input
+              value={data.securityPin}
+              onChange={(e) => handleChange('securityPin', e.target.value)}
+              placeholder="PIN"
+            />
+          )}
+          {data.securityType === 'pattern' && (
+            <Input
+              value={data.securityPattern}
+              onChange={(e) => handleChange('securityPattern', e.target.value)}
+              placeholder="Descripción del patrón"
+            />
+          )}
+          <Input
+            value={data.securityNotes}
+            onChange={(e) => handleChange('securityNotes', e.target.value)}
+            placeholder="Notas de seguridad"
+          />
+          <Input
+            value={data.technicianName}
+            onChange={(e) => handleChange('technicianName', e.target.value)}
+            placeholder="Técnico asignado"
+          />
+          <Input
+            value={data.estimatedTime}
+            onChange={(e) => handleChange('estimatedTime', e.target.value)}
+            placeholder="Tiempo estimado"
+          />
+          <textarea
+            value={data.technicianNotes}
+            onChange={(e) => handleChange('technicianNotes', e.target.value)}
+            placeholder="Notas internas"
+            rows={2}
+            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm resize-none"
+          />
+        </CardContent>
+      </Card>
 
       {/* Garantía */}
       <Card>
@@ -253,19 +404,129 @@ export default function PDFConfig() {
         </CardContent>
       </Card>
 
-      
+      {/* Configuración visual */}
+      <Card>
+        <CardContent className="p-4 space-y-3">
+          <h3 className="font-bold text-foreground flex items-center gap-2">
+            <Settings size={16} className="text-primary" /> Configuración visual
+          </h3>
+          <div className="space-y-2">
+            {[
+              { key: 'showHeader', label: 'Mostrar encabezado' },
+              { key: 'showFooter', label: 'Mostrar pie de página' },
+              { key: 'showClientSection', label: 'Mostrar sección cliente' },
+              { key: 'showTechnicianSection', label: 'Mostrar sección técnico' },
+              { key: 'showSecurityInfo', label: 'Mostrar información de seguridad' },
+              { key: 'showWarrantyTerms', label: 'Mostrar términos de garantía' },
+              { key: 'showSignatures', label: 'Mostrar espacios de firma' },
+            ].map((item) => (
+              <div key={item.key} className="flex items-center justify-between">
+                <span className="text-sm">{item.label}</span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={data[item.key as keyof ServiceOrderData] as boolean}
+                    onChange={(e) =>
+                      handleChange(item.key as keyof ServiceOrderData, e.target.checked)
+                    }
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                </label>
+              </div>
+            ))}
+          </div>
+          <div className="pt-2 border-t border-border">
+            <Input
+              value={data.headerText}
+              onChange={(e) => handleChange('headerText', e.target.value)}
+              placeholder="Texto del encabezado"
+            />
+            <Input
+              value={data.footerText}
+              onChange={(e) => handleChange('footerText', e.target.value)}
+              placeholder="Texto del pie"
+              className="mt-2"
+            />
+            <div className="flex items-center gap-4 mt-2">
+              <span className="text-sm font-medium">Fuente: {data.fontSize}px</span>
+              <input
+                type="range"
+                min="8"
+                max="14"
+                value={data.fontSize}
+                onChange={(e) => handleChange('fontSize', parseInt(e.target.value))}
+                className="flex-1"
+              />
+            </div>
+            <div className="flex items-center gap-4 mt-1">
+              <span className="text-sm font-medium">Margen: {data.margin}px</span>
+              <input
+                type="range"
+                min="12"
+                max="30"
+                value={data.margin}
+                onChange={(e) => handleChange('margin', parseInt(e.target.value))}
+                className="flex-1"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      <Button
-        onClick={() => {
-          setData(defaultData)
-          alert('Configuración restablecida.')
-        }}
-        variant="outline"
-        className="w-full"
-      >
-        <RefreshCw size={16} className="mr-2" />
-        Restablecer
-      </Button>
+      {/* Marca de agua */}
+      <Card>
+        <CardContent className="p-4 space-y-3">
+          <h3 className="font-bold text-foreground flex items-center gap-2">
+            <Settings size={16} className="text-primary" /> Marca de agua
+          </h3>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Mostrar marca de agua</span>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={data.showWatermark}
+                  onChange={(e) => handleChange('showWatermark', e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+              </label>
+            </div>
+            {data.showWatermark && (
+              <Input
+                value={data.watermarkUrl}
+                onChange={(e) => handleChange('watermarkUrl', e.target.value)}
+                placeholder="URL del logo (marca de agua)"
+              />
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Botones de acción */}
+      <div className="flex flex-col gap-3">
+        <Button
+          onClick={() => {
+            setData(defaultData)
+            alert('Configuración restablecida a los valores predeterminados.')
+          }}
+          variant="outline"
+          className="w-full"
+        >
+          <RefreshCw size={16} className="mr-2" />
+          Restablecer
+        </Button>
+        <Button
+          onClick={() => {
+            alert('Configuración guardada localmente.')
+          }}
+          className="w-full"
+        >
+          <Save size={16} className="mr-2" />
+          Guardar configuración
+        </Button>
+      </div>
     </div>
   )
 
