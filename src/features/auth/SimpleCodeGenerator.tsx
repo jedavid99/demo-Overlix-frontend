@@ -19,6 +19,8 @@ import { Button } from '../../shared/components/ui/button';
 import { Card } from '../../shared/components/ui/card';
 import { Label } from '../../shared/components/ui/label';
 import logo from '/ovelix-claro.png';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@radix-ui/react-select';
+import { Input } from '@/shared/components/ui/input';
 
 // Subscription plans
 const SUBSCRIPTION_PLANS = {
