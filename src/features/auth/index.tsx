@@ -207,6 +207,17 @@ export default function Login() {
               </button>
             </div>
           </div>
+                      <div className="text-center mt-6">
+              <p className="text-sm text-[#424754]">
+                ¿No tienes una cuenta?{' '}
+                <button
+                  onClick={() => navigate('/register')}
+                  className="text-[#0058be] font-medium hover:underline cursor-pointer"
+                >
+                  Regístrate
+                </button>
+              </p>
+            </div>
         </div>
       </section>
     </main>
