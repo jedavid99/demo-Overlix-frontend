@@ -253,40 +253,7 @@ export default function PDFConfig() {
         </CardContent>
       </Card>
 
-      {/* Configuración visual (simplificada) */}
-      <Card>
-        <CardContent className="p-4 space-y-3">
-          <h3 className="font-bold text-foreground flex items-center gap-2">
-            <Settings size={16} className="text-primary" /> Configuración visual
-          </h3>
-          <div className="space-y-2">
-            {[
-              { key: 'showHeader', label: 'Mostrar encabezado' },
-              { key: 'showFooter', label: 'Mostrar pie de página' },
-              { key: 'showClientSection', label: 'Mostrar sección cliente' },
-              { key: 'showTechnicianSection', label: 'Mostrar sección técnico' },
-              { key: 'showSecurityInfo', label: 'Mostrar información de seguridad' },
-              { key: 'showWarrantyTerms', label: 'Mostrar términos de garantía' },
-              { key: 'showSignatures', label: 'Mostrar espacios de firma' },
-            ].map((item) => (
-              <div key={item.key} className="flex items-center justify-between">
-                <span className="text-sm">{item.label}</span>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={data[item.key as keyof ServiceOrderData] as boolean}
-                    onChange={(e) =>
-                      handleChange(item.key as keyof ServiceOrderData, e.target.checked)
-                    }
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                </label>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      
 
       <Button
         onClick={() => {
