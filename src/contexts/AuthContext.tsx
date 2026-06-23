@@ -45,14 +45,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string, codigoEmpresa: string) => {
+    console.log('AuthContext.login llamado con:', { email, codigoEmpresa });
     const response = await loginService(email, password, codigoEmpresa);
+    console.log('Respuesta del login:', response);
     
     if (response.access_token) {
       localStorage.setItem('access_token', response.access_token);
+      console.log('Token guardado en localStorage');
       
       const currentUser = await getMe();
+      console.log('Usuario obtenido:', currentUser);
       setUser(currentUser);
       setIsAuthenticated(true);
+    } else {
+      console.error('No se recibió access_token en la respuesta');
     }
   };
 
