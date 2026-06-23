@@ -52,7 +52,9 @@ export const AdminTopBar = ({
   const [searchQuery, setSearchQuery] = useState('')
   const searchInputRef = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
-
+navigate = useNavigate()
+  const { logout } = useAuth()
+  const 
   const currentCategory = categories.find(cat => cat.value === selectedCategory) || categories[0]
 
   useEffect(() => {
@@ -70,7 +72,11 @@ export const AdminTopBar = ({
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && searchQuery.trim()) {
       const route = currentCategory.route
-      navigate(`${route}?search=${encodeURIComponent(searchQuery.trim())}`)
+     
+  }
+
+  const handleLogout = () => {
+    logout() navigate(`${route}?search=${encodeURIComponent(searchQuery.trim())}`)
       setSearchQuery('')
     }
   }
