@@ -47,6 +47,7 @@ interface UserData {
   password: string;
   confirmPassword: string;
   companyId?: string;
+  codigoEmpresa?: string;
 }
 
 interface CompanyData {
@@ -104,7 +105,8 @@ export default function Register() {
     phone: '',
     password: '',
     confirmPassword: '',
-    companyId: ''
+    companyId: '',
+    codigoEmpresa: ''
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -765,7 +767,17 @@ export default function Register() {
                         error={errors.fullName}
                       />
                     </div>
-
+<div className="space-y-1.5">
+                      <Label htmlFor="fullName">Codigo de la empresa *</Label>
+                      <Input
+                        id="codigoEmpresa"
+                        placeholder="AA2348"
+                        value={userData.codigoEmpresa}
+                        onChange={(e) => setUserData({ ...userData, codigoEmpresa: e.target.value })}
+                        leftIcon={<UserPlus className="w-5 h-5" />}
+                        error={errors.codigoEmpresa}
+                      />
+                    </div>
                     <div className="space-y-1.5">
                       <Label htmlFor="userEmail">Email *</Label>
                       <Input
