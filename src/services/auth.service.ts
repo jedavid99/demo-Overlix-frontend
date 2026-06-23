@@ -1,4 +1,4 @@
-import api, { setAuthToken } from './api';
+import api from './api';
 
 export const login = async (email: string, password: string, codigoEmpresa: string) => {
   const payload = {
@@ -31,5 +31,4 @@ export const register = async (data: any) => {
 
 export const logout = () => {
   localStorage.removeItem('access_token');
-  setAuthToken(null);
 };

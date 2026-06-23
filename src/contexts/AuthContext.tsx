@@ -27,13 +27,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (token) {
         try {
-          setAuthToken(token);
           const currentUser = await getMe();
           setUser(currentUser);
           setIsAuthenticated(true);
         } catch (error) {
           localStorage.removeItem('access_token');
-          setAuthToken(null);
           setIsAuthenticated(false);
         }
       } else {
@@ -51,7 +49,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     if (response.access_token) {
       localStorage.setItem('access_token', response.access_token);
-      setAuthToken(response.access_token);
       
       const currentUser = await getMe();
       setUser(currentUser);

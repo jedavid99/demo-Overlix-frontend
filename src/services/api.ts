@@ -10,17 +10,6 @@ const api = axios.create({
   },
 });
 
-// Desactivar logging de errores por defecto de Axios
-
-// Función para establecer el token en los headers
-export const setAuthToken = (token: string | null) => {
-  if (token) {
-    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  } else {
-    delete api.defaults.headers.common['Authorization'];
-  }
-};
-
 // Interceptor request: agrega token si existe
 api.interceptors.request.use(
   (config) => {
@@ -34,6 +23,11 @@ api.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+// Función para limpiar el token (usada en logout)
+export const clearAuthToken = () => {
+  localStorage.removeItem('access_token');
+};
 
 // Rutas públicas que no deben redirigir en caso de 401
 const publicRoutes = ['/auth/login', '/auth/register'];
@@ -52,8 +46,7 @@ api.interceptors.response.use(
       
       if (!isPublicRoute) {
         // Eliminar token y redirigir solo en rutas protegidas
-        localStorage.removeItem('access_token');
-        setAuthToken(null);
+        clearAuthToken();
         // Disparar evento para notificar al AuthContext
         window.dispatchEvent(new CustomEvent('auth:logout'));
         window.location.href = '/login';
