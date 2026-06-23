@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { Plus, Cloud, Clock, Bell, Key, Smartphone, Laptop, Monitor, Gamepad2, Edit, Trash2, ChevronDown, Info, DollarSign, ChevronRight, Building2, AlertCircle, CheckCircle2, Ticket, Eye, RotateCcw, CreditCard } from 'lucide-react'
+import { Plus, Cloud, Clock, Bell, Key, Smartphone, Laptop, Monitor, Gamepad2, Edit, Trash2, ChevronDown, Info, DollarSign, ChevronRight, Building2, AlertCircle, CheckCircle2, Ticket, Eye, RotateCcw, CreditCard, FileText } from 'lucide-react'
 import { MdContentCopy, MdDelete, MdLink, MdEdit, MdCalendarToday, MdEmail, MdBarChart } from 'react-icons/md'
-
+import PDFConfig from './PDFConfig'
 const sections = [
   { id: 'general', label: 'General', icon: <Cloud size={16} /> },
   { id: 'business', label: 'Información del negocio', icon: <Clock size={16} /> },
@@ -9,6 +9,7 @@ const sections = [
   { id: 'taxes', label: 'Impuestos y pagos', icon: <Key size={16} /> },
   { id: 'notificationes', label: 'Notificaciones', icon: <Bell size={16} /> },
   { id: 'api', label: 'API e integraciones', icon: <Cloud size={16} /> },
+  { id: 'pdf', label: 'Configuración PDF', icon: <FileText size={16} /> },
 ]
 
 function LeftNav({ current, onChange }: { current: string; onChange: (id: string) => void }) {
@@ -705,7 +706,9 @@ export default function Settings() {
                 </button>
               </div>
             </div>
+            
           )}
+          {section === 'pdf' && <PDFConfig />}
         </main>
       </div>
     </div>

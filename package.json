@@ -30,6 +30,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.4.0",
     "framer-motion": "^10.18.0",
+    "jspdf": "^4.2.1",
     "lucide-react": "^0.278.0",
     "popover": "^2.4.1",
     "postcss": "^8.4.0",
