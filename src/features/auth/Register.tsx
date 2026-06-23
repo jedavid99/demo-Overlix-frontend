@@ -14,7 +14,8 @@ import {
   MapPin,
   FileText,
   Shield,
-  Check
+  Check,
+  MessageCircle
 } from 'lucide-react';
 import { Button } from '../../shared/components/ui/button';
 import { Input } from '../../shared/components/ui/input';
@@ -239,10 +240,11 @@ export default function Register() {
   // Stepper component
   const Stepper = () => {
     const steps = [
-      { number: 1, label: 'Activación' },
-      { number: 2, label: 'Tipo' },
-      { number: 3, label: 'Datos' },
-      { number: 4, label: 'Confirmación' }
+      { number: 1, label: 'Solicitar' },
+      { number: 2, label: 'Activación' },
+      { number: 3, label: 'Tipo' },
+      { number: 4, label: 'Datos' },
+      { number: 5, label: 'Confirmación' }
     ];
 
     const getStepStatus = (stepNumber: number) => {
@@ -342,8 +344,82 @@ export default function Register() {
         <div className="flex-1 flex items-center justify-center py-8">
           <div className="w-full max-w-[500px]">
             <AnimatePresence mode="wait" initial={false}>
-              {/* Step 0: Activation Code */}
+              {/* Step 0: Request Code via WhatsApp */}
               {step === 0 && (
+                <motion.div
+                  key="step0"
+                  custom={direction}
+                  variants={stepVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.3 }}
+                  className="bg-white rounded-2xl shadow-xl border border-[#c2c6d6]/60 p-8 lg:p-10"
+                >
+                  <div className="mb-8">
+                    <h2 className="text-2xl font-bold text-[#191b23] tracking-tight mb-2">
+                      Solicita tu código de activación
+                    </h2>
+                    <p className="text-sm text-[#424754]">
+                      Para registrarte en Overlix, necesitas un código de activación. Solicítalo a través de WhatsApp.
+                    </p>
+                  </div>
+
+                  <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-6">
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 bg-green-100 rounded-full">
+                        <MessageCircle className="w-6 h-6 text-green-600" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-[#191b23] mb-2">¿Cómo obtener tu código?</h3>
+                        <ul className="text-sm text-[#424754] space-y-1">
+                          <li>• Haz clic en el botón de WhatsApp</li>
+                          <li>• Envía el mensaje predefinido</li>
+                          <li>• Recibirás tu código de activación</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  <a
+                    href="https://wa.me/1234567890?text=Hola,%20me%20gustaría%20solicitar%20un%20código%20de%20activación%20para%20registrarme%20en%20Overlix"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full"
+                  >
+                    <Button
+                      className="w-full bg-green-500 hover:bg-green-600"
+                      size="lg"
+                    >
+                      <MessageCircle className="w-5 h-5 mr-2" />
+                      Solicitar código por WhatsApp
+                    </Button>
+                  </a>
+
+                  <div className="mt-6 text-center">
+                    <p className="text-xs text-[#727785]">
+                      ¿Ya tienes tu código?{' '}
+                      <button
+                        onClick={handleNextStep}
+                        className="text-[#0058be] font-medium hover:underline cursor-pointer"
+                      >
+                        Ingresa aquí
+                      </button>
+                    </p>
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    onClick={handleGoToLogin}
+                    className="w-full mt-4"
+                  >
+                    Volver al login
+                  </Button>
+                </motion.div>
+              )}
+
+              {/* Step 1: Activation Code */}
+              {step === 1 && (
                 <motion.div
                   key="step0"
                   custom={direction}
@@ -408,8 +484,8 @@ export default function Register() {
                 </motion.div>
               )}
 
-              {/* Step 1: Registration Type Selection */}
-              {step === 1 && (
+              {/* Step 2: Registration Type Selection */}
+              {step === 2 && (
                 <motion.div
                   key="step1"
                   custom={direction}
@@ -486,8 +562,8 @@ export default function Register() {
                 </motion.div>
               )}
 
-              {/* Step 2a: Company Registration Form */}
-              {step === 2 && registrationType === 'new' && (
+              {/* Step 3a: Company Registration Form */}
+              {step === 3 && registrationType === 'new' && (
                 <motion.div
                   key="step2a"
                   custom={direction}
@@ -590,8 +666,8 @@ export default function Register() {
                 </motion.div>
               )}
 
-              {/* Step 2b: User Registration Form */}
-              {step === 2 && registrationType === 'existing' && (
+              {/* Step 3b: Company Selection */}
+              {step === 3 && registrationType === 'existing' && (
                 <motion.div
                   key="step2b"
                   custom={direction}
@@ -656,8 +732,8 @@ export default function Register() {
                 </motion.div>
               )}
 
-              {/* Step 3: User Registration Form */}
-              {step === 3 && (
+              {/* Step 4: User Registration Form */}
+              {step === 4 && (
                 <motion.div
                   key="step3"
                   custom={direction}
@@ -765,8 +841,8 @@ export default function Register() {
                 </motion.div>
               )}
 
-              {/* Step 4: Confirmation */}
-              {step === 4 && (
+              {/* Step 5: Confirmation */}
+              {step === 5 && (
                 <motion.div
                   key="step4"
                   custom={direction}
