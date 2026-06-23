@@ -4,10 +4,6 @@ import {
   Eye,
   Save,
   RefreshCw,
-  Shield,
-  Smartphone,
-  User,
-  Wrench,
   Building,
   Award,
   Settings,
@@ -22,7 +18,7 @@ import jsPDF from 'jspdf'
 import ServiceOrderPreview from '@/features/settings/ServiceOrderPreview'
 
 // ============================================================================
-// Tipos e interfaces
+// Tipos e interfaces (completos para el preview, pero solo algunas editables)
 // ============================================================================
 interface ServiceOrderData {
   companyName: string
@@ -72,7 +68,7 @@ interface ServiceOrderData {
 }
 
 // ============================================================================
-// Valores por defecto
+// Valores por defecto (con datos de ejemplo para la vista previa)
 // ============================================================================
 const defaultData: ServiceOrderData = {
   companyName: 'TechFix Reparaciones',
@@ -85,36 +81,37 @@ const defaultData: ServiceOrderData = {
     month: '2-digit',
     day: '2-digit',
   }),
-  clientName: '',
-  clientPhone: '',
-  clientEmail: '',
-  clientAddress: '',
-  clientId: '',
-  deviceModel: '',
-  deviceImei: '',
-  deviceSerial: '',
-  deviceColor: '',
-  deviceStorage: '',
-  deviceDescription: '',
-  repairDescription: '',
-  repairDiagnostic: '',
-  laborCost: '0',
-  partsCost: '0',
-  totalPrice: '0',
+  // Datos de ejemplo para el preview (no editables en este panel)
+  clientName: 'Juan Pérez',
+  clientPhone: '+54 9 11 1234-5678',
+  clientEmail: 'juan.perez@email.com',
+  clientAddress: 'Av. Rivadavia 5678, CABA',
+  clientId: 'DNI 30.123.456',
+  deviceModel: 'iPhone 15 Pro Max',
+  deviceImei: '356912087654321',
+  deviceSerial: 'G6T5X7Y8Z9',
+  deviceColor: 'Titanium Black',
+  deviceStorage: '256 GB',
+  deviceDescription: 'Pantalla OLED, cámara trasera triple',
+  repairDescription: 'Reemplazo de pantalla OLED y reparación de botón de volumen',
+  repairDiagnostic: 'Pantalla con líneas verticales y falta de respuesta táctil. Botón de volumen inferior dañado.',
+  laborCost: '170.00',
+  partsCost: '280.00',
+  totalPrice: '450.00',
   warrantyMonths: '12',
   warrantyTerms:
     'Garantía por defectos de fabricación y mano de obra por 12 meses. No cubre daños por agua, golpes o uso indebido posterior a la reparación.',
-  securityType: 'none',
-  securityPin: '',
-  securityPattern: '',
-  securityNotes: '',
-  technicianName: '',
-  technicianNotes: '',
-  estimatedTime: '',
+  securityType: 'pin',
+  securityPin: '1234',
+  securityPattern: 'Patrón en L (3x3)',
+  securityNotes: 'El cliente ha proporcionado la clave de acceso.',
+  technicianName: 'Carlos López',
+  technicianNotes: 'Verificar la batería durante el proceso.',
+  estimatedTime: '3 horas',
   showHeader: true,
   showFooter: true,
   headerText: 'ORDEN DE SERVICIO',
-  footerText: 'Este documento es un comprobante de recepción de equipo. Leer los términos y condiciones.',
+  footerText: 'Este documento es un comprobante de recepción de equipo.',
   fontSize: 10,
   margin: 18,
   showClientSection: true,
@@ -166,7 +163,7 @@ export default function PDFConfig() {
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width
 
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
-      pdf.save('orden-servicio-profesional.pdf')
+      pdf.save('orden-servicio.pdf')
     } catch (error) {
       console.error('Error al generar el PDF:', error)
       alert('Ocurrió un error al generar el PDF. Por favor, inténtalo de nuevo.')
@@ -176,11 +173,11 @@ export default function PDFConfig() {
   }
 
   // ============================================================================
-  // Renderizado del panel de configuración (completo)
+  // Panel de configuración (solo Empresa, Garantía y Marca de agua)
   // ============================================================================
   const renderConfigPanel = () => (
     <div className="space-y-4">
-      {/* Empresa */}
+      {/* ========== EMPRESA ========== */}
       <Card>
         <CardContent className="p-4 space-y-3">
           <h3 className="font-bold text-foreground flex items-center gap-2">
@@ -223,167 +220,7 @@ export default function PDFConfig() {
         </CardContent>
       </Card>
 
-      {/* Cliente */}
-      <Card>
-        <CardContent className="p-4 space-y-3">
-          <h3 className="font-bold text-foreground flex items-center gap-2">
-            <User size={16} className="text-primary" /> Cliente
-          </h3>
-          <Input
-            value={data.clientName}
-            onChange={(e) => handleChange('clientName', e.target.value)}
-            placeholder="Nombre completo"
-          />
-          <Input
-            value={data.clientPhone}
-            onChange={(e) => handleChange('clientPhone', e.target.value)}
-            placeholder="Teléfono"
-          />
-          <Input
-            value={data.clientEmail}
-            onChange={(e) => handleChange('clientEmail', e.target.value)}
-            placeholder="Email"
-          />
-          <Input
-            value={data.clientAddress}
-            onChange={(e) => handleChange('clientAddress', e.target.value)}
-            placeholder="Dirección"
-          />
-          <Input
-            value={data.clientId}
-            onChange={(e) => handleChange('clientId', e.target.value)}
-            placeholder="Documento"
-          />
-        </CardContent>
-      </Card>
-
-      {/* Dispositivo y Reparación */}
-      <Card>
-        <CardContent className="p-4 space-y-3">
-          <h3 className="font-bold text-foreground flex items-center gap-2">
-            <Smartphone size={16} className="text-primary" /> Dispositivo
-          </h3>
-          <Input
-            value={data.deviceModel}
-            onChange={(e) => handleChange('deviceModel', e.target.value)}
-            placeholder="Modelo"
-          />
-          <Input
-            value={data.deviceImei}
-            onChange={(e) => handleChange('deviceImei', e.target.value)}
-            placeholder="IMEI"
-          />
-          <Input
-            value={data.deviceSerial}
-            onChange={(e) => handleChange('deviceSerial', e.target.value)}
-            placeholder="Serial"
-          />
-          <Input
-            value={data.deviceColor}
-            onChange={(e) => handleChange('deviceColor', e.target.value)}
-            placeholder="Color"
-          />
-          <Input
-            value={data.deviceStorage}
-            onChange={(e) => handleChange('deviceStorage', e.target.value)}
-            placeholder="Almacenamiento"
-          />
-          <Input
-            value={data.deviceDescription}
-            onChange={(e) => handleChange('deviceDescription', e.target.value)}
-            placeholder="Descripción del dispositivo"
-          />
-          <div className="border-t border-border pt-3 mt-2">
-            <Label className="text-sm font-medium">Reparación</Label>
-            <Input
-              value={data.repairDescription}
-              onChange={(e) => handleChange('repairDescription', e.target.value)}
-              placeholder="Descripción de la reparación"
-              className="mt-1"
-            />
-            <Input
-              value={data.repairDiagnostic}
-              onChange={(e) => handleChange('repairDiagnostic', e.target.value)}
-              placeholder="Diagnóstico"
-              className="mt-1"
-            />
-            <div className="grid grid-cols-3 gap-2 mt-1">
-              <Input
-                value={data.laborCost}
-                onChange={(e) => handleChange('laborCost', e.target.value)}
-                placeholder="Mano de obra"
-              />
-              <Input
-                value={data.partsCost}
-                onChange={(e) => handleChange('partsCost', e.target.value)}
-                placeholder="Repuestos"
-              />
-              <Input
-                value={data.totalPrice}
-                onChange={(e) => handleChange('totalPrice', e.target.value)}
-                placeholder="Total"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Seguridad y Técnico */}
-      <Card>
-        <CardContent className="p-4 space-y-3">
-          <h3 className="font-bold text-foreground flex items-center gap-2">
-            <Shield size={16} className="text-primary" /> Seguridad y Técnico
-          </h3>
-          <select
-            value={data.securityType}
-            onChange={(e) => handleChange('securityType', e.target.value as any)}
-            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
-          >
-            <option value="none">Ninguno</option>
-            <option value="pin">PIN</option>
-            <option value="pattern">Patrón</option>
-            <option value="fingerprint">Huella</option>
-          </select>
-          {data.securityType === 'pin' && (
-            <Input
-              value={data.securityPin}
-              onChange={(e) => handleChange('securityPin', e.target.value)}
-              placeholder="PIN"
-            />
-          )}
-          {data.securityType === 'pattern' && (
-            <Input
-              value={data.securityPattern}
-              onChange={(e) => handleChange('securityPattern', e.target.value)}
-              placeholder="Descripción del patrón"
-            />
-          )}
-          <Input
-            value={data.securityNotes}
-            onChange={(e) => handleChange('securityNotes', e.target.value)}
-            placeholder="Notas de seguridad"
-          />
-          <Input
-            value={data.technicianName}
-            onChange={(e) => handleChange('technicianName', e.target.value)}
-            placeholder="Técnico asignado"
-          />
-          <Input
-            value={data.estimatedTime}
-            onChange={(e) => handleChange('estimatedTime', e.target.value)}
-            placeholder="Tiempo estimado"
-          />
-          <textarea
-            value={data.technicianNotes}
-            onChange={(e) => handleChange('technicianNotes', e.target.value)}
-            placeholder="Notas internas"
-            rows={2}
-            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm resize-none"
-          />
-        </CardContent>
-      </Card>
-
-      {/* Garantía */}
+      {/* ========== GARANTÍA ========== */}
       <Card>
         <CardContent className="p-4 space-y-3">
           <h3 className="font-bold text-foreground flex items-center gap-2">
@@ -404,77 +241,7 @@ export default function PDFConfig() {
         </CardContent>
       </Card>
 
-      {/* Configuración visual */}
-      <Card>
-        <CardContent className="p-4 space-y-3">
-          <h3 className="font-bold text-foreground flex items-center gap-2">
-            <Settings size={16} className="text-primary" /> Configuración visual
-          </h3>
-          <div className="space-y-2">
-            {[
-              { key: 'showHeader', label: 'Mostrar encabezado' },
-              { key: 'showFooter', label: 'Mostrar pie de página' },
-              { key: 'showClientSection', label: 'Mostrar sección cliente' },
-              { key: 'showTechnicianSection', label: 'Mostrar sección técnico' },
-              { key: 'showSecurityInfo', label: 'Mostrar información de seguridad' },
-              { key: 'showWarrantyTerms', label: 'Mostrar términos de garantía' },
-              { key: 'showSignatures', label: 'Mostrar espacios de firma' },
-            ].map((item) => (
-              <div key={item.key} className="flex items-center justify-between">
-                <span className="text-sm">{item.label}</span>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={data[item.key as keyof ServiceOrderData] as boolean}
-                    onChange={(e) =>
-                      handleChange(item.key as keyof ServiceOrderData, e.target.checked)
-                    }
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                </label>
-              </div>
-            ))}
-          </div>
-          <div className="pt-2 border-t border-border">
-            <Input
-              value={data.headerText}
-              onChange={(e) => handleChange('headerText', e.target.value)}
-              placeholder="Texto del encabezado"
-            />
-            <Input
-              value={data.footerText}
-              onChange={(e) => handleChange('footerText', e.target.value)}
-              placeholder="Texto del pie"
-              className="mt-2"
-            />
-            <div className="flex items-center gap-4 mt-2">
-              <span className="text-sm font-medium">Fuente: {data.fontSize}px</span>
-              <input
-                type="range"
-                min="8"
-                max="14"
-                value={data.fontSize}
-                onChange={(e) => handleChange('fontSize', parseInt(e.target.value))}
-                className="flex-1"
-              />
-            </div>
-            <div className="flex items-center gap-4 mt-1">
-              <span className="text-sm font-medium">Margen: {data.margin}px</span>
-              <input
-                type="range"
-                min="12"
-                max="30"
-                value={data.margin}
-                onChange={(e) => handleChange('margin', parseInt(e.target.value))}
-                className="flex-1"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Marca de agua */}
+      {/* ========== MARCA DE AGUA ========== */}
       <Card>
         <CardContent className="p-4 space-y-3">
           <h3 className="font-bold text-foreground flex items-center gap-2">
@@ -538,7 +305,7 @@ export default function PDFConfig() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Generador de Orden de Servicio</h2>
-          <p className="text-muted-foreground">Personaliza y genera documentos profesionales para tus clientes</p>
+          <p className="text-muted-foreground">Personaliza la empresa, garantía y marca de agua</p>
         </div>
         <Button onClick={generatePDF} disabled={isGenerating} className="gap-2">
           {isGenerating ? (
@@ -551,7 +318,7 @@ export default function PDFConfig() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Panel de configuración */}
+        {/* Panel de configuración (solo 3 secciones) */}
         <div className="lg:col-span-1">
           <div className="sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto pr-2">
             {renderConfigPanel()}
