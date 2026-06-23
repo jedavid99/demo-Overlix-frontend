@@ -151,21 +151,55 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
               Rol en la empresa <span className="text-destructive">*</span>
             </Label>
             <Select
-              value={formData.role}
-              onValueChange={(value) => setFormData({ ...formData, role: value })}
-            >
-              <SelectTrigger className={errors.role ? 'border-destructive' : ''}>
-                <SelectValue placeholder="Selecciona el rol" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Administrador">Administrador</SelectItem>
-                <SelectItem value="Técnico">Técnico</SelectItem>
-                <SelectItem value="Recepcionista">Recepcionista</SelectItem>
-                <SelectItem value="Gerente">Gerente</SelectItem>
-                <SelectItem value="Contador">Contador</SelectItem>
-                <SelectItem value="Otro">Otro</SelectItem>
-              </SelectContent>
-            </Select>
+  value={formData.role}
+  onValueChange={(value) => setFormData({ ...formData, role: value })}
+>
+  <SelectTrigger 
+    className={`
+      w-full 
+      bg-white dark:bg-slate-800 
+      border border-input 
+      rounded-lg 
+      px-3 py-2 
+      text-sm text-foreground 
+      shadow-sm 
+      focus:ring-2 focus:ring-primary/20 focus:border-primary 
+      transition-all
+      ${errors.role ? 'border-destructive ring-destructive/20' : ''}
+    `}
+  >
+    <SelectValue placeholder="Selecciona el rol" />
+  </SelectTrigger>
+  <SelectContent 
+    className="
+      bg-white dark:bg-slate-800 
+      border border-input 
+      rounded-lg 
+      shadow-lg 
+      max-h-[200px] 
+      overflow-y-auto
+    "
+  >
+    <SelectItem value="Administrador" className="cursor-pointer hover:bg-muted/50 px-3 py-2">
+      Administrador
+    </SelectItem>
+    <SelectItem value="Técnico" className="cursor-pointer hover:bg-muted/50 px-3 py-2">
+      Técnico
+    </SelectItem>
+    <SelectItem value="Recepcionista" className="cursor-pointer hover:bg-muted/50 px-3 py-2">
+      Recepcionista
+    </SelectItem>
+    <SelectItem value="Gerente" className="cursor-pointer hover:bg-muted/50 px-3 py-2">
+      Gerente
+    </SelectItem>
+    <SelectItem value="Contador" className="cursor-pointer hover:bg-muted/50 px-3 py-2">
+      Contador
+    </SelectItem>
+    <SelectItem value="Otro" className="cursor-pointer hover:bg-muted/50 px-3 py-2">
+      Otro
+    </SelectItem>
+  </SelectContent>
+</Select>
             {errors.role && (
               <p className="text-xs text-destructive flex items-center gap-1 mt-1">
                 <AlertCircle size={12} /> {errors.role}
