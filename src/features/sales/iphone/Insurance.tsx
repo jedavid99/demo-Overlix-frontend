@@ -15,6 +15,7 @@ import {
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
+import { useNavigate } from 'react-router-dom';
 
 interface Device {
   id: string;
@@ -39,6 +40,7 @@ interface Device {
 }
 
 export default function IPhoneInsurance() {
+   const navigate = useNavigate()  
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [modelFilter, setModelFilter] = useState('All Series');
@@ -128,10 +130,14 @@ export default function IPhoneInsurance() {
             <Download size={16} className="mr-2" />
             Exportar CSV
           </Button>
-          <Button onClick={() => { setShowAddModal(true); setInsuranceStep(1); }}>
-            <Plus size={16} className="mr-2" />
-            Agregar Seguro
-          </Button>
+          <Button
+  onClick={() => navigate('/stock/iphone-insurance')}
+  variant="outline"
+  className="w-full gap-2"
+>
+  <Shield size={16} />
+  Agregar seguro
+</Button>
         </div>
       </div>
 
