@@ -50,10 +50,15 @@ interface UserData {
 }
 
 interface CompanyData {
-  name: string;
+  razonSocial: string;
+  nombreFantasia: string;
   address: string;
   phone: string;
   email: string;
+  cuit: string;
+  owner: string;
+  paymentMethod: string;
+  workshopType: string;
   nif?: string;
 }
 
@@ -92,10 +97,15 @@ export default function Register() {
   const [activationError, setActivationError] = useState('');
   const [registrationType, setRegistrationType] = useState<'new' | 'existing' | null>(null);
   const [companyData, setCompanyData] = useState<CompanyData>({
-    name: '',
+    razonSocial: '',
+    nombreFantasia: '',
     address: '',
     phone: '',
     email: '',
+    cuit: '',
+    owner: '',
+    paymentMethod: '',
+    workshopType: '',
     nif: ''
   });
   const [userData, setUserData] = useState<UserData>({
@@ -170,12 +180,17 @@ export default function Register() {
   const validateCompanyForm = () => {
     const newErrors: Record<string, string> = {};
     
-    if (!companyData.name.trim()) newErrors.name = 'El nombre de la empresa es obligatorio';
+    if (!companyData.razonSocial.trim()) newErrors.razonSocial = 'La razón social es obligatoria';
+    if (!companyData.nombreFantasia.trim()) newErrors.nombreFantasia = 'El nombre de fantasía es obligatorio';
     if (!companyData.address.trim()) newErrors.address = 'La dirección es obligatoria';
     if (!companyData.phone.trim()) newErrors.phone = 'El teléfono es obligatorio';
     else if (!validatePhone(companyData.phone)) newErrors.phone = 'Teléfono inválido';
     if (!companyData.email.trim()) newErrors.email = 'El email es obligatorio';
     else if (!validateEmail(companyData.email)) newErrors.email = 'Email inválido';
+    if (!companyData.cuit.trim()) newErrors.cuit = 'El CUIT es obligatorio';
+    if (!companyData.owner.trim()) newErrors.owner = 'El nombre del dueño es obligatorio';
+    if (!companyData.paymentMethod) newErrors.paymentMethod = 'La forma de pago es obligatoria';
+    if (!companyData.workshopType) newErrors.workshopType = 'El tipo de taller es obligatorio';
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -228,9 +243,13 @@ export default function Register() {
       // Save company data (simulated)
       const newCompany: Company = {
         id: Date.now().toString(),
-        ...companyData
+        name: companyData.razonSocial,
+        address: companyData.address,
+        phone: companyData.phone,
+        email: companyData.email
       };
       localStorage.setItem('newCompany', JSON.stringify(newCompany));
+      localStorage.setItem('companyDetails', JSON.stringify(companyData));
       handleNextStep();
     }
   };
@@ -630,14 +649,26 @@ export default function Register() {
 
                   <form onSubmit={handleCompanySubmit} className="space-y-4">
                     <div className="space-y-1.5">
-                      <Label htmlFor="companyName">Nombre de la empresa *</Label>
+                      <Label htmlFor="razonSocial">Razón Social *</Label>
                       <Input
-                        id="companyName"
+                        id="razonSocial"
                         placeholder="Ej: TechFix S.A."
-                        value={companyData.name}
-                        onChange={(e) => setCompanyData({ ...companyData, name: e.target.value })}
+                        value={companyData.razonSocial}
+                        onChange={(e) => setCompanyData({ ...companyData, razonSocial: e.target.value })}
                         leftIcon={<Building2 className="w-5 h-5" />}
-                        error={errors.name}
+                        error={errors.razonSocial}
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="nombreFantasia">Nombre de Fantasía *</Label>
+                      <Input
+                        id="nombreFantasia"
+                        placeholder="Ej: TechFix"
+                        value={companyData.nombreFantasia}
+                        onChange={(e) => setCompanyData({ ...companyData, nombreFantasia: e.target.value })}
+                        leftIcon={<Building2 className="w-5 h-5" />}
+                        error={errors.nombreFantasia}
                       />
                     </div>
 
@@ -676,6 +707,77 @@ export default function Register() {
                         leftIcon={<Mail className="w-5 h-5" />}
                         error={errors.email}
                       />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="cuit">CUIT *</Label>
+                      <Input
+                        id="cuit"
+                        placeholder="Ej: 20-12345678-9"
+                        value={companyData.cuit}
+                        onChange={(e) => setCompanyData({ ...companyData, cuit: e.target.value })}
+                        leftIcon={<FileText className="w-5 h-5" />}
+                        error={errors.cuit}
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="owner">Dueño / Responsable *</Label>
+                      <Input
+                        id="owner"
+                        placeholder="Ej: Juan Pérez"
+                        value={companyData.owner}
+                        onChange={(e) => setCompanyData({ ...companyData, owner: e.target.value })}
+                        leftIcon={<UserPlus className="w-5 h-5" />}
+                        error={errors.owner}
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="paymentMethod">Forma de Pago *</Label>
+                      <Select
+                        value={companyData.paymentMethod}
+                        onValueChange={(value) => setCompanyData({ ...companyData, paymentMethod: value })}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Selecciona forma de pago" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="efectivo">Efectivo</SelectItem>
+                          <SelectItem value="transferencia">Transferencia Bancaria</SelectItem>
+                          <SelectItem value="tarjeta">Tarjeta de Crédito/Débito</SelectItem>
+                          <SelectItem value="mercadopago">MercadoPago</SelectItem>
+                          <SelectItem value="cheque">Cheque</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {errors.paymentMethod && (
+                        <p className="text-xs text-destructive mt-1">{errors.paymentMethod}</p>
+                      )}
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label htmlFor="workshopType">Tipo de Taller *</Label>
+                      <Select
+                        value={companyData.workshopType}
+                        onValueChange={(value) => setCompanyData({ ...companyData, workshopType: value })}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Selecciona tipo de taller" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="electronica">Electrónica</SelectItem>
+                          <SelectItem value="mecanica">Mecánica Automotriz</SelectItem>
+                          <SelectItem value="computacion">Computación/IT</SelectItem>
+                          <SelectItem value="celulares">Celulares</SelectItem>
+                          <SelectItem value="electrodomesticos">Electrodomésticos</SelectItem>
+                          <SelectItem value="bicicletas">Bicicletas</SelectItem>
+                          <SelectItem value="general">General/Mixto</SelectItem>
+                          <SelectItem value="otro">Otro</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      {errors.workshopType && (
+                        <p className="text-xs text-destructive mt-1">{errors.workshopType}</p>
+                      )}
                     </div>
 
                     <div className="space-y-1.5">
@@ -916,8 +1018,8 @@ export default function Register() {
                       <p><strong>Nombre:</strong> {userData.fullName}</p>
                       <p><strong>Email:</strong> {userData.email}</p>
                       <p><strong>Teléfono:</strong> {userData.phone}</p>
-                      {registrationType === 'new' && companyData.name && (
-                        <p><strong>Empresa:</strong> {companyData.name}</p>
+                      {registrationType === 'new' && companyData.razonSocial && (
+                        <p><strong>Empresa:</strong> {companyData.razonSocial}</p>
                       )}
                       {registrationType === 'existing' && userData.codigoEmpresa && (
                         <p><strong>Código empresa:</strong> {userData.codigoEmpresa}</p>
