@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import Home from '../features/dashboard/home'
 import Login from '../features/auth/index'
 import Register from '../features/auth/Register'
+import AdminActivationCodes from '../features/auth/AdminActivationCodes'
 import Dashboard from '../features/dashboard/index'
 import Clients from '../features/clients/index'
 import Sales from '../features/sales/index'
@@ -59,6 +60,7 @@ export function AppRouter() {
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/admin/activation-codes" element={<AdminActivationCodes />} />
       <Route path="/home" element={<Home />} />
 
       <Route path="/dashboard" element={<AdminLayout><Dashboard /></AdminLayout>} />
