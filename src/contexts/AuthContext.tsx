@@ -63,6 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     logoutService();
     setUser(null);
     setIsAuthenticated(false);
+    window.location.href = '/login';
   };
 
   return (

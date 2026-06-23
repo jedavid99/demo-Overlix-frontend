@@ -10,6 +10,8 @@ const api = axios.create({
   },
 });
 
+// Desactivar logging de errores por defecto de Axios
+
 // Función para establecer el token en los headers
 export const setAuthToken = (token: string | null) => {
   if (token) {
@@ -52,6 +54,8 @@ api.interceptors.response.use(
         // Eliminar token y redirigir solo en rutas protegidas
         localStorage.removeItem('access_token');
         setAuthToken(null);
+        // Disparar evento para notificar al AuthContext
+        window.dispatchEvent(new CustomEvent('auth:logout'));
         window.location.href = '/login';
       }
     } else if (error.response?.status === 403) {
