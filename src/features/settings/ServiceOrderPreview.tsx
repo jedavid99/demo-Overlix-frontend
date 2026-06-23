@@ -81,15 +81,23 @@ export default function ServiceOrderPreview({ data, className = '' }: ServiceOrd
     formId: 'Formulario SO-TECH-2024-V2',
     confidential: 'Documento Interno Confidencial',
     page: 'Página 1 de 1',
+        warranty: 'GARANTÍA',
+    warrantyTerms: 'Términos y Condiciones de Garantía',
   }
 
   return (
     <div className={`bg-white text-[#191c1d] font-sans ${className}`} style={{ fontFamily: 'Inter, sans-serif' }}>
       <div className="max-w-[800px] mx-auto border border-[#c3c5d7] shadow-sm print-container overflow-hidden relative">
         {/* MARCA DE AGUA (WATERMARK) */}
-        {data.showWatermark && data.watermarkUrl && (
+                {data.showWatermark && (
           <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-10 z-0">
-            <img src={data.watermarkUrl} alt="Watermark Logo" className="w-48 h-auto object-contain" />
+            {data.watermarkUrl ? (
+              <img src={data.watermarkUrl} alt="Watermark Logo" className="w-48 h-auto object-contain" />
+            ) : (
+              <div className="text-6xl font-bold text-[#003fb1] transform -rotate-45">
+                {data.companyName || 'LOGO'}
+              </div>
+            )}
           </div>
         )}
 
@@ -142,6 +150,18 @@ export default function ServiceOrderPreview({ data, className = '' }: ServiceOrd
             </div>
           </div>
 
+          {/* Warranty Terms */}
+          {data.warrantyTerms && (
+            <div className="mt-6 border border-[#c3c5d7]">
+              <div className="bg-[#f3f4f5] px-4 py-2 border-b border-[#c3c5d7] text-xs font-semibold uppercase text-[#191c1d] tracking-wider flex items-center gap-2">
+                <span>{texts.warranty}</span>
+                {data.warrantyMonths && <span className="text-[#003fb1]">- {data.warrantyMonths} MESES</span>}
+              </div>
+              <div className="p-4 text-sm text-[#434654] whitespace-pre-line">
+                {data.warrantyTerms}
+              </div>
+            </div>
+          )}
           {/* Authorization & Total */}
           <div className="flex justify-between items-end">
             <div className="w-1/2">
