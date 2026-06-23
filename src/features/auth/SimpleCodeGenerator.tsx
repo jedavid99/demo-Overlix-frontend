@@ -61,6 +61,12 @@ export default function SimpleCodeGenerator() {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<keyof typeof SUBSCRIPTION_PLANS>('monthly');
+  const [companyData, setCompanyData] = useState({
+    cuit: '',
+    owner: '',
+    workshopType: '',
+    paymentMethod: ''
+  });
 
   // Check admin session
   useEffect(() => {
@@ -123,7 +129,18 @@ export default function SimpleCodeGenerator() {
         expiresAt: expiresAt.toISOString(),
         plan: selectedPlan,
         used: false,
-        status: 'active'
+        status: 'active',
+        companyDetails: {
+          razonSocial: '',
+          nombreFantasia: '',
+          address: '',
+          phone: '',
+          email: '',
+          cuit: companyData.cuit,
+          owner: companyData.owner,
+          paymentMethod: companyData.paymentMethod,
+          workshopType: companyData.workshopType
+        }
       };
 
       const updatedCodes = [newActivationCode, ...codes];
@@ -265,7 +282,7 @@ export default function SimpleCodeGenerator() {
         <Card className="p-6 bg-white border border-[#c2c6d6]/60 mb-8">
           <div className="mb-6">
             <h2 className="text-lg font-semibold text-[#191b23] mb-1">Generar Nuevo Código</h2>
-            <p className="text-sm text-[#727785]">Selecciona el plan de suscripción y genera el código</p>
+            <p className="text-sm text-[#727785]">Selecciona el plan de suscripción, ingresa los datos de la empresa y genera el código</p>
           </div>
 
           <div className="mb-6">
@@ -292,13 +309,76 @@ export default function SimpleCodeGenerator() {
             </div>
           </div>
 
+          <div className="mb-6">
+            <Label className="text-sm font-semibold text-[#191b23] mb-3 block">Datos de la Empresa</Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="cuit" className="text-xs text-[#727785] mb-1 block">CUIT *</Label>
+                <Input
+                  id="cuit"
+                  placeholder="Ej: 20-12345678-9"
+                  value={companyData.cuit}
+                  onChange={(e) => setCompanyData({ ...companyData, cuit: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="owner" className="text-xs text-[#727785] mb-1 block">Dueño / Responsable *</Label>
+                <Input
+                  id="owner"
+                  placeholder="Ej: Juan Pérez"
+                  value={companyData.owner}
+                  onChange={(e) => setCompanyData({ ...companyData, owner: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label htmlFor="workshopType" className="text-xs text-[#727785] mb-1 block">Tipo de Taller *</Label>
+                <Select
+                  value={companyData.workshopType}
+                  onValueChange={(value) => setCompanyData({ ...companyData, workshopType: value })}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecciona tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="electronica">Electrónica</SelectItem>
+                    <SelectItem value="mecanica">Mecánica Automotriz</SelectItem>
+                    <SelectItem value="computacion">Computación/IT</SelectItem>
+                    <SelectItem value="celulares">Celulares</SelectItem>
+                    <SelectItem value="electrodomesticos">Electrodomésticos</SelectItem>
+                    <SelectItem value="bicicletas">Bicicletas</SelectItem>
+                    <SelectItem value="general">General/Mixto</SelectItem>
+                    <SelectItem value="otro">Otro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="paymentMethod" className="text-xs text-[#727785] mb-1 block">Forma de Pago *</Label>
+                <Select
+                  value={companyData.paymentMethod}
+                  onValueChange={(value) => setCompanyData({ ...companyData, paymentMethod: value })}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecciona forma de pago" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="efectivo">Efectivo</SelectItem>
+                    <SelectItem value="transferencia">Transferencia Bancaria</SelectItem>
+                    <SelectItem value="tarjeta">Tarjeta de Crédito/Débito</SelectItem>
+                    <SelectItem value="mercadopago">MercadoPago</SelectItem>
+                    <SelectItem value="cheque">Cheque</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
           <div className="flex items-center justify-between">
             <div className="text-sm text-[#727785]">
               <span className="font-medium text-[#191b23]">Plan seleccionado:</span> {SUBSCRIPTION_PLANS[selectedPlan].name} ({SUBSCRIPTION_PLANS[selectedPlan].duration} días)
             </div>
             <Button
               onClick={generateCode}
-              disabled={isGenerating}
+              disabled={isGenerating || !companyData.cuit || !companyData.owner || !companyData.workshopType || !companyData.paymentMethod}
               className="bg-[#0058be] hover:bg-[#2170e4] flex items-center gap-2"
             >
               {isGenerating ? (
