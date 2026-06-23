@@ -52,7 +52,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log('response.data.data:', response.data?.data);
     console.log('response.data.data.access_token:', response.data?.data?.access_token);
     
-    // El token está en response.data.data.access_token
+    // El backend envuelve la respuesta en {success: true, data: {...}}
+    // Por lo tanto el token está en response.data.data.access_token
     const token = response.data?.data?.access_token || response.data?.access_token || response.access_token;
     
     if (token) {
@@ -65,6 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsAuthenticated(true);
     } else {
       console.error('No se recibió access_token en la respuesta');
+      console.error('Estructura completa de response:', JSON.stringify(response, null, 2));
     }
   };
 
