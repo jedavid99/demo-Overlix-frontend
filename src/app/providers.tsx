@@ -1,5 +1,5 @@
 import { AppProvider } from "@/app/shared/contexts/AppContext"
-import { AuthProvider } from "@/app/features/autenticacion/components/AuthContext.client"
+import { AuthProvider } from "@/contexts/AuthContext"
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   return <main className="min-h-screen">{children}</main>
