@@ -19,7 +19,7 @@ import { Label } from '@/shared/components/ui/label'
 import { Badge } from '@/shared/components/ui/badge'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
-import ServiceOrderPreview from './ServiceOrderPreview'
+import ServiceOrderPreview from '@/features/settings/ServiceOrderPreview'
 
 // ============================================================================
 // Tipos e interfaces (mismos que antes)
