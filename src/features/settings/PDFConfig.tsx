@@ -1,580 +1,508 @@
 import React, { useState, useRef } from 'react'
-import { FileText, Download, Settings as SettingsIcon, Move, Image, AlignCenter, Eye, Save, RefreshCw, User, Wrench, Calendar, Clock, CheckCircle, FileSignature } from 'lucide-react'
+import {
+  Download,
+  Eye,
+  Save,
+  RefreshCw,
+  Shield,
+  Smartphone,
+  User,
+  Wrench,
+  Building,
+  Award,
+  Settings,
+} from 'lucide-react'
+import { Card, CardContent } from '@/shared/components/ui/card'
+import { Button } from '@/shared/components/ui/button'
+import { Input } from '@/shared/components/ui/input'
+import { Label } from '@/shared/components/ui/label'
+import { Badge } from '@/shared/components/ui/badge'
+import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
+import ServiceOrderPreview from './ServiceOrderPreview'
 
-interface PDFConfig {
-  showLogo: boolean
+// ============================================================================
+// Tipos e interfaces (mismos que antes)
+// ============================================================================
+interface ServiceOrderData {
+  companyName: string
+  companyAddress: string
+  companyPhone: string
+  companyEmail: string
+  orderNumber: string
+  orderDate: string
+  clientName: string
+  clientPhone: string
+  clientEmail: string
+  clientAddress: string
+  clientId: string
+  deviceModel: string
+  deviceImei: string
+  deviceSerial: string
+  deviceColor: string
+  deviceStorage: string
+  deviceDescription: string
+  repairDescription: string
+  repairDiagnostic: string
+  laborCost: string
+  partsCost: string
+  totalPrice: string
+  warrantyMonths: string
+  warrantyTerms: string
+  securityType: 'none' | 'pin' | 'pattern' | 'fingerprint'
+  securityPin: string
+  securityPattern: string
+  securityNotes: string
+  technicianName: string
+  technicianNotes: string
+  estimatedTime: string
+  showHeader: boolean
+  showFooter: boolean
+  headerText: string
   footerText: string
-  warrantyTerms: string[]
+  fontSize: number
+  margin: number
+  showClientSection: boolean
+  showTechnicianSection: boolean
+  showSecurityInfo: boolean
+  showWarrantyTerms: boolean
+  showSignatures: boolean
 }
 
-const defaultConfig: PDFConfig = {
-  showLogo: true,
-  footerText: 'Gracias por su confianza',
-  warrantyTerms: [
-    '• La garantía cubre defectos de fabricación de la pieza instalada',
-    '• No cubre daños por mal uso, caídas o exposición a líquidos',
-    '• El cliente debe conservar esta orden como comprobante de garantía',
-    '• Para hacer válida la garantía, el dispositivo no debe tener sellos rotos',
-    '• La garantía es transferible a un nuevo propietario'
-  ],
+// ============================================================================
+// Valores por defecto
+// ============================================================================
+const defaultData: ServiceOrderData = {
+  companyName: 'TechFix Reparaciones',
+  companyAddress: 'Av. Corrientes 1234, CABA, Argentina',
+  companyPhone: '+54 11 4321-1234',
+  companyEmail: 'info@techfix.com',
+  orderNumber: `OS-${String(Math.floor(Math.random() * 9000) + 1000)}`,
+  orderDate: new Date().toLocaleDateString('es-AR', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }),
+  clientName: '',
+  clientPhone: '',
+  clientEmail: '',
+  clientAddress: '',
+  clientId: '',
+  deviceModel: '',
+  deviceImei: '',
+  deviceSerial: '',
+  deviceColor: '',
+  deviceStorage: '',
+  deviceDescription: '',
+  repairDescription: '',
+  repairDiagnostic: '',
+  laborCost: '0',
+  partsCost: '0',
+  totalPrice: '0',
+  warrantyMonths: '12',
+  warrantyTerms:
+    'Garantía por defectos de fabricación y mano de obra por 12 meses. No cubre daños por agua, golpes o uso indebido posterior a la reparación.',
+  securityType: 'none',
+  securityPin: '',
+  securityPattern: '',
+  securityNotes: '',
+  technicianName: '',
+  technicianNotes: '',
+  estimatedTime: '',
+  showHeader: true,
+  showFooter: true,
+  headerText: 'ORDEN DE SERVICIO',
+  footerText: 'Este documento es un comprobante de recepción de equipo. Leer los términos y condiciones.',
+  fontSize: 10,
+  margin: 18,
+  showClientSection: true,
+  showTechnicianSection: true,
+  showSecurityInfo: true,
+  showWarrantyTerms: true,
+  showSignatures: true,
 }
 
+// ============================================================================
+// Componente principal
+// ============================================================================
 export default function PDFConfig() {
-  const [config, setConfig] = useState<PDFConfig>(defaultConfig)
+  const [data, setData] = useState<ServiceOrderData>(defaultData)
   const [isGenerating, setIsGenerating] = useState(false)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const previewRef = useRef<HTMLDivElement>(null)
 
-  const handleConfigChange = (key: keyof PDFConfig, value: any) => {
-    setConfig((prev) => ({ ...prev, [key]: value }))
+  // ============================================================================
+  // Manejadores de cambios
+  // ============================================================================
+  const handleChange = <K extends keyof ServiceOrderData>(key: K, value: ServiceOrderData[K]) => {
+    setData((prev) => ({ ...prev, [key]: value }))
   }
 
-  const generatePreview = () => {
-    const canvas = canvasRef.current
-    if (!canvas) return
+  // ============================================================================
+  // Generación de PDF con html2canvas + jsPDF
+  // ============================================================================
+  const generatePDF = async () => {
+    if (!previewRef.current) return
 
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-
-    // Limpiar canvas
-    ctx.fillStyle = '#ffffff'
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-    const margin = 20
-    const fontSize = 11
-    let currentY = margin
-
-    // Logo (siempre marca de agua)
-    if (config.showLogo) {
-      ctx.globalAlpha = 0.08
-      ctx.fillStyle = '#3b82f6'
-      ctx.beginPath()
-      ctx.arc(canvas.width / 2, canvas.height / 2, 100, 0, Math.PI * 2)
-      ctx.fill()
-      ctx.globalAlpha = 1
-    }
-
-    // Header fijo
-    ctx.fillStyle = '#1e293b'
-    ctx.fillRect(margin, currentY, canvas.width - margin * 2, 35)
-    ctx.fillStyle = '#ffffff'
-    ctx.font = `bold ${fontSize + 3}px Arial`
-    ctx.textAlign = 'center'
-    ctx.fillText('ORDEN DE SERVICIO', canvas.width / 2, currentY + 22)
-    currentY += 50
-
-    // Layout optimizado: Información del cliente y dispositivo en columnas
-    ctx.textAlign = 'left'
-    ctx.fillStyle = '#64748b'
-    ctx.font = `${fontSize}px Arial`
-    
-    // Columna izquierda - Cliente
-    ctx.fillStyle = '#1e293b'
-    ctx.font = `bold ${fontSize}px Arial`
-    ctx.fillText('INFORMACIÓN DEL CLIENTE', margin, currentY)
-    currentY += 18
-    ctx.fillStyle = '#64748b'
-    ctx.font = `${fontSize}px Arial`
-    ctx.fillText('N° Orden: #ORD-2024-00123', margin, currentY)
-    ctx.fillText('Fecha: 22/06/2024', margin, currentY + 16)
-    ctx.fillText('Estado: En proceso', margin, currentY + 32)
-    ctx.fillText('Cliente: Juan Pérez', margin, currentY + 48)
-    ctx.fillText('Tel: +54 11 1234-5678', margin, currentY + 64)
-    currentY += 80
-
-    // Columna derecha - Dispositivo
-    const rightColumnX = canvas.width / 2 + 20
-    ctx.fillStyle = '#1e293b'
-    ctx.font = `bold ${fontSize}px Arial`
-    ctx.fillText('INFORMACIÓN DEL DISPOSITIVO', rightColumnX, currentY - 62)
-    ctx.fillStyle = '#64748b'
-    ctx.font = `${fontSize}px Arial`
-    ctx.fillText('iPhone 15 Pro Max', rightColumnX, currentY - 44)
-    ctx.fillText('IMEI: 356912087654321', rightColumnX, currentY - 28)
-    ctx.fillText('Color: Titanium Black', rightColumnX, currentY - 12)
-    ctx.fillText('Almacenamiento: 256 GB', rightColumnX, currentY + 4)
-
-    // Detalles de reparación
-    currentY += 10
-    ctx.fillStyle = '#1e293b'
-    ctx.font = `bold ${fontSize}px Arial`
-    ctx.fillText('DETALLES DE REPARACIÓN', margin, currentY)
-    currentY += 18
-    ctx.fillStyle = '#64748b'
-    ctx.font = `${fontSize}px Arial`
-    ctx.fillText('Servicio: Cambio de pantalla', margin, currentY)
-    ctx.fillText('Descripción: Pantalla OLED original', margin, currentY + 16)
-    currentY += 40
-
-    // Precios en línea
-    ctx.fillStyle = '#1e293b'
-    ctx.font = `bold ${fontSize}px Arial`
-    ctx.fillText('PRECIO: ', margin, currentY)
-    ctx.fillStyle = '#64748b'
-    ctx.font = `${fontSize}px Arial`
-    ctx.fillText('Servicio: $450.00 | Piezas: $350.00 | Mano de obra: $100.00', margin + 50, currentY)
-    currentY += 30
-
-    // Garantía y términos modificables
-    ctx.fillStyle = '#059669'
-    ctx.font = `bold ${fontSize}px Arial`
-    ctx.fillText('GARANTÍA: 90 DÍAS', margin, currentY)
-    currentY += 20
-    ctx.fillStyle = '#64748b'
-    ctx.font = `${fontSize - 1}px Arial`
-    ctx.fillText('Términos y condiciones:', margin, currentY)
-    currentY += 16
-    config.warrantyTerms.forEach((term, index) => {
-      ctx.fillText(term, margin, currentY + (index * 14))
-    })
-    currentY += config.warrantyTerms.length * 14 + 20
-
-    // Firma del cliente
-    ctx.fillStyle = '#1e293b'
-    ctx.font = `bold ${fontSize}px Arial`
-    ctx.fillText('Firma del cliente: ______________________  Fecha: ____/____/______', margin, currentY)
-    currentY += 30
-
-    // ORDEN DE SERVICIO - TÉCNICO
-    currentY += 10
-    ctx.fillStyle = '#1e293b'
-    ctx.fillRect(margin, currentY, canvas.width - margin * 2, 25)
-    ctx.fillStyle = '#ffffff'
-    ctx.font = `bold ${fontSize + 2}px Arial`
-    ctx.textAlign = 'center'
-    ctx.fillText('ORDEN DE SERVICIO - TÉCNICO', canvas.width / 2, currentY + 17)
-    currentY += 35
-
-    ctx.textAlign = 'left'
-    ctx.fillStyle = '#64748b'
-    ctx.font = `${fontSize}px Arial`
-    
-    // Información del técnico en columnas
-    ctx.fillStyle = '#1e293b'
-    ctx.font = `bold ${fontSize}px Arial`
-    ctx.fillText('TÉCNICO ASIGNADO', margin, currentY)
-    currentY += 18
-    ctx.fillStyle = '#64748b'
-    ctx.font = `${fontSize}px Arial`
-    ctx.fillText('Nombre: Carlos García', margin, currentY)
-    ctx.fillText('ID: TEC-001', margin, currentY + 16)
-    ctx.fillText('Fecha: 22/06/2024 | Hora: 09:00 AM', margin, currentY + 32)
-    ctx.fillText('Tiempo estimado: 2 horas | Prioridad: Normal', margin, currentY + 48)
-    currentY += 65
-
-    // Columna derecha - Estado del trabajo
-    ctx.fillStyle = '#1e293b'
-    ctx.font = `bold ${fontSize}px Arial`
-    ctx.fillText('ESTADO DEL TRABAJO', rightColumnX, currentY - 47)
-    ctx.fillStyle = '#64748b'
-    ctx.font = `${fontSize}px Arial`
-    ctx.fillText('Estado actual: En progreso', rightColumnX, currentY - 29)
-    ctx.fillText('Progreso: 0% completado', rightColumnX, currentY - 13)
-    ctx.fillText('Fecha estimada entrega: 22/06/2024', rightColumnX, currentY + 3)
-    ctx.fillText('Hora estimada entrega: 11:00 AM', rightColumnX, currentY + 19)
-
-    // Diagnóstico detallado
-    currentY += 10
-    ctx.fillStyle = '#1e293b'
-    ctx.font = `bold ${fontSize}px Arial`
-    ctx.fillText('DIAGNÓSTICO DETALLADO', margin, currentY)
-    currentY += 18
-    ctx.fillStyle = '#64748b'
-    ctx.font = `${fontSize}px Arial`
-    ctx.fillText('Síntoma: Pantalla dañada con líneas verticales', margin, currentY)
-    ctx.fillText('Estado: Rota, sin respuesta táctil', margin, currentY + 16)
-    ctx.fillText('Pruebas: Test de pantalla, test táctil, test de sensores', margin, currentY + 32)
-    ctx.fillText('Resultado: Pantalla defectuosa, requiere reemplazo completo', margin, currentY + 48)
-    currentY += 65
-
-    // Piezas requeridas
-    ctx.fillStyle = '#1e293b'
-    ctx.font = `bold ${fontSize}px Arial`
-    ctx.fillText('PIEZAS Y HERRAMIENTAS', margin, currentY)
-    currentY += 18
-    ctx.fillStyle = '#64748b'
-    ctx.font = `${fontSize}px Arial`
-    ctx.fillText('• Pantalla OLED iPhone 15 Pro Max (x1)', margin, currentY)
-    ctx.fillText('• Adhesivo de pantalla premium (x1)', margin, currentY + 16)
-    ctx.fillText('• Kit de herramientas especializado (x1)', margin, currentY + 32)
-    ctx.fillText('• Guantes antiestáticos (x1 par)', margin, currentY + 48)
-    currentY += 65
-
-    // Procedimiento compacto
-    ctx.fillStyle = '#1e293b'
-    ctx.font = `bold ${fontSize}px Arial`
-    ctx.fillText('PROCEDIMIENTO', margin, currentY)
-    currentY += 18
-    ctx.fillStyle = '#64748b'
-    ctx.font = `${fontSize}px Arial`
-    const procedures = [
-      '1. Apagar dispositivo y retirar protectores',
-      '2. Calentar bordes (80°C) para ablandar adhesivo',
-      '3. Retirar pantalla con herramienta de succión',
-      '4. Limpiar marco y aplicar nuevo adhesivo',
-      '5. Instalar nueva pantalla OLED con cuidado',
-      '6. Conectar flex cables y realizar pruebas',
-      '7. Verificar calidad de imagen, táctil y sensores'
-    ]
-    procedures.forEach((proc, index) => {
-      ctx.fillText(proc, margin, currentY + (index * 14))
-    })
-    currentY += procedures.length * 14 + 20
-
-    // Observaciones
-    ctx.fillStyle = '#1e293b'
-    ctx.font = `bold ${fontSize}px Arial`
-    ctx.fillText('OBSERVACIONES', margin, currentY)
-    currentY += 18
-    ctx.fillStyle = '#64748b'
-    ctx.font = `${fontSize}px Arial`
-    ctx.fillText('• Cliente reportó caída desde 1m de altura', margin, currentY)
-    ctx.fillText('• No hay evidencia de daño por líquido', margin, currentY + 16)
-    ctx.fillText('• Sellos de seguridad intactos', margin, currentY + 32)
-    ctx.fillText('• Batería en buen estado (95% capacidad)', margin, currentY + 48)
-    currentY += 65
-
-    // Firma del técnico
-    ctx.fillStyle = '#1e293b'
-    ctx.font = `bold ${fontSize}px Arial`
-    ctx.fillText('Firma del técnico: ______________________  Fecha: ____/____/______', margin, currentY)
-    currentY += 30
-
-    // Footer
-    ctx.fillStyle = '#64748b'
-    ctx.font = `${fontSize}px Arial`
-    ctx.textAlign = 'center'
-    ctx.fillText(config.footerText, canvas.width / 2, canvas.height - margin)
-  }
-
-  const generatePDF = () => {
     setIsGenerating(true)
-    const doc = new jsPDF()
-    
-    const margin = 20
-    const fontSize = 11
-    let y = margin
 
-    // Logo (siempre marca de agua)
-    if (config.showLogo) {
-      doc.setFillColor(59, 130, 246)
-      doc.setGState(new doc.GState({ opacity: 0.08 }))
-      doc.circle(105, 150, 50, 'F')
-      doc.setGState(new doc.GState({ opacity: 1 }))
+    try {
+      // Capturar el componente de previsualización
+      const canvas = await html2canvas(previewRef.current, {
+        scale: 2, // Alta calidad
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+      })
+
+      const imgData = canvas.toDataURL('image/png')
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'px',
+        format: 'a4',
+      })
+
+      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
+      pdf.save('orden-servicio-profesional.pdf')
+    } catch (error) {
+      console.error('Error al generar el PDF:', error)
+      alert('Ocurrió un error al generar el PDF. Por favor, inténtalo de nuevo.')
+    } finally {
+      setIsGenerating(false)
     }
-
-    // Header fijo
-    doc.setFillColor(30, 41, 59)
-    doc.rect(margin, y, 170, 15, 'F')
-    doc.setTextColor(255, 255, 255)
-    doc.setFontSize(fontSize + 3)
-    doc.setFont(undefined, 'bold')
-    doc.text('ORDEN DE SERVICIO', 105, y + 10, { align: 'center' })
-    y += 25
-
-    doc.setTextColor(0, 0, 0)
-    doc.setFontSize(fontSize)
-    doc.setFont(undefined, 'normal')
-
-    // Layout optimizado: Información del cliente y dispositivo en columnas
-    // Columna izquierda - Cliente
-    doc.setTextColor(30, 41, 59)
-    doc.setFont(undefined, 'bold')
-    doc.text('INFORMACIÓN DEL CLIENTE', margin, y)
-    y += 7
-    doc.setTextColor(100, 116, 139)
-    doc.setFont(undefined, 'normal')
-    doc.text('N° Orden: #ORD-2024-00123', margin, y)
-    doc.text('Fecha: 22/06/2024', margin, y + 6)
-    doc.text('Estado: En proceso', margin, y + 12)
-    doc.text('Cliente: Juan Pérez', margin, y + 18)
-    doc.text('Tel: +54 11 1234-5678', margin, y + 24)
-    y += 32
-
-    // Columna derecha - Dispositivo
-    const rightColumnX = 105
-    doc.setTextColor(30, 41, 59)
-    doc.setFont(undefined, 'bold')
-    doc.text('INFORMACIÓN DEL DISPOSITIVO', rightColumnX, y - 25)
-    doc.setTextColor(100, 116, 139)
-    doc.setFont(undefined, 'normal')
-    doc.text('iPhone 15 Pro Max', rightColumnX, y - 18)
-    doc.text('IMEI: 356912087654321', rightColumnX, y - 11)
-    doc.text('Color: Titanium Black', rightColumnX, y - 4)
-    doc.text('Almacenamiento: 256 GB', rightColumnX, y + 3)
-
-    // Detalles de reparación
-    y += 5
-    doc.setTextColor(30, 41, 59)
-    doc.setFont(undefined, 'bold')
-    doc.text('DETALLES DE REPARACIÓN', margin, y)
-    y += 7
-    doc.setTextColor(100, 116, 139)
-    doc.setFont(undefined, 'normal')
-    doc.text('Servicio: Cambio de pantalla', margin, y)
-    doc.text('Descripción: Pantalla OLED original', margin, y + 6)
-    y += 16
-
-    // Precios en línea
-    doc.setTextColor(30, 41, 59)
-    doc.setFont(undefined, 'bold')
-    doc.text('PRECIO: ', margin, y)
-    doc.setTextColor(100, 116, 139)
-    doc.setFont(undefined, 'normal')
-    doc.text('Servicio: $450.00 | Piezas: $350.00 | Mano de obra: $100.00', margin + 15, y)
-    y += 12
-
-    // Garantía y términos modificables
-    doc.setTextColor(5, 150, 105)
-    doc.setFont(undefined, 'bold')
-    doc.text('GARANTÍA: 90 DÍAS', margin, y)
-    y += 8
-    doc.setTextColor(100, 116, 139)
-    doc.setFont(undefined, 'normal')
-    doc.setFontSize(fontSize - 1)
-    doc.text('Términos y condiciones:', margin, y)
-    y += 6
-    config.warrantyTerms.forEach((term) => {
-      doc.text(term, margin, y)
-      y += 5
-    })
-    y += 8
-    doc.setFontSize(fontSize)
-
-    // Firma del cliente
-    doc.setTextColor(30, 41, 59)
-    doc.setFont(undefined, 'bold')
-    doc.text('Firma del cliente: ______________________  Fecha: ____/____/______', margin, y)
-    y += 12
-
-    // ORDEN DE SERVICIO - TÉCNICO
-    y += 5
-    doc.setFillColor(30, 41, 59)
-    doc.rect(margin, y, 170, 10, 'F')
-    doc.setTextColor(255, 255, 255)
-    doc.setFontSize(fontSize + 2)
-    doc.setFont(undefined, 'bold')
-    doc.text('ORDEN DE SERVICIO - TÉCNICO', 105, y + 7, { align: 'center' })
-    y += 15
-
-    doc.setTextColor(100, 116, 139)
-    doc.setFontSize(fontSize)
-    doc.setFont(undefined, 'normal')
-    
-    // Información del técnico en columnas
-    doc.setTextColor(30, 41, 59)
-    doc.setFont(undefined, 'bold')
-    doc.text('TÉCNICO ASIGNADO', margin, y)
-    y += 7
-    doc.setTextColor(100, 116, 139)
-    doc.setFont(undefined, 'normal')
-    doc.text('Nombre: Carlos García', margin, y)
-    doc.text('ID: TEC-001', margin, y + 6)
-    doc.text('Fecha: 22/06/2024 | Hora: 09:00 AM', margin, y + 12)
-    doc.text('Tiempo estimado: 2 horas | Prioridad: Normal', margin, y + 18)
-    y += 26
-
-    // Columna derecha - Estado del trabajo
-    doc.setTextColor(30, 41, 59)
-    doc.setFont(undefined, 'bold')
-    doc.text('ESTADO DEL TRABAJO', rightColumnX, y - 19)
-    doc.setTextColor(100, 116, 139)
-    doc.setFont(undefined, 'normal')
-    doc.text('Estado actual: En progreso', rightColumnX, y - 12)
-    doc.text('Progreso: 0% completado', rightColumnX, y - 5)
-    doc.text('Fecha estimada entrega: 22/06/2024', rightColumnX, y + 2)
-    doc.text('Hora estimada entrega: 11:00 AM', rightColumnX, y + 9)
-
-    // Diagnóstico detallado
-    y += 5
-    doc.setTextColor(30, 41, 59)
-    doc.setFont(undefined, 'bold')
-    doc.text('DIAGNÓSTICO DETALLADO', margin, y)
-    y += 7
-    doc.setTextColor(100, 116, 139)
-    doc.setFont(undefined, 'normal')
-    doc.text('Síntoma: Pantalla dañada con líneas verticales', margin, y)
-    doc.text('Estado: Rota, sin respuesta táctil', margin, y + 6)
-    doc.text('Pruebas: Test de pantalla, test táctil, test de sensores', margin, y + 12)
-    doc.text('Resultado: Pantalla defectuosa, requiere reemplazo completo', margin, y + 18)
-    y += 26
-
-    // Piezas requeridas
-    doc.setTextColor(30, 41, 59)
-    doc.setFont(undefined, 'bold')
-    doc.text('PIEZAS Y HERRAMIENTAS', margin, y)
-    y += 7
-    doc.setTextColor(100, 116, 139)
-    doc.setFont(undefined, 'normal')
-    doc.text('• Pantalla OLED iPhone 15 Pro Max (x1)', margin, y)
-    doc.text('• Adhesivo de pantalla premium (x1)', margin, y + 6)
-    doc.text('• Kit de herramientas especializado (x1)', margin, y + 12)
-    doc.text('• Guantes antiestáticos (x1 par)', margin, y + 18)
-    y += 26
-
-    // Procedimiento compacto
-    doc.setTextColor(30, 41, 59)
-    doc.setFont(undefined, 'bold')
-    doc.text('PROCEDIMIENTO', margin, y)
-    y += 7
-    doc.setTextColor(100, 116, 139)
-    doc.setFont(undefined, 'normal')
-    const procedures = [
-      '1. Apagar dispositivo y retirar protectores',
-      '2. Calentar bordes (80°C) para ablandar adhesivo',
-      '3. Retirar pantalla con herramienta de succión',
-      '4. Limpiar marco y aplicar nuevo adhesivo',
-      '5. Instalar nueva pantalla OLED con cuidado',
-      '6. Conectar flex cables y realizar pruebas',
-      '7. Verificar calidad de imagen, táctil y sensores'
-    ]
-    procedures.forEach((proc) => {
-      doc.text(proc, margin, y)
-      y += 5
-    })
-    y += 8
-
-    // Observaciones
-    doc.setTextColor(30, 41, 59)
-    doc.setFont(undefined, 'bold')
-    doc.text('OBSERVACIONES', margin, y)
-    y += 7
-    doc.setTextColor(100, 116, 139)
-    doc.setFont(undefined, 'normal')
-    doc.text('• Cliente reportó caída desde 1m de altura', margin, y)
-    doc.text('• No hay evidencia de daño por líquido', margin, y + 6)
-    doc.text('• Sellos de seguridad intactos', margin, y + 12)
-    doc.text('• Batería en buen estado (95% capacidad)', margin, y + 18)
-    y += 26
-
-    // Firma del técnico
-    doc.setTextColor(30, 41, 59)
-    doc.setFont(undefined, 'bold')
-    doc.text('Firma del técnico: ______________________  Fecha: ____/____/______', margin, y)
-    y += 12
-
-    // Footer
-    doc.setTextColor(100, 116, 139)
-    doc.setFont(undefined, 'normal')
-    doc.text(config.footerText, 105, 280 - margin, { align: 'center' })
-
-    doc.save('orden-servicio.pdf')
-    setIsGenerating(false)
   }
 
-  React.useEffect(() => {
-    generatePreview()
-  }, [config])
+  // ============================================================================
+  // Renderizado del panel de configuración (reducido para brevedad)
+  // ============================================================================
+  const renderConfigPanel = () => (
+    <div className="space-y-4">
+      {/* Empresa */}
+      <Card>
+        <CardContent className="p-4 space-y-3">
+          <h3 className="font-bold text-foreground flex items-center gap-2">
+            <Building size={16} className="text-primary" /> Empresa
+          </h3>
+          <Input
+            value={data.companyName}
+            onChange={(e) => handleChange('companyName', e.target.value)}
+            placeholder="Nombre de la empresa"
+          />
+          <Input
+            value={data.companyAddress}
+            onChange={(e) => handleChange('companyAddress', e.target.value)}
+            placeholder="Dirección"
+          />
+          <Input
+            value={data.companyPhone}
+            onChange={(e) => handleChange('companyPhone', e.target.value)}
+            placeholder="Teléfono"
+          />
+          <Input
+            value={data.companyEmail}
+            onChange={(e) => handleChange('companyEmail', e.target.value)}
+            placeholder="Email"
+          />
+          <div className="flex gap-2">
+            <Input
+              value={data.orderNumber}
+              onChange={(e) => handleChange('orderNumber', e.target.value)}
+              placeholder="N° Orden"
+              className="flex-1"
+            />
+            <Input
+              type="date"
+              value={data.orderDate}
+              onChange={(e) => handleChange('orderDate', e.target.value)}
+              className="w-32"
+            />
+          </div>
+        </CardContent>
+      </Card>
 
+      {/* Cliente */}
+      <Card>
+        <CardContent className="p-4 space-y-3">
+          <h3 className="font-bold text-foreground flex items-center gap-2">
+            <User size={16} className="text-primary" /> Cliente
+          </h3>
+          <Input
+            value={data.clientName}
+            onChange={(e) => handleChange('clientName', e.target.value)}
+            placeholder="Nombre completo"
+          />
+          <Input
+            value={data.clientPhone}
+            onChange={(e) => handleChange('clientPhone', e.target.value)}
+            placeholder="Teléfono"
+          />
+          <Input
+            value={data.clientEmail}
+            onChange={(e) => handleChange('clientEmail', e.target.value)}
+            placeholder="Email"
+          />
+          <Input
+            value={data.clientAddress}
+            onChange={(e) => handleChange('clientAddress', e.target.value)}
+            placeholder="Dirección"
+          />
+          <Input
+            value={data.clientId}
+            onChange={(e) => handleChange('clientId', e.target.value)}
+            placeholder="Documento"
+          />
+        </CardContent>
+      </Card>
+
+      {/* Dispositivo y reparación */}
+      <Card>
+        <CardContent className="p-4 space-y-3">
+          <h3 className="font-bold text-foreground flex items-center gap-2">
+            <Smartphone size={16} className="text-primary" /> Dispositivo
+          </h3>
+          <Input
+            value={data.deviceModel}
+            onChange={(e) => handleChange('deviceModel', e.target.value)}
+            placeholder="Modelo"
+          />
+          <Input
+            value={data.deviceImei}
+            onChange={(e) => handleChange('deviceImei', e.target.value)}
+            placeholder="IMEI"
+          />
+          <Input
+            value={data.deviceSerial}
+            onChange={(e) => handleChange('deviceSerial', e.target.value)}
+            placeholder="Serial"
+          />
+          <Input
+            value={data.deviceColor}
+            onChange={(e) => handleChange('deviceColor', e.target.value)}
+            placeholder="Color"
+          />
+          <Input
+            value={data.deviceStorage}
+            onChange={(e) => handleChange('deviceStorage', e.target.value)}
+            placeholder="Almacenamiento"
+          />
+          <Input
+            value={data.deviceDescription}
+            onChange={(e) => handleChange('deviceDescription', e.target.value)}
+            placeholder="Descripción del dispositivo"
+          />
+          <div className="border-t border-border pt-3 mt-2">
+            <Label className="text-sm font-medium">Reparación</Label>
+            <Input
+              value={data.repairDescription}
+              onChange={(e) => handleChange('repairDescription', e.target.value)}
+              placeholder="Descripción de la reparación"
+              className="mt-1"
+            />
+            <Input
+              value={data.repairDiagnostic}
+              onChange={(e) => handleChange('repairDiagnostic', e.target.value)}
+              placeholder="Diagnóstico"
+              className="mt-1"
+            />
+            <div className="grid grid-cols-3 gap-2 mt-1">
+              <Input
+                value={data.laborCost}
+                onChange={(e) => handleChange('laborCost', e.target.value)}
+                placeholder="Mano obra"
+              />
+              <Input
+                value={data.partsCost}
+                onChange={(e) => handleChange('partsCost', e.target.value)}
+                placeholder="Repuestos"
+              />
+              <Input
+                value={data.totalPrice}
+                onChange={(e) => handleChange('totalPrice', e.target.value)}
+                placeholder="Total"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Seguridad y técnico */}
+      <Card>
+        <CardContent className="p-4 space-y-3">
+          <h3 className="font-bold text-foreground flex items-center gap-2">
+            <Shield size={16} className="text-primary" /> Seguridad y Técnico
+          </h3>
+          <select
+            value={data.securityType}
+            onChange={(e) => handleChange('securityType', e.target.value as any)}
+            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm"
+          >
+            <option value="none">Ninguno</option>
+            <option value="pin">PIN</option>
+            <option value="pattern">Patrón</option>
+            <option value="fingerprint">Huella</option>
+          </select>
+          {data.securityType === 'pin' && (
+            <Input
+              value={data.securityPin}
+              onChange={(e) => handleChange('securityPin', e.target.value)}
+              placeholder="PIN"
+            />
+          )}
+          {data.securityType === 'pattern' && (
+            <Input
+              value={data.securityPattern}
+              onChange={(e) => handleChange('securityPattern', e.target.value)}
+              placeholder="Descripción del patrón"
+            />
+          )}
+          <Input
+            value={data.securityNotes}
+            onChange={(e) => handleChange('securityNotes', e.target.value)}
+            placeholder="Notas de seguridad"
+          />
+          <Input
+            value={data.technicianName}
+            onChange={(e) => handleChange('technicianName', e.target.value)}
+            placeholder="Técnico asignado"
+          />
+          <Input
+            value={data.estimatedTime}
+            onChange={(e) => handleChange('estimatedTime', e.target.value)}
+            placeholder="Tiempo estimado"
+          />
+          <textarea
+            value={data.technicianNotes}
+            onChange={(e) => handleChange('technicianNotes', e.target.value)}
+            placeholder="Notas internas"
+            rows={2}
+            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm resize-none"
+          />
+        </CardContent>
+      </Card>
+
+      {/* Garantía */}
+      <Card>
+        <CardContent className="p-4 space-y-3">
+          <h3 className="font-bold text-foreground flex items-center gap-2">
+            <Award size={16} className="text-primary" /> Garantía
+          </h3>
+          <Input
+            value={data.warrantyMonths}
+            onChange={(e) => handleChange('warrantyMonths', e.target.value)}
+            placeholder="Meses de garantía"
+          />
+          <textarea
+            value={data.warrantyTerms}
+            onChange={(e) => handleChange('warrantyTerms', e.target.value)}
+            placeholder="Términos y condiciones"
+            rows={3}
+            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm resize-none"
+          />
+        </CardContent>
+      </Card>
+
+      {/* Configuración visual (simplificada) */}
+      <Card>
+        <CardContent className="p-4 space-y-3">
+          <h3 className="font-bold text-foreground flex items-center gap-2">
+            <Settings size={16} className="text-primary" /> Configuración visual
+          </h3>
+          <div className="space-y-2">
+            {[
+              { key: 'showHeader', label: 'Mostrar encabezado' },
+              { key: 'showFooter', label: 'Mostrar pie de página' },
+              { key: 'showClientSection', label: 'Mostrar sección cliente' },
+              { key: 'showTechnicianSection', label: 'Mostrar sección técnico' },
+              { key: 'showSecurityInfo', label: 'Mostrar información de seguridad' },
+              { key: 'showWarrantyTerms', label: 'Mostrar términos de garantía' },
+              { key: 'showSignatures', label: 'Mostrar espacios de firma' },
+            ].map((item) => (
+              <div key={item.key} className="flex items-center justify-between">
+                <span className="text-sm">{item.label}</span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={data[item.key as keyof ServiceOrderData] as boolean}
+                    onChange={(e) =>
+                      handleChange(item.key as keyof ServiceOrderData, e.target.checked)
+                    }
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                </label>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Button
+        onClick={() => {
+          setData(defaultData)
+          alert('Configuración restablecida.')
+        }}
+        variant="outline"
+        className="w-full"
+      >
+        <RefreshCw size={16} className="mr-2" />
+        Restablecer
+      </Button>
+    </div>
+  )
+
+  // ============================================================================
+  // Renderizado principal
+  // ============================================================================
   return (
     <div className="space-y-6 pb-24">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Configuración de PDF</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-1">Personaliza la apariencia y contenido de tus documentos PDF</p>
+          <h2 className="text-2xl font-bold text-foreground">Generador de Orden de Servicio</h2>
+          <p className="text-muted-foreground">Personaliza y genera documentos profesionales para tus clientes</p>
         </div>
-        <button
-          onClick={generatePDF}
-          disabled={isGenerating}
-          className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isGenerating ? <RefreshCw size={18} className="animate-spin" /> : <Download size={18} />}
+        <Button onClick={generatePDF} disabled={isGenerating} className="gap-2">
+          {isGenerating ? (
+            <span className="animate-spin">⟳</span>
+          ) : (
+            <Download size={18} />
+          )}
           {isGenerating ? 'Generando...' : 'Descargar PDF'}
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Panel de configuración */}
-        <div className="lg:col-span-1 space-y-4">
-          {/* Logo Settings */}
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <Image size={18} className="text-primary" />
-              <h3 className="font-bold text-slate-900 dark:text-white">Configuración de Logo</h3>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-700 dark:text-slate-300">Mostrar logo (marca de agua)</span>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={config.showLogo}
-                  onChange={(e) => handleConfigChange('showLogo', e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-              </label>
-            </div>
+        <div className="lg:col-span-1">
+          <div className="sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto pr-2">
+            {renderConfigPanel()}
           </div>
-
-
-          {/* Texto personalizado */}
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <FileText size={18} className="text-primary" />
-              <h3 className="font-bold text-slate-900 dark:text-white">Texto Personalizado</h3>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Texto del pie de página</label>
-              <input
-                type="text"
-                value={config.footerText}
-                onChange={(e) => handleConfigChange('footerText', e.target.value)}
-                className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-slate-900 dark:text-white"
-              />
-            </div>
-          </div>
-
-          {/* Términos y condiciones de garantía */}
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <FileSignature size={18} className="text-primary" />
-              <h3 className="font-bold text-slate-900 dark:text-white">Términos y Condiciones de Garantía</h3>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Términos (un término por línea)</label>
-              <textarea
-                value={config.warrantyTerms.join('\n')}
-                onChange={(e) => handleConfigChange('warrantyTerms', e.target.value.split('\n').filter(t => t.trim()))}
-                className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-slate-900 dark:text-white resize-y"
-                rows={6}
-                placeholder="• La garantía cubre defectos de fabricación\n• No cubre daños por mal uso\n• El cliente debe conservar esta orden"
-              />
-            </div>
-          </div>
-
         </div>
 
         {/* Vista previa */}
         <div className="lg:col-span-2">
-          <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <Eye size={18} className="text-primary" />
-              <h3 className="font-bold text-slate-900 dark:text-white">Vista Previa</h3>
-            </div>
-            <div className="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800">
-              <canvas
-                ref={canvasRef}
-                width={595}
-                height={842}
-                className="w-full h-auto"
-              />
-            </div>
-            <p className="text-xs text-slate-500 mt-3 text-center">
-              Vista previa en escala A4. Los cambios se reflejan automáticamente.
-            </p>
-          </div>
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-4">
+                <Eye size={18} className="text-primary" />
+                <h3 className="font-bold text-foreground">Vista previa</h3>
+                <Badge variant="outline" className="ml-auto text-[10px] font-mono">
+                  A4
+                </Badge>
+              </div>
+              <div className="border border-border rounded-lg overflow-hidden bg-muted/30">
+                <div ref={previewRef} className="transform scale-[0.7] origin-top-left w-[143%]">
+                  <ServiceOrderPreview data={data} />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-3 text-center">
+                La vista previa se actualiza automáticamente con cada cambio.
+              </p>
+            </CardContent>
+          </Card>
         </div>
-      </div>
-
-      {/* Botón Guardar */}
-      <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
-        <button
-          onClick={() => alert('Configuración de PDF guardada')}
-          className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-all shadow-md shadow-blue-600/20"
-        >
-          <Save size={16} />
-          Guardar configuración
-        </button>
       </div>
     </div>
   )
