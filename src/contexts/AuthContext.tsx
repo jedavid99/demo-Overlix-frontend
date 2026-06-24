@@ -69,15 +69,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
-    // Eliminar token de localStorage y headers de Axios
-    clearAuthToken();
-    // Llamar al servicio de logout del backend (opcional)
-    logoutService();
-    // Limpiar estado de autenticación
-    setUser(null);
-    setIsAuthenticated(false);
-    // Redirigir al login
-    window.location.href = '/';
+    console.log('Logout iniciado');
+    
+    try {
+      // Eliminar token de localStorage y headers de Axios
+      clearAuthToken();
+      console.log('Token eliminado de localStorage y headers');
+      
+      // Llamar al servicio de logout del backend
+      logoutService();
+      console.log('Servicio de logout llamado');
+      
+      // Limpiar estado de autenticación
+      setUser(null);
+      setIsAuthenticated(false);
+      console.log('Estado de autenticación limpiado');
+      
+      // Redirigir al login
+      window.location.href = '/';
+      console.log('Redirigiendo a /');
+    } catch (error) {
+      console.error('Error durante logout:', error);
+      // Aún así limpiar el estado y redirigir
+      setUser(null);
+      setIsAuthenticated(false);
+      window.location.href = '/';
+    }
   };
 
   return (
