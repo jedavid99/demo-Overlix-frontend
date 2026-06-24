@@ -19,7 +19,9 @@ export const clientService = {
       console.log('clientService.create - Respuesta del backend:', res.data);
       return res.data;
     }).catch(err => {
-      console.error('clientService.create - Error:', err.response?.data || err.message);
+      console.error('clientService.create - Error completo:', err);
+      console.error('clientService.create - Response data:', err.response?.data);
+      console.error('clientService.create - Errors array:', err.response?.data?.errors);
       throw err;
     });
   },
