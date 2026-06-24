@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Menu, Search, Bell, User, Command, PanelLeft, ChevronDown, ArrowRight, ArrowRightToLine, Badge } from 'lucide-react'
@@ -7,7 +5,6 @@ import { MdSearch, MdSettings, MdBarChart, MdInventory2, MdAttachMoney, MdReceip
 import { Button } from '@/shared/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
 import { useAuth } from '@/contexts/AuthContext'
-
 const categories = [
   { value: 'all', label: 'Todo', placeholder: 'Buscar en Overlix...', route: '/dashboard' },
   { value: 'sales', label: 'Ventas', placeholder: 'Buscar venta...', route: '/sales' },
@@ -21,7 +18,6 @@ const categories = [
   { value: 'reports-stock', label: 'Reporte Stock', placeholder: 'Buscar en reporte de stock...', route: '/reports/stock', icon: <MdInventory2 size={16} /> },
   { value: 'reports-financial', label: 'Reporte Financiero', placeholder: 'Buscar en reporte financiero...', route: '/reports/financial', icon: <MdAttachMoney size={16} /> },
 ]
-
 export const AdminTopBar = ({
   onMenuClick = () => {},
   onToggleCollapse = () => {},
@@ -35,14 +31,11 @@ export const AdminTopBar = ({
 }) => {
   const navigate = useNavigate()
   const { logout } = useAuth() // 👈 Obtener la función logout del contexto
-
   const [searchFocused, setSearchFocused] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const searchInputRef = useRef<HTMLInputElement>(null)
-
   const currentCategory = categories.find(cat => cat.value === selectedCategory) || categories[0]
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -50,11 +43,9 @@ export const AdminTopBar = ({
         searchInputRef.current?.focus()
       }
     }
-
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
-
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && searchQuery.trim()) {
       const route = currentCategory.route
@@ -62,13 +53,11 @@ export const AdminTopBar = ({
       setSearchQuery('')
     }
   }
-
   // 👈 Función de logout única y limpia
   const handleLogout = async () => {
     await logout() // Llama al logout del contexto (que ya tiene la lógica del backend)
     // El contexto ya se encarga de limpiar tokens y redirigir a /login
   }
-
   return (
     <header className="h-14 flex items-center justify-between px-4 lg:px-6 bg-card/80 backdrop-blur-md border-b border-border z-30 sticky top-0">
       <div className="flex items-center gap-3">
@@ -89,7 +78,6 @@ export const AdminTopBar = ({
           <ArrowRightToLine size={18} className={`transition-transform ${sidebarCollapsed ? 'rotate-180' : ''}`} />
         </Button>
       </div>
-
       <div className="flex items-center gap-3">
         {/* Global Search with category selector */}
         <div className="hidden md:flex items-center gap-0 w-64">
@@ -116,7 +104,6 @@ export const AdminTopBar = ({
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-
           {/* Search Input */}
           <div className="relative flex-1">
             <MdSearch size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -133,13 +120,12 @@ export const AdminTopBar = ({
             />
           </div>
         </div>
-
         {/* Notifications with badge */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon-sm" className="relative">
               <Bell size={18} className="text-muted-foreground" />
-              <Badge  className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px]">
+              <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px]">
                 3
               </Badge>
             </Button>
@@ -171,7 +157,6 @@ export const AdminTopBar = ({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-
         {/* Profile */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -210,5 +195,4 @@ export const AdminTopBar = ({
     </header>
   )
 }
-
 export default AdminTopBar
