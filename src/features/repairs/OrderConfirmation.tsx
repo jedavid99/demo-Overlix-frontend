@@ -58,13 +58,18 @@ export default function OrderConfirmation() {
       console.log('Intentando obtener orden:', id)
       const response = await repairService.getById(id)
       console.log('Respuesta de orden:', response)
-      console.log('Campos de orden:', Object.keys(response || {}))
+      console.log('Campos de respuesta:', Object.keys(response || {}))
+      
+      // Extraer datos de response.data (estructura: {success: true, data: {orden}})
+      const orderData = response?.data || response
+      console.log('Datos de orden:', orderData)
+      console.log('Campos de orden:', Object.keys(orderData || {}))
       console.log('Datos del cliente:', {
-        cliente_nombre: response?.cliente_nombre,
-        cliente_telefono: response?.cliente_telefono,
-        cliente_email: response?.cliente_email,
+        cliente_nombre: orderData?.cliente_nombre,
+        cliente_telefono: orderData?.cliente_telefono,
+        cliente_email: orderData?.cliente_email,
       })
-      setOrderData(response)
+      setOrderData(orderData)
     } catch (error: any) {
       console.error('Error al cargar orden:', error)
       console.error('Error response:', error.response?.data)

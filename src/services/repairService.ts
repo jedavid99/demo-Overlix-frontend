@@ -9,7 +9,7 @@ export const repairService = {
 
   // Obtener una reparación por ID
   getById: (id: string): Promise<Repair> => {
-    return api.get(`/repairs/${id}`).then(res => res.data.data);
+    return api.get(`/repairs/${id}`).then(res => res.data);
   },
 
   // Crear una nueva reparación
