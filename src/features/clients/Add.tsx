@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { User, MapPin, Phone, Mail, Hash, MessageCircle } from 'lucide-react'
+import { useClientMutations } from '@/hooks/useClients'
+
 export default function ClientAdd() {
   const navigate = useNavigate()
+  const { createClient, loading, error } = useClientMutations()
   const [form, setForm] = useState({
     name: '', phoneCode: '+34', phone: '', email: '', dni: '', address: '', city: '', zip: '', notes: '', whatsapp: true,
   })
@@ -11,10 +14,31 @@ export default function ClientAdd() {
     const val = (type === 'checkbox') ? (e.target as HTMLInputElement).checked : value
     setForm({ ...form, [name]: val })
   }
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: persist to backend
-    navigate('/clients')
+    console.log('ClientAdd - Datos del formulario:', form)
+    
+    // Mapear campos del formulario al formato del backend
+    const clientData = {
+      nombre_completo: form.name,
+      telefono: form.phone,
+      email: form.email || undefined,
+      dni: form.dni || undefined,
+      direccion: form.address || undefined,
+      ciudad: form.city || undefined,
+      provincia: form.city || undefined, // Usando city como provincia por ahora
+      notas: form.notes || undefined
+    }
+    
+    console.log('ClientAdd - Datos a enviar al backend:', clientData)
+    
+    const result = await createClient(clientData)
+    if (result) {
+      console.log('ClientAdd - Cliente creado exitosamente')
+      navigate('/clients')
+    } else {
+      console.error('ClientAdd - Error al crear cliente:', error)
+    }
   }
   return (
     <div className="py-8">
@@ -93,10 +117,17 @@ export default function ClientAdd() {
           </section>
         </div>
         <div className="mt-6 border-t pt-4">
+          {error && (
+            <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+              {error}
+            </div>
+          )}
           
           <div className="mt-6 flex items-center justify-end gap-3">
             <button type="button" onClick={() => navigate('/clients')} className="px-4 py-2 border rounded">Cancelar</button>
-            <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded shadow">Registrar Cliente</button>
+            <button type="submit" disabled={loading} className="px-4 py-2 bg-green-600 text-white rounded shadow disabled:opacity-50 disabled:cursor-not-allowed">
+              {loading ? 'Guardando...' : 'Registrar Cliente'}
+            </button>
           </div>
         </div>
       </form>
