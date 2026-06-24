@@ -51,7 +51,7 @@ export default function Clients() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Clientes</h1>
-          <p className="text-muted-foreground">Gestiona tu base de clientes</p>
+          <p className="text-muted-foreground">Gestiona ss tu base de clientes</p>
         </div>
         <Link to="/clients/add">
           <Button>
