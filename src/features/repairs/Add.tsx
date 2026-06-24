@@ -337,9 +337,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
         marca: state.brand || undefined,
         modelo: state.model || undefined,
         problema_reportado: state.issueDescription,
-        diagnostico: state.technicianNotes || undefined,
         prioridad: state.priority === 'Normal' ? 'medium' : state.priority === 'Baja' ? 'low' : state.priority === 'Alta' ? 'high' : 'critical',
-        costo_estimado: parseFloat(repairPrice),
         fecha_ingreso: new Date(),
         fecha_estimada_entrega: new Date(Date.now() + state.estimatedDays * 24 * 60 * 60 * 1000)
       };
