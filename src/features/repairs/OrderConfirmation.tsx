@@ -38,14 +38,14 @@ export default function OrderConfirmation() {
   const pdfRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (orderId) {
+    if (orderId && orderId !== 'undefined') {
       console.log('Cargando orden con ID:', orderId)
       fetchOrderData(orderId)
     } else {
-      console.error('No se proporcionó ID de orden')
+      console.error('No se proporcionó ID de orden o ID es undefined')
       toast({
         title: 'Error',
-        description: 'No se proporcionó ID de orden',
+        description: 'No se proporcionó un ID de orden válido',
         variant: 'destructive'
       })
       navigate('/reparaciones/add')
@@ -61,11 +61,21 @@ export default function OrderConfirmation() {
     } catch (error: any) {
       console.error('Error al cargar orden:', error)
       console.error('Error response:', error.response?.data)
-      toast({
-        title: 'Error',
-        description: `No se pudo cargar la orden de servicio: ${error.response?.data?.message || error.message}`,
-        variant: 'destructive'
-      })
+      
+      if (error.response?.status === 404) {
+        toast({
+          title: 'Orden no encontrada',
+          description: 'La orden de servicio no existe en la base de datos',
+          variant: 'destructive'
+        })
+        navigate('/reparaciones/list')
+      } else {
+        toast({
+          title: 'Error',
+          description: `No se pudo cargar la orden de servicio: ${error.response?.data?.message || error.message}`,
+          variant: 'destructive'
+        })
+      }
     } finally {
       setLoading(false)
     }
