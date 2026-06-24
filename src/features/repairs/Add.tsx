@@ -302,12 +302,8 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
       });
       return;
     }
-    const orderNum = `ORD-${String(Math.floor(Math.random() * 90000) + 10000)}`;
-    console.log('Generando orden:', orderNum);
-    applyUpdate({ orderNumber: orderNum } as any);
-    console.log('Cambiando a confirm step');
     setOrderStep('confirm');
-    console.log('orderStep después de setOrderStep:', orderStep);
+    console.log('Cambiando a confirm step');
   };
 
   const handleConfirmOrder = async () => {
@@ -336,14 +332,19 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
         dispositivo: state.deviceType,
         marca: state.brand || undefined,
         modelo: state.model || undefined,
+        numero_serie: state.serial || undefined,
         problema_reportado: state.issueDescription,
         prioridad: state.priority === 'Normal' ? 'medium' : state.priority === 'Baja' ? 'low' : state.priority === 'Alta' ? 'high' : 'critical',
+        total_reparacion: parseFloat(repairPrice),
+        notas: state.technicianNotes || undefined,
+        pagado: false, // Por defecto false (pago parcial)
+        metodo_pago_id: undefined, // Se puede agregar después
         fecha_ingreso: new Date(),
         fecha_estimada_entrega: new Date(Date.now() + state.estimatedDays * 24 * 60 * 60 * 1000)
       };
 
       console.log('Enviando payload:', payload);
-      const response = await repairService.create(payload);
+      const response = await repairService.create(payload as any);
       console.log('Respuesta:', response);
       setCreatedOrder(response);
       setOrderStep('success');
@@ -368,8 +369,8 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
   const handleSendWhatsApp = () => {
     if (!createdOrder || !state.selectedClient) return;
     
-    const orderNumber = (state as any).orderNumber || 'N/A';
-    const message = `Hola ${state.selectedClient.name}, su orden de servicio ${orderNumber} ha sido creada exitosamente. Dispositivo: ${state.brand} ${state.model}. Precio estimado: $${repairPrice}.`;
+    const orderNumber = createdOrder.numero_reparacion || 'N/A';
+    const message = `Hola ${state.selectedClient.name}, su orden de servicio ${orderNumber} ha sido creada exitosamente. Dispositivo: ${state.brand} ${state.model}. Precio: $${repairPrice}.`;
     const phone = state.selectedClient.phone?.replace(/\D/g, '');
     const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
@@ -389,7 +390,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
     setCreatedOrder(null);
     applyUpdate({ 
       selectedClient: null,
-      orderNumber: '',
       brand: '',
       model: '',
       serial: '',
@@ -1161,12 +1161,12 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                     </div>
                   </div>
 
-                  {/* Número de orden */}
+                  {/* Información */}
                   <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs text-muted-foreground uppercase">Número de Orden</p>
-                        <p className="text-2xl font-bold text-primary">{(state as any).orderNumber}</p>
+                        <p className="text-xs text-muted-foreground uppercase">Estado</p>
+                        <p className="text-lg font-bold text-primary">Pendiente de confirmación</p>
                       </div>
                       <Badge variant="default" className="text-xs">Pendiente</Badge>
                     </div>
@@ -1243,7 +1243,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                   <div className="border rounded-lg p-6 bg-white">
                     <div className="text-center mb-6">
                       <h2 className="text-xl font-bold">ORDEN DE SERVICIO</h2>
-                      <p className="text-lg font-semibold text-primary">{(state as any).orderNumber}</p>
+                      <p className="text-lg font-semibold text-primary">{createdOrder?.numero_reparacion || 'N/A'}</p>
                     </div>
                     
                     <div className="space-y-4 text-sm">
@@ -1258,6 +1258,10 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                       <div className="flex justify-between border-b pb-2">
                         <span className="text-muted-foreground">Dispositivo:</span>
                         <span className="font-medium">{state.brand} {state.model}</span>
+                      </div>
+                      <div className="flex justify-between border-b pb-2">
+                        <span className="text-muted-foreground">Serial:</span>
+                        <span className="font-medium">{state.serial || '—'}</span>
                       </div>
                       <div className="flex justify-between border-b pb-2">
                         <span className="text-muted-foreground">Problema:</span>
