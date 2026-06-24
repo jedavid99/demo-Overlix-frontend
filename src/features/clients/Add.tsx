@@ -96,7 +96,7 @@ export default function ClientAdd() {
           
           <div className="mt-6 flex items-center justify-end gap-3">
             <button type="button" onClick={() => navigate('/clients')} className="px-4 py-2 border rounded">Cancelar</button>
-            <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded shadow">Guardar y Crear Orden</button>
+            <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded shadow">Registrar Cliente</button>
           </div>
         </div>
       </form>
