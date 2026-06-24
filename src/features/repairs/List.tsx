@@ -347,7 +347,7 @@ export default function RepairsList() {
                       <td className="px-4 py-3 text-sm text-muted-foreground">
                         {repair.fecha_ingreso ? new Date(repair.fecha_ingreso).toLocaleDateString('es-AR') : '—'}
                       </td>
-                      <td className="px-4 py-3 text-sm text-right">
+                      <td className="px-4 py-3 text-sm text-right" onClick={(e) => e.stopPropagation()}>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
@@ -355,26 +355,26 @@ export default function RepairsList() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => navigate(`/reparaciones/confirmation?orderId=${repair.id}`)}>
+                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/reparaciones/confirmation?orderId=${repair.id}`); }}>
                               <Eye className="h-4 w-4 mr-2" />
                               Vista Previa
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => navigate(`/reparaciones/edit/${repair.id}`)}>
+                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/reparaciones/edit/${repair.id}`); }}>
                               <Edit className="h-4 w-4 mr-2" />
                               Editar
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => navigate(`/reparaciones/confirmation?orderId=${repair.id}&print=true`)}>
+                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/reparaciones/confirmation?orderId=${repair.id}&print=true`); }}>
                               <FileText className="h-4 w-4 mr-2" />
                               PDF Orden
                             </DropdownMenuItem>
                             {repair.estado !== 'delivered' && (
-                              <DropdownMenuItem onClick={() => handleMarkAsDelivered(repair.id)}>
+                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleMarkAsDelivered(repair.id); }}>
                                 <Package className="h-4 w-4 mr-2" />
                                 Marcar Entregado
                               </DropdownMenuItem>
                             )}
                             <DropdownMenuItem 
-                              onClick={() => handleDelete(repair.id)}
+                              onClick={(e) => { e.stopPropagation(); handleDelete(repair.id); }}
                               className="text-destructive"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
