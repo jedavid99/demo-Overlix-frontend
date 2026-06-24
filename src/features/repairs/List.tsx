@@ -27,6 +27,7 @@ import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
 import { repairService } from '@/services/repairService';
 import { toast } from '@/hooks/use-toast';
+import RepairPreviewModal from './RepairPreviewModal';
 
 const getStatusBadge = (status: string) => {
   switch (status) {
@@ -69,6 +70,8 @@ export default function RepairsList() {
   const [totalRepairs, setTotalRepairs] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [selectedRepairId, setSelectedRepairId] = useState<string | null>(null);
 
   useEffect(() => {
     loadRepairs();
@@ -362,7 +365,8 @@ export default function RepairsList() {
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setActiveDropdown(null);
-                                  navigate(`/reparaciones/confirmation?orderId=${repair.id}`);
+                                  setSelectedRepairId(repair.id);
+                                  setPreviewModalOpen(true);
                                 }}
                               >
                                 <Eye className="h-4 w-4" />
@@ -453,6 +457,18 @@ export default function RepairsList() {
           )}
         </CardContent>
       </Card>
+
+      {/* Modal de vista previa */}
+      {selectedRepairId && (
+        <RepairPreviewModal
+          isOpen={previewModalOpen}
+          onClose={() => {
+            setPreviewModalOpen(false);
+            setSelectedRepairId(null);
+          }}
+          repairId={selectedRepairId}
+        />
+      )}
     </div>
   );
 }

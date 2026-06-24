@@ -9,6 +9,7 @@ import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/shared/components/ui/dialog'
+import { repairService } from '@/services/repairService'
 // Datos mock eliminados - conectar con API real
 // const salesData = [
   // { name: 'Lun', ingresos: 45000 },
@@ -101,43 +102,89 @@ export default function Dashboard() {
   const [stockAlerts, setStockAlerts] = useState<any[]>([])
   const [repairStatesData, setRepairStatesData] = useState<any[]>([])
   const [recentClients, setRecentClients] = useState<any[]>([])
-  // KPIs - will be calculated from real data
-  const totalActiveOrders = repairs.filter(r => r.status !== 'completed').length
-  const totalToDeliver = 0
-  const totalRevenueToday = 0
-  const totalEfficiency = 0
-  const avgRepairTime = 0
-  // Placeholder function for API integration
+  // KPIs - calculated from real data
+  const totalActiveOrders = repairs.filter((r: any) => r.estado !== 'delivered' && r.estado !== 'cancelled').length
+  const totalToDeliver = repairs.filter((r: any) => r.estado === 'ready').length
+  const totalRevenueToday = repairs
+    .filter((r: any) => {
+      const repairDate = new Date(r.fecha_ingreso)
+      const today = new Date()
+      return repairDate.toDateString() === today.toDateString() && r.total_reparacion
+    })
+    .reduce((sum: number, r: any) => {
+      const total = typeof r.total_reparacion === 'number' ? r.total_reparacion : parseFloat(r.total_reparacion) || 0
+      return sum + total
+    }, 0)
+  const totalEfficiency = repairs.length > 0 
+    ? ((repairs.filter((r: any) => r.estado === 'delivered').length / repairs.length) * 100).toFixed(1)
+    : 0
+  const avgRepairTime = 3 // Placeholder - would need date calculation
+  
+  // Function to fetch dashboard data
   const fetchDashboardData = async () => {
-    // TODO: Replace with actual API calls
-    // setLoading(true)
-    // try {
-    //   const [repairsRes, activitiesRes, salesRes, deliveriesRes, stockRes, statesRes, clientsRes] = await Promise.all([
-    //     api.get('/repairs'),
-    //     api.get('/activities'),
-    //     api.get('/sales'),
-    //     api.get('/deliveries'),
-    //     api.get('/stock-alerts'),
-    //     api.get('/repair-states'),
-    //     api.get('/recent-clients')
-    //   ])
-    //   setRepairs(repairsRes.data)
-    //   setDailyActivities(activitiesRes.data)
-    //   setSalesData(salesRes.data)
-    //   setPendingDeliveries(deliveriesRes.data)
-    //   setStockAlerts(stockRes.data)
-    //   setRepairStatesData(statesRes.data)
-    //   setRecentClients(clientsRes.data)
-    // } catch (error) {
-    //   console.error('Error fetching dashboard data:', error)
-    // } finally {
-    //   setLoading(false)
-    // }
+    setLoading(true)
+    try {
+      const response = await repairService.list({ limit: 100 }) as any
+      
+      // Extract repairs array from response
+      const repairsArray = response?.data?.data?.reparaciones ||
+                         response?.data?.reparaciones ||
+                         response?.reparaciones ||
+                         response?.data?.data?.data ||
+                         response?.data?.data ||
+                         response?.data ||
+                         [];
+      
+      setRepairs(Array.isArray(repairsArray) ? repairsArray : [])
+      
+      // Calculate repair states data for pie chart
+      const states = repairsArray.reduce((acc: any, r: any) => {
+        const state = r.estado || 'unknown'
+        acc[state] = (acc[state] || 0) + 1
+        return acc
+      }, {})
+      
+      const repairStatesData = Object.entries(states).map(([name, value]) => ({
+        name: name === 'pending' ? 'Pendiente' :
+              name === 'diagnostic' ? 'Diagnóstico' :
+              name === 'in_progress' ? 'En Progreso' :
+              name === 'waiting_parts' ? 'Esperando Repuestos' :
+              name === 'ready' ? 'Listo' :
+              name === 'delivered' ? 'Entregado' :
+              name === 'cancelled' ? 'Cancelado' : name,
+        value: value as number,
+        color: name === 'pending' ? '#F59E0B' :
+               name === 'diagnostic' ? '#3B82F6' :
+               name === 'in_progress' ? '#8B5CF6' :
+               name === 'waiting_parts' ? '#F97316' :
+               name === 'ready' ? '#10B981' :
+               name === 'delivered' ? '#6B7280' :
+               name === 'cancelled' ? '#EF4444' : '#9CA3AF'
+      }))
+      
+      setRepairStatesData(repairStatesData)
+      
+      // Set recent repairs for table
+      const recentRepairs = Array.isArray(repairsArray) 
+        ? repairsArray.slice(0, 5).map((r: any) => ({
+            id: r.numero_reparacion || r.id?.substring(0, 8),
+            dispositivo: r.dispositivo || '—',
+            estado: r.estado || '—'
+          }))
+        : []
+      
+      setRepairs(recentRepairs)
+      
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error)
+    } finally {
+      setLoading(false)
+    }
   }
-  // Uncomment to enable data fetching on mount
-  // useEffect(() => {
-  //   fetchDashboardData()
-  // }, [])
+  
+  useEffect(() => {
+    fetchDashboardData()
+  }, [])
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -320,17 +367,30 @@ export default function Dashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {/* Conectar con API real: api.get('/repairs') */}
-                    <tr className="border-b border-border">
-                      <td className="text-sm font-mono text-foreground py-2 px-3">-</td>
-                      <td className="text-sm text-foreground py-2 px-3">
-                        <div className="flex items-center gap-2">
-                          <MdPhoneAndroid size={16} />
-                          <span className="truncate">-</span>
-                        </div>
-                      </td>
-                      <td className="text-sm py-2 px-3"><Badge variant="default" size="sm">-</Badge></td>
-                    </tr>
+                    {repairs.length > 0 ? (
+                      repairs.map((repair: any) => (
+                        <tr key={repair.id} className="border-b border-border">
+                          <td className="text-sm font-mono text-foreground py-2 px-3">{repair.id}</td>
+                          <td className="text-sm text-foreground py-2 px-3">
+                            <div className="flex items-center gap-2">
+                              <MdPhoneAndroid size={16} />
+                              <span className="truncate">{repair.dispositivo}</span>
+                            </div>
+                          </td>
+                          <td className="text-sm py-2 px-3">
+                            <Badge variant={getStatusBadge(repair.estado)?.variant} size="sm">
+                              {getStatusBadge(repair.estado)?.label}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr className="border-b border-border">
+                        <td colSpan={3} className="text-sm text-muted-foreground py-4 px-3 text-center">
+                          No hay reparaciones recientes
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>

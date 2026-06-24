@@ -220,9 +220,9 @@ export default function OrderConfirmation() {
       deviceDescription: orderData?.dispositivo || '',
       repairDescription: orderData?.problema_reportado || '',
       repairDiagnostic: orderData?.diagnosis || '',
-      laborCost: '0.00',
+      laborCost: typeof orderData?.total_reparacion === 'number' ? orderData.total_reparacion.toFixed(2) : '0.00',
       partsCost: '0.00',
-      totalPrice: '0.00',
+      totalPrice: typeof orderData?.total_reparacion === 'number' ? orderData.total_reparacion.toFixed(2) : (orderData?.total_reparacion || '0.00'),
       warrantyMonths: '12',
       warrantyTerms: 'Garantía por defectos de fabricación y mano de obra por 12 meses.',
       securityType: 'none' as const,
@@ -347,7 +347,7 @@ export default function OrderConfirmation() {
                   {orderData.total_reparacion && (
                     <div className="flex justify-between border-b pb-2">
                       <span className="text-muted-foreground">Total:</span>
-                      <span className="font-medium">${orderData.total_reparacion.toFixed(2)}</span>
+                      <span className="font-medium">${typeof orderData.total_reparacion === 'number' ? orderData.total_reparacion.toFixed(2) : orderData.total_reparacion}</span>
                     </div>
                   )}
                   {orderData.notas && (
@@ -371,7 +371,7 @@ export default function OrderConfirmation() {
                     {orderData.repuestos.map((repuesto: any, index: number) => (
                       <div key={index} className="flex justify-between text-sm border-b pb-2">
                         <span>{repuesto.nombre}</span>
-                        <span>{repuesto.cantidad} x ${repuesto.costo_unitario?.toFixed(2) || '0.00'}</span>
+                        <span>{repuesto.cantidad} x ${typeof repuesto.costo_unitario === 'number' ? repuesto.costo_unitario.toFixed(2) : repuesto.costo_unitario || '0.00'}</span>
                       </div>
                     ))}
                   </div>
