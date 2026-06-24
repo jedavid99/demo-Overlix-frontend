@@ -103,6 +103,30 @@ export default function RepairEdit() {
     try {
       setSaving(true);
       
+      // Validar transición de estado
+      const validTransitions: Record<string, string[]> = {
+        'pending': ['diagnostic', 'in_progress', 'cancelled'],
+        'diagnostic': ['in_progress', 'cancelled'],
+        'in_progress': ['waiting_parts', 'ready', 'cancelled'],
+        'waiting_parts': ['in_progress', 'cancelled'],
+        'ready': ['delivered', 'cancelled'],
+        'delivered': [],
+        'cancelled': [],
+      };
+
+      if (formData.estado !== repairData.estado) {
+        const allowedTransitions = validTransitions[repairData.estado] || [];
+        if (!allowedTransitions.includes(formData.estado)) {
+          toast({
+            title: 'Error',
+            description: `No puedes cambiar de "${repairData.estado}" a "${formData.estado}". Transición no válida.`,
+            variant: 'destructive'
+          });
+          setSaving(false);
+          return;
+        }
+      }
+      
       // Construir payload solo con campos que tienen valores
       const payload: any = {};
       
