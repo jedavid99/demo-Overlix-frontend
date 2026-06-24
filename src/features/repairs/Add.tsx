@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { clientService } from '@/services/clientService';
+import { repairService } from '@/services/repairService';
 import { Client } from '@/types/client.types';
+import { toast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
@@ -41,6 +43,10 @@ import {
   CreditCard,
   Building2,
   Hash,
+  MessageCircle,
+  Printer,
+  ArrowLeft,
+  Loader2,
 } from 'lucide-react';
 import { MdPerson, MdBuild, MdCheck } from 'react-icons/md';
 import { RiSimCard2Line } from 'react-icons/ri';
@@ -198,11 +204,17 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
   const [lastClient, setLastClient] = useState<Client | null>(null);
   const [loadingClients, setLoadingClients] = useState(true);
   
+  // Estados para flujo de orden
+  const [orderStep, setOrderStep] = useState<'form' | 'confirm' | 'success'>('form');
+  const [repairPrice, setRepairPrice] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [createdOrder, setCreatedOrder] = useState<any>(null);
+  
   // Cargar último cliente al montar
   useEffect(() => {
     const fetchLastClient = async () => {
       try {
-        const response = await clientService.list({ limit: 1, sort: 'created_at:desc' });
+        const response = await clientService.list({ limit: 1, sort: 'created_at:desc' }) as any;
         console.log('Respuesta último cliente:', response);
         
         // Extraer datos según la estructura real (igual que en página de clientes)
@@ -278,6 +290,109 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
       handleSelectClient(lastClient);
     }
   }, [lastClient, handleSelectClient]);
+
+  // Handlers para flujo de orden
+  const handleCreateOrder = () => {
+    if (!state.selectedClient) {
+      toast({
+        title: 'Error',
+        description: 'Debe seleccionar un cliente',
+        variant: 'destructive'
+      });
+      return;
+    }
+    const orderNum = `ORD-${String(Math.floor(Math.random() * 90000) + 10000)}`;
+    applyUpdate({ orderNumber: orderNum } as any);
+    setOrderStep('confirm');
+  };
+
+  const handleConfirmOrder = async () => {
+    if (!repairPrice || parseFloat(repairPrice) <= 0) {
+      toast({
+        title: 'Error',
+        description: 'Debe ingresar un precio válido',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (!state.selectedClient) {
+      toast({
+        title: 'Error',
+        description: 'Debe seleccionar un cliente',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const payload = {
+        cliente_id: state.selectedClient.id,
+        dispositivo: state.deviceType,
+        marca: state.brand,
+        modelo: state.model,
+        serial: state.serial,
+        falla_reportada: state.issueDescription,
+        diagnostico: state.technicianNotes,
+        prioridad: state.priority === 'Normal' ? 'media' : state.priority.toLowerCase(),
+        costo_estimado: parseFloat(repairPrice),
+        notas: state.accessories.join(', '),
+        fecha_ingreso: new Date().toISOString(),
+        fecha_estimada_entrega: new Date(Date.now() + state.estimatedDays * 24 * 60 * 60 * 1000).toISOString()
+      };
+
+      const response = await repairService.create(payload);
+      setCreatedOrder(response);
+      setOrderStep('success');
+      toast({
+        title: 'Orden creada',
+        description: 'La orden de servicio se ha creado exitosamente'
+      });
+    } catch (error) {
+      console.error('Error al crear orden:', error);
+      toast({
+        title: 'Error',
+        description: 'No se pudo crear la orden de servicio',
+        variant: 'destructive'
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleSendWhatsApp = () => {
+    if (!createdOrder || !state.selectedClient) return;
+    
+    const orderNumber = (state as any).orderNumber || 'N/A';
+    const message = `Hola ${state.selectedClient.name}, su orden de servicio ${orderNumber} ha sido creada exitosamente. Dispositivo: ${state.brand} ${state.model}. Precio estimado: $${repairPrice}.`;
+    const phone = state.selectedClient.phone?.replace(/\D/g, '');
+    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const handlePrintOrder = () => {
+    window.print();
+  };
+
+  const handleBackToForm = () => {
+    setOrderStep('form');
+  };
+
+  const handleNewOrder = () => {
+    setOrderStep('form');
+    setRepairPrice('');
+    setCreatedOrder(null);
+    applyUpdate({ 
+      selectedClient: null,
+      orderNumber: '',
+      brand: '',
+      model: '',
+      serial: '',
+      issueDescription: '',
+      technicianNotes: ''
+    } as any);
+  };
   // Obtener items de hardware según categoría
   const currentHardwareItems = useMemo(() => {
     return hardwareByCategory[state.deviceType] || [];
@@ -823,11 +938,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
               className="flex justify-end"
             >
               <Button
-                onClick={() => {
-                  const orderNum = `ORD-${String(Math.floor(Math.random() * 90000) + 10000)}`;
-                  applyUpdate({ orderNumber: orderNum });
-                  onSave();
-                }}
+                onClick={handleCreateOrder}
                 size="lg"
                 className="px-8 py-5 text-base"
               >
@@ -1003,6 +1114,197 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
             </div>
           </div>
         </div>
+
+        {/* Paso de Confirmación */}
+        <AnimatePresence>
+          {orderStep === 'confirm' && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            >
+              <Card className="max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CheckCircle2 className="text-primary" />
+                    Confirmar Orden de Servicio
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Datos del cliente */}
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <h3 className="font-semibold text-sm mb-3">Datos del Cliente</h3>
+                    <div className="space-y-2 text-sm">
+                      <p><span className="text-muted-foreground">Nombre:</span> {state.selectedClient?.name}</p>
+                      <p><span className="text-muted-foreground">Teléfono:</span> {state.selectedClient?.phone}</p>
+                      <p><span className="text-muted-foreground">Email:</span> {state.selectedClient?.email || '—'}</p>
+                    </div>
+                  </div>
+
+                  {/* Datos del dispositivo */}
+                  <div className="p-4 bg-muted/50 rounded-lg">
+                    <h3 className="font-semibold text-sm mb-3">Datos del Dispositivo</h3>
+                    <div className="space-y-2 text-sm">
+                      <p><span className="text-muted-foreground">Dispositivo:</span> {state.deviceType}</p>
+                      <p><span className="text-muted-foreground">Marca:</span> {state.brand || '—'}</p>
+                      <p><span className="text-muted-foreground">Modelo:</span> {state.model || '—'}</p>
+                      <p><span className="text-muted-foreground">Serial:</span> {state.serial || '—'}</p>
+                      <p><span className="text-muted-foreground">Problema:</span> {state.issueDescription}</p>
+                    </div>
+                  </div>
+
+                  {/* Número de orden */}
+                  <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase">Número de Orden</p>
+                        <p className="text-2xl font-bold text-primary">{(state as any).orderNumber}</p>
+                      </div>
+                      <Badge variant="default" className="text-xs">Pendiente</Badge>
+                    </div>
+                  </div>
+
+                  {/* Precio */}
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Precio de Reparación *</label>
+                    <div className="relative">
+                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+                      <input
+                        type="number"
+                        value={repairPrice}
+                        onChange={(e) => setRepairPrice(e.target.value)}
+                        placeholder="0.00"
+                        className="w-full pl-10 pr-4 py-3 bg-muted border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-lg font-semibold"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Botones */}
+                  <div className="flex items-center justify-end gap-3 pt-4 border-t">
+                    <Button
+                      variant="outline"
+                      onClick={handleBackToForm}
+                      disabled={submitting}
+                    >
+                      <ArrowLeft className="h-4 w-4 mr-2" />
+                      Volver
+                    </Button>
+                    <Button
+                      onClick={handleConfirmOrder}
+                      disabled={submitting}
+                      className="min-w-[150px]"
+                    >
+                      {submitting ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Procesando...
+                        </>
+                      ) : (
+                        <>
+                          <Check className="h-4 w-4 mr-2" />
+                          Confirmar Orden
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Paso de Éxito */}
+        <AnimatePresence>
+          {orderStep === 'success' && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            >
+              <Card className="max-w-2xl w-full">
+                <CardHeader className="text-center">
+                  <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                    <Check className="text-green-600" size={32} />
+                  </div>
+                  <CardTitle className="text-2xl">¡Orden Creada Exitosamente!</CardTitle>
+                  <p className="text-muted-foreground">La orden de servicio ha sido registrada en el sistema</p>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Vista previa de la orden */}
+                  <div className="border rounded-lg p-6 bg-white">
+                    <div className="text-center mb-6">
+                      <h2 className="text-xl font-bold">ORDEN DE SERVICIO</h2>
+                      <p className="text-lg font-semibold text-primary">{(state as any).orderNumber}</p>
+                    </div>
+                    
+                    <div className="space-y-4 text-sm">
+                      <div className="flex justify-between border-b pb-2">
+                        <span className="text-muted-foreground">Cliente:</span>
+                        <span className="font-medium">{state.selectedClient?.name}</span>
+                      </div>
+                      <div className="flex justify-between border-b pb-2">
+                        <span className="text-muted-foreground">Teléfono:</span>
+                        <span className="font-medium">{state.selectedClient?.phone}</span>
+                      </div>
+                      <div className="flex justify-between border-b pb-2">
+                        <span className="text-muted-foreground">Dispositivo:</span>
+                        <span className="font-medium">{state.brand} {state.model}</span>
+                      </div>
+                      <div className="flex justify-between border-b pb-2">
+                        <span className="text-muted-foreground">Problema:</span>
+                        <span className="font-medium">{state.issueDescription}</span>
+                      </div>
+                      <div className="flex justify-between border-b pb-2">
+                        <span className="text-muted-foreground">Fecha:</span>
+                        <span className="font-medium">{new Date().toLocaleDateString('es-AR')}</span>
+                      </div>
+                      <div className="flex justify-between text-lg font-bold">
+                        <span>Total:</span>
+                        <span className="text-primary">${repairPrice}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Botones de acción */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={handleSendWhatsApp}
+                      className="flex items-center justify-center gap-2"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      Enviar por WhatsApp
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={handlePrintOrder}
+                      className="flex items-center justify-center gap-2"
+                    >
+                      <Printer className="h-4 w-4" />
+                      Imprimir Orden
+                    </Button>
+                  </div>
+
+                  <div className=" flex items-center justify-center gap-3 pt-4 border-t">
+                    <Button
+                      variant="ghost"
+                      onClick={handleNewOrder}
+                    >
+                      Crear Nueva Orden
+                    </Button>
+                    <Button
+                      onClick={() => navigate('/reparaciones/list')}
+                    >
+                      Ver Lista de Reparaciones
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
     </motion.div>
   );
