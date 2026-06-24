@@ -77,9 +77,9 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null
 }
 const CustomPieTooltip = ({ active, payload, repairStatesData }: any) => {
-  if (active && payload && payload.length) {
+  if (active && payload && payload.length && repairStatesData && Array.isArray(repairStatesData)) {
     const data = payload[0]
-    const total = repairStatesData.reduce((sum: number, item: any) => sum + item.value, 0)
+    const total = repairStatesData.reduce((sum: number, item: any) => sum + (item.value || 0), 0)
     const percentage = total > 0 ? ((data.value / total) * 100).toFixed(1) : '0'
     return (
       <div className="bg-card border border-border shadow-lg rounded-lg p-3">

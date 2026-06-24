@@ -102,18 +102,30 @@ export default function RepairEdit() {
 
     try {
       setSaving(true);
-      const payload = {
+      
+      // Convertir repuestos al formato esperado por el backend
+      const repuestosUsados = repuestos.length > 0 ? repuestos.map(r => ({
+        repuesto_id: r.id,
+        nombre: r.nombre,
+        cantidad: r.cantidad,
+        costo_unitario: r.costo_unitario,
+      })) : undefined;
+
+      const payload: any = {
         problema_reportado: formData.problema_reportado,
         diagnosis: formData.diagnosis,
         reparacion_realizada: formData.reparacion_realizada,
         estado: formData.estado,
-        total_reparacion: formData.total_reparacion || undefined,
+        costo_final: formData.total_reparacion || undefined,
         notas: formData.notas || undefined,
-        foto_evidencia: formData.foto_evidencia || undefined,
-        repuestos: repuestos.length > 0 ? repuestos : undefined,
       };
 
-      await repairService.update(repairData.id, payload as any);
+      // Solo incluir repuestos si hay alguno
+      if (repuestosUsados && repuestosUsados.length > 0) {
+        payload.repuestos_usados = repuestosUsados;
+      }
+
+      await repairService.update(repairData.id, payload);
       
       toast({
         title: 'Éxito',
@@ -125,7 +137,7 @@ export default function RepairEdit() {
       console.error('Error al actualizar reparación:', error);
       toast({
         title: 'Error',
-        description: 'No se pudo actualizar la reparación',
+        description: error.response?.data?.message || 'No se pudo actualizar la reparación',
         variant: 'destructive'
       });
     } finally {
