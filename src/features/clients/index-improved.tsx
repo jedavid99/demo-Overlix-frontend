@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Search, Plus, Eye, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { MdPerson } from 'react-icons/md'
 import { Button } from '@/shared/components/ui/button'
@@ -10,7 +10,13 @@ import { Skeleton } from '@/shared/components/ui/skeleton'
 import { clientService } from '@/services/clientService'
 import { toast } from '@/hooks/use-toast'
 
+const statusColors: Record<string, string> = {
+  activo: 'bg-green-100 text-green-800',
+  inactivo: 'bg-gray-100 text-gray-800'
+}
+
 export default function Clients() {
+  const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [page, setPage] = useState(1)
   const [statusFilter, setStatusFilter] = useState<'all' | 'activo' | 'inactivo'>('all')
@@ -32,7 +38,6 @@ export default function Clients() {
         console.log('Respuesta completa:', response)
         
         // Extraer datos según la estructura real
-        // Intenta varias posibilidades
         let clientesArray = response?.data?.data?.clientes ||
                            response?.data?.data?.data ||
                            response?.data?.data ||
@@ -59,7 +64,7 @@ export default function Clients() {
     }
 
     fetchClients()
-  }, []) // 👈 Dependencias vacías = se ejecuta UNA SOLA VEZ
+  }, [])
 
   // Filtros locales
   const filtered = useMemo(() => {
@@ -217,69 +222,62 @@ export default function Clients() {
         </div>
       ) : (
         <>
-          {/* Tabla básica */}
-          <div className="overflow-x-auto border border-border rounded-lg bg-background">
+          {/* Tabla mejorada estilo reparaciones */}
+          <div className="border rounded-lg overflow-hidden">
             <table className="w-full">
               <thead className="bg-muted">
                 <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Cliente</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">DNI</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Teléfono</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Fecha registro</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Estado</th>
-                  <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">Acciones</th>
+                  <th className="px-4 py-3 text-left font-medium">Cliente</th>
+                  <th className="px-4 py-3 text-left font-medium">DNI</th>
+                  <th className="px-4 py-3 text-left font-medium">Teléfono</th>
+                  <th className="px-4 py-3 text-left font-medium">Fecha registro</th>
+                  <th className="px-4 py-3 text-left font-medium">Estado</th>
+                  <th className="px-4 py-3 text-right font-medium">Acciones</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody>
                 {paginatedData.map((row) => (
                   <tr key={row.id} className="border-t hover:bg-muted/50">
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
-                          {row.nombre_completo?.charAt(0).toUpperCase() || '?'}
-                        </div>
-                        <div>
-                          <p className="font-medium text-foreground">{row.nombre_completo || 'Sin nombre'}</p>
-                          <p className="text-xs text-muted-foreground">{row.email || 'Sin email'}</p>
-                        </div>
-                      </div>
+                      <div className="font-medium">{row.nombre_completo}</div>
+                      <div className="text-sm text-muted-foreground">{row.email || 'Sin email'}</div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-foreground">{row.dni || '—'}</td>
-                    <td className="px-4 py-3 text-sm text-foreground">{row.telefono || '—'}</td>
-                    <td className="px-4 py-3 text-sm text-foreground">
+                    <td className="px-4 py-3 text-sm">{row.dni || '—'}</td>
+                    <td className="px-4 py-3 text-sm">{row.telefono || '—'}</td>
+                    <td className="px-4 py-3 text-sm">
                       {row.fecha_registro ? new Date(row.fecha_registro).toLocaleDateString('es-AR') : '—'}
                     </td>
                     <td className="px-4 py-3">
-                      <Badge
-                        variant={row.estado === 'activo' ? 'success' : 'secondary'}
-                        className="capitalize"
-                      >
-                        {row.estado || 'activo'}
-                      </Badge>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[row.estado] || statusColors.activo}`}>
+                        {(row.estado || 'activo').toUpperCase()}
+                      </span>
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Link
-                          to={`/clients/${row.id}`}
-                          className="p-1.5 rounded-md hover:bg-muted transition-colors"
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => navigate(`/clients/${row.id}`)}
                           title="Ver cliente"
                         >
-                          <Eye size={16} className="text-muted-foreground" />
-                        </Link>
-                        <Link
-                          to={`/clients/edit/${row.id}`}
-                          className="p-1.5 rounded-md hover:bg-muted transition-colors"
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => navigate(`/clients/edit/${row.id}`)}
                           title="Editar cliente"
                         >
-                          <Edit size={16} className="text-muted-foreground" />
-                        </Link>
-                        <button
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
                           onClick={() => handleDelete(row.id)}
-                          className="p-1.5 rounded-md hover:bg-red-50 transition-colors"
                           title="Eliminar cliente"
                         >
-                          <Trash2 size={16} className="text-red-500" />
-                        </button>
+                          <Trash2 className="w-4 h-4 text-red-500" />
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -289,33 +287,29 @@ export default function Clients() {
           </div>
 
           {/* Paginación */}
-          <div className="flex items-center justify-between mt-4">
-            <span className="text-sm text-muted-foreground">
-              Mostrando {(page - 1) * pageSize + 1} - {Math.min(page * pageSize, totalFiltered)} de {totalFiltered} clientes
-            </span>
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-muted-foreground">
+              Mostrando {paginatedData.length} de {totalFiltered} clientes
+            </div>
             <div className="flex gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="gap-1"
               >
-                <ChevronLeft size={14} />
                 Anterior
               </Button>
-              <span className="flex items-center px-3 text-sm text-muted-foreground">
-                {page} / {totalPages}
+              <span className="px-4 py-2 text-sm">
+                Página {page} de {totalPages}
               </span>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                className="gap-1"
               >
                 Siguiente
-                <ChevronRight size={14} />
               </Button>
             </div>
           </div>
