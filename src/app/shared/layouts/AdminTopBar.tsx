@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Menu, Search, Bell, User, Command, PanelLeft, ChevronDown, ArrowRight, ArrowRightToLine, LogOut } from 'lucide-react'
+import { Menu, Search, Bell, User, Command, PanelLeft, ChevronDown, ArrowRight, ArrowRightToLine } from 'lucide-react'
 import { MdSearch, MdSettings, MdBarChart, MdInventory2, MdAttachMoney, MdReceipt } from 'react-icons/md'
 import { Button } from '../../../components/ui/button'
 import { Input } from '../../../components/ui/input'
@@ -48,7 +48,6 @@ export const AdminTopBar = ({
   sidebarOpen?: boolean
 }) => {
   const navigate = useNavigate()
-  const { logout } = useAuth()
   const [searchFocused, setSearchFocused] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
@@ -207,11 +206,6 @@ export const AdminTopBar = ({
                 <MdSettings size={16} className="mr-2" />
                 Configuración
               </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-              <LogOut size={16} className="mr-2" />
-              Cerrar sesión
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
