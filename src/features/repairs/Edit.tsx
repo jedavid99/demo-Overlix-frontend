@@ -103,28 +103,27 @@ export default function RepairEdit() {
     try {
       setSaving(true);
       
+      // Construir payload solo con campos que tienen valores
+      const payload: any = {};
+      
+      if (formData.problema_reportado) payload.problema_reportado = formData.problema_reportado;
+      if (formData.diagnosis) payload.diagnosis = formData.diagnosis;
+      if (formData.reparacion_realizada) payload.reparacion_realizada = formData.reparacion_realizada;
+      if (formData.estado) payload.estado = formData.estado;
+      if (formData.total_reparacion && formData.total_reparacion > 0) payload.costo_final = formData.total_reparacion;
+      if (formData.notas) payload.notas = formData.notas;
+      
       // Convertir repuestos al formato esperado por el backend
-      const repuestosUsados = repuestos.length > 0 ? repuestos.map(r => ({
-        repuesto_id: r.id,
-        nombre: r.nombre,
-        cantidad: r.cantidad,
-        costo_unitario: r.costo_unitario,
-      })) : undefined;
-
-      const payload: any = {
-        problema_reportado: formData.problema_reportado,
-        diagnosis: formData.diagnosis,
-        reparacion_realizada: formData.reparacion_realizada,
-        estado: formData.estado,
-        costo_final: formData.total_reparacion || undefined,
-        notas: formData.notas || undefined,
-      };
-
-      // Solo incluir repuestos si hay alguno
-      if (repuestosUsados && repuestosUsados.length > 0) {
-        payload.repuestos_usados = repuestosUsados;
+      if (repuestos.length > 0) {
+        payload.repuestos_usados = repuestos.map(r => ({
+          repuesto_id: r.id,
+          nombre: r.nombre,
+          cantidad: r.cantidad,
+          costo_unitario: r.costo_unitario,
+        }));
       }
 
+      console.log('Payload enviado:', payload);
       await repairService.update(repairData.id, payload);
       
       toast({
@@ -135,6 +134,7 @@ export default function RepairEdit() {
       navigate('/reparaciones/list');
     } catch (error: any) {
       console.error('Error al actualizar reparación:', error);
+      console.error('Error response:', error.response?.data);
       toast({
         title: 'Error',
         description: error.response?.data?.message || 'No se pudo actualizar la reparación',
