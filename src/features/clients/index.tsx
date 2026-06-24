@@ -30,10 +30,20 @@ export default function Clients() {
       return []
     }
     
-    // Verificar si data es un array
-    if (Array.isArray(clientsData)) {
-      console.log('Clients - clientsData es un array directamente')
-      return clientsData.map((client: any) => ({
+    // El backend envuelve la respuesta: { data: { success: true, data: [...] } }
+    // Accedemos a clientsData.data.data para obtener el array de clientes
+    const backendData = clientsData.data?.data
+    console.log('Clients - backendData (clientsData.data.data):', backendData)
+    
+    if (!backendData) {
+      console.log('Clients - backendData es null/undefined')
+      return []
+    }
+    
+    // Verificar si backendData es un array
+    if (Array.isArray(backendData)) {
+      console.log('Clients - backendData es un array con', backendData.length, 'clientes')
+      return backendData.map((client: any) => ({
         id: client.id,
         name: client.nombre_completo,
         dni: client.dni || '',
@@ -44,10 +54,10 @@ export default function Clients() {
       }))
     }
     
-    // Si data tiene una propiedad data que es array
-    if (clientsData.data && Array.isArray(clientsData.data)) {
-      console.log('Clients - clientsData.data es un array')
-      return clientsData.data.map((client: any) => ({
+    // Si backendData tiene una propiedad data que es array
+    if (backendData.data && Array.isArray(backendData.data)) {
+      console.log('Clients - backendData.data es un array')
+      return backendData.data.map((client: any) => ({
         id: client.id,
         name: client.nombre_completo,
         dni: client.dni || '',
@@ -58,7 +68,7 @@ export default function Clients() {
       }))
     }
     
-    console.log('Clients - Estructura no reconocida:', typeof clientsData)
+    console.log('Clients - Estructura no reconocida:', typeof backendData)
     return []
   }, [clientsData])
   const filtered = useMemo(() => {
