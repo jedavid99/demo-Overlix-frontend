@@ -283,8 +283,6 @@ export default function Clients() {
           currentPage={page}
           totalPages={totalPages}
           onPageChange={setPage}
-          loading={loading}
-          emptyMessage="No hay clientes que coincidan con la búsqueda"
         />
       )}
     </motion.div>
