@@ -334,30 +334,31 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
       const payload = {
         cliente_id: state.selectedClient.id,
         dispositivo: state.deviceType,
-        marca: state.brand,
-        modelo: state.model,
-        serial: state.serial,
+        marca: state.brand || undefined,
+        modelo: state.model || undefined,
+        serial: state.serial || undefined,
         falla_reportada: state.issueDescription,
-        diagnostico: state.technicianNotes,
-        prioridad: state.priority === 'Normal' ? 'media' : state.priority.toLowerCase(),
+        prioridad: (state.priority === 'Normal' ? 'media' : state.priority.toLowerCase()) as 'baja' | 'media' | 'alta' | 'urgente',
         costo_estimado: parseFloat(repairPrice),
-        notas: state.accessories.join(', '),
-        fecha_ingreso: new Date().toISOString(),
+        notas: state.technicianNotes ? state.technicianNotes + (state.accessories.length > 0 ? '. Accesorios: ' + state.accessories.join(', ') : '') : state.accessories.join(', ') || undefined,
         fecha_estimada_entrega: new Date(Date.now() + state.estimatedDays * 24 * 60 * 60 * 1000).toISOString()
       };
 
+      console.log('Enviando payload:', payload);
       const response = await repairService.create(payload);
+      console.log('Respuesta:', response);
       setCreatedOrder(response);
       setOrderStep('success');
       toast({
         title: 'Orden creada',
         description: 'La orden de servicio se ha creado exitosamente'
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al crear orden:', error);
+      console.error('Error response:', error.response?.data);
       toast({
         title: 'Error',
-        description: 'No se pudo crear la orden de servicio',
+        description: error.response?.data?.message || 'No se pudo crear la orden de servicio',
         variant: 'destructive'
       });
     } finally {
