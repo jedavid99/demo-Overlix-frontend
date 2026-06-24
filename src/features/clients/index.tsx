@@ -8,7 +8,7 @@ import { Input } from '@/shared/components/ui/input'
 import { Badge } from '@/shared/components/ui/badge'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { useClients } from '@/hooks/useClients'
-import { toast } from 'react-hot-toast'
+import { toast } from '@/hooks/use-toast'
 
 export default function Clients() {
   const [query, setQuery] = useState('')
