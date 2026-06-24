@@ -19,19 +19,47 @@ export default function Clients() {
   // Conectar con API real usando el hook
   const { data: clientsData, loading, error, refetch } = useClients({ page: 1, limit: 100 })
   
+  // Log para ver la estructura de la respuesta
+  console.log('Clients - clientsData:', clientsData)
+  console.log('Clients - clientsData.data:', clientsData?.data)
+  
   // Mapear datos del backend al formato del componente
   const clients = useMemo(() => {
-    if (!clientsData?.data) return []
-    return clientsData.data.map((client: any) => ({
-      id: client.id,
-      name: client.nombre_completo,
-      // email: client.email || '',
-      // dni: client.dni || '',
-      // phone: client.telefono || '',
-      // status: client.estado, // 'activo' | 'inactivo'
-      // joinDate: client.fecha_registro,
-      // transactions: client.deuda_actual || 0,
-    }))
+    if (!clientsData) {
+      console.log('Clients - clientsData es null/undefined')
+      return []
+    }
+    
+    // Verificar si data es un array
+    if (Array.isArray(clientsData)) {
+      console.log('Clients - clientsData es un array directamente')
+      return clientsData.map((client: any) => ({
+        id: client.id,
+        name: client.nombre_completo,
+        dni: client.dni || '',
+        phone: client.telefono || '',
+        address: client.direccion || '',
+        fecha_registro: client.fecha_registro,
+        equipos_reparados: 0, // Este campo vendría del backend si existe
+      }))
+    }
+    
+    // Si data tiene una propiedad data que es array
+    if (clientsData.data && Array.isArray(clientsData.data)) {
+      console.log('Clients - clientsData.data es un array')
+      return clientsData.data.map((client: any) => ({
+        id: client.id,
+        name: client.nombre_completo,
+        dni: client.dni || '',
+        phone: client.telefono || '',
+        address: client.direccion || '',
+        fecha_registro: client.fecha_registro,
+        equipos_reparados: 0,
+      }))
+    }
+    
+    console.log('Clients - Estructura no reconocida:', typeof clientsData)
+    return []
   }, [clientsData])
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -52,10 +80,11 @@ export default function Clients() {
   const tableData = filtered.slice((page - 1) * pageSize, page * pageSize).map(c => ({
     id: c.id,
     name: c.name,
-    // email: c.email,
-    // status: c.status,
-    // joinDate: c.joinDate,
-    // transactions: c.transactions,
+    dni: c.dni,
+    phone: c.phone,
+    address: c.address,
+    fecha_registro: c.fecha_registro,
+    equipos_reparados: c.equipos_reparados,
   }))
   return (
     <motion.div
