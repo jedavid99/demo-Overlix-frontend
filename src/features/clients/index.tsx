@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { Search, Plus, Eye, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
@@ -7,7 +7,7 @@ import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { Badge } from '@/shared/components/ui/badge'
 import { Skeleton } from '@/shared/components/ui/skeleton'
-import { useClients } from '@/hooks/useClients'
+import { clientService } from '@/services/clientService'
 import { toast } from '@/hooks/use-toast'
 
 export default function Clients() {
@@ -16,30 +16,50 @@ export default function Clients() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'activo' | 'inactivo'>('all')
   const pageSize = 5
 
-  // Obtener datos del backend
-  const { data: clientsData, loading, error, refetch } = useClients({ page: 1, limit: 100 })
+  // Estado local
+  const [clients, setClients] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [total, setTotal] = useState(0)
 
-  // Mapear datos del backend al formato del componente
-  const clients = useMemo(() => {
-    if (!clientsData?.data?.data) return []
-    
-    const backendData = clientsData.data.data
-    const clientesArray = backendData.clientes || backendData.data || backendData
-    
-    if (!Array.isArray(clientesArray)) return []
+  // Cargar datos UNA SOLA VEZ
+  useEffect(() => {
+    const fetchClients = async () => {
+      setLoading(true)
+      setError(null)
+      try {
+        const response = await clientService.list({ page: 1, limit: 100 })
+        console.log('Respuesta completa:', response)
+        
+        // Extraer datos según la estructura real
+        // Intenta varias posibilidades
+        let clientesArray = response?.data?.data?.clientes ||
+                           response?.data?.data?.data ||
+                           response?.data?.data ||
+                           response?.data ||
+                           response
+        
+        if (!Array.isArray(clientesArray)) {
+          console.error('No se encontró un array de clientes:', response)
+          setClients([])
+          setTotal(0)
+          return
+        }
 
-    return clientesArray.map((client: any) => ({
-      id: client.id,
-      name: client.nombre_completo || 'Sin nombre',
-      dni: client.dni || '—',
-      phone: client.telefono || '—',
-      address: client.direccion || '—',
-      fecha_registro: client.fecha_registro || client.created_at,
-      estado: client.estado || 'activo',
-      email: client.email || '—',
-      equipos_reparados: client.equipos_reparados || 0,
-    }))
-  }, [clientsData])
+        console.log('Clientes obtenidos:', clientesArray.length)
+        setClients(clientesArray)
+        setTotal(clientesArray.length)
+      } catch (err: any) {
+        console.error('Error al cargar clientes:', err)
+        setError(err?.response?.data?.message || 'Error al cargar clientes')
+        setClients([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchClients()
+  }, []) // 👈 Dependencias vacías = se ejecuta UNA SOLA VEZ
 
   // Filtros locales
   const filtered = useMemo(() => {
@@ -48,9 +68,9 @@ export default function Clients() {
 
     if (q) {
       result = result.filter(c =>
-        c.name.toLowerCase().includes(q) ||
-        c.dni.toLowerCase().includes(q) ||
-        c.phone.toLowerCase().includes(q)
+        c.nombre_completo?.toLowerCase().includes(q) ||
+        c.dni?.toLowerCase().includes(q) ||
+        c.telefono?.toLowerCase().includes(q)
       )
     }
 
@@ -62,8 +82,8 @@ export default function Clients() {
   }, [clients, query, statusFilter])
 
   // Paginación local
-  const total = filtered.length
-  const totalPages = Math.max(1, Math.ceil(total / pageSize))
+  const totalFiltered = filtered.length
+  const totalPages = Math.max(1, Math.ceil(totalFiltered / pageSize))
   const paginatedData = filtered.slice((page - 1) * pageSize, page * pageSize)
 
   const onSearch = (value: string) => {
@@ -71,24 +91,31 @@ export default function Clients() {
     setPage(1)
   }
 
-  // Función para eliminar (con confirmación)
-  const handleDelete = (id: string) => {
-    if (window.confirm('¿Estás seguro de eliminar este cliente?')) {
-      // Aquí iría la llamada a la API para eliminar
-      toast.success('Cliente eliminado correctamente')
-      refetch()
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('¿Estás seguro de eliminar este cliente?')) return
+    try {
+      await clientService.delete(id)
+      toast({ title: 'Cliente eliminado' })
+      // Recargar la lista
+      const response = await clientService.list({ page: 1, limit: 100 })
+      let clientesArray = response?.data?.data?.clientes || response?.data?.data || response?.data || response
+      if (Array.isArray(clientesArray)) {
+        setClients(clientesArray)
+        setTotal(clientesArray.length)
+      }
+    } catch (err) {
+      toast.error('Error al eliminar')
     }
   }
 
-  // Mostrar error si ocurre
   if (error) {
     return (
       <div className="space-y-6">
         <h1 className="text-2xl font-bold text-foreground">Clientes</h1>
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
-          Error al cargar clientes: {error}
+          Error: {error}
         </div>
-        <Button onClick={() => refetch()}>Reintentar</Button>
+        <Button onClick={() => window.location.reload()}>Reintentar</Button>
       </div>
     )
   }
@@ -105,9 +132,7 @@ export default function Clients() {
         <div>
           <h1 className="text-2xl font-bold text-foreground">Clientes</h1>
           <p className="text-muted-foreground">
-            {clients.length > 0
-              ? `Gestiona tu base de clientes (${clients.length} registrados)`
-              : 'Gestiona tu base de clientes'}
+            Gestiona tu base de clientes ({total} registrados)
           </p>
         </div>
         <Link to="/clients/add">
@@ -153,11 +178,11 @@ export default function Clients() {
           </Badge>
         </div>
         <span className="text-sm text-muted-foreground ml-auto">
-          {filtered.length} cliente{filtered.length !== 1 ? 's' : ''}
+          {totalFiltered} cliente{totalFiltered !== 1 ? 's' : ''}
         </span>
       </div>
 
-      {/* Contenido principal - TABLA BÁSICA */}
+      {/* Contenido */}
       {loading ? (
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -170,7 +195,7 @@ export default function Clients() {
             </div>
           ))}
         </div>
-      ) : filtered.length === 0 ? (
+      ) : paginatedData.length === 0 ? (
         <div className="text-center py-12">
           <MdPerson size={48} className="mx-auto text-muted-foreground mb-4" />
           <h3 className="text-lg font-semibold text-foreground mb-2">
@@ -192,7 +217,7 @@ export default function Clients() {
         </div>
       ) : (
         <>
-          {/* Tabla básica con Tailwind */}
+          {/* Tabla básica */}
           <div className="overflow-x-auto border border-border rounded-lg bg-background">
             <table className="w-full">
               <thead className="bg-muted/50">
@@ -211,27 +236,25 @@ export default function Clients() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
-                          {row.name.charAt(0).toUpperCase()}
+                          {row.nombre_completo?.charAt(0).toUpperCase() || '?'}
                         </div>
                         <div>
-                          <p className="font-medium text-foreground">{row.name}</p>
-                          <p className="text-xs text-muted-foreground">{row.email}</p>
+                          <p className="font-medium text-foreground">{row.nombre_completo || 'Sin nombre'}</p>
+                          <p className="text-xs text-muted-foreground">{row.email || 'Sin email'}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-foreground">{row.dni}</td>
-                    <td className="px-4 py-3 text-sm text-foreground">{row.phone}</td>
+                    <td className="px-4 py-3 text-sm text-foreground">{row.dni || '—'}</td>
+                    <td className="px-4 py-3 text-sm text-foreground">{row.telefono || '—'}</td>
                     <td className="px-4 py-3 text-sm text-foreground">
-                      {row.fecha_registro
-                        ? new Date(row.fecha_registro).toLocaleDateString('es-AR')
-                        : '—'}
+                      {row.fecha_registro ? new Date(row.fecha_registro).toLocaleDateString('es-AR') : '—'}
                     </td>
                     <td className="px-4 py-3">
                       <Badge
                         variant={row.estado === 'activo' ? 'success' : 'secondary'}
                         className="capitalize"
                       >
-                        {row.estado}
+                        {row.estado || 'activo'}
                       </Badge>
                     </td>
                     <td className="px-4 py-3 text-right">
@@ -268,7 +291,7 @@ export default function Clients() {
           {/* Paginación */}
           <div className="flex items-center justify-between mt-4">
             <span className="text-sm text-muted-foreground">
-              Mostrando {(page - 1) * pageSize + 1} - {Math.min(page * pageSize, total)} de {total} clientes
+              Mostrando {(page - 1) * pageSize + 1} - {Math.min(page * pageSize, totalFiltered)} de {totalFiltered} clientes
             </span>
             <div className="flex gap-2">
               <Button
