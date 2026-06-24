@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { login as loginService, logout as logoutService, getMe } from '../services/auth.service';
+import { login as loginService, getMe } from '../services/auth.service';
 import { clearAuthToken } from '../services/api';
 
 interface User {
@@ -68,25 +68,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const logout = async () => {
-    console.log('AuthContext.logout: Iniciando proceso de logout');
-    
-    try {
-      // Llamar al endpoint /auth/logout del backend
-      await logoutService();
-      console.log('AuthContext.logout: Logout del backend completado exitosamente');
-    } catch (error) {
-      console.error('AuthContext.logout: Error al llamar al endpoint de logout del backend:', error);
-      // Continuamos con el logout local incluso si falla el backend
-    } finally {
-      // Siempre limpiar tokens, estado y redirigir
-      console.log('AuthContext.logout: Limpiando tokens y estado local');
-      clearAuthToken();
-      setUser(null);
-      setIsAuthenticated(false);
-      console.log('AuthContext.logout: Redirigiendo a /');
-      window.location.href = '/';
-    }
+  const logout = () => {
+    console.log('AuthContext.logout: Limpiando tokens y estado local');
+    clearAuthToken();
+    setUser(null);
+    setIsAuthenticated(false);
+    console.log('AuthContext.logout: Redirigiendo a /');
+    window.location.href = '/';
   };
 
   return (

@@ -54,9 +54,8 @@ export const AdminTopBar = ({
     }
   }
   // 👈 Función de logout única y limpia
-  const handleLogout = async () => {
-    await logout() // Llama al logout del contexto (que ya tiene la lógica del backend)
-    // El contexto ya se encarga de limpiar tokens y redirigir a /login
+  const handleLogout = () => {
+    logout() // Llama al logout del contexto (solo limpia estado local)
   }
   return (
     <header className="h-14 flex items-center justify-between px-4 lg:px-6 bg-card/80 backdrop-blur-md border-b border-border z-30 sticky top-0">
