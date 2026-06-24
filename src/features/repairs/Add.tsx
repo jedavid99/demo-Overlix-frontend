@@ -336,12 +336,11 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
         dispositivo: state.deviceType,
         marca: state.brand || undefined,
         modelo: state.model || undefined,
-        serial: state.serial || undefined,
-        falla_reportada: state.issueDescription,
+        problema: state.issueDescription,
+        descripcion: state.technicianNotes || undefined,
         prioridad: (state.priority === 'Normal' ? 'media' : state.priority.toLowerCase()) as 'baja' | 'media' | 'alta' | 'urgente',
-        costo_estimado: parseFloat(repairPrice),
-        notas: state.technicianNotes ? state.technicianNotes + (state.accessories.length > 0 ? '. Accesorios: ' + state.accessories.join(', ') : '') : state.accessories.join(', ') || undefined,
-        fecha_estimada_entrega: new Date(Date.now() + state.estimatedDays * 24 * 60 * 60 * 1000).toISOString()
+        presupuesto_estimado: parseFloat(repairPrice),
+        fecha_estimada_entrega: new Date(Date.now() + state.estimatedDays * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
       };
 
       console.log('Enviando payload:', payload);
