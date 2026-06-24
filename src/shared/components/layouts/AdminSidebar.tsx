@@ -9,7 +9,7 @@ import {
   Building2, HelpCircle, Bell, FileText, Printer, PanelLeft, Receipt
 } from 'lucide-react'
 import { Badge } from '../../components/ui/badge'
-import { useAuth } from '../../contexts/AuthContext'
+import { useAuth } from '@/contexts/AuthContext'
 interface NavItem {
   title: string
   href: string
