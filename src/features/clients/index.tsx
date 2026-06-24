@@ -1,15 +1,14 @@
 import React, { useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { Search, Plus, Eye, Edit, Trash2 } from 'lucide-react'
+import { Search, Plus, Eye, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { MdPerson } from 'react-icons/md'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { Badge } from '@/shared/components/ui/badge'
 import { Skeleton } from '@/shared/components/ui/skeleton'
-import DataTable from '@/shared/components/data-table'
 import { useClients } from '@/hooks/useClients'
-import { toast } from '@/hooks/use-toast'
+import { toast } from 'react-hot-toast'
 
 export default function Clients() {
   const [query, setQuery] = useState('')
@@ -72,96 +71,11 @@ export default function Clients() {
     setPage(1)
   }
 
-  // Definición de columnas para el DataTable
-  const columns = [
-    {
-      key: 'name',
-      label: 'Nombre',
-      sortable: true,
-      render: (row: any) => (
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
-            {row.name.charAt(0).toUpperCase()}
-          </div>
-          <div>
-            <p className="font-medium text-foreground">{row.name}</p>
-            <p className="text-xs text-muted-foreground">{row.email}</p>
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: 'dni',
-      label: 'DNI',
-      render: (row: any) => <span className="text-sm">{row.dni}</span>,
-    },
-    {
-      key: 'phone',
-      label: 'Teléfono',
-      render: (row: any) => <span className="text-sm">{row.phone}</span>,
-    },
-    {
-      key: 'fecha_registro',
-      label: 'Fecha registro',
-      render: (row: any) => (
-        <span className="text-sm">
-          {row.fecha_registro
-            ? new Date(row.fecha_registro).toLocaleDateString('es-AR')
-            : '—'}
-        </span>
-      ),
-    },
-    {
-      key: 'estado',
-      label: 'Estado',
-      render: (row: any) => (
-        <Badge
-          variant={row.estado === 'activo' ? 'success' : 'secondary'}
-          className="capitalize"
-        >
-          {row.estado}
-        </Badge>
-      ),
-    },
-    {
-      key: 'actions',
-      label: 'Acciones',
-      render: (row: any) => (
-        <div className="flex items-center gap-2">
-          <Link
-            to={`/clients/${row.id}`}
-            className="p-1.5 rounded-md hover:bg-muted transition-colors"
-            title="Ver cliente"
-          >
-            <Eye size={16} className="text-muted-foreground" />
-          </Link>
-          <Link
-            to={`/clients/edit/${row.id}`}
-            className="p-1.5 rounded-md hover:bg-muted transition-colors"
-            title="Editar cliente"
-          >
-            <Edit size={16} className="text-muted-foreground" />
-          </Link>
-          <button
-            onClick={() => handleDelete(row.id)}
-            className="p-1.5 rounded-md hover:bg-red-50 transition-colors"
-            title="Eliminar cliente"
-          >
-            <Trash2 size={16} className="text-red-500" />
-          </button>
-        </div>
-      ),
-    },
-  ]
-
   // Función para eliminar (con confirmación)
   const handleDelete = (id: string) => {
     if (window.confirm('¿Estás seguro de eliminar este cliente?')) {
       // Aquí iría la llamada a la API para eliminar
-      toast({
-        title: 'Cliente eliminado correctamente',
-        description: 'El cliente ha sido eliminado exitosamente',
-      })
+      toast.success('Cliente eliminado correctamente')
       refetch()
     }
   }
@@ -243,7 +157,7 @@ export default function Clients() {
         </span>
       </div>
 
-      {/* Contenido principal */}
+      {/* Contenido principal - TABLA BÁSICA */}
       {loading ? (
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -277,13 +191,112 @@ export default function Clients() {
           )}
         </div>
       ) : (
-        <DataTable
-          columns={columns}        // 👈 ¡Ahora con columnas!
-          data={paginatedData}
-          currentPage={page}
-          totalPages={totalPages}
-          onPageChange={setPage}
-        />
+        <>
+          {/* Tabla básica con Tailwind */}
+          <div className="overflow-x-auto border border-border rounded-lg bg-background">
+            <table className="w-full">
+              <thead className="bg-muted/50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Cliente</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">DNI</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Teléfono</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Fecha registro</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Estado</th>
+                  <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {paginatedData.map((row) => (
+                  <tr key={row.id} className="hover:bg-muted/30 transition-colors">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
+                          {row.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground">{row.name}</p>
+                          <p className="text-xs text-muted-foreground">{row.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-foreground">{row.dni}</td>
+                    <td className="px-4 py-3 text-sm text-foreground">{row.phone}</td>
+                    <td className="px-4 py-3 text-sm text-foreground">
+                      {row.fecha_registro
+                        ? new Date(row.fecha_registro).toLocaleDateString('es-AR')
+                        : '—'}
+                    </td>
+                    <td className="px-4 py-3">
+                      <Badge
+                        variant={row.estado === 'activo' ? 'success' : 'secondary'}
+                        className="capitalize"
+                      >
+                        {row.estado}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Link
+                          to={`/clients/${row.id}`}
+                          className="p-1.5 rounded-md hover:bg-muted transition-colors"
+                          title="Ver cliente"
+                        >
+                          <Eye size={16} className="text-muted-foreground" />
+                        </Link>
+                        <Link
+                          to={`/clients/edit/${row.id}`}
+                          className="p-1.5 rounded-md hover:bg-muted transition-colors"
+                          title="Editar cliente"
+                        >
+                          <Edit size={16} className="text-muted-foreground" />
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(row.id)}
+                          className="p-1.5 rounded-md hover:bg-red-50 transition-colors"
+                          title="Eliminar cliente"
+                        >
+                          <Trash2 size={16} className="text-red-500" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Paginación */}
+          <div className="flex items-center justify-between mt-4">
+            <span className="text-sm text-muted-foreground">
+              Mostrando {(page - 1) * pageSize + 1} - {Math.min(page * pageSize, total)} de {total} clientes
+            </span>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="gap-1"
+              >
+                <ChevronLeft size={14} />
+                Anterior
+              </Button>
+              <span className="flex items-center px-3 text-sm text-muted-foreground">
+                {page} / {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="gap-1"
+              >
+                Siguiente
+                <ChevronRight size={14} />
+              </Button>
+            </div>
+          </div>
+        </>
       )}
     </motion.div>
   )
