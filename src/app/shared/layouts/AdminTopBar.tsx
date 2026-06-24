@@ -2,19 +2,11 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Menu, Search, Bell, User, Command, PanelLeft, ChevronDown, ArrowRight, ArrowRightToLine } from 'lucide-react'
+import { Menu, Search, Bell, User, Command, PanelLeft, ChevronDown, ArrowRight, ArrowRightToLine, Badge } from 'lucide-react'
 import { MdSearch, MdSettings, MdBarChart, MdInventory2, MdAttachMoney, MdReceipt } from 'react-icons/md'
-import { Button } from '../../../components/ui/button'
-import { Input } from '../../../components/ui/input'
-import { Badge } from '../../../components/ui/badge'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '../../../components/ui/dropdown-menu'
+import { Button } from '@/shared/components/ui/button'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
+import { useAuth } from '@/contexts/AuthContext'
 
 const categories = [
   { value: 'all', label: 'Todo', placeholder: 'Buscar en Overlix...', route: '/dashboard' },
@@ -30,12 +22,6 @@ const categories = [
   { value: 'reports-financial', label: 'Reporte Financiero', placeholder: 'Buscar en reporte financiero...', route: '/reports/financial', icon: <MdAttachMoney size={16} /> },
 ]
 
-  const navigate = useNavigate()
-
-const handleLogout = () => {
-    // Limpiar sesión aquí si es necesario
-    navigate('/')
-  }
 export const AdminTopBar = ({
   onMenuClick = () => {},
   onToggleCollapse = () => {},
@@ -48,6 +34,8 @@ export const AdminTopBar = ({
   sidebarOpen?: boolean
 }) => {
   const navigate = useNavigate()
+  const { logout } = useAuth() // 👈 Obtener la función logout del contexto
+
   const [searchFocused, setSearchFocused] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
@@ -70,13 +58,15 @@ export const AdminTopBar = ({
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && searchQuery.trim()) {
       const route = currentCategory.route
-     
-  }
-
-  const handleLogout = () => {
-    logout() navigate(`${route}?search=${encodeURIComponent(searchQuery.trim())}`)
+      navigate(`${route}?search=${encodeURIComponent(searchQuery.trim())}`)
       setSearchQuery('')
     }
+  }
+
+  // 👈 Función de logout única y limpia
+  const handleLogout = async () => {
+    await logout() // Llama al logout del contexto (que ya tiene la lógica del backend)
+    // El contexto ya se encarga de limpiar tokens y redirigir a /login
   }
 
   return (
@@ -96,7 +86,7 @@ export const AdminTopBar = ({
           size="icon-sm"
           className="hidden lg:inline-flex"
         >
-          <ArrowRightToLine    size={18} className={`transition-transform ${sidebarCollapsed ? 'rotate-180' : ''}`} />
+          <ArrowRightToLine size={18} className={`transition-transform ${sidebarCollapsed ? 'rotate-180' : ''}`} />
         </Button>
       </div>
 
@@ -149,7 +139,7 @@ export const AdminTopBar = ({
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon-sm" className="relative">
               <Bell size={18} className="text-muted-foreground" />
-              <Badge variant="destructive" className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px]">
+              <Badge  className="absolute -top-1 -right-1 h-4 w-4 p-0 flex items-center justify-center text-[10px]">
                 3
               </Badge>
             </Button>
@@ -206,6 +196,13 @@ export const AdminTopBar = ({
                 <MdSettings size={16} className="mr-2" />
                 Configuración
               </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogout}> {/* 👈 Botón de logout conectado */}
+              <span className="text-red-500 flex items-center gap-2">
+                <span className="text-red-500">🚪</span>
+                Cerrar sesión
+              </span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
