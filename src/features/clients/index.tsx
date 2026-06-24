@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { Search, Plus } from 'lucide-react'
@@ -8,15 +8,31 @@ import { Input } from '@/shared/components/ui/input'
 import { Badge } from '@/shared/components/ui/badge'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import DataTable from '@/shared/components/data-table'
-// Datos mock eliminados - conectar con API real
+import { useClients } from '@/hooks/useClients'
+
 export default function Clients() {
   const [query, setQuery] = useState('')
   const [page, setPage] = useState(1)
-  const [loading, setLoading] = useState(false)
   const [statusFilter, setStatusFilter] = useState<'all' | 'activo' | 'inactivo'>('all')
   const pageSize = 5
-  // Conectar con API real: api.get('/clients')
-  const [clients, setClients] = useState<any[]>([])
+  
+  // Conectar con API real usando el hook
+  const { data: clientsData, loading, error, refetch } = useClients({ page: 1, limit: 100 })
+  
+  // Mapear datos del backend al formato del componente
+  const clients = useMemo(() => {
+    if (!clientsData?.data) return []
+    return clientsData.data.map((client: any) => ({
+      id: client.id,
+      name: client.nombre_completo,
+      email: client.email || '',
+      dni: client.dni || '',
+      phone: client.telefono || '',
+      status: client.estado, // 'activo' | 'inactivo'
+      joinDate: client.fecha_registro,
+      transactions: client.deuda_actual || 0,
+    }))
+  }, [clientsData])
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     let result = clients
@@ -94,6 +110,11 @@ export default function Clients() {
           </Badge>
         </div>
       </div>
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+          Error al cargar clientes: {error}
+        </div>
+      )}
       {loading ? (
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
