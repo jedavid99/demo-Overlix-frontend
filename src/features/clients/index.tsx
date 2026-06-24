@@ -218,75 +218,106 @@ export default function Clients() {
       ) : (
         <>
           {/* Tabla básica */}
-          <div className="overflow-x-auto border border-border rounded-lg bg-background">
-            <table className="w-full">
-              <thead className="bg-muted">
-                <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Cliente</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">DNI</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Teléfono</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Fecha registro</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Estado</th>
-                  <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {paginatedData.map((row) => (
-                  <tr key={row.id} className="border-t hover:bg-muted/50">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
-                          {row.nombre_completo?.charAt(0).toUpperCase() || '?'}
-                        </div>
-                        <div>
-                          <p className="font-medium text-foreground">{row.nombre_completo || 'Sin nombre'}</p>
-                          <p className="text-xs text-muted-foreground">{row.email || 'Sin email'}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-foreground">{row.dni || '—'}</td>
-                    <td className="px-4 py-3 text-sm text-foreground">{row.telefono || '—'}</td>
-                    <td className="px-4 py-3 text-sm text-foreground">
-                      {row.fecha_registro ? new Date(row.fecha_registro).toLocaleDateString('es-AR') : '—'}
-                    </td>
-                    <td className="px-4 py-3">
-                      <Badge
-                        variant={row.estado === 'activo' ? 'success' : 'secondary'}
-                        className="capitalize"
-                      >
-                        {row.estado || 'activo'}
-                      </Badge>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Link
-                          to={`/clients/${row.id}`}
-                          className="p-1.5 rounded-md hover:bg-muted transition-colors"
-                          title="Ver cliente"
-                        >
-                          <Eye size={16} className="text-muted-foreground" />
-                        </Link>
-                        <Link
-                          to={`/clients/edit/${row.id}`}
-                          className="p-1.5 rounded-md hover:bg-muted transition-colors"
-                          title="Editar cliente"
-                        >
-                          <Edit size={16} className="text-muted-foreground" />
-                        </Link>
-                        <button
-                          onClick={() => handleDelete(row.id)}
-                          className="p-1.5 rounded-md hover:bg-red-50 transition-colors"
-                          title="Eliminar cliente"
-                        >
-                          <Trash2 size={16} className="text-red-500" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+         <div className="overflow-hidden rounded-xl border border-border/50 bg-background shadow-sm">
+  <div className="overflow-x-auto">
+    <table className="w-full">
+      <thead className="bg-slate-50/80 dark:bg-slate-800/60">
+        <tr>
+          <th className="px-5 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+            Cliente
+          </th>
+          <th className="px-5 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+            DNI
+          </th>
+          <th className="px-5 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+            Teléfono
+          </th>
+          <th className="px-5 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+            Fecha registro
+          </th>
+          <th className="px-5 py-4 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+            Estado
+          </th>
+          <th className="px-5 py-4 text-right text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+            Acciones
+          </th>
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
+        {paginatedData.map((row) => (
+          <tr
+            key={row.id}
+            className="group transition-all duration-200 hover:bg-slate-50/70 dark:hover:bg-slate-800/40 hover:shadow-sm"
+          >
+            <td className="px-5 py-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary/10 to-primary/5 text-primary font-semibold text-sm ring-1 ring-primary/10">
+                  {row.nombre_completo?.charAt(0).toUpperCase() || '?'}
+                </div>
+                <div>
+                  <p className="font-medium text-slate-900 dark:text-slate-100 line-clamp-1">
+                    {row.nombre_completo || 'Sin nombre'}
+                  </p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-1">
+                    {row.email || 'Sin email'}
+                  </p>
+                </div>
+              </div>
+            </td>
+            <td className="px-5 py-4 font-mono text-sm text-slate-700 dark:text-slate-300">
+              {row.dni || '—'}
+            </td>
+            <td className="px-5 py-4 text-sm text-slate-700 dark:text-slate-300">
+              {row.telefono || '—'}
+            </td>
+            <td className="px-5 py-4 text-sm text-slate-700 dark:text-slate-300">
+              {row.fecha_registro
+                ? new Date(row.fecha_registro).toLocaleDateString('es-AR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                  })
+                : '—'}
+            </td>
+            <td className="px-5 py-4">
+              <Badge
+                variant={row.estado === 'activo' ? 'success' : 'secondary'}
+                className="capitalize shadow-sm"
+              >
+                {row.estado || 'activo'}
+              </Badge>
+            </td>
+            <td className="px-5 py-4 text-right">
+              <div className="flex items-center justify-end gap-1">
+                <Link
+                  to={`/clients/${row.id}`}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition-all duration-200 hover:bg-primary/10 hover:text-primary dark:text-slate-400 dark:hover:bg-primary/20 dark:hover:text-primary"
+                  title="Ver cliente"
+                >
+                  <Eye size={17} />
+                </Link>
+                <Link
+                  to={`/clients/edit/${row.id}`}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition-all duration-200 hover:bg-blue-50 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-blue-500/20 dark:hover:text-blue-400"
+                  title="Editar cliente"
+                >
+                  <Edit size={17} />
+                </Link>
+                <button
+                  onClick={() => handleDelete(row.id)}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition-all duration-200 hover:bg-red-50 hover:text-red-600 dark:text-slate-400 dark:hover:bg-red-500/20 dark:hover:text-red-400"
+                  title="Eliminar cliente"
+                >
+                  <Trash2 size={17} />
+                </button>
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
 
           {/* Paginación */}
           <div className="flex items-center justify-between mt-4">
