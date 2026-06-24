@@ -17,6 +17,7 @@ import AdminLayout from '../shared/components/layouts/AdminLayout'
 import RepairsList from '../features/repairs/List'
 import RepairAdd from '../features/repairs/Add'
 import RepairFlow from '../features/repairs/RepairFlow'
+import RepairAddSimple from '../features/repairs/RepairAdd'
 import Budgets from '../features/repairs/Budgets'
 import ClientAdd from '../features/clients/Add'
 import SaleAdd from '../features/sales/Add'
@@ -91,6 +92,7 @@ export function AppRouter() {
       <Route path="/caja-diaria" element={<ProtectedRoute><AdminLayout><CajaDiaria /></AdminLayout></ProtectedRoute>} />
       <Route path="/reparaciones/list" element={<ProtectedRoute><AdminLayout><RepairsList /></AdminLayout></ProtectedRoute>} />
       <Route path="/reparaciones/add" element={<ProtectedRoute><AdminLayout><RepairFlow /></AdminLayout></ProtectedRoute>} />
+      <Route path="/reparaciones/add-simple" element={<ProtectedRoute><AdminLayout><RepairAddSimple /></AdminLayout></ProtectedRoute>} />
       <Route path="/reparaciones/budgets" element={<ProtectedRoute><AdminLayout><Budgets /></AdminLayout></ProtectedRoute>} />
       <Route path="/billing/ARCA" element={<ProtectedRoute><AdminLayout><ARCA /></AdminLayout></ProtectedRoute>} />
       <Route path="/billing/ARCA/iva" element={<ProtectedRoute><AdminLayout><ARCAIVA /></AdminLayout></ProtectedRoute>} />
