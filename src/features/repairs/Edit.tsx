@@ -121,6 +121,10 @@ export default function RepairEdit() {
         'cancelled': [],
       };
 
+      // Construir payload solo con campos que tienen valores según backend
+      const payload: any = {};
+      
+      // Solo incluir estado si cambió y es una transición válida
       if (formData.estado !== repairData.estado) {
         const allowedTransitions = validTransitions[repairData.estado] || [];
         if (!allowedTransitions.includes(formData.estado)) {
@@ -132,12 +136,9 @@ export default function RepairEdit() {
           setSaving(false);
           return;
         }
+        payload.estado = formData.estado;
       }
       
-      // Construir payload solo con campos que tienen valores según backend
-      const payload: any = {};
-      
-      if (formData.estado) payload.estado = formData.estado;
       if (formData.diagnosis) payload.diagnosis = formData.diagnosis;
       if (formData.reparacion_realizada) payload.reparacion_realizada = formData.reparacion_realizada;
       if (formData.tecnico_asignado_id) payload.tecnico_asignado_id = formData.tecnico_asignado_id;
