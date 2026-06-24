@@ -334,10 +334,9 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
         modelo: state.model || undefined,
         problema_reportado: state.issueDescription,
         diagnosis: undefined,
-        prioridad: state.priority === 'Normal' ? 'media' : state.priority === 'Baja' ? 'baja' : state.priority === 'Alta' ? 'alta' : 'urgente',
+        prioridad: state.priority === 'Normal' ? 'medium' : state.priority === 'Baja' ? 'low' : state.priority === 'Alta' ? 'high' : 'critical',
         fecha_ingreso: new Date().toISOString().split('T')[0],
-        tecnico_asignado_id: undefined,
-        notas: state.technicianNotes || undefined
+        tecnico_asignado_id: undefined
       };
 
       console.log('Enviando payload:', payload);
