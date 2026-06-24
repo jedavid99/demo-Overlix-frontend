@@ -346,29 +346,51 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
         description: 'La orden de servicio se ha creado exitosamente'
       });
       
-      // Solución temporal: obtener la última orden creada desde la lista
-      // ya que el backend no devuelve el ID en la respuesta
-      try {
-        const repairsList = await repairService.list({ limit: 1, sort: 'created_at:desc' }) as any;
-        console.log('Lista de reparaciones:', repairsList);
-        
-        // Extraer datos según la estructura
-        let repairsArray = repairsList?.data?.data?.repairs ||
-                           repairsList?.data?.data?.data ||
-                           repairsList?.data?.data ||
-                           repairsList?.data ||
-                           repairsList;
-        
-        if (Array.isArray(repairsArray) && repairsArray.length > 0) {
-          const lastOrder = repairsArray[0];
-          const orderId = lastOrder.id || lastOrder.numero_reparacion || lastOrder._id;
-          console.log('ID de última orden:', orderId);
-          console.log('Última orden:', lastOrder);
+      // Extraer la orden creada de response.data
+      const createdOrder = response?.data || response;
+      console.log('Orden creada:', createdOrder);
+      console.log('Campos de orden:', Object.keys(createdOrder || {}));
+      
+      const orderId = createdOrder?.id || createdOrder?.numero_reparacion || createdOrder?._id;
+      console.log('ID de orden a usar:', orderId);
+      
+      if (orderId) {
+        navigate(`/reparaciones/confirmation?orderId=${orderId}`);
+      } else {
+        // Si no hay ID en la respuesta, intentar obtener de la lista
+        try {
+          const repairsList = await repairService.list({ limit: 1, sort: 'created_at:desc' }) as any;
+          console.log('Lista de reparaciones:', repairsList);
+          console.log('Campos de lista:', Object.keys(repairsList || {}));
           
-          if (orderId) {
-            navigate(`/reparaciones/confirmation?orderId=${orderId}`);
+          // Extraer datos según la estructura
+          let repairsArray = repairsList?.data?.data?.repairs ||
+                             repairsList?.data?.data?.data ||
+                             repairsList?.data?.data ||
+                             repairsList?.data ||
+                             repairsList;
+          
+          console.log('Array de reparaciones:', repairsArray);
+          
+          if (Array.isArray(repairsArray) && repairsArray.length > 0) {
+            const lastOrder = repairsArray[0];
+            const listOrderId = lastOrder.id || lastOrder.numero_reparacion || lastOrder._id;
+            console.log('ID de última orden:', listOrderId);
+            console.log('Última orden:', lastOrder);
+            
+            if (listOrderId) {
+              navigate(`/reparaciones/confirmation?orderId=${listOrderId}`);
+            } else {
+              console.error('No se pudo obtener ID de la última orden');
+              toast({
+                title: 'Advertencia',
+                description: 'Orden creada pero no se pudo obtener el ID. Ve a la lista de reparaciones.',
+                variant: 'destructive'
+              });
+              navigate('/reparaciones/list');
+            }
           } else {
-            console.error('No se pudo obtener ID de la última orden');
+            console.error('No se encontraron reparaciones en la lista');
             toast({
               title: 'Advertencia',
               description: 'Orden creada pero no se pudo obtener el ID. Ve a la lista de reparaciones.',
@@ -376,8 +398,8 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
             });
             navigate('/reparaciones/list');
           }
-        } else {
-          console.error('No se encontraron reparaciones en la lista');
+        } catch (listError) {
+          console.error('Error al obtener lista de reparaciones:', listError);
           toast({
             title: 'Advertencia',
             description: 'Orden creada pero no se pudo obtener el ID. Ve a la lista de reparaciones.',
@@ -385,14 +407,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
           });
           navigate('/reparaciones/list');
         }
-      } catch (listError) {
-        console.error('Error al obtener lista de reparaciones:', listError);
-        toast({
-          title: 'Advertencia',
-          description: 'Orden creada pero no se pudo obtener el ID. Ve a la lista de reparaciones.',
-          variant: 'destructive'
-        });
-        navigate('/reparaciones/list');
       }
     } catch (error: any) {
       console.error('Error al crear orden:', error);
