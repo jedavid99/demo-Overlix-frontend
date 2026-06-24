@@ -329,28 +329,15 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
     try {
       const payload = {
         cliente_id: state.selectedClient.id,
-        dispositivo: state.deviceType,
-        categoria_dispositivo: state.deviceType,
+        dispositivo: state.brand && state.model ? `${state.brand} ${state.model}` : state.deviceType,
         marca: state.brand || undefined,
         modelo: state.model || undefined,
-        numero_serie: state.serial || undefined,
         problema_reportado: state.issueDescription,
-        condicion_estetica: state.aestheticCondition || undefined,
-        accesorios_incluidos: state.accessories || [],
-        prioridad: state.priority === 'Normal' ? 'medium' : state.priority === 'Baja' ? 'low' : state.priority === 'Alta' ? 'high' : 'critical',
-        total_reparacion: parseFloat(repairPrice),
-        notas: state.technicianNotes || undefined,
-        pagado: false, // Por defecto false (pago parcial)
-        metodo_pago_id: undefined, // Se puede agregar después
-        fecha_ingreso: new Date(),
-        fecha_estimada_entrega: new Date(Date.now() + state.estimatedDays * 24 * 60 * 60 * 1000),
-        // Seguridad y acceso
-        tipo_seguridad: state.securityType || 'ninguno',
-        pin_acceso: state.accessPin || undefined,
-        patron_puntos: state.patternDots || [],
-        secuencia_patron: state.patternSequence || [],
-        // Chequeo de hardware
-        chequeo_hardware: state.hardwareChecks || {}
+        diagnosis: undefined,
+        prioridad: state.priority === 'Normal' ? 'media' : state.priority === 'Baja' ? 'baja' : state.priority === 'Alta' ? 'alta' : 'urgente',
+        fecha_ingreso: new Date().toISOString().split('T')[0],
+        tecnico_asignado_id: undefined,
+        notas: state.technicianNotes || undefined
       };
 
       console.log('Enviando payload:', payload);
