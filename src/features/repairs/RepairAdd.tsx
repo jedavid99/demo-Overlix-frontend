@@ -140,17 +140,17 @@ export default function RepairAdd() {
 
     setSubmitting(true)
 
-    const payload: RepairCreate = {
+    const payload = {
       cliente_id: selectedClient.id,
       dispositivo: formData.dispositivo,
       marca: formData.marca || undefined,
       modelo: formData.modelo || undefined,
-      falla_reportada: formData.problema_reportado,
-      diagnostico: formData.diagnosis || undefined,
+      problema_reportado: formData.problema_reportado,
+      diagnosis: formData.diagnosis || undefined,
       prioridad: formData.prioridad,
-      tecnico_id: formData.tecnico_asignado_id || undefined,
-      notas: formData.notas || undefined,
-      fecha_estimada_entrega: undefined
+      fecha_ingreso: formData.fecha_ingreso,
+      tecnico_asignado_id: formData.tecnico_asignado_id || undefined,
+      notas: formData.notas || undefined
     }
 
     try {
