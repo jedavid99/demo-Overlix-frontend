@@ -60,8 +60,8 @@ export default function OrderConfirmation() {
       console.log('Respuesta de orden:', response)
       console.log('Campos de respuesta:', Object.keys(response || {}))
       
-      // Extraer datos de response.data (estructura: {success: true, data: {orden}})
-      const orderData = response?.data || response
+      // Extraer datos de response.data.data (estructura: {success: true, data: {orden}})
+      const orderData = response?.data?.data || response?.data
       console.log('Datos de orden:', orderData)
       console.log('Campos de orden:', Object.keys(orderData || {}))
       console.log('Datos del cliente:', {
