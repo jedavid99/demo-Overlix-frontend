@@ -174,6 +174,21 @@ export default function OrderConfirmation() {
     document.body.removeChild(link)
   }
 
+  // Función para imprimir PDF
+  const handlePrintPDF = async () => {
+    const pdfBlob = await generateServiceOrderPDF()
+    if (!pdfBlob) return
+
+    const pdfUrl = URL.createObjectURL(pdfBlob)
+    const printWindow = window.open(pdfUrl, '_blank')
+    
+    if (printWindow) {
+      printWindow.onload = () => {
+        printWindow.print()
+      }
+    }
+  }
+
   // Obtener configuración de PDF desde localStorage
   const getPDFConfig = () => {
     try {
@@ -250,14 +265,14 @@ export default function OrderConfirmation() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate('/reparaciones/add')}
+            onClick={() => navigate('/reparaciones/list')}
             className="shrink-0"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Confirmación de Orden de Servicio</h1>
-            <p className="text-sm text-muted-foreground">Orden creada exitosamente</p>
+            <h1 className="text-2xl font-bold text-foreground">Vista Previa de Orden de Servicio</h1>
+            <p className="text-sm text-muted-foreground">{orderData.numero_reparacion || orderData.id}</p>
           </div>
         </div>
 
@@ -268,7 +283,7 @@ export default function OrderConfirmation() {
             <Card className="bg-primary/10 border-primary">
               <CardContent className="p-6 text-center">
                 <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2">Código de Orden de Servicio</p>
-                <p className="text-4xl font-bold text-primary">{orderData.id}</p>
+                <p className="text-4xl font-bold text-primary">{orderData.numero_reparacion || orderData.id}</p>
               </CardContent>
             </Card>
 
@@ -300,17 +315,39 @@ export default function OrderConfirmation() {
                     <span className="font-medium">{orderData.problema_reportado}</span>
                   </div>
                   <div className="flex justify-between border-b pb-2">
+                    <span className="text-muted-foreground">Estado:</span>
+                    <span className="font-medium capitalize">{orderData.estado || '—'}</span>
+                  </div>
+                  <div className="flex justify-between border-b pb-2">
                     <span className="text-muted-foreground">Prioridad:</span>
-                    <span className="font-medium capitalize">{orderData.prioridad}</span>
+                    <span className="font-medium capitalize">{orderData.prioridad || '—'}</span>
                   </div>
                   <div className="flex justify-between border-b pb-2">
                     <span className="text-muted-foreground">Fecha de ingreso:</span>
-                    <span className="font-medium">{orderData.fecha_ingreso}</span>
+                    <span className="font-medium">{orderData.fecha_ingreso || '—'}</span>
                   </div>
+                  {orderData.fecha_estimada_entrega && (
+                    <div className="flex justify-between border-b pb-2">
+                      <span className="text-muted-foreground">Fecha estimada de entrega:</span>
+                      <span className="font-medium">{orderData.fecha_estimada_entrega}</span>
+                    </div>
+                  )}
                   {orderData.diagnosis && (
                     <div className="flex justify-between border-b pb-2">
                       <span className="text-muted-foreground">Diagnosis:</span>
                       <span className="font-medium">{orderData.diagnosis}</span>
+                    </div>
+                  )}
+                  {orderData.reparacion_realizada && (
+                    <div className="flex justify-between border-b pb-2">
+                      <span className="text-muted-foreground">Reparación realizada:</span>
+                      <span className="font-medium">{orderData.reparacion_realizada}</span>
+                    </div>
+                  )}
+                  {orderData.total_reparacion && (
+                    <div className="flex justify-between border-b pb-2">
+                      <span className="text-muted-foreground">Total:</span>
+                      <span className="font-medium">${orderData.total_reparacion.toFixed(2)}</span>
                     </div>
                   )}
                   {orderData.notas && (
@@ -322,6 +359,41 @@ export default function OrderConfirmation() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Repuestos */}
+            {orderData.repuestos && orderData.repuestos.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Repuestos Usados</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {orderData.repuestos.map((repuesto: any, index: number) => (
+                      <div key={index} className="flex justify-between text-sm border-b pb-2">
+                        <span>{repuesto.nombre}</span>
+                        <span>{repuesto.cantidad} x ${repuesto.costo_unitario?.toFixed(2) || '0.00'}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Foto de Evidencia */}
+            {orderData.foto_evidencia && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Foto de Evidencia</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <img
+                    src={orderData.foto_evidencia}
+                    alt="Evidencia"
+                    className="w-full h-64 object-cover rounded-lg"
+                  />
+                </CardContent>
+              </Card>
+            )}
 
             {/* Botones de acción */}
             <Card>
@@ -363,11 +435,21 @@ export default function OrderConfirmation() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => window.print()}
+                  onClick={handlePrintPDF}
+                  disabled={generatingPDF}
                   className="w-full flex items-center justify-center gap-2"
                 >
-                  <Printer className="h-4 w-4" />
-                  Imprimir
+                  {generatingPDF ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Generando...
+                    </>
+                  ) : (
+                    <>
+                      <Printer className="h-4 w-4" />
+                      Imprimir PDF
+                    </>
+                  )}
                 </Button>
               </CardContent>
             </Card>
@@ -376,9 +458,9 @@ export default function OrderConfirmation() {
             <div className="flex items-center justify-center gap-3 pt-4">
               <Button
                 variant="ghost"
-                onClick={() => navigate('/reparaciones/add')}
+                onClick={() => navigate('/reparaciones/list')}
               >
-                Crear Nueva Orden
+                Volver a la Lista
               </Button>
               <Button
                 onClick={() => navigate('/reparaciones/list')}

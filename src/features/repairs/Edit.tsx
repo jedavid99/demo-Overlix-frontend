@@ -1,0 +1,475 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Save, Upload, X, Plus, Trash2, Camera } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
+import { Button } from '@/shared/components/ui/button';
+import { Input } from '@/shared/components/ui/input';
+import { Textarea } from '@/shared/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
+import { Badge } from '@/shared/components/ui/badge';
+import { toast } from '@/hooks/use-toast';
+import { repairService } from '@/services/repairService';
+
+interface RepairPart {
+  id: string;
+  nombre: string;
+  cantidad: number;
+  costo_unitario: number;
+}
+
+interface RepairData {
+  id: string;
+  numero_reparacion?: string;
+  cliente_nombre?: string;
+  cliente_telefono?: string;
+  dispositivo: string;
+  marca?: string;
+  modelo?: string;
+  problema_reportado: string;
+  diagnosis?: string;
+  reparacion_realizada?: string;
+  estado: string;
+  prioridad: string;
+  fecha_ingreso: string;
+  fecha_estimada_entrega?: string;
+  total_reparacion?: number;
+  notas?: string;
+  foto_evidencia?: string;
+  repuestos?: RepairPart[];
+}
+
+export default function RepairEdit() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [repairData, setRepairData] = useState<RepairData | null>(null);
+  const [formData, setFormData] = useState({
+    problema_reportado: '',
+    diagnosis: '',
+    reparacion_realizada: '',
+    estado: 'pending',
+    total_reparacion: 0,
+    notas: '',
+    foto_evidencia: '',
+  });
+  const [repuestos, setRepuestos] = useState<RepairPart[]>([]);
+  const [nuevoRepuesto, setNuevoRepuesto] = useState({
+    nombre: '',
+    cantidad: 1,
+    costo_unitario: 0,
+  });
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  useEffect(() => {
+    if (id) {
+      loadRepairData(id);
+    }
+  }, [id]);
+
+  const loadRepairData = async (repairId: string) => {
+    try {
+      setLoading(true);
+      const response = await repairService.getById(repairId) as any;
+      const orderData = response?.data?.data || response?.data || response;
+      
+      setRepairData(orderData);
+      setFormData({
+        problema_reportado: orderData.problema_reportado || '',
+        diagnosis: orderData.diagnosis || '',
+        reparacion_realizada: orderData.reparacion_realizada || '',
+        estado: orderData.estado || 'pending',
+        total_reparacion: orderData.total_reparacion || 0,
+        notas: orderData.notas || '',
+        foto_evidencia: orderData.foto_evidencia || '',
+      });
+      setRepuestos(orderData.repuestos || []);
+    } catch (error: any) {
+      console.error('Error al cargar reparación:', error);
+      toast({
+        title: 'Error',
+        description: 'No se pudo cargar la reparación',
+        variant: 'destructive'
+      });
+      navigate('/reparaciones/list');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!repairData) return;
+
+    try {
+      setSaving(true);
+      const payload = {
+        problema_reportado: formData.problema_reportado,
+        diagnosis: formData.diagnosis,
+        reparacion_realizada: formData.reparacion_realizada,
+        estado: formData.estado,
+        total_reparacion: formData.total_reparacion || undefined,
+        notas: formData.notas || undefined,
+        foto_evidencia: formData.foto_evidencia || undefined,
+        repuestos: repuestos.length > 0 ? repuestos : undefined,
+      };
+
+      await repairService.update(repairData.id, payload as any);
+      
+      toast({
+        title: 'Éxito',
+        description: 'Reparación actualizada correctamente',
+      });
+      
+      navigate('/reparaciones/list');
+    } catch (error: any) {
+      console.error('Error al actualizar reparación:', error);
+      toast({
+        title: 'Error',
+        description: 'No se pudo actualizar la reparación',
+        variant: 'destructive'
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleAddRepuesto = () => {
+    if (!nuevoRepuesto.nombre || nuevoRepuesto.cantidad <= 0) {
+      toast({
+        title: 'Error',
+        description: 'Complete los datos del repuesto',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const repuesto: RepairPart = {
+      id: Date.now().toString(),
+      nombre: nuevoRepuesto.nombre,
+      cantidad: nuevoRepuesto.cantidad,
+      costo_unitario: nuevoRepuesto.costo_unitario,
+    };
+
+    setRepuestos([...repuestos, repuesto]);
+    setNuevoRepuesto({ nombre: '', cantidad: 1, costo_unitario: 0 });
+  };
+
+  const handleRemoveRepuesto = (repuestoId: string) => {
+    setRepuestos(repuestos.filter(r => r.id !== repuestoId));
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadingPhoto(true);
+      // Aquí deberías implementar la subida de la foto a tu servicio de almacenamiento
+      // Por ahora, simulamos la subida con una URL temporal
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, foto_evidencia: reader.result as string });
+        setUploadingPhoto(false);
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('Error al subir foto:', error);
+      toast({
+        title: 'Error',
+        description: 'No se pudo subir la foto',
+        variant: 'destructive'
+      });
+      setUploadingPhoto(false);
+    }
+  };
+
+  const calculateTotal = () => {
+    const repuestosTotal = repuestos.reduce((sum, r) => sum + (r.cantidad * r.costo_unitario), 0);
+    return repuestosTotal;
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!repairData) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">No se encontró la reparación</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-background p-6">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/reparaciones/list')}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Editar Reparación</h1>
+            <p className="text-sm text-muted-foreground">
+              {repairData.numero_reparacion || repairData.id?.substring(0, 8)}
+            </p>
+          </div>
+        </div>
+
+        {/* Información del cliente y dispositivo */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Información General</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-1">Cliente</label>
+                <p className="text-foreground font-medium">{repairData.cliente_nombre || '—'}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-1">Teléfono</label>
+                <p className="text-foreground">{repairData.cliente_telefono || '—'}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-1">Dispositivo</label>
+                <p className="text-foreground font-medium">{repairData.dispositivo || '—'}</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-1">Marca/Modelo</label>
+                <p className="text-foreground">
+                  {repairData.marca && repairData.modelo ? `${repairData.marca} ${repairData.modelo}` : '—'}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Problema y Diagnóstico */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Problema y Diagnóstico</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Problema Reportado</label>
+              <Textarea
+                value={formData.problema_reportado}
+                onChange={(e) => setFormData({ ...formData, problema_reportado: e.target.value })}
+                rows={3}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Diagnóstico</label>
+              <Textarea
+                value={formData.diagnosis}
+                onChange={(e) => setFormData({ ...formData, diagnosis: e.target.value })}
+                rows={3}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Reparación Realizada</label>
+              <Textarea
+                value={formData.reparacion_realizada}
+                onChange={(e) => setFormData({ ...formData, reparacion_realizada: e.target.value })}
+                rows={3}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Estado */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Estado de la Reparación</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Select value={formData.estado} onValueChange={(value) => setFormData({ ...formData, estado: value })}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pending">Pendiente</SelectItem>
+                <SelectItem value="diagnostic">Diagnóstico</SelectItem>
+                <SelectItem value="in_progress">En Progreso</SelectItem>
+                <SelectItem value="waiting_parts">Esperando Repuestos</SelectItem>
+                <SelectItem value="ready">Listo</SelectItem>
+                <SelectItem value="delivered">Entregado</SelectItem>
+                <SelectItem value="cancelled">Cancelado</SelectItem>
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
+
+        {/* Repuestos */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Repuestos</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-4 gap-2">
+              <Input
+                placeholder="Nombre del repuesto"
+                value={nuevoRepuesto.nombre}
+                onChange={(e) => setNuevoRepuesto({ ...nuevoRepuesto, nombre: e.target.value })}
+              />
+              <Input
+                type="number"
+                placeholder="Cantidad"
+                value={nuevoRepuesto.cantidad}
+                onChange={(e) => setNuevoRepuesto({ ...nuevoRepuesto, cantidad: parseInt(e.target.value) || 0 })}
+                min={1}
+              />
+              <Input
+                type="number"
+                placeholder="Costo unitario"
+                value={nuevoRepuesto.costo_unitario}
+                onChange={(e) => setNuevoRepuesto({ ...nuevoRepuesto, costo_unitario: parseFloat(e.target.value) || 0 })}
+                min={0}
+                step={0.01}
+              />
+              <Button onClick={handleAddRepuesto}>
+                <Plus className="h-4 w-4 mr-2" />
+                Agregar
+              </Button>
+            </div>
+
+            {repuestos.length > 0 && (
+              <div className="space-y-2">
+                {repuestos.map((repuesto) => (
+                  <div key={repuesto.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                    <div>
+                      <p className="font-medium">{repuesto.nombre}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {repuesto.cantidad} x ${repuesto.costo_unitario.toFixed(2)} = ${(repuesto.cantidad * repuesto.costo_unitario).toFixed(2)}
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleRemoveRepuesto(repuesto.id)}
+                    >
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                ))}
+                <div className="flex justify-between font-bold pt-2 border-t">
+                  <span>Total Repuestos:</span>
+                  <span>${calculateTotal().toFixed(2)}</span>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Precio Total */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Precio Total</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Input
+              type="number"
+              value={formData.total_reparacion}
+              onChange={(e) => setFormData({ ...formData, total_reparacion: parseFloat(e.target.value) || 0 })}
+              placeholder="Precio total de la reparación"
+              min={0}
+              step={0.01}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Foto de Evidencia */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Foto de Evidencia</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Sube una foto del equipo desarmado para documentar irregularidades o daños encontrados.
+            </p>
+            
+            {formData.foto_evidencia ? (
+              <div className="relative">
+                <img
+                  src={formData.foto_evidencia}
+                  alt="Evidencia"
+                  className="w-full h-64 object-cover rounded-lg"
+                />
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="absolute top-2 right-2"
+                  onClick={() => setFormData({ ...formData, foto_evidencia: '' })}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
+                <Camera className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                <p className="text-sm text-muted-foreground mb-4">
+                  Haz clic para subir una foto
+                </p>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoUpload}
+                  disabled={uploadingPhoto}
+                  className="hidden"
+                  id="photo-upload"
+                />
+                <label htmlFor="photo-upload">
+                  <Button asChild disabled={uploadingPhoto}>
+                    <span>
+                      <Upload className="h-4 w-4 mr-2" />
+                      {uploadingPhoto ? 'Subiendo...' : 'Subir Foto'}
+                    </span>
+                  </Button>
+                </label>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Notas */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Notas Adicionales</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Textarea
+              value={formData.notas}
+              onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
+              rows={3}
+              placeholder="Notas adicionales..."
+            />
+          </CardContent>
+        </Card>
+
+        {/* Botones de acción */}
+        <div className="flex gap-4">
+          <Button onClick={handleSave} disabled={saving} className="flex-1">
+            <Save className="h-4 w-4 mr-2" />
+            {saving ? 'Guardando...' : 'Guardar Cambios'}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => navigate('/reparaciones/list')}
+            className="flex-1"
+          >
+            Cancelar
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}

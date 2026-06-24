@@ -15,11 +15,22 @@ import {
   DollarSign,
   TrendingUp,
   Loader2,
+  Eye,
+  Trash2,
+  Edit,
+  FileText,
+  Package,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/shared/components/ui/dropdown-menu';
 import { repairService } from '@/services/repairService';
 import { toast } from '@/hooks/use-toast';
 
@@ -110,6 +121,46 @@ export default function RepairsList() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (repairId: string) => {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta reparación?')) {
+      return;
+    }
+
+    try {
+      await repairService.delete(repairId);
+      toast({
+        title: 'Éxito',
+        description: 'Reparación eliminada correctamente',
+      });
+      loadRepairs();
+    } catch (error: any) {
+      console.error('Error al eliminar reparación:', error);
+      toast({
+        title: 'Error',
+        description: 'No se pudo eliminar la reparación',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  const handleMarkAsDelivered = async (repairId: string) => {
+    try {
+      await repairService.updateStatus(repairId, { estado: 'delivered' });
+      toast({
+        title: 'Éxito',
+        description: 'Reparación marcada como entregada',
+      });
+      loadRepairs();
+    } catch (error: any) {
+      console.error('Error al marcar como entregada:', error);
+      toast({
+        title: 'Error',
+        description: 'No se pudo marcar la reparación como entregada',
+        variant: 'destructive'
+      });
     }
   };
 
@@ -262,14 +313,14 @@ export default function RepairsList() {
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Estado</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Prioridad</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Fecha</th>
+                    <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {filteredRepairs.map((repair) => (
                     <tr
                       key={repair.id}
-                      className="hover:bg-muted/50 transition-colors cursor-pointer"
-                      onClick={() => navigate(`/reparaciones/confirmation?orderId=${repair.id}`)}
+                      className="hover:bg-muted/50 transition-colors"
                     >
                       <td className="px-4 py-3 text-sm text-muted-foreground font-mono">
                         {repair.numero_reparacion || repair.id?.substring(0, 8)}
@@ -295,6 +346,42 @@ export default function RepairsList() {
                       </td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">
                         {repair.fecha_ingreso ? new Date(repair.fecha_ingreso).toLocaleDateString('es-AR') : '—'}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => navigate(`/reparaciones/confirmation?orderId=${repair.id}`)}>
+                              <Eye className="h-4 w-4 mr-2" />
+                              Vista Previa
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => navigate(`/reparaciones/edit/${repair.id}`)}>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => navigate(`/reparaciones/confirmation?orderId=${repair.id}&print=true`)}>
+                              <FileText className="h-4 w-4 mr-2" />
+                              PDF Orden
+                            </DropdownMenuItem>
+                            {repair.estado !== 'delivered' && (
+                              <DropdownMenuItem onClick={() => handleMarkAsDelivered(repair.id)}>
+                                <Package className="h-4 w-4 mr-2" />
+                                Marcar Entregado
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem 
+                              onClick={() => handleDelete(repair.id)}
+                              className="text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Eliminar
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </td>
                     </tr>
                   ))}
