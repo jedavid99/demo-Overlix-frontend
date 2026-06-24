@@ -35,6 +35,15 @@ export const register = async (data: any) => {
   }
 };
 
-export const logout = () => {
-  localStorage.removeItem('access_token');
+export const logout = async () => {
+  try {
+    console.log('auth.service.logout: Llamando a /auth/logout');
+    const response = await api.post('/auth/logout');
+    console.log('auth.service.logout: Respuesta del servidor', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('auth.service.logout: Error al llamar al endpoint', error);
+    // No lanzamos el error porque queremos que el logout local siempre se complete
+    throw error;
+  }
 };
