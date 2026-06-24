@@ -346,8 +346,8 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
         description: 'La orden de servicio se ha creado exitosamente'
       });
       
-      // Extraer la orden creada de response.data
-      const createdOrder = response?.data || response;
+      // Extraer la orden creada de response.data.data (estructura: {success: true, data: {orden}})
+      const createdOrder = response?.data?.data || response?.data;
       console.log('Orden creada:', createdOrder);
       console.log('Campos de orden:', Object.keys(createdOrder || {}));
       
@@ -363,12 +363,10 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
           console.log('Lista de reparaciones:', repairsList);
           console.log('Campos de lista:', Object.keys(repairsList || {}));
           
-          // Extraer datos según la estructura
-          let repairsArray = repairsList?.data?.data?.repairs ||
-                             repairsList?.data?.data?.data ||
-                             repairsList?.data?.data ||
-                             repairsList?.data ||
-                             repairsList;
+          // Extraer datos según la estructura: {data: {reparaciones: [...], total: 10, pagina: 1, total_paginas: 10}}
+          let repairsArray = repairsList?.data?.data?.reparaciones ||
+                             repairsList?.data?.reparaciones ||
+                             repairsList?.reparaciones;
           
           console.log('Array de reparaciones:', repairsArray);
           

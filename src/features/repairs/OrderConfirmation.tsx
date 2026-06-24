@@ -12,6 +12,7 @@ import { repairService } from '@/services/repairService'
 
 interface OrderData {
   id: string
+  numero_reparacion?: string
   cliente_id: string
   cliente_nombre?: string
   cliente_telefono?: string
