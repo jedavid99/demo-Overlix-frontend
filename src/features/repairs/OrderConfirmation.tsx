@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Check, ArrowLeft, MessageCircle, Download, Loader2, Eye, Printer } from 'lucide-react'
+import { Check, ArrowLeft, MessageCircle, Download, Loader2, , Printer, EyeIcon } from 'lucide-react'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import ServiceOrderPreview from '@/features/settings/ServiceOrderPreview'
@@ -366,7 +366,7 @@ export default function OrderConfirmation() {
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <Eye size={18} className="text-primary" />
+                  <EyeIcon size={18} className="text-primary" />
                   <CardTitle>Vista previa de Orden de Servicio</CardTitle>
                   <Badge variant="outline" className="ml-auto text-[10px] font-mono">
                     A4
