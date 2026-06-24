@@ -1,4 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { clientService } from '@/services/clientService';
+import { Client } from '@/types/client.types';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
@@ -188,13 +190,72 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
     if (updateData) updateData(updates);
     else setLocalData((prev) => ({ ...prev, ...updates }));
   };
-  // Clientes mock (cargar desde API)
-  const clients: any[] = [];
-  const filteredClients = clients.filter((client) =>
-    client.name?.toLowerCase().includes(search.toLowerCase()) ||
-    client.phone?.includes(search) ||
-    client.email?.toLowerCase().includes(search.toLowerCase())
-  );
+  
+  // Estados para clientes
+  const [clients, setClients] = useState<Client[]>([]);
+  const [searchResults, setSearchResults] = useState<Client[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [lastClient, setLastClient] = useState<Client | null>(null);
+  const [loadingClients, setLoadingClients] = useState(true);
+  
+  // Cargar último cliente al montar
+  useEffect(() => {
+    const fetchLastClient = async () => {
+      try {
+        const response = await clientService.list({ limit: 1, sort: 'created_at:desc' });
+        if (response?.data?.length > 0) {
+          setLastClient(response.data[0]);
+        }
+      } catch (error) {
+        console.error('Error al cargar último cliente:', error);
+      } finally {
+        setLoadingClients(false);
+      }
+    };
+    fetchLastClient();
+  }, []);
+  
+  // Búsqueda con debounce
+  useEffect(() => {
+    const debounceTimer = setTimeout(async () => {
+      if (search.length >= 2) {
+        setSearching(true);
+        try {
+          const response = await clientService.list({ search: search, limit: 10 });
+          setSearchResults(response?.data || []);
+        } catch (error) {
+          console.error('Error en búsqueda:', error);
+          setSearchResults([]);
+        } finally {
+          setSearching(false);
+        }
+      } else {
+        setSearchResults([]);
+      }
+    }, 500);
+    
+    return () => clearTimeout(debounceTimer);
+  }, [search]);
+  
+  // Handlers para clientes
+  const handleSelectClient = useCallback((client: Client) => {
+    applyUpdate({ 
+      selectedClient: {
+        id: client.id,
+        name: client.nombre_completo,
+        phone: client.telefono,
+        email: client.email
+      }
+    });
+    setSearch('');
+    setSearchResults([]);
+  }, [applyUpdate]);
+  
+  const handleSelectLastClient = useCallback(() => {
+    if (lastClient) {
+      handleSelectClient(lastClient);
+    }
+  }, [lastClient, handleSelectClient]);
   // Obtener items de hardware según categoría
   const currentHardwareItems = useMemo(() => {
     return hardwareByCategory[state.deviceType] || [];
@@ -289,8 +350,38 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
           <div className="lg:col-span-8 space-y-6">
             {/* Cliente */}
             <Card>
-  <CardContent className="p-4">
-    <div className="flex items-center gap-2 mb-3">
+  <CardContent className="p-4 space-y-4">
+    {/* Último cliente registrado */}
+    {!state.selectedClient && !search && (
+      <div className="p-3 bg-muted/50 rounded-lg border border-border">
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs font-semibold text-muted-foreground uppercase">Último cliente registrado</p>
+          {loadingClients ? (
+            <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+          ) : null}
+        </div>
+        {lastClient ? (
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <p className="text-sm font-medium text-foreground">{lastClient.nombre_completo}</p>
+              <p className="text-xs text-muted-foreground">{lastClient.telefono}</p>
+            </div>
+            <Button
+              size="sm"
+              onClick={handleSelectLastClient}
+              className="h-7 text-xs"
+            >
+              Seleccionar
+            </Button>
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground">No hay clientes registrados</p>
+        )}
+      </div>
+    )}
+
+    {/* Buscador de clientes */}
+    <div className="flex items-center gap-2">
       <div className="relative flex-1">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
         <input
@@ -311,6 +402,52 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
         Agregar
       </Button>
     </div>
+
+    {/* Resultados de búsqueda */}
+    {search && searchResults.length > 0 && (
+      <div className="border rounded-lg overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-muted">
+            <tr>
+              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">Nombre</th>
+              <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground">Teléfono</th>
+              <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground">Acción</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y">
+            {searchResults.map((client) => (
+              <tr key={client.id} className="hover:bg-muted/50">
+                <td className="px-3 py-2 text-xs font-medium text-foreground">{client.nombre_completo}</td>
+                <td className="px-3 py-2 text-xs text-muted-foreground">{client.telefono}</td>
+                <td className="px-3 py-2 text-right">
+                  <Button
+                    size="sm"
+                    onClick={() => handleSelectClient(client)}
+                    className="h-6 text-xs"
+                  >
+                    Seleccionar
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )}
+
+    {search && searching && (
+      <div className="flex items-center justify-center py-2">
+        <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    )}
+
+    {search && searchResults.length === 0 && !searching && (
+      <p className="text-center text-xs text-muted-foreground py-2">
+        No se encontraron clientes
+      </p>
+    )}
+
+    {/* Cliente seleccionado */}
     {state.selectedClient ? (
       <div className="flex items-center justify-between p-2 bg-primary/5 rounded-lg border border-primary/20">
         <div className="flex items-center gap-2">
@@ -327,9 +464,11 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
         </Button>
       </div>
     ) : (
-      <p className="text-center text-xs text-muted-foreground py-2">
-        No hay cliente seleccionado.
-      </p>
+      !search && (
+        <p className="text-center text-xs text-muted-foreground py-2">
+          No hay cliente seleccionado.
+        </p>
+      )
     )}
   </CardContent>
 </Card>
