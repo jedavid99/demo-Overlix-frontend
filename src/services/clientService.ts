@@ -14,7 +14,14 @@ export const clientService = {
 
   // Crear un nuevo cliente
   create: (data: ClientCreate): Promise<Client> => {
-    return api.post('/clients', data).then(res => res.data);
+    console.log('clientService.create - Enviando datos:', data);
+    return api.post('/clients', data).then(res => {
+      console.log('clientService.create - Respuesta del backend:', res.data);
+      return res.data;
+    }).catch(err => {
+      console.error('clientService.create - Error:', err.response?.data || err.message);
+      throw err;
+    });
   },
 
   // Actualizar un cliente

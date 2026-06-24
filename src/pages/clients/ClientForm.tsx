@@ -46,15 +46,26 @@ export const ClientForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('ClientForm.handleSubmit - Datos del formulario:', formData);
+    console.log('ClientForm.handleSubmit - Modo:', isEdit ? 'edición' : 'creación');
+    
     if (isEdit && id) {
+      console.log('ClientForm.handleSubmit - Actualizando cliente ID:', id);
       const result = await updateClient(id, formData as ClientUpdate);
       if (result) {
+        console.log('ClientForm.handleSubmit - Actualización exitosa, navegando a:', `/clients/${id}`);
         navigate(`/clients/${id}`);
+      } else {
+        console.error('ClientForm.handleSubmit - La actualización falló');
       }
     } else {
+      console.log('ClientForm.handleSubmit - Creando nuevo cliente');
       const result = await createClient(formData);
       if (result) {
+        console.log('ClientForm.handleSubmit - Creación exitosa, navegando a /clients');
         navigate('/clients');
+      } else {
+        console.error('ClientForm.handleSubmit - La creación falló');
       }
     }
   };

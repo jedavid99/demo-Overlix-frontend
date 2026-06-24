@@ -61,10 +61,15 @@ export const useClientMutations = () => {
     setLoading(true);
     setError(null);
     try {
+      console.log('useClientMutations.createClient - Iniciando creación con datos:', data);
       const response = await clientService.create(data);
+      console.log('useClientMutations.createClient - Cliente creado exitosamente:', response);
       return response;
     } catch (err: any) {
-      setError(err.message || 'Error al crear cliente');
+      console.error('useClientMutations.createClient - Error completo:', err);
+      const errorMessage = err.response?.data?.message || err.response?.data?.error || err.message || 'Error al crear cliente';
+      console.error('useClientMutations.createClient - Error message:', errorMessage);
+      setError(errorMessage);
       return null;
     } finally {
       setLoading(false);
