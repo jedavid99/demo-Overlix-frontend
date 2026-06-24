@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Check, X } from 'lucide-react'
@@ -8,7 +6,6 @@ import { ScrollArea } from '../../ui/scroll-area'
 import { Separator } from '../../ui/separator'
 import { Notification, NotificationGroup } from './notification.types'
 import { NotificationItem } from './NotificationItem'
-
 interface NotificationListProps {
   notifications: Notification[]
   onNotificationRead: (id: number) => void
@@ -16,7 +13,6 @@ interface NotificationListProps {
   onMarkAllRead: () => void
   onViewAll: () => void
 }
-
 export const NotificationList: React.FC<NotificationListProps> = ({
   notifications,
   onNotificationRead,
@@ -25,24 +21,19 @@ export const NotificationList: React.FC<NotificationListProps> = ({
   onViewAll
 }) => {
   const unreadCount = notifications.filter(n => !n.read).length
-
   // Agrupar notificaciones por fecha
   const groupedNotifications = useMemo(() => {
     const groups: NotificationGroup[] = []
     const today = new Date()
     today.setHours(0, 0, 0, 0)
-
     const yesterday = new Date(today)
     yesterday.setDate(yesterday.getDate() - 1)
-
     const thisWeek = new Date(today)
     thisWeek.setDate(thisWeek.getDate() - 7)
-
     const todayNotifs: Notification[] = []
     const yesterdayNotifs: Notification[] = []
     const thisWeekNotifs: Notification[] = []
     const olderNotifs: Notification[] = []
-
     notifications.forEach(notif => {
       // Simular fecha basada en el string de tiempo
       const timeStr = notif.time.toLowerCase()
@@ -56,7 +47,6 @@ export const NotificationList: React.FC<NotificationListProps> = ({
         olderNotifs.push(notif)
       }
     })
-
     if (todayNotifs.length > 0) {
       groups.push({ label: 'Hoy', notifications: todayNotifs })
     }
@@ -69,10 +59,8 @@ export const NotificationList: React.FC<NotificationListProps> = ({
     if (olderNotifs.length > 0) {
       groups.push({ label: 'Más antiguo', notifications: olderNotifs })
     }
-
     return groups
   }, [notifications])
-
   return (
     <div className="flex flex-col h-full">
       {/* Cabecera */}
@@ -97,7 +85,6 @@ export const NotificationList: React.FC<NotificationListProps> = ({
           </Button>
         )}
       </div>
-
       {/* Lista con scroll */}
       <ScrollArea className="flex-1">
         {notifications.length === 0 ? (
@@ -138,7 +125,6 @@ export const NotificationList: React.FC<NotificationListProps> = ({
                       />
                     ))}
                   </div>
-
                   {/* Separador entre grupos */}
                   {groupIndex < groupedNotifications.length - 1 && (
                     <Separator className="my-2" />
@@ -149,7 +135,6 @@ export const NotificationList: React.FC<NotificationListProps> = ({
           </div>
         )}
       </ScrollArea>
-
       {/* Pie */}
       {notifications.length > 0 && (
         <div className="p-3 border-t border-border bg-card/50">
@@ -165,5 +150,4 @@ export const NotificationList: React.FC<NotificationListProps> = ({
     </div>
   )
 }
-
 export default NotificationList

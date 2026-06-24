@@ -14,9 +14,7 @@ import {
   FileText,
   Database,
 } from 'lucide-react';
-
 // Datos mock eliminados - conectar con API real
-
 export default function ARCA() {
   const [isConnected, setIsConnected] = useState(false);
   const [formData, setFormData] = useState({
@@ -28,23 +26,19 @@ export default function ARCA() {
     defaultVAT: '21% (Standard)',
     enablePercepciones: false,
   });
-
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
-
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Header */}
     
-
       <main className="max-w-6xl mx-auto w-full p-6 lg:p-10">
         {/* Header Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">ARCA Integration Settings</h1>
           <p className="text-slate-500 dark:text-slate-400">Manage your connection to ARCA (ex-AFIP) Web Services</p>
         </div>
-
         {/* Connection Status Card */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm gap-4 mb-8">
           <div className="flex items-center gap-4">
@@ -67,7 +61,6 @@ export default function ARCA() {
               </p>
             </div>
           </div>
-
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsConnected(!isConnected)}
@@ -87,7 +80,6 @@ export default function ARCA() {
             </label>
           </div>
         </div>
-
         {/* Business Credentials & Digital Certificate */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Business Credentials */}
@@ -96,7 +88,6 @@ export default function ARCA() {
               <Key size={20} className="text-blue-600" />
               Business Credentials
             </h3>
-
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">CUIT Number</label>
@@ -108,7 +99,6 @@ export default function ARCA() {
                   className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Point of Sale</label>
@@ -132,7 +122,6 @@ export default function ARCA() {
                   </select>
                 </div>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Service Type</label>
                 <select
@@ -148,14 +137,12 @@ export default function ARCA() {
               </div>
             </div>
           </div>
-
           {/* Digital Certificate */}
           <div className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm">
             <h3 className="text-lg font-bold mb-6 flex items-center gap-2 text-slate-900 dark:text-slate-100">
               <Shield size={20} className="text-blue-600" />
               Digital Certificate
             </h3>
-
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Upload Certificate (.crt)</label>
@@ -164,7 +151,6 @@ export default function ARCA() {
                   <p className="text-xs text-slate-500 dark:text-slate-400">Drag or click to upload</p>
                 </div>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Private Key (.key)</label>
                 <div className="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg p-6 text-center hover:border-blue-500 transition-colors cursor-pointer group">
@@ -172,19 +158,16 @@ export default function ARCA() {
                   <p className="text-xs text-slate-500 dark:text-slate-400">Drag or click to upload</p>
                 </div>
               </div>
-
               <p className="text-xs text-slate-400 dark:text-slate-500 italic">Certificates are encrypted and stored securely.</p>
             </div>
           </div>
         </div>
-
         {/* Tax Configuration */}
         <div className="p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm mb-8">
           <h3 className="text-lg font-bold mb-6 flex items-center gap-2 text-slate-900 dark:text-slate-100">
             <FileText size={20} className="text-blue-600" />
             Tax Configuration
           </h3>
-
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div>
               <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Business Type</label>
@@ -198,7 +181,6 @@ export default function ARCA() {
                 <option>Exento</option>
               </select>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Default VAT (IVA)</label>
               <select
@@ -212,7 +194,6 @@ export default function ARCA() {
                 <option>0% (Exempt)</option>
               </select>
             </div>
-
             <div className="flex items-center gap-3 pt-2">
               <input
                 type="checkbox"
@@ -227,7 +208,6 @@ export default function ARCA() {
             </div>
           </div>
         </div>
-
         {/* Synchronization Logs */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm mb-8">
           <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
@@ -239,7 +219,6 @@ export default function ARCA() {
               Clear Logs
             </button>
           </div>
-
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -264,7 +243,6 @@ export default function ARCA() {
             </table>
           </div>
         </div>
-
         {/* Footer Actions */}
         <div className="flex justify-end gap-4">
           <button className="px-6 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
@@ -279,4 +257,3 @@ export default function ARCA() {
     </div>
   );
 }
-

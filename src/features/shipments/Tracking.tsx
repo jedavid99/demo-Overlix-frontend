@@ -1,4 +1,4 @@
-ï»¿import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import {
   Search, Plus, ChevronDown, MoreVertical, Package,
@@ -16,7 +16,6 @@ import {
 import { Card, CardContent } from '@/shared/components/ui/card'
 import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
-
 interface Shipment {
   id: string
   customer: string
@@ -39,7 +38,6 @@ interface Shipment {
   description?: string
   value?: string
 }
-
 interface LogEvent {
   title: string
   detail: string
@@ -47,7 +45,6 @@ interface LogEvent {
   time: string
   icon?: React.ReactNode
 }
-
 export default function Tracking() {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(null)
@@ -56,9 +53,7 @@ export default function Tracking() {
   const [showModal, setShowModal] = useState(false)
   const [modalView, setModalView] = useState<'details' | 'map' | 'timeline'>('details')
   const [mapZoom, setMapZoom] = useState(12)
-
   const location = useLocation()
-
   useEffect(() => {
     if (location.state) {
       const st = location.state as any
@@ -67,17 +62,14 @@ export default function Tracking() {
       if (st.filterStatus) setFilterStatus(st.filterStatus)
     }
   }, [location.state])
-
-  // ðŸ“¦ Datos vacÃ­os â€“ conectar con API real
+  // ?? Datos vacíos – conectar con API real
   const shipments: Shipment[] = []
-
   const kpiCards = [
-    { title: 'En PreparaciÃ³n', value: shipments.filter(s => s.status === 'preparation').length, change: 0, icon: <Package size={20} />, color: 'text-amber-600', bgColor: 'bg-amber-100' },
-    { title: 'En TrÃ¡nsito', value: shipments.filter(s => s.status === 'transit').length, change: 0, icon: <Truck size={20} />, color: 'text-blue-600', bgColor: 'bg-blue-100' },
+    { title: 'En Preparación', value: shipments.filter(s => s.status === 'preparation').length, change: 0, icon: <Package size={20} />, color: 'text-amber-600', bgColor: 'bg-amber-100' },
+    { title: 'En Tránsito', value: shipments.filter(s => s.status === 'transit').length, change: 0, icon: <Truck size={20} />, color: 'text-blue-600', bgColor: 'bg-blue-100' },
     { title: 'En Reparto', value: shipments.filter(s => s.status === 'delivery').length, change: 0, icon: <Navigation size={20} />, color: 'text-purple-600', bgColor: 'bg-purple-100' },
     { title: 'Entregados', value: shipments.filter(s => s.status === 'delivered').length, change: 0, icon: <CheckCircle size={20} />, color: 'text-green-600', bgColor: 'bg-green-100' },
   ]
-
   const filteredShipments = shipments.filter(s => {
     if (filterStatus !== 'all' && s.status !== filterStatus) return false
     if (searchTerm) {
@@ -91,7 +83,6 @@ export default function Tracking() {
     }
     return true
   })
-
   const getStatusColor = (status: string) => {
     switch(status) {
       case 'preparation': return 'bg-amber-100 text-amber-700 border-amber-200'
@@ -101,7 +92,6 @@ export default function Tracking() {
       default: return 'bg-muted text-foreground border-gray-200'
     }
   }
-
   const getStatusIcon = (status: string) => {
     switch(status) {
       case 'preparation': return <Package size={14} />
@@ -111,36 +101,30 @@ export default function Tracking() {
       default: return <Circle size={14} />
     }
   }
-
   const getStatusText = (status: string) => {
     switch(status) {
-      case 'preparation': return 'PreparaciÃ³n'
-      case 'transit': return 'En TrÃ¡nsito'
+      case 'preparation': return 'Preparación'
+      case 'transit': return 'En Tránsito'
       case 'delivery': return 'En Reparto'
       case 'delivered': return 'Entregado'
       default: return status
     }
   }
-
   const getTrackingLog = (shipmentId: string): LogEvent[] => {
     // Conectar con API real: api.get(`/shipments/${shipmentId}/log`)
     return []
   }
-
   const getMapUrl = (lat: number, lng: number, zoom: number) => {
     return `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lng}&zoom=${zoom}&size=800x500&markers=${lat},${lng},red-pin`
   }
-
   const openTrackingModal = (shipment: Shipment) => {
     setSelectedShipment(shipment)
     setShowModal(true)
     setModalView('details')
   }
-
   // Modal (solo se renderiza si hay shipment seleccionado)
   const TrackingModal = () => {
     if (!selectedShipment) return null
-
     return (
       <div className="fixed inset-0 z-50 overflow-y-auto">
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" onClick={() => setShowModal(false)} />
@@ -192,7 +176,6 @@ export default function Tracking() {
                 </button>
               </div>
             </div>
-
             {/* Contenido */}
             <div className="p-4 max-h-[calc(100vh-160px)] overflow-y-auto">
               {modalView === 'details' && (
@@ -210,11 +193,10 @@ export default function Tracking() {
                       <div><span className="opacity-70">Origen</span><br /><span className="font-medium">{selectedShipment.origin}</span></div>
                       <div><span className="opacity-70">Destino</span><br /><span className="font-medium">{selectedShipment.destination}</span></div>
                       <div><span className="opacity-70">Entrega</span><br /><span className="font-medium">{selectedShipment.estimatedDelivery}</span></div>
-                      <div><span className="opacity-70">Ãšltima act.</span><br /><span className="font-medium">{selectedShipment.lastUpdate}</span></div>
+                      <div><span className="opacity-70">Última act.</span><br /><span className="font-medium">{selectedShipment.lastUpdate}</span></div>
                     </div>
                   </div>
-
-                  {/* Grid de informaciÃ³n */}
+                  {/* Grid de información */}
                   <div className="grid grid-cols-2 gap-3">
                     <div className="bg-gray-50 dark:bg-muted/50 rounded-xl p-4">
                       <h4 className="text-xs font-semibold text-foreground mb-3 flex items-center gap-1.5">
@@ -222,12 +204,11 @@ export default function Tracking() {
                       </h4>
                       <div className="space-y-2 text-xs">
                         <div className="flex justify-between"><span className="text-muted-foreground">Peso</span><span className="font-medium">{selectedShipment.weight}</span></div>
-                        <div className="flex justify-between"><span className="text-muted-foreground">ArtÃ­culos</span><span className="font-medium">{selectedShipment.items} u.</span></div>
+                        <div className="flex justify-between"><span className="text-muted-foreground">Artículos</span><span className="font-medium">{selectedShipment.items} u.</span></div>
                         <div className="flex justify-between"><span className="text-muted-foreground">Transportista</span><span className="font-medium">{selectedShipment.provider}</span></div>
                         <div className="flex justify-between"><span className="text-muted-foreground">Valor</span><span className="font-bold text-green-600">{selectedShipment.value}</span></div>
                       </div>
                     </div>
-
                     <div className="bg-gray-50 dark:bg-muted/50 rounded-xl p-4">
                       <h4 className="text-xs font-semibold text-foreground mb-3 flex items-center gap-1.5">
                         <User size={14} className="text-blue-600" /> Cliente
@@ -243,7 +224,6 @@ export default function Tracking() {
                         <div className="flex items-center gap-1.5"><Mail size={12} className="text-muted-foreground" /><span>{selectedShipment.customer.toLowerCase().replace(' ', '.')}@email.com</span></div>
                       </div>
                     </div>
-
                     <div className="bg-gray-50 dark:bg-muted/50 rounded-xl p-4">
                       <h4 className="text-xs font-semibold text-foreground mb-3 flex items-center gap-1.5">
                         <Truck size={14} className="text-blue-600" /> Transportista
@@ -259,19 +239,17 @@ export default function Tracking() {
                         <div className="flex items-center gap-1.5"><Phone size={12} className="text-muted-foreground" /><span>+1 (555) 987-6543</span></div>
                       </div>
                     </div>
-
                     <div className="bg-gray-50 dark:bg-muted/50 rounded-xl p-4">
                       <h4 className="text-xs font-semibold text-foreground mb-3 flex items-center gap-1.5">
                         <Info size={14} className="text-blue-600" /> Adicional
                       </h4>
                       <div className="space-y-2 text-xs">
                         <div className="flex justify-between"><span className="text-muted-foreground">Tipo</span><span className={`px-2 py-0.5 rounded-lg text-[10px] font-medium ${selectedShipment.type === 'Repair' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}`}>{selectedShipment.type}</span></div>
-                        <div className="flex justify-between"><span className="text-muted-foreground">Firma</span><span className={selectedShipment.signature ? 'text-green-600' : 'text-muted-foreground'}>{selectedShipment.signature ? 'SÃ­' : 'No'}</span></div>
+                        <div className="flex justify-between"><span className="text-muted-foreground">Firma</span><span className={selectedShipment.signature ? 'text-green-600' : 'text-muted-foreground'}>{selectedShipment.signature ? 'Sí' : 'No'}</span></div>
                         <div className="flex justify-between"><span className="text-muted-foreground">Seguimiento</span><span className="font-mono font-bold text-blue-600 text-[10px]">{selectedShipment.id}</span></div>
                       </div>
                     </div>
                   </div>
-
                   {/* Acciones */}
                   <div className="flex gap-2 pt-2">
                     <button className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
@@ -286,11 +264,10 @@ export default function Tracking() {
                   </div>
                 </div>
               )}
-
               {modalView === 'map' && selectedShipment.lat && selectedShipment.lng && (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5"><Map size={16} className="text-blue-600" /><h3 className="text-sm font-semibold">UbicaciÃ³n en tiempo real</h3></div>
+                    <div className="flex items-center gap-1.5"><Map size={16} className="text-blue-600" /><h3 className="text-sm font-semibold">Ubicación en tiempo real</h3></div>
                     <div className="flex gap-1">
                       <button onClick={() => setMapZoom(Math.min(mapZoom + 1, 18))} className="p-1.5 bg-muted rounded-lg hover:bg-muted/70"><Plus size={14} /></button>
                       <button onClick={() => setMapZoom(Math.max(mapZoom - 1, 5))} className="p-1.5 bg-muted rounded-lg hover:bg-muted/70"><Minus size={14} /></button>
@@ -300,7 +277,7 @@ export default function Tracking() {
                   <div className="relative h-72 w-full bg-muted rounded-xl overflow-hidden">
                     <img src={getMapUrl(selectedShipment.lat, selectedShipment.lng, mapZoom)} alt="Map" className="w-full h-full object-cover" />
                     <div className="absolute top-3 left-3 bg-white/90 dark:bg-muted/90 backdrop-blur-sm rounded-lg p-2 shadow-lg">
-                      <p className="text-[10px] font-medium text-muted-foreground">UbicaciÃ³n actual</p>
+                      <p className="text-[10px] font-medium text-muted-foreground">Ubicación actual</p>
                       <p className="text-xs font-semibold">{selectedShipment.location}</p>
                     </div>
                     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -316,12 +293,11 @@ export default function Tracking() {
                     </div>
                   </div>
                   <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div><span>VehÃ­culo en movimiento</span></div>
+                    <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div><span>Vehículo en movimiento</span></div>
                     <button className="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-0.5"><ExternalLink size={12} /> Ver en Google Maps</button>
                   </div>
                 </div>
               )}
-
               {modalView === 'timeline' && (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -335,7 +311,6 @@ export default function Tracking() {
                 </div>
               )}
             </div>
-
             {/* Footer */}
             <div className="flex items-center justify-end gap-2 p-3 border-t border-border">
               <button onClick={() => setShowModal(false)} className="px-3 py-1.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50">Cerrar</button>
@@ -346,7 +321,6 @@ export default function Tracking() {
       </div>
     )
   }
-
   // Componentes auxiliares para zoom
   const Plus = (props: any) => (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
@@ -354,7 +328,6 @@ export default function Tracking() {
   const Minus = (props: any) => (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12" /></svg>
   )
-
   return (
     <div className="min-h-screen bg-background">
       <main className="p-6">
@@ -362,8 +335,8 @@ export default function Tracking() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Seguimiento de EnvÃ­os</h1>
-              <p className="text-muted-foreground">Monitorea el estado de tus envÃ­os en tiempo real</p>
+              <h1 className="text-3xl font-bold text-foreground">Seguimiento de Envíos</h1>
+              <p className="text-muted-foreground">Monitorea el estado de tus envíos en tiempo real</p>
             </div>
             <div className="flex gap-3">
               <Button variant="outline" className="gap-2">
@@ -372,11 +345,10 @@ export default function Tracking() {
               </Button>
               <Button className="gap-2">
                 <Plus size={16} />
-                Nuevo envÃ­o
+                Nuevo envío
               </Button>
             </div>
           </div>
-
           {/* KPIs */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {kpiCards.map((kpi, index) => (
@@ -396,15 +368,14 @@ export default function Tracking() {
               </Card>
             ))}
           </div>
-
-          {/* BÃºsqueda y filtros */}
+          {/* Búsqueda y filtros */}
           <Card className="p-4">
             <div className="flex flex-wrap items-center gap-3">
               <div className="relative flex-1 min-w-[200px]">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
                 <input
                   type="text"
-                  placeholder="Buscar por ID, cliente, ubicaciÃ³n o transportista..."
+                  placeholder="Buscar por ID, cliente, ubicación o transportista..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 rounded-lg border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
@@ -424,16 +395,15 @@ export default function Tracking() {
               </div>
             </div>
           </Card>
-
-          {/* Tabla de envÃ­os */}
+          {/* Tabla de envíos */}
           <Card>
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 {filteredShipments.length === 0 ? (
                   <div className="text-center py-16 text-muted-foreground">
                     <Package size={48} className="mx-auto mb-4 text-muted-foreground/40" />
-                    <p className="text-lg font-semibold text-foreground mb-1">No hay envÃ­os registrados</p>
-                    <p className="text-sm">Los envÃ­os aparecerÃ¡n aquÃ­ una vez que se creen.</p>
+                    <p className="text-lg font-semibold text-foreground mb-1">No hay envíos registrados</p>
+                    <p className="text-sm">Los envíos aparecerán aquí una vez que se creen.</p>
                   </div>
                 ) : (
                   <table className="w-full">
@@ -443,7 +413,7 @@ export default function Tracking() {
                         <th className="px-6 py-4 font-medium">Cliente</th>
                         <th className="px-6 py-4 font-medium">Tipo</th>
                         <th className="px-6 py-4 font-medium">Transportista</th>
-                        <th className="px-6 py-4 font-medium">UbicaciÃ³n</th>
+                        <th className="px-6 py-4 font-medium">Ubicación</th>
                         <th className="px-6 py-4 font-medium">Estado</th>
                         <th className="px-6 py-4 font-medium">Progreso</th>
                         <th className="px-6 py-4 font-medium text-right">Acciones</th>
@@ -531,7 +501,6 @@ export default function Tracking() {
           </Card>
         </div>
       </main>
-
       {showModal && <TrackingModal />}
     </div>
   )

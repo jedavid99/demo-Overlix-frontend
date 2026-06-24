@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
@@ -11,7 +9,6 @@ import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { exportToCSV } from '@/shared/lib/export'
-
 // Tipos
 interface Sale {
   id: string
@@ -22,21 +19,16 @@ interface Sale {
   date: Date
   status: 'completed' | 'pending' | 'cancelled'
 }
-
 interface SalesData {
   date: string
   sales: number
 }
-
 // Datos mock eliminados – conectar con API real
 const sales: Sale[] = []
-
 const categories = ['Todos', 'Celulares', 'Baterías', 'Pantallas', 'Flex', 'Carcasas', 'Insumos']
-
 const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value)
 }
-
 const SalesReport = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
@@ -47,12 +39,10 @@ const SalesReport = () => {
   const [salesData, setSalesData] = useState<Sale[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
-
   useEffect(() => {
     // Conectar con API real: api.get('/reports/sales')
     setLoading(false)
   }, [])
-
   // Filtrar ventas
   const filteredSales = salesData.filter((sale) => {
     const matchesCategory = selectedCategory === 'Todos' || sale.category === selectedCategory
@@ -68,13 +58,11 @@ const SalesReport = () => {
     }
     return matchesCategory && matchesSearch && matchesPeriod
   })
-
   // Calcular KPIs
   const totalItems = filteredSales.reduce((sum, s) => sum + s.quantity, 0)
   const totalRevenue = filteredSales.reduce((sum, s) => sum + s.total, 0)
   const totalTransactions = filteredSales.length
   const averageTicket = totalTransactions > 0 ? totalRevenue / totalTransactions : 0
-
   // Datos para gráfico de barras (ventas por día)
   const getDailySales = (): SalesData[] => {
     const days = 7
@@ -96,13 +84,10 @@ const SalesReport = () => {
       sales
     }))
   }
-
   const dailyData = getDailySales()
-
   // Paginación
   const paginatedSales = filteredSales.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
   const totalPages = Math.ceil(filteredSales.length / itemsPerPage)
-
   // Exportar CSV
   const handleExport = () => {
     const csvData = filteredSales.map(sale => ({
@@ -115,14 +100,12 @@ const SalesReport = () => {
     }))
     exportToCSV(csvData, 'reporte-ventas')
   }
-
   const handleRetry = () => {
     setError(false)
     setLoading(true)
     // Conectar con API real: api.get('/reports/sales')
     setLoading(false)
   }
-
   if (loading) {
     return (
       <motion.div
@@ -145,7 +128,6 @@ const SalesReport = () => {
       </motion.div>
     )
   }
-
   if (error) {
     return (
       <motion.div
@@ -163,7 +145,6 @@ const SalesReport = () => {
       </motion.div>
     )
   }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -182,7 +163,6 @@ const SalesReport = () => {
           Exportar
         </Button>
       </div>
-
       {/* Filtros */}
       <Card className="p-4">
         <div className="flex flex-wrap items-center gap-4">
@@ -226,7 +206,6 @@ const SalesReport = () => {
           </div>
         </div>
       </Card>
-
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
@@ -240,7 +219,6 @@ const SalesReport = () => {
             <p className="text-sm text-muted-foreground">Unidades vendidas</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -252,7 +230,6 @@ const SalesReport = () => {
             <p className="text-sm text-muted-foreground">Ingresos totales</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -264,7 +241,6 @@ const SalesReport = () => {
             <p className="text-sm text-muted-foreground">Transacciones</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -283,7 +259,6 @@ const SalesReport = () => {
           </CardContent>
         </Card>
       </div>
-
       {/* Gráfico de ventas diarias */}
       <Card>
         <CardHeader>
@@ -324,7 +299,6 @@ const SalesReport = () => {
           )}
         </CardContent>
       </Card>
-
       {/* Tabla de ventas */}
       <Card>
         <CardHeader>
@@ -406,5 +380,4 @@ const SalesReport = () => {
     </motion.div>
   )
 }
-
 export default SalesReport

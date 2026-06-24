@@ -7,7 +7,6 @@ import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
 import { Badge } from '@/shared/components/ui/badge'
-
 export default function ProviderAdd() {
   const navigate = useNavigate()
   const [form, setForm] = useState({
@@ -26,16 +25,13 @@ export default function ProviderAdd() {
     incoterms: 'DDP',
     leadTime: '2-3 Business Days',
   })
-
   const [errors, setErrors] = useState<Record<string, string>>({})
-
   const handleChange = (field: string, value: any) => {
     setForm((prev) => ({ ...prev, [field]: value }))
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: '' }))
     }
   }
-
   const toggleCategory = (cat: string) => {
     setForm((prev) => ({
       ...prev,
@@ -44,12 +40,10 @@ export default function ProviderAdd() {
         : [...prev.categories, cat],
     }))
   }
-
   const handlePartsChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value)
     setForm((prev) => ({ ...prev, parts: selectedOptions }))
   }
-
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {}
     if (!form.businessName.trim()) newErrors.businessName = 'El nombre del negocio es obligatorio'
@@ -65,7 +59,6 @@ export default function ProviderAdd() {
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!validate()) return
@@ -73,7 +66,6 @@ export default function ProviderAdd() {
     alert('Proveedor guardado correctamente')
     navigate('/providers')
   }
-
   const categories = ['Teléfonos', 'PCs / Portátiles', 'Consolas', 'Accesorios']
   const partOptions = [
     'Pantallas LCD / OLED',
@@ -87,10 +79,8 @@ export default function ProviderAdd() {
     'Cables flex',
     'Conectores',
   ]
-
   const incotermsOptions = ['DDP', 'EXW', 'FOB', 'CIF']
   const leadTimeOptions = ['Entrega al día siguiente', '2-3 días hábiles', '1 semana', '2+ semanas (Internacional)']
-
   const sectionVariants = {
     hidden: { opacity: 0, y: 10 },
     visible: (i: number) => ({
@@ -99,7 +89,6 @@ export default function ProviderAdd() {
       transition: { delay: i * 0.06, duration: 0.3, ease: 'easeOut' },
     }),
   }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -124,7 +113,6 @@ export default function ProviderAdd() {
             </Button>
           </div>
         </div>
-
         <form onSubmit={handleSubmit} className="space-y-4 pb-12">
           {/* Información básica */}
           <motion.section
@@ -179,7 +167,6 @@ export default function ProviderAdd() {
               </div>
             </div>
           </motion.section>
-
           {/* Contacto principal */}
           <motion.section
             variants={sectionVariants}
@@ -257,7 +244,6 @@ export default function ProviderAdd() {
               </div>
             </div>
           </motion.section>
-
           {/* Categorías y piezas */}
           <motion.section
             variants={sectionVariants}
@@ -294,7 +280,6 @@ export default function ProviderAdd() {
                   ))}
                 </div>
               </div>
-
               <div>
                 <Label htmlFor="parts" className="text-xs font-semibold block mb-1.5">
                   Piezas específicas que suministra
@@ -337,7 +322,6 @@ export default function ProviderAdd() {
               </div>
             </div>
           </motion.section>
-
           {/* Dirección y envío */}
           <motion.section
             variants={sectionVariants}
@@ -423,7 +407,6 @@ export default function ProviderAdd() {
               </div>
             </div>
           </motion.section>
-
           {/* Botones de acción */}
           <motion.div
             variants={sectionVariants}

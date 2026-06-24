@@ -1,11 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { login as loginService, getMe } from '../services/auth.service';
 import { clearAuthToken } from '../services/api';
-
 interface User {
   [key: string]: any;
 }
-
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string, codigoEmpresa: string) => Promise<void>;
@@ -13,14 +11,11 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
 }
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
   useEffect(() => {
     const initAuth = async () => {
       const token = localStorage.getItem('access_token');
@@ -40,10 +35,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       setIsLoading(false);
     };
-
     initAuth();
   }, []);
-
   const login = async (email: string, password: string, codigoEmpresa: string) => {
     console.log('AuthContext.login llamado con:', { email, codigoEmpresa });
     const response = await loginService(email, password, codigoEmpresa);
@@ -55,7 +48,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     if (token) {
       localStorage.setItem('access_token', token);
-      console.log('Token guardado en localStorage:', token);
       
       // El usuario ya viene en la respuesta, no necesitamos llamar a getMe
       const usuario = response.data?.data?.usuario;
@@ -67,7 +59,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error('Estructura completa de response:', JSON.stringify(response, null, 2));
     }
   };
-
   const logout = () => {
     console.log('AuthContext.logout: Limpiando tokens y estado local');
     clearAuthToken();
@@ -76,14 +67,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log('AuthContext.logout: Redirigiendo a /');
     window.location.href = '/';
   };
-
   return (
     <AuthContext.Provider value={{ user, login, logout, isLoading, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );
 };
-
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

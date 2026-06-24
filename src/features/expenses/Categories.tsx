@@ -25,7 +25,6 @@ import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
-
 interface Category {
   id: string
   name: string
@@ -36,7 +35,6 @@ interface Category {
   expenseCount: number
   totalAmount: number
 }
-
 export default function Categories() {
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
@@ -47,10 +45,8 @@ export default function Categories() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
-
   // 📦 Datos vacíos – conectar con API real
   const categories: Category[] = []
-
   // Estado del formulario
   const [formData, setFormData] = useState({
     name: '',
@@ -59,7 +55,6 @@ export default function Categories() {
     status: 'active' as 'active' | 'inactive',
     icon: 'Tag',
   })
-
   const filteredCategories = categories.filter((cat) => {
     const matchesSearch =
       cat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -68,19 +63,16 @@ export default function Categories() {
     const matchesType = typeFilter === 'all' || cat.type === typeFilter
     return matchesSearch && matchesStatus && matchesType
   })
-
   const paginatedCategories = filteredCategories.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   )
   const totalPages = Math.ceil(filteredCategories.length / itemsPerPage)
-
   // KPIs
   const totalCategories = categories.length
   const activeCategories = categories.filter((c) => c.status === 'active').length
   const inactiveCategories = categories.filter((c) => c.status === 'inactive').length
   const totalExpenses = categories.reduce((sum, c) => sum + c.totalAmount, 0)
-
   const kpiData = [
     {
       label: 'Total Categorías',
@@ -111,7 +103,6 @@ export default function Categories() {
       bgColor: 'bg-blue-500/10',
     },
   ]
-
   const iconOptions = [
     { value: 'Tag', icon: Tag },
     { value: 'DollarSign', icon: DollarSign },
@@ -121,38 +112,32 @@ export default function Categories() {
     { value: 'Wrench', icon: Wrench },
     { value: 'Zap', icon: Zap },
   ]
-
   const getTypeBadge = (type: 'income' | 'expense') => {
     return type === 'income'
       ? { variant: 'success' as const, label: 'Ingreso' }
       : { variant: 'destructive' as const, label: 'Gasto' }
   }
-
   const getStatusBadge = (status: 'active' | 'inactive') => {
     return status === 'active'
       ? { variant: 'success' as const, label: 'Activa' }
       : { variant: 'secondary' as const, label: 'Inactiva' }
   }
-
   const getIconComponent = (iconName: string) => {
     const found = iconOptions.find((i) => i.value === iconName)
     return found ? found.icon : Tag
   }
-
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
-
   const handleSaveCategory = () => {
     // Validación básica
     if (!formData.name.trim()) {
       alert('El nombre de la categoría es obligatorio.')
       return
     }
-
     // Simular guardado
     alert('Categoría guardada correctamente.')
     setShowAddModal(false)
@@ -164,7 +149,6 @@ export default function Categories() {
       icon: 'Tag',
     })
   }
-
   const handleEditCategory = (category: Category) => {
     setSelectedCategory(category)
     setFormData({
@@ -176,7 +160,6 @@ export default function Categories() {
     })
     setShowEditModal(true)
   }
-
   const handleUpdateCategory = () => {
     if (!formData.name.trim()) {
       alert('El nombre de la categoría es obligatorio.')
@@ -193,13 +176,11 @@ export default function Categories() {
       icon: 'Tag',
     })
   }
-
   const handleDeleteCategory = (category: Category) => {
     if (confirm(`¿Eliminar la categoría "${category.name}"?`)) {
       alert('Categoría eliminada correctamente.')
     }
   }
-
   // Modal de agregar/editar
   const CategoryModal = ({ isEdit = false }: { isEdit?: boolean }) => {
     const title = isEdit ? 'Editar Categoría' : 'Nueva Categoría'
@@ -219,7 +200,6 @@ export default function Categories() {
         icon: 'Tag',
       })
     }
-
     return (
       <div className="fixed inset-0 z-50 overflow-y-auto">
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
@@ -237,7 +217,6 @@ export default function Categories() {
                 <X size={20} className="text-muted-foreground" />
               </button>
             </div>
-
             {/* Formulario */}
             <div className="p-6 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
               <div className="space-y-2">
@@ -250,7 +229,6 @@ export default function Categories() {
                   placeholder="Ej. Alquiler, Repuestos, Servicios"
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="description" className="text-sm font-medium">Descripción</Label>
                 <textarea
@@ -263,7 +241,6 @@ export default function Categories() {
                   className="w-full px-4 py-2 rounded-lg border border-input bg-background text-foreground"
                 />
               </div>
-
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="type" className="text-sm font-medium">Tipo</Label>
@@ -292,7 +269,6 @@ export default function Categories() {
                   </select>
                 </div>
               </div>
-
               <div className="space-y-2">
                 <Label className="text-sm font-medium">Icono</Label>
                 <div className="flex flex-wrap gap-2">
@@ -316,7 +292,6 @@ export default function Categories() {
                 </div>
               </div>
             </div>
-
             {/* Footer */}
             <div className="flex items-center justify-end gap-3 p-4 border-t border-border">
               <Button variant="outline" onClick={onClose}>
@@ -332,7 +307,6 @@ export default function Categories() {
       </div>
     )
   }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -351,7 +325,6 @@ export default function Categories() {
           Nueva categoría
         </Button>
       </div>
-
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {kpiData.map((kpi, idx) => {
@@ -371,7 +344,6 @@ export default function Categories() {
           )
         })}
       </div>
-
       {/* Filtros */}
       <Card className="p-4">
         <div className="flex flex-wrap items-center gap-3">
@@ -426,7 +398,6 @@ export default function Categories() {
           )}
         </div>
       </Card>
-
       {/* Tabla */}
       <Card>
         <CardContent className="p-0">
@@ -508,7 +479,6 @@ export default function Categories() {
                   </tbody>
                 </table>
               </div>
-
               {/* Paginación */}
               {totalPages > 1 && (
                 <div className="flex items-center justify-between px-6 py-4 border-t border-border">
@@ -540,7 +510,6 @@ export default function Categories() {
           )}
         </CardContent>
       </Card>
-
       {/* Modales */}
       {showAddModal && <CategoryModal isEdit={false} />}
       {showEditModal && <CategoryModal isEdit={true} />}

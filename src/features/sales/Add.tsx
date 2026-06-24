@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, Filter, Plus, Minus, CreditCard, DollarSign, ShoppingCart, ChevronRight } from 'lucide-react'
-
 type CatalogItem = {
   id: string
   title: string
@@ -10,22 +9,18 @@ type CatalogItem = {
   img?: string
   badge?: string
 }
-
 // 📦 CATÁLOGO VACÍO – reemplazar con llamada a la API
 const CATALOG: CatalogItem[] = []
-
 export default function SaleAdd() {
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [selectedCustomer, setSelectedCustomer] = useState('') // vacío
   const [items, setItems] = useState<{ item: CatalogItem; qty: number }[]>([]) // carrito vacío
-
   // Filtrado (con catálogo vacío no muestra nada)
   const filtered = useMemo(
     () => CATALOG.filter(c => c.title.toLowerCase().includes(query.toLowerCase())),
     [query]
   )
-
   const addItem = (it: CatalogItem) => {
     setItems(prev => {
       const existing = prev.find(p => p.item.id === it.id)
@@ -39,7 +34,6 @@ export default function SaleAdd() {
       return [{ item: it, qty: 1 }, ...prev]
     })
   }
-
   const changeQty = (id: string, delta: number) => {
     setItems(prev =>
       prev.map(p =>
@@ -52,15 +46,12 @@ export default function SaleAdd() {
       )
     )
   }
-
   const removeItem = (id: string) =>
     setItems(prev => prev.filter(p => p.item.id !== id))
-
   const subtotal = items.reduce((s, p) => s + p.item.price * p.qty, 0)
   const taxRate = 0.08
   const tax = +(subtotal * taxRate).toFixed(2)
   const total = +(subtotal + tax).toFixed(2)
-
   return (
     <div className="h-full flex flex-col gap-4">
       {/* Encabezado */}
@@ -68,7 +59,6 @@ export default function SaleAdd() {
         <h1 className="text-2xl font-extrabold">Crear Venta</h1>
         
       </div>
-
       <div className="flex-1 flex gap-4 min-h-0">
         {/* Catálogo */}
         <section className="flex-1 min-w-0 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm flex flex-col">
@@ -80,7 +70,6 @@ export default function SaleAdd() {
               </button>
             </div>
           </div>
-
           {/* Buscador */}
           <div className="p-4 flex gap-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20">
             <div className="relative flex-1">
@@ -96,9 +85,7 @@ export default function SaleAdd() {
               <Filter size={16} />
             </button>
           </div>
-
          
-
           {/* Grid de productos */}
           <div className="flex-1 overflow-y-auto p-4">
             {filtered.length === 0 ? (
@@ -131,7 +118,6 @@ export default function SaleAdd() {
             )}
           </div>
         </section>
-
         {/* Venta Actual */}
          <section className="w-[420px] shrink-0 flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm h-full max-h-[calc(100vh-120px)]">
   {/* Cabecera: cliente y número de venta - fijo */}
@@ -158,7 +144,6 @@ export default function SaleAdd() {
       </div>
     </div>
   </div> */}
-
   {/* Lista de items del carrito (scroll) - con altura limitada */}
   <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-[100px] max-h-[280px]">
     {items.length === 0 ? (
@@ -206,7 +191,6 @@ export default function SaleAdd() {
       ))
     )}
   </div>
-
   {/* Totales y botón - fijo abajo */}
   <div className="p-6 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 space-y-4 flex-shrink-0">
     <div className="flex items-center justify-between text-sm text-slate-500 font-medium">
@@ -227,7 +211,6 @@ export default function SaleAdd() {
       <span>Total</span>
       <span className="text-primary">${total.toFixed(2)}</span>
     </div>
-
     {/* Botón principal */}
     <button
       onClick={() => navigate('/sales')}

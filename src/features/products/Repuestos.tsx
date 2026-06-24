@@ -44,7 +44,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu'
-
 // Types
 interface RepuestoItem {
   id: number
@@ -59,21 +58,17 @@ interface RepuestoItem {
   icon: React.ElementType
   color: string
 }
-
 // 📦 Datos de muestra ELIMINADOS – array vacío (conectar con API)
 const repuestosData: RepuestoItem[] = []
-
 // Categorías y estados para filtros
 const categories = ['all', 'pantallas', 'baterías', 'componentes', 'cables', 'ventiladores']
 const statusOptions = ['all', 'good', 'low', 'out']
-
 export default function Repuestos() {
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
   const [activeCategory, setActiveCategory] = useState('all')
   const [activeStatus, setActiveStatus] = useState('all')
   const [loading, setLoading] = useState(false)
-
   // Estado del modal
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [newRepuesto, setNewRepuesto] = useState({
@@ -86,7 +81,6 @@ export default function Repuestos() {
     compatibleWith: [] as string[],
   })
   const [compatibilityInput, setCompatibilityInput] = useState('')
-
   // Filtrar repuestos
   const filteredItems = useMemo(() => {
     return repuestosData.filter((item) => {
@@ -103,20 +97,17 @@ export default function Repuestos() {
       return matchesSearch && matchesCategory && matchesStatus
     })
   }, [searchTerm, activeCategory, activeStatus])
-
   // KPIs (todos en 0 o valores genéricos)
   const totalItems = repuestosData.length
   const totalCategories = new Set(repuestosData.map((i) => i.category)).size
   const lowStockItems = repuestosData.filter((i) => i.quantity < 5 && i.quantity > 0).length
   const totalValue = repuestosData.reduce((sum, i) => sum + i.price * i.quantity, 0)
-
   // Helper para badge de estado
   const getStatusBadge = (status: string, quantity: number) => {
     if (quantity === 0) return { variant: 'destructive' as const, label: 'Agotado' }
     if (quantity < 5) return { variant: 'warning' as const, label: 'Bajo stock' }
     return { variant: 'success' as const, label: 'En stock' }
   }
-
   // Mapeo de colores por categoría
   const categoryColorMap: Record<string, string> = {
     Pantallas: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
@@ -125,7 +116,6 @@ export default function Repuestos() {
     Cables: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
     Ventiladores: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300',
   }
-
   const kpiData = [
     {
       label: 'Repuestos totales',
@@ -160,12 +150,10 @@ export default function Repuestos() {
       color: 'text-emerald-600',
     },
   ]
-
   // Manejadores del formulario modal
   const handleNewRepuestoChange = (field: string, value: string | number) => {
     setNewRepuesto((prev) => ({ ...prev, [field]: value }))
   }
-
   const addCompatibility = (device: string) => {
     const newDevice = device || compatibilityInput
     if (newDevice && !newRepuesto.compatibleWith.includes(newDevice)) {
@@ -176,32 +164,27 @@ export default function Repuestos() {
       setCompatibilityInput('')
     }
   }
-
   const removeCompatibility = (device: string) => {
     setNewRepuesto((prev) => ({
       ...prev,
       compatibleWith: prev.compatibleWith.filter((d) => d !== device),
     }))
   }
-
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault()
       addCompatibility(compatibilityInput)
     }
   }
-
   const handleSaveRepuesto = () => {
     // Validación básica
     if (!newRepuesto.name || !newRepuesto.sku || !newRepuesto.category) {
       alert('Por favor completa los campos obligatorios: Nombre, SKU y Categoría.')
       return
     }
-
     // Aquí iría la llamada a la API para guardar el repuesto
     console.log('Nuevo repuesto:', newRepuesto)
     alert('Repuesto guardado correctamente (simulado).')
-
     // Cerrar modal y resetear formulario
     setIsModalOpen(false)
     setNewRepuesto({
@@ -215,7 +198,6 @@ export default function Repuestos() {
     })
     setCompatibilityInput('')
   }
-
   // Framer Motion variants
   const kpiContainerVariants = {
     hidden: { opacity: 0 },
@@ -227,7 +209,6 @@ export default function Repuestos() {
       },
     },
   }
-
   const kpiCardVariants = {
     hidden: { opacity: 0, y: 20, scale: 0.95 },
     visible: {
@@ -243,7 +224,6 @@ export default function Repuestos() {
       transition: { type: 'spring', stiffness: 400, damping: 15 },
     },
   }
-
   const rowVariants = {
     hidden: { opacity: 0, y: 10 },
     visible: (i: number) => ({
@@ -253,7 +233,6 @@ export default function Repuestos() {
     }),
     exit: { opacity: 0, scale: 0.95, transition: { duration: 0.15 } },
   }
-
   return (
     <>
       <motion.div
@@ -278,7 +257,6 @@ export default function Repuestos() {
             </Button>
           </div>
         </div>
-
         {/* KPI Cards */}
         <motion.div
           variants={kpiContainerVariants}
@@ -333,7 +311,6 @@ export default function Repuestos() {
             )
           })}
         </motion.div>
-
         {/* Filtros y búsqueda */}
         <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
           <div className="relative flex-1 min-w-[200px] max-w-md">
@@ -345,7 +322,6 @@ export default function Repuestos() {
               className="pl-10 h-10 bg-background"
             />
           </div>
-
           <div className="flex flex-wrap items-center gap-2">
             {/* Categorías */}
             <div className="flex items-center gap-1.5 bg-muted/30 rounded-lg p-1">
@@ -372,7 +348,6 @@ export default function Repuestos() {
                 </Badge>
               ))}
             </div>
-
             {/* Estado */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -397,7 +372,6 @@ export default function Repuestos() {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-
             {/* Limpiar filtros */}
             {(activeCategory !== 'all' || activeStatus !== 'all' || searchTerm) && (
               <Button
@@ -416,7 +390,6 @@ export default function Repuestos() {
             )}
           </div>
         </div>
-
         {/* Estado vacío */}
         {loading ? (
           <div className="space-y-3">
@@ -483,7 +456,6 @@ export default function Repuestos() {
                       const status = getStatusBadge(item.status, item.quantity)
                       const categoryColor =
                         categoryColorMap[item.category] || 'bg-muted text-muted-foreground'
-
                       return (
                         <motion.tr
                           key={item.id}
@@ -574,7 +546,6 @@ export default function Repuestos() {
                 </tbody>
               </table>
             </div>
-
             <div className="flex items-center justify-between px-4 py-3 bg-muted/10 border-t border-border text-xs text-muted-foreground">
               <span>
                 Mostrando <strong className="text-foreground">{filteredItems.length}</strong> de{' '}
@@ -585,7 +556,6 @@ export default function Repuestos() {
           </motion.div>
         )}
       </motion.div>
-
       {/* 🪟 MODAL PARA AGREGAR REPUESTO */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
@@ -595,7 +565,6 @@ export default function Repuestos() {
               Agregar nuevo repuesto
             </DialogTitle>
           </DialogHeader>
-
           <div className="space-y-4 py-4">
             {/* Nombre */}
             <div className="space-y-2">
@@ -609,7 +578,6 @@ export default function Repuestos() {
                 placeholder="Ej. Pantalla OLED iPhone 14 Pro"
               />
             </div>
-
             {/* SKU */}
             <div className="space-y-2">
               <Label htmlFor="sku" className="text-sm font-semibold">
@@ -622,7 +590,6 @@ export default function Repuestos() {
                 placeholder="Ej. SCR-IP14P-001"
               />
             </div>
-
             {/* Categoría */}
             <div className="space-y-2">
               <Label htmlFor="category" className="text-sm font-semibold">
@@ -642,7 +609,6 @@ export default function Repuestos() {
                 ))}
               </select>
             </div>
-
             {/* Cantidad y Precio */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -675,7 +641,6 @@ export default function Repuestos() {
                 </div>
               </div>
             </div>
-
             {/* Descripción - usando textarea nativo para evitar errores de importación */}
             <div className="space-y-2">
               <Label htmlFor="description" className="text-sm font-semibold">
@@ -692,7 +657,6 @@ export default function Repuestos() {
                 className="w-full rounded-lg border border-input bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
               />
             </div>
-
             {/* Compatibilidad */}
             <div className="space-y-2">
               <Label className="text-sm font-semibold">Compatibilidad</Label>
@@ -741,7 +705,6 @@ export default function Repuestos() {
               </div>
             </div>
           </div>
-
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsModalOpen(false)}>
               Cancelar

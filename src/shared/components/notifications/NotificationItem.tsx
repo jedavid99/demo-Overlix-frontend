@@ -1,5 +1,3 @@
-"use client"
-
 import React from 'react'
 import { motion } from 'framer-motion'
 import { X } from 'lucide-react'
@@ -7,13 +5,11 @@ import { Button } from '../../ui/button'
 import { Avatar, AvatarFallback } from '../../ui/avatar'
 import { Card } from '../../ui/card'
 import { Notification } from './notification.types'
-
 interface NotificationItemProps {
   notification: Notification
   onRead: (id: number) => void
   onDelete: (id: number) => void
 }
-
 export const NotificationItem: React.FC<NotificationItemProps> = ({
   notification,
   onRead,
@@ -27,12 +23,10 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
       window.location.href = notification.link
     }
   }
-
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation()
     onDelete(notification.id)
   }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: -10 }}
@@ -54,7 +48,6 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
               <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
             </div>
           )}
-
           <div className="flex items-start gap-3">
             {/* Avatar con icono */}
             <Avatar className={`h-10 w-10 shrink-0 ${notification.color}`}>
@@ -62,7 +55,6 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
                 <span className="text-lg">{notification.icon}</span>
               </AvatarFallback>
             </Avatar>
-
             {/* Contenido */}
             <div className="flex-1 min-w-0 pr-6">
               <h4 className={`text-sm font-semibold mb-1 ${notification.read ? 'text-muted-foreground' : 'text-foreground'}`}>
@@ -77,7 +69,6 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
                 {notification.time}
               </p>
             </div>
-
             {/* Botón eliminar */}
             <button
               onClick={handleDelete}
@@ -92,5 +83,4 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
     </motion.div>
   )
 }
-
 export default NotificationItem

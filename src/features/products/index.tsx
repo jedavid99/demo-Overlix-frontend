@@ -34,7 +34,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu'
-
 // Types
 interface StockItem {
   id: number
@@ -48,21 +47,17 @@ interface StockItem {
   icon: React.ElementType
   color: string
 }
-
 // 📦 Datos de muestra ELIMINADOS – array vacío (conectar con API)
 const stockItems: StockItem[] = []
-
 // Categorías y estados para filtros
 const categories = ['all', 'phone', 'pc', 'console']
 const statusOptions = ['all', 'good', 'low', 'out']
-
 export default function Stock() {
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
   const [activeCategory, setActiveCategory] = useState('all')
   const [activeStatus, setActiveStatus] = useState('all')
   const [loading, setLoading] = useState(false)
-
   // Filtrar productos
   const filteredItems = useMemo(() => {
     return stockItems.filter((item) => {
@@ -79,27 +74,23 @@ export default function Stock() {
       return matchesSearch && matchesCategory && matchesStatus
     })
   }, [searchTerm, activeCategory, activeStatus])
-
   // KPIs (todos en 0 o valores genéricos)
   const totalItems = stockItems.length
   const totalCategories = new Set(stockItems.map((i) => i.category)).size
   const lowStockItems = stockItems.filter((i) => i.quantity < 5 && i.quantity > 0).length
   const totalValue = stockItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
-
   // Helper para badge de estado
   const getStatusBadge = (status: string, quantity: number) => {
     if (quantity === 0) return { variant: 'destructive' as const, label: 'Agotado' }
     if (quantity < 5) return { variant: 'warning' as const, label: 'Bajo stock' }
     return { variant: 'success' as const, label: 'En stock' }
   }
-
   // Mapeo de colores por categoría
   const categoryColorMap: Record<string, string> = {
     Phone: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
     PC: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300',
     Console: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300',
   }
-
   const kpiData = [
     {
       label: 'Productos totales',
@@ -134,7 +125,6 @@ export default function Stock() {
       color: 'text-emerald-600',
     },
   ]
-
   // 🔥 Variantes para el contenedor de KPIs (stagger)
   const kpiContainerVariants = {
     hidden: { opacity: 0 },
@@ -146,7 +136,6 @@ export default function Stock() {
       },
     },
   }
-
   const kpiCardVariants = {
     hidden: { opacity: 0, y: 20, scale: 0.95 },
     visible: {
@@ -162,7 +151,6 @@ export default function Stock() {
       transition: { type: 'spring', stiffness: 400, damping: 15 },
     },
   }
-
   // Variantes para filas de tabla
   const rowVariants = {
     hidden: { opacity: 0, y: 10 },
@@ -173,7 +161,6 @@ export default function Stock() {
     }),
     exit: { opacity: 0, scale: 0.95, transition: { duration: 0.15 } },
   }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -200,7 +187,6 @@ export default function Stock() {
           </Button>
         </div>
       </div>
-
       {/* KPI Cards con animación mejorada */}
       <motion.div
         variants={kpiContainerVariants}
@@ -255,7 +241,6 @@ export default function Stock() {
           )
         })}
       </motion.div>
-
       {/* Filtros y búsqueda */}
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
         <div className="relative flex-1 min-w-[200px] max-w-md">
@@ -267,7 +252,6 @@ export default function Stock() {
             className="pl-10 h-10 bg-background"
           />
         </div>
-
         <div className="flex flex-wrap items-center gap-2">
           {/* Categorías */}
           <div className="flex items-center gap-1.5 bg-muted/30 rounded-lg p-1">
@@ -292,7 +276,6 @@ export default function Stock() {
               </Badge>
             ))}
           </div>
-
           {/* Estado */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -317,7 +300,6 @@ export default function Stock() {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-
           {/* Limpiar filtros */}
           {(activeCategory !== 'all' || activeStatus !== 'all' || searchTerm) && (
             <Button
@@ -336,7 +318,6 @@ export default function Stock() {
           )}
         </div>
       </div>
-
       {/* Tabla / Lista de productos */}
       {loading ? (
         <div className="space-y-3">
@@ -403,7 +384,6 @@ export default function Stock() {
                     const status = getStatusBadge(item.status, item.quantity)
                     const categoryColor =
                       categoryColorMap[item.category] || 'bg-muted text-muted-foreground'
-
                     return (
                       <motion.tr
                         key={item.id}
@@ -477,7 +457,6 @@ export default function Stock() {
               </tbody>
             </table>
           </div>
-
           {/* Footer de la tabla */}
           <div className="flex items-center justify-between px-4 py-3 bg-muted/10 border-t border-border text-xs text-muted-foreground">
             <span>

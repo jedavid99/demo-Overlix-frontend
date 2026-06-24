@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
@@ -12,7 +10,6 @@ import { Badge } from '../../components/ui/badge'
 import { Skeleton } from '../../components/ui/skeleton'
 import { Input } from '../../components/ui/input'
 import { exportToCSV } from '../../lib/export'
-
 // Tipos
 interface Order {
   id: string
@@ -24,20 +21,16 @@ interface Order {
   status: 'Pendiente' | 'Enviada' | 'Recibida' | 'Cancelada'
   notes?: string
 }
-
 // Datos mock eliminados - conectar con API real
-
 const statusColors = {
   'Pendiente': 'bg-warning/10 text-warning border-warning/20',
   'Enviada': 'bg-primary/10 text-primary border-primary/20',
   'Recibida': 'bg-success/10 text-success border-success/20',
   'Cancelada': 'bg-destructive/10 text-destructive border-destructive/20',
 }
-
 const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value)
 }
-
 const OrdersList = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
@@ -47,12 +40,10 @@ const OrdersList = () => {
   const [selectedStatus, setSelectedStatus] = useState('Todas')
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
-
   useEffect(() => {
     // Conectar con API real: api.get('/orders')
     setLoading(false)
   }, [])
-
   // Filtrar órdenes
   const filteredOrders = orders.filter(order => {
     const matchesSearch = searchQuery === '' || 
@@ -61,14 +52,12 @@ const OrdersList = () => {
     const matchesStatus = selectedStatus === 'Todas' || order.status === selectedStatus
     return matchesSearch && matchesStatus
   })
-
   // Paginación
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage)
   const paginatedOrders = filteredOrders.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   )
-
   // KPIs
   const pendingOrders = orders.filter(o => o.status === 'Pendiente').length
   const thisMonthTotal = orders
@@ -82,7 +71,6 @@ const OrdersList = () => {
     .filter(o => o.status === 'Enviada' || o.status === 'Pendiente')
     .sort((a, b) => a.deliveryDate.getTime() - b.deliveryDate.getTime())[0]
   const activeProviders = new Set(orders.map(o => o.provider)).size
-
   // Exportar CSV
   const handleExport = () => {
     const exportData = filteredOrders.map(order => ({
@@ -95,7 +83,6 @@ const OrdersList = () => {
     }))
     exportToCSV(exportData, 'ordenes-compra')
   }
-
   if (error) {
     return (
       <motion.div
@@ -115,7 +102,6 @@ const OrdersList = () => {
       </motion.div>
     )
   }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -134,7 +120,6 @@ const OrdersList = () => {
           Nueva orden
         </Button>
       </div>
-
       {/* Filtros */}
       <Card>
         <CardContent className="p-4">
@@ -167,7 +152,6 @@ const OrdersList = () => {
           </div>
         </CardContent>
       </Card>
-
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="hover:shadow-md transition-shadow cursor-pointer">
@@ -209,7 +193,6 @@ const OrdersList = () => {
           </CardContent>
         </Card>
       </div>
-
       {/* Tabla de órdenes */}
       <Card>
         <CardContent className="p-0">
@@ -284,7 +267,6 @@ const OrdersList = () => {
               </tbody>
             </table>
           </div>
-
           {/* Paginación */}
           {!loading && filteredOrders.length > 0 && (
             <div className="flex items-center justify-between p-4 border-t">
@@ -316,5 +298,4 @@ const OrdersList = () => {
     </motion.div>
   )
 }
-
 export default OrdersList

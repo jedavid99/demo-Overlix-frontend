@@ -20,9 +20,7 @@ import { Card, CardContent } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
 import DataTable from '@/shared/components/data-table';
-
 // Datos mock eliminados - conectar con API real
-
 const getStatusBadge = (status: string) => {
   switch (status) {
     case 'waiting': return { variant: 'warning' as const, label: 'Esperando' };
@@ -32,13 +30,11 @@ const getStatusBadge = (status: string) => {
     default: return { variant: 'outline' as const, label: status };
   }
 };
-
 const deviceIcons = {
   phone: <Smartphone className="text-primary" size={20} />,
   laptop: <Laptop className="text-primary" size={20} />,
   gaming: <Gamepad2 className="text-primary" size={20} />,
 };
-
 export default function RepairsList() {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
@@ -47,14 +43,12 @@ export default function RepairsList() {
   
   // Conectar con API real: api.get('/repairs')
   const [repairs, setRepairs] = useState<any[]>([]);
-
   const filteredRepairs = repairs.filter(repair => {
     const matchesStatus = filterStatus === 'all' || repair.status === filterStatus;
     const matchesSearch = repair.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          repair.email.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesStatus && matchesSearch;
   });
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -67,7 +61,6 @@ export default function RepairsList() {
           Nueva reparación
         </Button>
       </div>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
@@ -84,7 +77,6 @@ export default function RepairsList() {
             </div>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-start justify-between mb-4">
@@ -99,7 +91,6 @@ export default function RepairsList() {
             </div>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-start justify-between mb-4">
@@ -114,7 +105,6 @@ export default function RepairsList() {
             </div>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-start justify-between mb-4">
@@ -131,7 +121,6 @@ export default function RepairsList() {
           </CardContent>
         </Card>
       </div>
-
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-6">
@@ -158,7 +147,6 @@ export default function RepairsList() {
           </div>
         </CardContent>
       </Card>
-
       <DataTable
         data={filteredRepairs}
         currentPage={currentPage}
@@ -170,5 +158,3 @@ export default function RepairsList() {
     </div>
   );
 }
-
-

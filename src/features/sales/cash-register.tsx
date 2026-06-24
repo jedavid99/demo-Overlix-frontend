@@ -8,7 +8,6 @@ import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
 import { Badge } from '@/shared/components/ui/badge'
-
 export default function CajaDiaria() {
   const navigate = useNavigate()
   const [cash, setCash] = useState({
@@ -21,10 +20,8 @@ export default function CajaDiaria() {
     other: '',
     notes: '',
   })
-
   const expectedBalance = 1695.50
   const transactions = 42
-
   const calculateActualTotal = () => {
     const b100 = (parseFloat(cash.bills100) || 0) * 100
     const b50 = (parseFloat(cash.bills50) || 0) * 50
@@ -35,20 +32,16 @@ export default function CajaDiaria() {
     const other = parseFloat(cash.other) || 0
     return (b100 + b50 + b20 + b10 + b5 + b1 + other).toFixed(2)
   }
-
   const actualTotal = parseFloat(calculateActualTotal())
   const discrepancy = (actualTotal - expectedBalance).toFixed(2)
   const hasDiscrepancy = discrepancy !== '0.00'
-
   const handleChange = (field: string, value: string) => {
     setCash(prev => ({ ...prev, [field]: value }))
   }
-
   const handleFinalize = () => {
     // TODO: persist closing data
     alert(`Cash closing finalized. Discrepancy: $${discrepancy}`)
   }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -66,7 +59,6 @@ export default function CajaDiaria() {
           Exportar resumen
         </Button>
       </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-5 space-y-6">
           <Card>
@@ -99,7 +91,6 @@ export default function CajaDiaria() {
               </div>
             </CardContent>
           </Card>
-
           <Card className="bg-primary/5 border-primary/20">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
@@ -114,7 +105,6 @@ export default function CajaDiaria() {
             </CardContent>
           </Card>
         </div>
-
         <div className="lg:col-span-7">
           <Card>
             <CardHeader>
@@ -169,7 +159,6 @@ export default function CajaDiaria() {
                     </div>
                   </div>
                 </div>
-
                 <div className="space-y-3">
                   <Label>Monedas y billetes pequeños</Label>
                   <div className="space-y-2">
@@ -210,7 +199,6 @@ export default function CajaDiaria() {
                   </div>
                 </div>
               </div>
-
               <div className="space-y-2 pt-6 border-t border-border">
                 <Label>Notas de cierre</Label>
                 <textarea
@@ -225,7 +213,6 @@ export default function CajaDiaria() {
           </Card>
         </div>
       </div>
-
       <Card className="p-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-6">
@@ -266,5 +253,3 @@ export default function CajaDiaria() {
     </motion.div>
   )
 }
-
-

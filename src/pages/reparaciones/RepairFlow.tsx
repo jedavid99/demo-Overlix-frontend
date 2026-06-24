@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import RepairAdd from './Add';
 import RepairTechnical from './Technical';
 import RepairFinalize from './Finalize';
-
 export interface RepairData {
   // Step 1 data
   selectedClient: { id: string; name: string; phone: string; email: string } | null;
@@ -29,7 +28,6 @@ export interface RepairData {
   signaturePad: string;
   printOption: string;
 }
-
 export default function RepairFlow() {
   const [currentStep, setCurrentStep] = useState(1);
   
@@ -70,31 +68,26 @@ export default function RepairFlow() {
     signaturePad: '',
     printOption: 'both',
   });
-
   const updateData = (updates: Partial<RepairData>) => {
     setData(prev => ({ ...prev, ...updates }));
   };
-
   const handleNext = () => {
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
       window.scrollTo(0, 0);
     }
   };
-
   const handleBack = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
       window.scrollTo(0, 0);
     }
   };
-
   const handleComplete = () => {
     // Handle final submission
     
     alert('Reparación completada e impresa!');
   };
-
   return (
     <div>
       {currentStep === 1 && (
@@ -128,7 +121,3 @@ export default function RepairFlow() {
     </div>
   );
 }
-
-
-
-

@@ -16,7 +16,6 @@ import {
 } from 'lucide-react';
 import { MdPhoneAndroid } from 'react-icons/md';
 import { Link } from 'react-router-dom';
-
 interface iPhone {
   id: string;
   model: string;
@@ -28,16 +27,13 @@ interface iPhone {
   status: 'Available' | 'Reserved' | 'Sold' | 'Out of Stock';
   image: React.ReactNode;
 }
-
 export default function IPhoneInventoryList() {
   const [searchQuery, setSearchQuery] = useState('');
   const [seriesFilter, setSeriesFilter] = useState('All');
   const [conditionFilter, setConditionFilter] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
-
   // 📦 Lista de iPhone – vacía (cargar desde API)
   const iphones: iPhone[] = [];
-
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Available':
@@ -52,14 +48,12 @@ export default function IPhoneInventoryList() {
         return { bg: 'bg-slate-100 dark:bg-slate-800', text: 'text-slate-600 dark:text-slate-400', dot: 'bg-slate-500' };
     }
   };
-
   const getBatteryColor = (battery: number) => {
     if (battery >= 80) return 'bg-emerald-500';
     if (battery >= 50) return 'bg-amber-500';
     if (battery >= 20) return 'bg-orange-500';
     return 'bg-red-500';
   };
-
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col">
       <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-8">
@@ -82,7 +76,6 @@ export default function IPhoneInventoryList() {
             </Link>
           </div>
         </div>
-
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
@@ -97,7 +90,6 @@ export default function IPhoneInventoryList() {
             <h3 className="text-slate-500 text-sm font-medium">Total de unidades iPhone</h3>
             <p className="text-4xl font-bold text-slate-900 dark:text-white mt-2">0</p>
           </div>
-
           <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center text-blue-600">
@@ -108,7 +100,6 @@ export default function IPhoneInventoryList() {
             <h3 className="text-slate-500 text-sm font-medium">Valor de mercado</h3>
             <p className="text-4xl font-bold text-slate-900 dark:text-white mt-2">$0.00</p>
           </div>
-
           <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center text-red-600">
@@ -120,7 +111,6 @@ export default function IPhoneInventoryList() {
             <p className="text-4xl font-bold text-slate-900 dark:text-white mt-2">0</p>
           </div>
         </div>
-
         {/* Table */}
         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
           {/* Table Header */}
@@ -166,7 +156,6 @@ export default function IPhoneInventoryList() {
               </button>
             </div>
           </div>
-
           {/* Table */}
           <div className="overflow-x-auto">
             <table className="w-full text-left">
@@ -264,7 +253,6 @@ export default function IPhoneInventoryList() {
               </tbody>
             </table>
           </div>
-
           {/* Pagination */}
           <div className="p-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
             <p className="text-xs text-slate-500 font-medium">Mostrando 0 de 0 entradas</p>
@@ -279,7 +267,6 @@ export default function IPhoneInventoryList() {
             </div>
           </div>
         </div>
-
         {/* Bottom Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 mb-12">
           {/* Stock Distribution */}
@@ -295,7 +282,6 @@ export default function IPhoneInventoryList() {
               </div>
             </div>
           </div>
-
           {/* Recent Activity */}
           <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
             <h3 className="font-bold text-lg text-slate-900 dark:text-white mb-6">Actividad reciente</h3>

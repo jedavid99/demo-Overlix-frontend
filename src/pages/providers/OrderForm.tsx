@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -12,8 +10,6 @@ import { Input } from '../../components/ui/input'
 import { Badge } from '../../components/ui/badge'
 import { Label } from '../../components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-
-
 // Tipos
 interface OrderItem {
   id: string
@@ -23,34 +19,27 @@ interface OrderItem {
   unitPrice: number
   subtotal: number
 }
-
 interface Provider {
   id: string
   name: string
   phone: string
 }
-
 interface Product {
   id: string
   name: string
   suggestedPrice: number
 }
-
 // Datos mock eliminados - conectar con API real
-
 const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value)
 }
-
 const OrderForm = () => {
   const navigate = useNavigate()
   const { id } = useParams()
   const isEditing = !!id
-
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
-
   const [orderNumber, setOrderNumber] = useState(`#OC-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`)
   const [providerId, setProviderId] = useState('')
   const [issueDate, setIssueDate] = useState(format(new Date(), 'yyyy-MM-dd'))
@@ -58,7 +47,6 @@ const OrderForm = () => {
   const [status, setStatus] = useState('Pendiente')
   const [notes, setNotes] = useState('')
   const [items, setItems] = useState<OrderItem[]>([])
-
   useEffect(() => {
     if (isEditing) {
       setLoading(true)
@@ -81,7 +69,6 @@ const OrderForm = () => {
       addItem()
     }
   }, [isEditing])
-
   const addItem = () => {
     const newItem: OrderItem = {
       id: Date.now().toString(),
@@ -93,13 +80,11 @@ const OrderForm = () => {
     }
     setItems([...items, newItem])
   }
-
   const removeItem = (itemId: string) => {
     if (items.length > 1) {
       setItems(items.filter(item => item.id !== itemId))
     }
   }
-
   const updateItem = (itemId: string, field: keyof OrderItem, value: string | number) => {
     const updatedItems = items.map(item => {
       if (item.id === itemId) {
@@ -118,14 +103,11 @@ const OrderForm = () => {
     })
     setItems(updatedItems)
   }
-
   const subtotal = items.reduce((sum, item) => sum + item.subtotal, 0)
   const iva = subtotal * 0.21
   const total = subtotal + iva
-
   const validate = () => {
     const newErrors: Record<string, string> = {}
-
     if (!providerId) newErrors.providerId = 'El proveedor es requerido'
     if (!deliveryDate) newErrors.deliveryDate = 'La fecha de entrega es requerida'
     
@@ -138,25 +120,19 @@ const OrderForm = () => {
         if (item.unitPrice <= 0) newErrors[`item-${index}-price`] = 'El precio debe ser mayor a 0'
       })
     }
-
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
     if (!validate()) return
-
     setSaving(true)
-
     // Simular guardado
     setTimeout(() => {
       setSaving(false)
       navigate('/providers/orders')
     }, 1000)
   }
-
   if (loading) {
     return (
       <div className="space-y-6">
@@ -174,7 +150,6 @@ const OrderForm = () => {
       </div>
     )
   }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -192,7 +167,6 @@ const OrderForm = () => {
           <p className="text-muted-foreground">{isEditing ? 'Modificá los datos de la orden' : 'Completá los datos para crear una nueva orden'}</p>
         </div>
       </div>
-
       <form onSubmit={handleSubmit}>
         <Card>
           <CardHeader>
@@ -268,7 +242,6 @@ const OrderForm = () => {
             </div>
           </CardContent>
         </Card>
-
         <Card>
           <CardHeader>
             <CardTitle>Productos</CardTitle>
@@ -354,7 +327,6 @@ const OrderForm = () => {
             {errors.items && <p className="text-sm text-destructive">{errors.items}</p>}
           </CardContent>
         </Card>
-
         <Card>
           <CardHeader>
             <CardTitle>Resumen</CardTitle>
@@ -374,7 +346,6 @@ const OrderForm = () => {
             </div>
           </CardContent>
         </Card>
-
         <div className="flex gap-4 justify-end">
           <Button
             type="button"
@@ -402,5 +373,4 @@ const OrderForm = () => {
     </motion.div>
   )
 }
-
 export default OrderForm

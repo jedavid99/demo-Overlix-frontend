@@ -16,9 +16,7 @@ import {
   ShieldCheck,
   ArrowLeft,
 } from 'lucide-react';
-
 import type { RepairData } from './RepairFlow';
-
 interface RepairFinalizeProps {
   data?: RepairData;
   updateData?: (updates: Partial<RepairData>) => void;
@@ -26,7 +24,6 @@ interface RepairFinalizeProps {
   onComplete?: () => void;
   currentStep?: number;
 }
-
 export default function RepairFinalize({ data, updateData, onBack = () => {}, onComplete = () => {}, currentStep = 3 }: RepairFinalizeProps) {
   const defaultData: RepairData = {
     selectedClient: null,
@@ -56,7 +53,6 @@ export default function RepairFinalize({ data, updateData, onBack = () => {}, on
     signaturePad: '',
     printOption: 'both',
   };
-
   const [localData, setLocalData] = React.useState<RepairData>(defaultData);
   const [paymentMethod, setPaymentMethod] = React.useState('card');
   const [withWarranty, setWithWarranty] = React.useState(true);
@@ -65,13 +61,11 @@ export default function RepairFinalize({ data, updateData, onBack = () => {}, on
     if (updateData) updateData(updates);
     else setLocalData(prev => ({ ...prev, ...updates }));
   };
-
   const laborCost = 85.00;
   const partsCost = 210.00;
   const depositPaid = 150.00;
   const subtotal = laborCost + partsCost;
   const finalBalance = subtotal - depositPaid;
-
   return (
     <div className="min-h-screen bg-slate-50">
       <main className="max-w-[1200px] mx-auto p-6 md:p-8">
@@ -94,7 +88,6 @@ export default function RepairFinalize({ data, updateData, onBack = () => {}, on
               <span>Previsualización</span>
             </button>
           </div>
-
           {/* Status Banner */}
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 flex items-center justify-between mb-8">
             <div className="flex items-center gap-6">
@@ -112,7 +105,6 @@ export default function RepairFinalize({ data, updateData, onBack = () => {}, on
             </div>
           </div>
         </div>
-
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Side: Repair Summary (2/3) */}
@@ -126,7 +118,6 @@ export default function RepairFinalize({ data, updateData, onBack = () => {}, on
                 </h2>
                 <span className="text-slate-500 font-mono bg-slate-50 px-3 py-1 rounded border border-slate-200 text-sm">#REP-001</span>
               </div>
-
               {/* Device & Customer Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 {/* Device */}
@@ -140,7 +131,6 @@ export default function RepairFinalize({ data, updateData, onBack = () => {}, on
                     <p className="text-xs text-slate-600">SN: {state.serial || 'N/A'}</p>
                   </div>
                 </div>
-
                 {/* Customer */}
                 <div className="flex gap-4">
                   <div className="size-14 rounded-xl bg-slate-100 flex items-center justify-center text-blue-600 shrink-0">
@@ -153,7 +143,6 @@ export default function RepairFinalize({ data, updateData, onBack = () => {}, on
                   </div>
                 </div>
               </div>
-
               {/* Services & Notes */}
               <div className="space-y-6">
                 <div>
@@ -175,7 +164,6 @@ export default function RepairFinalize({ data, updateData, onBack = () => {}, on
                 )}
               </div>
             </div>
-
             {/* Terms & Signature */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Terms */}
@@ -206,7 +194,6 @@ export default function RepairFinalize({ data, updateData, onBack = () => {}, on
                   </span>
                 </label>
               </div>
-
               {/* Signature */}
               <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
                 <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
@@ -229,7 +216,6 @@ export default function RepairFinalize({ data, updateData, onBack = () => {}, on
               </div>
             </div>
           </div>
-
           {/* Right Side: Financial Settlement (1/3) */}
           <div className="lg:col-span-1">
             <div className="sticky top-8 space-y-6">
@@ -239,7 +225,6 @@ export default function RepairFinalize({ data, updateData, onBack = () => {}, on
                   <h2 className="text-lg font-bold">Liquidación Financiera</h2>
                   <p className="text-slate-400 text-xs mt-1">Finaliza el pago antes de la entrega</p>
                 </div>
-
                 <div className="p-6 space-y-6">
                   {/* Price Breakdown */}
                   <div className="space-y-3">
@@ -259,7 +244,6 @@ export default function RepairFinalize({ data, updateData, onBack = () => {}, on
                       <DollarSign className="text-blue-600 text-3xl" />
                     </div>
                   </div>
-
                   {/* Payment Method */}
                   <div className="space-y-3 border-t border-slate-100 pt-6">
                     <p className="text-xs font-bold text-slate-900 uppercase tracking-wide">Método de Pago</p>
@@ -299,7 +283,6 @@ export default function RepairFinalize({ data, updateData, onBack = () => {}, on
                       </button>
                     </div>
                   </div>
-
                   {/* Warranty Toggle */}
                   <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-100">
                     <div className="flex items-center gap-3">
@@ -319,7 +302,6 @@ export default function RepairFinalize({ data, updateData, onBack = () => {}, on
                       <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                     </label>
                   </div>
-
                   {/* Action Buttons */}
                   <div className="space-y-3 pt-4 border-t border-slate-100">
                     <button
@@ -334,11 +316,9 @@ export default function RepairFinalize({ data, updateData, onBack = () => {}, on
                       <CheckCircle2 size={20} />
                       Completar Entrega
                     </button>
-
                     <button className="w-full bg-slate-50 border border-slate-200 text-slate-600 font-bold py-3 px-6 rounded-lg hover:bg-slate-100 transition-all">
                       Guardar como Borrador
                     </button>
-
                     <p className="text-center text-xs text-slate-500 italic">
                       Al completar, se enviará confirmación por SMS y Email al cliente.
                     </p>
@@ -352,5 +332,3 @@ export default function RepairFinalize({ data, updateData, onBack = () => {}, on
     </div>
   );
 }
-
-

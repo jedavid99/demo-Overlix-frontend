@@ -1,7 +1,6 @@
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { HelpCircle } from 'lucide-react'
-
 export default function Help() {
   return (
     <div className="p-6">
@@ -20,4 +19,3 @@ export default function Help() {
     </div>
   )
 }
-

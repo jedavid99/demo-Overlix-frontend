@@ -5,12 +5,10 @@ import { Card, CardContent } from '@/shared/components/ui/card'
 import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
 import DataTable from '@/shared/components/data-table'
-
 export default function IphoneCanje() {
   const navigate = useNavigate()
   
   // Datos mock eliminados - conectar con API real
-
   return (
    <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -29,7 +27,6 @@ export default function IphoneCanje() {
           </Button>
         </div>
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
@@ -46,7 +43,6 @@ export default function IphoneCanje() {
             </div>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-start justify-between mb-4">
@@ -62,7 +58,6 @@ export default function IphoneCanje() {
             </div>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-start justify-between mb-4">
@@ -79,7 +74,6 @@ export default function IphoneCanje() {
           </CardContent>
         </Card>
       </div>
-
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-6">
@@ -126,7 +120,6 @@ export default function IphoneCanje() {
           </div>
         </CardContent>
       </Card>
-
       <DataTable
         // Conectar con API real: api.get('/iphone/canje')
         data={[]}
@@ -139,5 +132,3 @@ export default function IphoneCanje() {
     </div>
   )
 }
-
-

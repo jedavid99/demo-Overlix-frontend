@@ -16,7 +16,6 @@ import { Badge } from '@/shared/components/ui/badge'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import ServiceOrderPreview from '@/features/settings/ServiceOrderPreview'
-
 // ============================================================================
 // Tipos e interfaces (completos para el preview, pero solo algunas editables)
 // ============================================================================
@@ -66,7 +65,6 @@ interface ServiceOrderData {
   showWatermark: boolean
   watermarkUrl: string
 }
-
 // ============================================================================
 // Valores por defecto (con datos de ejemplo para la vista previa)
 // ============================================================================
@@ -122,7 +120,6 @@ const defaultData: ServiceOrderData = {
   showWatermark: false,
   watermarkUrl: '',
 }
-
 // ============================================================================
 // Componente principal
 // ============================================================================
@@ -130,19 +127,15 @@ export default function PDFConfig() {
   const [data, setData] = useState<ServiceOrderData>(defaultData)
   const [isGenerating, setIsGenerating] = useState(false)
   const previewRef = useRef<HTMLDivElement>(null)
-
   const handleChange = <K extends keyof ServiceOrderData>(key: K, value: ServiceOrderData[K]) => {
     setData((prev) => ({ ...prev, [key]: value }))
   }
-
   // ============================================================================
   // Generación de PDF con html2canvas + jsPDF
   // ============================================================================
   const generatePDF = async () => {
     if (!previewRef.current) return
-
     setIsGenerating(true)
-
     try {
       const canvas = await html2canvas(previewRef.current, {
         scale: 2,
@@ -151,17 +144,14 @@ export default function PDFConfig() {
         backgroundColor: '#ffffff',
         logging: false,
       })
-
       const imgData = canvas.toDataURL('image/png')
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'px',
         format: 'a4',
       })
-
       const pdfWidth = pdf.internal.pageSize.getWidth()
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width
-
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
       pdf.save('orden-servicio.pdf')
     } catch (error) {
@@ -171,7 +161,6 @@ export default function PDFConfig() {
       setIsGenerating(false)
     }
   }
-
   // ============================================================================
   // Panel de configuración (solo Empresa, Garantía y Marca de agua)
   // ============================================================================
@@ -219,7 +208,6 @@ export default function PDFConfig() {
           </div>
         </CardContent>
       </Card>
-
       {/* ========== GARANTÍA ========== */}
       <Card>
         <CardContent className="p-4 space-y-3">
@@ -240,7 +228,6 @@ export default function PDFConfig() {
           />
         </CardContent>
       </Card>
-
       {/* ========== MARCA DE AGUA ========== */}
       <Card>
         <CardContent className="p-4 space-y-3">
@@ -270,7 +257,6 @@ export default function PDFConfig() {
           </div>
         </CardContent>
       </Card>
-
       {/* Botones de acción */}
       <div className="flex flex-col gap-3">
         <Button
@@ -296,7 +282,6 @@ export default function PDFConfig() {
       </div>
     </div>
   )
-
   // ============================================================================
   // Renderizado principal
   // ============================================================================
@@ -316,7 +301,6 @@ export default function PDFConfig() {
           {isGenerating ? 'Generando...' : 'Descargar PDF'}
         </Button>
       </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Panel de configuración (solo 3 secciones) */}
         <div className="lg:col-span-1">
@@ -324,7 +308,6 @@ export default function PDFConfig() {
             {renderConfigPanel()}
           </div>
         </div>
-
         {/* Vista previa */}
         <div className="lg:col-span-2">
           <Card>

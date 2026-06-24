@@ -17,7 +17,6 @@ import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
 import { Badge } from '@/shared/components/ui/badge'
-
 interface InsuranceFormData {
   imei: string
   serialNumber: string
@@ -32,7 +31,6 @@ interface InsuranceFormData {
   coverageAmount: string
   notes: string
 }
-
 export default function IPhoneInsurance() {
   const navigate = useNavigate()
   const [formData, setFormData] = useState<InsuranceFormData>({
@@ -49,17 +47,14 @@ export default function IPhoneInsurance() {
     coverageAmount: '',
     notes: '',
   })
-
   const [isSaving, setIsSaving] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
-
   const handleInputChange = (field: keyof InsuranceFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: '' }))
     }
   }
-
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {}
     if (!formData.imei || formData.imei.length < 14) {
@@ -89,7 +84,6 @@ export default function IPhoneInsurance() {
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
-
   const handleSubmit = () => {
     if (!validate()) return
     setIsSaving(true)
@@ -99,7 +93,6 @@ export default function IPhoneInsurance() {
       navigate('/products/inventory')
     }, 1500)
   }
-
   const models = ['iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15 Plus', 'iPhone 15', 'iPhone 14 Pro Max', 'iPhone 14 Pro', 'iPhone 14 Plus', 'iPhone 14']
   const providers = ['AppleCare+', 'Asurion', 'SquareTrade', 'Seguros Atlas', 'Seguros Sura', 'Otro']
   const coverageTypes = [
@@ -108,7 +101,6 @@ export default function IPhoneInsurance() {
     { value: 'full', label: 'Completo', description: 'Daños y robo' },
     { value: 'custom', label: 'Personalizado', description: 'Cobertura a medida' },
   ]
-
   const calculateDuration = () => {
     if (!formData.startDate || !formData.endDate) return '—'
     const start = new Date(formData.startDate)
@@ -121,7 +113,6 @@ export default function IPhoneInsurance() {
     if (months > 0) return `${months} mes(es)`
     return `${diffDays} días`
   }
-
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-6">
       <div className="max-w-5xl mx-auto">
@@ -140,7 +131,6 @@ export default function IPhoneInsurance() {
             </Button>
           </div>
         </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Columna principal (2/3) */}
           <div className="lg:col-span-2 space-y-4">
@@ -204,7 +194,6 @@ export default function IPhoneInsurance() {
                 </div>
               </CardContent>
             </Card>
-
             {/* Información del seguro */}
             <Card>
               <CardContent className="p-4 space-y-4">
@@ -260,7 +249,6 @@ export default function IPhoneInsurance() {
                     </select>
                   </div>
                 </div>
-
                 {/* Grid de coberturas (versión compacta) */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {coverageTypes.map((type) => (
@@ -287,7 +275,6 @@ export default function IPhoneInsurance() {
                 </div>
               </CardContent>
             </Card>
-
             {/* Fechas y montos */}
             <Card>
               <CardContent className="p-4 space-y-4">
@@ -379,7 +366,6 @@ export default function IPhoneInsurance() {
                 </div>
               </CardContent>
             </Card>
-
             {/* Notas adicionales */}
             <Card>
               <CardContent className="p-4 space-y-4">
@@ -401,7 +387,6 @@ export default function IPhoneInsurance() {
               </CardContent>
             </Card>
           </div>
-
           {/* Columna derecha (1/3) – Resumen */}
           <div className="space-y-4">
             <Card>
@@ -442,7 +427,6 @@ export default function IPhoneInsurance() {
                     </span>
                   </div>
                 </div>
-
                 <div className="flex items-start gap-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-900/40">
                   <Info size={14} className="text-blue-600 flex-shrink-0 mt-0.5" />
                   <p className="text-[10px] text-blue-700 dark:text-blue-300">
@@ -451,7 +435,6 @@ export default function IPhoneInsurance() {
                 </div>
               </CardContent>
             </Card>
-
             <Button onClick={handleSubmit} className="w-full" disabled={isSaving}>
               {isSaving ? 'Guardando...' : 'Guardar seguro'}
             </Button>

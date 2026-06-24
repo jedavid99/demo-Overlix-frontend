@@ -26,8 +26,6 @@ import {
 import { MdCheck, MdBuild } from 'react-icons/md';
 import type { RepairData } from './RepairFlow';
 import { RiSimCard2Line } from "react-icons/ri";
-
-
 interface RepairTechnicalProps {
   data?: RepairData;
   updateData?: (updates: Partial<RepairData>) => void;
@@ -35,7 +33,6 @@ interface RepairTechnicalProps {
   onBack?: () => void;
   currentStep?: number;
 }
-
 export default function RepairTechnical({ data, updateData, onNext = () => {}, onBack = () => {}, currentStep = 2 }: RepairTechnicalProps) {
   const defaultData: RepairData = {
     selectedClient: null,
@@ -65,7 +62,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     signaturePad: '',
     printOption: 'both',
   };
-
   const [localData, setLocalData] = useState<RepairData>(defaultData);
   const state = data ?? localData;
   const applyUpdate = (updates: Partial<RepairData>) => {
@@ -86,20 +82,14 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     { key: 'fichaCarga', label: 'Ficha de Carga', icon: Zap },
     { key: 'bateria', label: 'Batería', icon: Battery },
 { key: 'lectorSimcard', label: 'Lector de Simcard', icon: RiSimCard2Line  },
-
-
     
-
   ];
-
   const handleHardwareToggle = (key: string) => {
     const updated = { ...state.hardwareChecks };
     updated[key as keyof typeof state.hardwareChecks] = !updated[key as keyof typeof state.hardwareChecks];
     applyUpdate({ hardwareChecks: updated });
   };
-
   const functionalCount = Object.values(state.hardwareChecks).filter(Boolean).length;
-
   // Pattern drawing helpers
   const isDrawing = useRef(false);
   const seqRef = useRef<number[]>(state.patternSequence ? [...state.patternSequence] : []);
@@ -107,23 +97,19 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
   const [refresh, setRefresh] = useState(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const dotsPositionRef = useRef<{ x: number; y: number }[]>([]);
-
   useEffect(() => {
     setLocalDots(state.patternDots.slice());
     seqRef.current = state.patternSequence ? [...state.patternSequence] : [];
   }, [state.patternDots, state.patternSequence]);
-
   // Calculate dot positions and draw canvas
   useEffect(() => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
     // Clear canvas
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
     // Calculate positions (3x3 grid centered in canvas)
     const startX = 35;
     const startY = 35;
@@ -137,7 +123,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
         y: startY + row * spacing,
       });
     }
-
     // Draw lines between connected dots
     if (seqRef.current.length > 1) {
       ctx.strokeStyle = '#3B82F6';
@@ -154,7 +139,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
       ctx.stroke();
     }
   }, [refresh, seqRef.current]);
-
   const startDraw = (idx: number, e: React.PointerEvent) => {
     isDrawing.current = true;
     try { (e.currentTarget as Element).setPointerCapture(e.pointerId); } catch {}
@@ -164,7 +148,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
       setRefresh(r => r + 1);
     }
   };
-
   const enterDot = (idx: number) => {
     if (!isDrawing.current) return;
     if (!seqRef.current.includes(idx)) {
@@ -173,13 +156,11 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
       setRefresh(r => r + 1);
     }
   };
-
   const endDraw = (e?: React.PointerEvent) => {
     isDrawing.current = false;
     if (e) try { (e.currentTarget as Element).releasePointerCapture(e.pointerId); } catch {}
     applyUpdate({ patternSequence: seqRef.current, patternDots: localDots });
   };
-
   const clearPattern = () => {
     seqRef.current = [];
     const cleared = Array(9).fill(false);
@@ -187,7 +168,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     setRefresh(r => r + 1);
     applyUpdate({ patternSequence: [], patternDots: cleared });
   };
-
   return (
     <div className="min-h-screen bg-background">
       <main className="max-w-[1400px] mx-auto p-6 md:p-8">
@@ -197,7 +177,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
             <h1 className="text-2xl font-bold text-foreground">Información Técnica</h1>
             <p className="text-muted-foreground text-sm">Paso 2: Información Técnica y Seguridad</p>
           </div>
-
           {/* Stepper */}
           <div className="hidden md:flex items-center gap-4">
             {[
@@ -235,7 +214,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
             ))}
           </div>
         </div>
-
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left Column - Main Content */}
@@ -248,12 +226,10 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                 </div>
                 <h2 className="text-lg font-bold text-slate-900">Chequeo rapido </h2>
               </div>
-
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
                 {hardwareItems.map((item) => {
                   const Icon = item.icon;
                   const isChecked = state.hardwareChecks[item.key as keyof typeof state.hardwareChecks];
-
                   return (
                     <div
                       key={item.key}
@@ -270,7 +246,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                           {item.label}
                         </span>
                       </div>
-
                       {/* Toggle Switch */}
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input
@@ -296,7 +271,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                 })}
               </div>
             </section>
-
             {/* Two Column Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Security & Access */}
@@ -307,7 +281,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                   </div>
                   <h2 className="text-lg font-bold text-slate-900">Seguridad y Acceso</h2>
                 </div>
-
                 <div className="space-y-6">
                   {/* Security Type Selector */}
                   <div className="flex p-1 bg-slate-100 rounded-xl">
@@ -329,7 +302,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                       </button>
                     ))}
                   </div>
-
                   {state.securityType !== 'Ninguno' && (
                     <div className="space-y-4">
                       {state.securityType === 'Pin' && (
@@ -421,7 +393,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                   )}
                 </div>
               </section>
-
               {/* Internal Diagnosis */}
               <section className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
                 <div className="flex items-center gap-3 mb-6">
@@ -430,7 +401,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                   </div>
                   <h2 className="text-lg font-bold text-slate-900">Diagnóstico interno</h2>
                 </div>
-
                 <div className="space-y-4">
                   <div>
                     <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">
@@ -444,7 +414,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                       className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm focus:ring-4 focus:ring-blue-100 focus:border-blue-600 transition-all text-slate-900"
                     />
                   </div>
-
                   <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 p-3 rounded-xl border border-emerald-100">
                     <Check size={20} />
                     <span className="text-xs font-semibold">
@@ -454,7 +423,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                 </div>
               </section>
             </div>
-
             {/* Navigation Buttons */}
               <div className="flex items-center justify-between pt-4">
               <button
@@ -476,7 +444,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
               </button>
             </div>
           </div>
-
           {/* Right Column - Ticket Summary */}
           <div className="lg:col-span-4">
             <div className="sticky top-24 space-y-6">
@@ -490,7 +457,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                       En Progreso
                     </span>
                   </div>
-
                   <div className="space-y-6">
                     {/* Customer */}
                     <div className="flex items-start gap-3">
@@ -511,7 +477,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                         <p className="text-xs text-slate-400">{state.selectedClient?.phone || ''}</p>
                       </div>
                     </div>
-
                     {/* Device Info */}
                     <div className="flex items-start gap-3">
                       <div className="bg-white/10 p-2 rounded-lg">
@@ -535,7 +500,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                         </p>
                       </div>
                     </div>
-
                     {/* Pre-Check Status */}
                     <div className="flex items-start gap-3">
                       <div className="bg-white/10 p-2 rounded-lg">
@@ -555,7 +519,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                         </p>
                       </div>
                     </div>
-
                     {/* Budget */}
                     <div className="pt-6 border-t border-white/10">
                       <div className="flex items-center justify-between mb-2">
@@ -574,7 +537,6 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
                   </div>
                 </div>
               </div>
-
               {/* Process Help */}
               <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-200">
                 <div className="flex items-center gap-2 mb-4">
@@ -596,5 +558,3 @@ export default function RepairTechnical({ data, updateData, onNext = () => {}, o
     </div>
   );
 }
-
-

@@ -47,7 +47,6 @@ import { Card, CardContent } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
-
 // Mapa de hardware por categoría
 const hardwareByCategory: Record<string, { key: string; label: string; icon: any }[]> = {
   phone: [
@@ -109,7 +108,6 @@ const hardwareByCategory: Record<string, { key: string; label: string; icon: any
     { key: 'audio', label: 'Audio', icon: Volume2 },
   ],
 };
-
 // Opciones de seguridad por categoría
 const securityOptionsByCategory: Record<string, { id: string; label: string; icon: any }[]> = {
   phone: [
@@ -141,7 +139,6 @@ const securityOptionsByCategory: Record<string, { id: string; label: string; ico
     { id: 'pin', label: 'Contraseña', icon: Key },
   ],
 };
-
 // Categorías de dispositivo
 const deviceCategories = [
   { id: 'phone', name: 'Teléfono', icon: Smartphone, color: 'text-primary', bgColor: 'bg-primary/10' },
@@ -151,7 +148,6 @@ const deviceCategories = [
   { id: 'console', name: 'Consola', icon: Gamepad2, color: 'text-destructive', bgColor: 'bg-destructive/10' },
   { id: 'other', name: 'Otro', icon: Grid3X3, color: 'text-muted-foreground', bgColor: 'bg-muted' },
 ];
-
 // Estado inicial extendido
 const defaultData: RepairData = {
   selectedClient: null,
@@ -178,24 +174,20 @@ const defaultData: RepairData = {
   paymentType: 'full',
   orderNumber: '',
 };
-
 interface RepairCreateProps {
   data?: RepairData;
   updateData?: (updates: Partial<RepairData>) => void;
   onSave?: () => void;
   currentStep?: number;
 }
-
 export default function RepairCreate({ data, updateData, onSave = () => {}, currentStep = 1 }: RepairCreateProps) {
   const [search, setSearch] = useState('');
   const [localData, setLocalData] = useState<RepairData>(defaultData);
   const state = data ?? localData;
-
   const applyUpdate = (updates: Partial<RepairData>) => {
     if (updateData) updateData(updates);
     else setLocalData((prev) => ({ ...prev, ...updates }));
   };
-
   // Clientes mock (cargar desde API)
   const clients: any[] = [];
   const filteredClients = clients.filter((client) =>
@@ -203,17 +195,14 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
     client.phone?.includes(search) ||
     client.email?.toLowerCase().includes(search.toLowerCase())
   );
-
   // Obtener items de hardware según categoría
   const currentHardwareItems = useMemo(() => {
     return hardwareByCategory[state.deviceType] || [];
   }, [state.deviceType]);
-
   // Obtener opciones de seguridad según categoría
   const currentSecurityOptions = useMemo(() => {
     return securityOptionsByCategory[state.deviceType] || securityOptionsByCategory.other;
   }, [state.deviceType]);
-
   // Inicializar hardwareChecks
   const hardwareKeys = currentHardwareItems.map((item) => item.key);
   const initialHardwareChecks = hardwareKeys.reduce((acc, key) => ({ ...acc, [key]: false }), {});
@@ -221,7 +210,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
   const filteredHardwareChecks = Object.fromEntries(
     Object.entries(mergedHardwareChecks).filter(([key]) => hardwareKeys.includes(key))
   );
-
   React.useEffect(() => {
     const newChecks = { ...initialHardwareChecks, ...state.hardwareChecks };
     const filtered = Object.fromEntries(Object.entries(newChecks).filter(([key]) => hardwareKeys.includes(key)));
@@ -232,15 +220,12 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
       applyUpdate({ securityType: 'ninguno' });
     }
   }, [state.deviceType]);
-
   const handleHardwareToggle = (key: string) => {
     const updated = { ...state.hardwareChecks };
     updated[key] = !updated[key];
     applyUpdate({ hardwareChecks: updated });
   };
-
   const functionalCount = Object.values(state.hardwareChecks).filter(Boolean).length;
-
   // Generador de IMEI (15 dígitos) o serial aleatorio
   const generateSerial = () => {
     const isPhone = state.deviceType === 'phone';
@@ -260,12 +245,10 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
     }
   };
   const navigate = useNavigate();
-
   const handleGenerateSerial = () => {
     const newSerial = generateSerial();
     applyUpdate({ serial: newSerial });
   };
-
   // Accesorios según categoría
   const getAccessoriesForDevice = () => {
     const map: Record<string, string[]> = {
@@ -278,7 +261,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
     };
     return map[state.deviceType] || [];
   };
-
   const handleAccessoryToggle = (accessory: string) => {
     if (state.accessories.includes(accessory)) {
       applyUpdate({ accessories: state.accessories.filter((a) => a !== accessory) });
@@ -286,7 +268,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
       applyUpdate({ accessories: [...state.accessories, accessory] });
     }
   };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -302,7 +283,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
             <p className="text-muted-foreground text-sm">Información de Cliente, Dispositivo y Diagnóstico</p>
           </div>
         </div>
-
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Column - Main Content */}
@@ -331,7 +311,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
         Agregar
       </Button>
     </div>
-
     {state.selectedClient ? (
       <div className="flex items-center justify-between p-2 bg-primary/5 rounded-lg border border-primary/20">
         <div className="flex items-center gap-2">
@@ -354,7 +333,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
     )}
   </CardContent>
 </Card>
-
             {/* Dispositivo + Especificaciones */}
             <Card>
               <CardContent className="p-4">
@@ -389,7 +367,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                     );
                   })}
                 </div>
-
                 {/* Especificaciones Técnicas con generador de serial */}
                 <div className="flex items-center gap-3 mb-4">
                   <div className="bg-primary/10 text-primary p-2 rounded-xl">
@@ -436,7 +413,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                     </div>
                   </div>
                 </div>
-
                 {/* Condición y Accesorios */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="border border-border rounded-xl p-4">
@@ -460,7 +436,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                       ))}
                     </div>
                   </div>
-
                   <div className="border border-border rounded-xl p-4">
                     <h3 className="text-xs font-bold text-foreground mb-3 flex items-center gap-2">
                       <Cable size={16} className="text-muted-foreground" />
@@ -491,7 +466,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                 </div>
               </CardContent>
             </Card>
-
             {/* Chequeo rápido de hardware (dinámico) */}
             <AnimatePresence mode="wait">
               {state.deviceType && currentHardwareItems.length > 0 && (
@@ -510,7 +484,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                     <h2 className="text-base font-bold text-foreground">Chequeo rápido de hardware</h2>
                     <Badge variant="outline" className="ml-auto text-xs">{functionalCount}/{currentHardwareItems.length} funcionales</Badge>
                   </div>
-
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2.5">
                     {currentHardwareItems.map((item) => {
                       const Icon = item.icon;
@@ -546,7 +519,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                 </motion.section>
               )}
             </AnimatePresence>
-
             {/* Seguridad y Acceso (dinámico) */}
             <AnimatePresence mode="wait">
               {state.deviceType && currentSecurityOptions.length > 0 && (
@@ -564,7 +536,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                     </div>
                     <h2 className="text-base font-bold text-foreground">Seguridad y Acceso</h2>
                   </div>
-
                   <div className="flex gap-2 mb-4">
                     {currentSecurityOptions.map((opt) => {
                       const Icon = opt.icon;
@@ -585,7 +556,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                       );
                     })}
                   </div>
-
                   {state.securityType === 'pin' && (
                     <div className="max-w-xs">
                       <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">
@@ -603,7 +573,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                       </div>
                     </div>
                   )}
-
                   {state.securityType === 'patron' && (
                     <div className="flex flex-col items-start gap-3">
                       <p className="text-[10px] font-bold text-muted-foreground uppercase">Dibuja el patrón (3x3)</p>
@@ -617,7 +586,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                       <Button variant="ghost" size="sm" className="text-xs">Limpiar patrón</Button>
                     </div>
                   )}
-
                   {state.securityType === 'huella' && (
                     <div className="flex items-center gap-3">
                       <Fingerprint size={24} className="text-primary" />
@@ -627,7 +595,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                 </motion.section>
               )}
             </AnimatePresence>
-
             {/* Diagnóstico y Notas */}
             <Card>
               <CardContent className="p-4">
@@ -688,7 +655,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                 </div>
               </CardContent>
             </Card>
-
             {/* Botón Guardar */}
             <motion.div
               whileHover={{ scale: 1.02 }}
@@ -709,7 +675,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
               </Button>
             </motion.div>
           </div>
-
           {/* Right Column - Resumen + Método de Pago */}
           <div className="lg:col-span-4">
             <div className="sticky top-24 space-y-4">
@@ -783,7 +748,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                   </div>
                 </div>
               </motion.div>
-
               {/* Método de Pago (NUEVA UBICACIÓN) */}
               <Card>
                 <CardContent className="p-4">
@@ -865,7 +829,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                   </div>
                 </CardContent>
               </Card>
-
               {/* Ayuda */}
               <div className="bg-card rounded-2xl p-4 shadow-sm border border-border">
                 <div className="flex items-center gap-2 mb-2">
@@ -883,47 +846,3 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
     </motion.div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

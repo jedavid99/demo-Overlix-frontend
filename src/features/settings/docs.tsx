@@ -1,7 +1,6 @@
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card'
 import { FileText } from 'lucide-react'
-
 export default function Docs() {
   return (
     <div className="p-6">
@@ -20,4 +19,3 @@ export default function Docs() {
     </div>
   )
 }
-

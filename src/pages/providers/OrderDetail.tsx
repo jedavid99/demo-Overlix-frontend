@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -17,7 +15,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../components/ui/dialog'
-
 // Tipos
 interface OrderItem {
   id: string
@@ -26,7 +23,6 @@ interface OrderItem {
   unitPrice: number
   subtotal: number
 }
-
 interface Order {
   id: string
   orderNumber: string
@@ -38,24 +34,20 @@ interface Order {
   status: 'Pendiente' | 'Enviada' | 'Recibida' | 'Cancelada'
   notes?: string
 }
-
 interface StatusChange {
   status: string
   date: Date
   notes?: string
 }
-
 const statusColors = {
   'Pendiente': 'bg-warning/10 text-warning border-warning/20',
   'Enviada': 'bg-primary/10 text-primary border-primary/20',
   'Recibida': 'bg-success/10 text-success border-success/20',
   'Cancelada': 'bg-destructive/10 text-destructive border-destructive/20',
 }
-
 const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value)
 }
-
 const OrderDetail = () => {
   const navigate = useNavigate()
   const { id } = useParams()
@@ -64,12 +56,10 @@ const OrderDetail = () => {
   const [items, setItems] = useState<OrderItem[]>([])
   const [statusHistory, setStatusHistory] = useState<StatusChange[]>([])
   const [showCancelDialog, setShowCancelDialog] = useState(false)
-
   useEffect(() => {
     // Conectar con API real: api.get(`/orders/${id}`)
     setLoading(false)
   }, [id])
-
   const handleMarkAsReceived = () => {
     if (order) {
       const updatedOrder = { ...order, status: 'Recibida' as const, actualDeliveryDate: new Date() }
@@ -80,7 +70,6 @@ const OrderDetail = () => {
       ])
     }
   }
-
   const handleCancelOrder = () => {
     if (order) {
       const updatedOrder = { ...order, status: 'Cancelada' as const }
@@ -92,11 +81,9 @@ const OrderDetail = () => {
       setShowCancelDialog(false)
     }
   }
-
   const canEdit = order && (order.status === 'Pendiente' || order.status === 'Enviada')
   const canMarkAsReceived = order && order.status === 'Enviada'
   const canCancel = order && (order.status === 'Pendiente' || order.status === 'Enviada')
-
   if (loading) {
     return (
       <div className="space-y-6">
@@ -114,7 +101,6 @@ const OrderDetail = () => {
       </div>
     )
   }
-
   if (!order) {
     return (
       <Card className="p-12 text-center">
@@ -126,7 +112,6 @@ const OrderDetail = () => {
       </Card>
     )
   }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -147,7 +132,6 @@ const OrderDetail = () => {
         </div>
         <Badge className={statusColors[order.status]}>{order.status}</Badge>
       </div>
-
       {/* Datos generales */}
       <Card>
         <CardHeader>
@@ -194,7 +178,6 @@ const OrderDetail = () => {
           )}
         </CardContent>
       </Card>
-
       {/* Productos */}
       <Card>
         <CardHeader>
@@ -231,7 +214,6 @@ const OrderDetail = () => {
           </div>
         </CardContent>
       </Card>
-
       {/* Timeline de estados */}
       <Card>
         <CardHeader>
@@ -268,7 +250,6 @@ const OrderDetail = () => {
           </div>
         </CardContent>
       </Card>
-
       {/* Acciones */}
       <Card>
         <CardContent className="p-4">
@@ -297,7 +278,6 @@ const OrderDetail = () => {
           </div>
         </CardContent>
       </Card>
-
       {/* Dialog de confirmación de cancelación */}
       <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
         <DialogContent>
@@ -321,5 +301,4 @@ const OrderDetail = () => {
     </motion.div>
   )
 }
-
 export default OrderDetail

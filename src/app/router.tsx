@@ -58,7 +58,6 @@ import Help from '../features/settings/help'
 import RepairsReport from '@/features/reports/RepairsReport'
 import ProtectedRoute from '../components/ProtectedRoute'
 import PublicRoute from '../components/PublicRoute'
-
 export function AppRouter() {
   return (
     <Routes>
@@ -69,7 +68,6 @@ export function AppRouter() {
       <Route path="/admin/generate-codes" element={<PublicRoute><SimpleCodeGenerator /></PublicRoute>} />
       <Route path="/admin/activation-codes" element={<PublicRoute><AdminActivationCodes /></PublicRoute>} />
       <Route path="/home" element={<Home />} />
-
       {/* Rutas protegidas */}
       <Route path="/dashboard" element={<ProtectedRoute><AdminLayout><Dashboard /></AdminLayout></ProtectedRoute>} />
       <Route path="/clients" element={<ProtectedRoute><AdminLayout><Clients /></AdminLayout></ProtectedRoute>} />

@@ -12,7 +12,6 @@ import {
   SelectValue,
 } from '@/shared/components/ui/select'
 import CreateUserModal from './CreateUserModal'
-
 // Tipos
 interface User {
   id: string
@@ -23,7 +22,6 @@ interface User {
   status: 'active' | 'inactive'
   joinDate: string
 }
-
 export default function Profile() {
   // 📦 Estado del usuario logueado – vacío (cargar desde API)
   const [userData] = useState({
@@ -37,7 +35,6 @@ export default function Profile() {
     ratingMax: 5.0,
     status: '',
   })
-
   // 📦 Actividad – vacía (cargar desde API)
   const [activities] = useState<{
     time: string
@@ -46,7 +43,6 @@ export default function Profile() {
     description: string
     status: string
   }[]>([])
-
   // 📦 Rendimiento – vacío (cargar desde API)
   const [performanceData] = useState<{
     period: string
@@ -56,13 +52,10 @@ export default function Profile() {
     rating: string
     trend: string
   }[]>([])
-
   // 📦 Lista de usuarios – vacía (cargar desde API)
   const [users, setUsers] = useState<User[]>([])
-
   // Estado del modal de crear usuario
   const [showUserModal, setShowUserModal] = useState(false)
-
   const handleCreateUser = (user: any) => {
     console.log('Usuario creado:', user)
     // Aquí iría la lógica para guardar el usuario en la API
@@ -79,7 +72,6 @@ export default function Profile() {
     setUsers([...users, newUser])
     setShowUserModal(false)
   }
-
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark p-6 lg:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
@@ -113,7 +105,6 @@ export default function Profile() {
                 </div>
               </div>
             </div>
-
             {/* Rating Card */}
             <div className="bg-gradient-to-br from-primary to-primary-hover rounded-lg p-6 flex flex-col items-center justify-center text-primary-foreground min-w-max">
               <p className="text-xs font-medium text-primary-foreground/80 mb-2">RATING MENSUAL</p>
@@ -129,7 +120,6 @@ export default function Profile() {
             </div>
           </div>
         </div>
-
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Information Section */}
           <div className="bg-card-light dark:bg-card-dark rounded-lg p-6 shadow-md">
@@ -139,7 +129,6 @@ export default function Profile() {
               </div>
               <h2 className="text-lg font-semibold text-foreground">Información</h2>
             </div>
-
             <div className="space-y-6">
               <div>
                 <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
@@ -167,7 +156,6 @@ export default function Profile() {
               </div>
             </div>
           </div>
-
           {/* Security & Access Section */}
           <div className="bg-card-light dark:bg-card-dark rounded-lg p-6 shadow-md">
             <div className="flex items-center gap-2 mb-6">
@@ -176,7 +164,6 @@ export default function Profile() {
               </div>
               <h2 className="text-lg font-semibold text-foreground">Seguridad y Acceso</h2>
             </div>
-
             <div className="space-y-4">
               {/* Change Password */}
               <div className="flex items-center justify-between p-4 border border-border-light dark:border-border-dark rounded-lg hover:bg-muted/50 transition-colors">
@@ -190,7 +177,6 @@ export default function Profile() {
                   Gestionar
                 </button>
               </div>
-
               {/* Two-Factor Auth */}
               <div className="flex items-center justify-between p-4 border border-border-light dark:border-border-dark rounded-lg">
                 <div className="flex items-center gap-3">
@@ -207,7 +193,6 @@ export default function Profile() {
             </div>
           </div>
         </div>
-
         {/* Activity Log */}
         <div className="bg-card-light dark:bg-card-dark rounded-lg p-6 shadow-md">
           <div className="flex items-center justify-between mb-6">
@@ -222,7 +207,6 @@ export default function Profile() {
           <p className="text-xs text-muted-foreground mb-4">
             Historial completo de acciones administrativas y de reparación
           </p>
-
           {activities.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <p className="font-medium">No hay actividad registrada</p>
@@ -281,7 +265,6 @@ export default function Profile() {
             </button>
           </div>
         </div>
-
         {/* Performance Analytics */}
         <div className="bg-card-light dark:bg-card-dark rounded-lg p-6 shadow-md">
           <div className="flex items-center justify-between mb-6">
@@ -297,7 +280,6 @@ export default function Profile() {
               Exportar CSV
             </button>
           </div>
-
           {performanceData.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <p className="font-medium">No hay datos de rendimiento disponibles</p>
@@ -362,7 +344,6 @@ export default function Profile() {
             </div>
           )}
         </div>
-
         {/* ========== NUEVA SECCIÓN: USUARIOS DEL SISTEMA ========== */}
         <div className="bg-card-light dark:bg-card-dark rounded-lg p-6 shadow-md">
           <div className="flex items-center justify-between mb-6">
@@ -382,7 +363,6 @@ export default function Profile() {
               Agregar Usuario
             </Button>
           </div>
-
           {users.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Users size={48} className="mx-auto text-muted-foreground/40 mb-3" />
@@ -432,7 +412,6 @@ export default function Profile() {
             </div>
           )}
         </div>
-
         {/* Modal de creación de usuario */}
         <CreateUserModal
           isOpen={showUserModal}

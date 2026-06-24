@@ -6,7 +6,6 @@ import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
 import { Input } from '@/shared/components/ui/input'
 import DataTable from '@/shared/components/data-table'
-
 type Sale = {
   id: string
   date: string
@@ -15,9 +14,7 @@ type Sale = {
   total: number
   status: 'Paid' | 'Pending' | 'Refunded' | 'Partial'
 }
-
 // Datos mock eliminados - conectar con API real
-
 const getStatusBadge = (status: string) => {
   switch (status) {
     case 'Paid': return { variant: 'success' as const, label: 'Pagado' }
@@ -27,7 +24,6 @@ const getStatusBadge = (status: string) => {
     default: return { variant: 'outline' as const, label: status }
   }
 }
-
 export default function Sales() {
   return (
     <div className="space-y-6">
@@ -43,7 +39,6 @@ export default function Sales() {
           </Button>
         </Link>
       </div>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
@@ -57,7 +52,6 @@ export default function Sales() {
             <p className="text-3xl font-bold text-foreground">$</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-start justify-between mb-4">
@@ -70,7 +64,6 @@ export default function Sales() {
             <p className="text-3xl font-bold text-foreground"></p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-start justify-between mb-4">
@@ -83,7 +76,6 @@ export default function Sales() {
             <p className="text-3xl font-bold text-foreground">$</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-start justify-between mb-4">
@@ -97,7 +89,6 @@ export default function Sales() {
           </CardContent>
         </Card>
       </div>
-
       <Card>
         <CardContent className="p-4">
           <div className="flex flex-wrap gap-3 items-center">
@@ -121,7 +112,6 @@ export default function Sales() {
           </div>
         </CardContent>
       </Card>
-
       <DataTable
         // Conectar con API real: api.get('/sales')
         data={[]}
@@ -134,4 +124,3 @@ export default function Sales() {
     </div>
   )
 }
-

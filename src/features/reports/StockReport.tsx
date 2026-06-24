@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
@@ -11,7 +9,6 @@ import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { exportToCSV } from '@/shared/lib/export'
-
 // Tipos
 interface Product {
   id: string
@@ -23,15 +20,11 @@ interface Product {
   cost: number
   lastSale?: Date
 }
-
 // Datos mock eliminados - conectar con API real
-
 const categories = ['Todos', 'Celulares', 'Baterías', 'Pantallas', 'Flex', 'Carcasas', 'Insumos']
-
 const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value)
 }
-
 const StockReport = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
@@ -41,19 +34,16 @@ const StockReport = () => {
   const [products, setProducts] = useState<Product[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
-
   useEffect(() => {
     // Conectar con API real: api.get('/reports/stock')
     setLoading(false)
   }, [])
-
   // Filtrar productos
   const filteredProducts = products.filter((product) => {
     const matchesCategory = selectedCategory === 'Todos' || product.category === selectedCategory
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesCategory && matchesSearch
   })
-
   // Calcular KPIs
   const totalItems = filteredProducts.reduce((sum, p) => sum + p.stock, 0)
   const lowStockItems = filteredProducts.filter(p => p.stock < p.minStock).length
@@ -61,7 +51,6 @@ const StockReport = () => {
   const avgStock = filteredProducts.length > 0 ? totalItems / filteredProducts.length : 0
   const totalSales = filteredProducts.reduce((sum, p) => sum + (p.lastSale ? 1 : 0), 0)
   const inventoryTurnover = avgStock > 0 ? (totalSales / avgStock) : 0
-
   // Datos para gráfico de barras por categoría
   const categoryData = categories
     .filter(cat => cat !== 'Todos')
@@ -77,17 +66,13 @@ const StockReport = () => {
       
       return { name: cat, stock: totalStock, color }
     })
-
   // Productos bajo stock mínimo
   const criticalStockProducts = filteredProducts.filter(p => p.stock < p.minStock)
-
   // Productos sin movimiento (últimos 30 días)
   const noMovementProducts = filteredProducts.filter(p => !p.lastSale || (new Date().getTime() - p.lastSale.getTime()) > 30 * 24 * 60 * 60 * 1000)
-
   // Paginación
   const paginatedProducts = filteredProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
-
   // Exportar CSV
   const handleExport = () => {
     const csvData = filteredProducts.map(product => ({
@@ -102,14 +87,12 @@ const StockReport = () => {
     }))
     exportToCSV(csvData, 'reporte-stock')
   }
-
   const handleRetry = () => {
     setError(false)
     setLoading(true)
     // Conectar con API real: api.get('/reports/stock')
     setLoading(false)
   }
-
   if (loading) {
     return (
       <motion.div
@@ -132,7 +115,6 @@ const StockReport = () => {
       </motion.div>
     )
   }
-
   if (error) {
     return (
       <motion.div
@@ -150,7 +132,6 @@ const StockReport = () => {
       </motion.div>
     )
   }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -169,7 +150,6 @@ const StockReport = () => {
           Exportar
         </Button>
       </div>
-
       {/* Filtros */}
       <Card className="p-4">
         <div className="flex flex-wrap items-center gap-4">
@@ -199,7 +179,6 @@ const StockReport = () => {
           </div>
         </div>
       </Card>
-
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
@@ -213,7 +192,6 @@ const StockReport = () => {
             <p className="text-sm text-muted-foreground">Total de ítems en stock</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -225,7 +203,6 @@ const StockReport = () => {
             <p className="text-sm text-muted-foreground">Ítems bajo stock mínimo</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -237,7 +214,6 @@ const StockReport = () => {
             <p className="text-sm text-muted-foreground">Valor total del inventario</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -256,7 +232,6 @@ const StockReport = () => {
           </CardContent>
         </Card>
       </div>
-
       {/* Alertas de stock crítico */}
       <Card className={criticalStockProducts.length > 0 ? 'border-destructive/50' : ''}>
         <CardHeader>
@@ -289,7 +264,6 @@ const StockReport = () => {
           )}
         </CardContent>
       </Card>
-
       {/* Gráfico de barras por categoría */}
       <Card>
         <CardHeader>
@@ -323,7 +297,6 @@ const StockReport = () => {
           </ResponsiveContainer>
         </CardContent>
       </Card>
-
       {/* Tabla de productos */}
       <Card>
         <CardHeader>
@@ -418,7 +391,6 @@ const StockReport = () => {
           </div>
         </CardContent>
       </Card>
-
       {/* Productos sin movimiento */}
       {noMovementProducts.length > 0 && (
         <Card>
@@ -443,5 +415,4 @@ const StockReport = () => {
     </motion.div>
   )
 }
-
 export default StockReport

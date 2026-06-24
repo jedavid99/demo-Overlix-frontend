@@ -42,7 +42,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/components/ui/dropdown-menu'
-
 // Types
 interface AdjustmentItem {
   id: number
@@ -56,14 +55,11 @@ interface AdjustmentItem {
   user: string
   status: 'pending' | 'approved' | 'rejected' | 'completed'
 }
-
 // 📦 Datos de muestra ELIMINADOS – array vacío (conectar con API)
 const adjustmentsData: AdjustmentItem[] = []
-
 // Tipos de ajuste y estados para filtros
 const adjustmentTypes = ['all', 'entry', 'exit', 'correction', 'physical', 'return']
 const statusOptions = ['all', 'pending', 'approved', 'rejected', 'completed']
-
 const typeLabels: Record<string, string> = {
   entry: 'Entrada',
   exit: 'Salida',
@@ -71,7 +67,6 @@ const typeLabels: Record<string, string> = {
   physical: 'Inventario Físico',
   return: 'Devolución',
 }
-
 const typeColors: Record<string, string> = {
   entry: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
   exit: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
@@ -79,20 +74,17 @@ const typeColors: Record<string, string> = {
   physical: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
   return: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400',
 }
-
 const statusColors: Record<string, string> = {
   pending: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400',
   approved: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
   rejected: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
   completed: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
 }
-
 export default function Adjustments() {
   const [searchTerm, setSearchTerm] = useState('')
   const [activeType, setActiveType] = useState('all')
   const [activeStatus, setActiveStatus] = useState('all')
   const [loading, setLoading] = useState(false)
-
   // Estado del modal
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [newAdjustment, setNewAdjustment] = useState({
@@ -105,7 +97,6 @@ export default function Adjustments() {
     date: new Date().toISOString().split('T')[0],
     user: 'Usuario actual', // Podrías obtener del contexto de autenticación
   })
-
   // Filtrar ajustes
   const filteredItems = useMemo(() => {
     return adjustmentsData.filter((item) => {
@@ -118,7 +109,6 @@ export default function Adjustments() {
       return matchesSearch && matchesType && matchesStatus
     })
   }, [searchTerm, activeType, activeStatus])
-
   // KPIs
   const totalAdjustments = adjustmentsData.length
   const totalEntries = adjustmentsData.filter((i) => i.type === 'entry').length
@@ -129,7 +119,6 @@ export default function Adjustments() {
     if (i.type === 'exit') return sum - i.quantity
     return sum // correction y physical no afectan el neto en este cálculo simplificado
   }, 0)
-
   const kpiData = [
     {
       label: 'Total ajustes',
@@ -164,23 +153,19 @@ export default function Adjustments() {
       color: 'text-indigo-600',
     },
   ]
-
   // Manejadores del formulario modal
   const handleNewAdjustmentChange = (field: string, value: string | number) => {
     setNewAdjustment((prev) => ({ ...prev, [field]: value }))
   }
-
   const handleSaveAdjustment = () => {
     // Validación básica
     if (!newAdjustment.productName || !newAdjustment.type || newAdjustment.quantity === 0) {
       alert('Por favor completa los campos obligatorios: Producto, Tipo y Cantidad.')
       return
     }
-
     // Aquí iría la llamada a la API para guardar el ajuste
     console.log('Nuevo ajuste:', newAdjustment)
     alert('Ajuste guardado correctamente (simulado).')
-
     // Cerrar modal y resetear formulario
     setIsModalOpen(false)
     setNewAdjustment({
@@ -194,7 +179,6 @@ export default function Adjustments() {
       user: 'Usuario actual',
     })
   }
-
   // Framer Motion variants
   const kpiContainerVariants = {
     hidden: { opacity: 0 },
@@ -206,7 +190,6 @@ export default function Adjustments() {
       },
     },
   }
-
   const kpiCardVariants = {
     hidden: { opacity: 0, y: 20, scale: 0.95 },
     visible: {
@@ -222,7 +205,6 @@ export default function Adjustments() {
       transition: { type: 'spring', stiffness: 400, damping: 15 },
     },
   }
-
   const rowVariants = {
     hidden: { opacity: 0, y: 10 },
     visible: (i: number) => ({
@@ -232,7 +214,6 @@ export default function Adjustments() {
     }),
     exit: { opacity: 0, scale: 0.95, transition: { duration: 0.15 } },
   }
-
   const getStatusBadge = (status: string) => {
     const labels: Record<string, string> = {
       pending: 'Pendiente',
@@ -248,7 +229,6 @@ export default function Adjustments() {
       </span>
     )
   }
-
   const getTypeBadge = (type: string) => {
     return (
       <span
@@ -258,7 +238,6 @@ export default function Adjustments() {
       </span>
     )
   }
-
   return (
     <>
       <motion.div
@@ -286,7 +265,6 @@ export default function Adjustments() {
             </Button>
           </div>
         </div>
-
         {/* KPI Cards */}
         <motion.div
           variants={kpiContainerVariants}
@@ -341,7 +319,6 @@ export default function Adjustments() {
             )
           })}
         </motion.div>
-
         {/* Filtros y búsqueda */}
         <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
           <div className="relative flex-1 min-w-[200px] max-w-md">
@@ -353,7 +330,6 @@ export default function Adjustments() {
               className="pl-10 h-10 bg-background"
             />
           </div>
-
           <div className="flex flex-wrap items-center gap-2">
             {/* Tipo de ajuste */}
             <div className="flex items-center gap-1.5 bg-muted/30 rounded-lg p-1">
@@ -375,7 +351,6 @@ export default function Adjustments() {
                 </Badge>
               ))}
             </div>
-
             {/* Estado */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -401,7 +376,6 @@ export default function Adjustments() {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-
             {/* Limpiar filtros */}
             {(activeType !== 'all' || activeStatus !== 'all' || searchTerm) && (
               <Button
@@ -420,7 +394,6 @@ export default function Adjustments() {
             )}
           </div>
         </div>
-
         {/* Estado vacío */}
         {loading ? (
           <div className="space-y-3">
@@ -555,7 +528,6 @@ export default function Adjustments() {
                 </tbody>
               </table>
             </div>
-
             <div className="flex items-center justify-between px-4 py-3 bg-muted/10 border-t border-border text-xs text-muted-foreground">
               <span>
                 Mostrando <strong className="text-foreground">{filteredItems.length}</strong> de{' '}
@@ -566,7 +538,6 @@ export default function Adjustments() {
           </motion.div>
         )}
       </motion.div>
-
       {/* 🪟 MODAL PARA NUEVO AJUSTE */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
@@ -576,7 +547,6 @@ export default function Adjustments() {
               Nuevo ajuste de stock
             </DialogTitle>
           </DialogHeader>
-
           <div className="space-y-4 py-4">
             {/* Producto */}
             <div className="space-y-2">
@@ -590,7 +560,6 @@ export default function Adjustments() {
                 placeholder="Ej. Pantalla iPhone 14 Pro"
               />
             </div>
-
             {/* SKU */}
             <div className="space-y-2">
               <Label htmlFor="productSku" className="text-sm font-semibold">
@@ -603,7 +572,6 @@ export default function Adjustments() {
                 placeholder="Ej. SCR-IP14P-001"
               />
             </div>
-
             {/* Tipo de ajuste */}
             <div className="space-y-2">
               <Label htmlFor="type" className="text-sm font-semibold">
@@ -622,7 +590,6 @@ export default function Adjustments() {
                 <option value="return">Devolución</option>
               </select>
             </div>
-
             {/* Cantidad */}
             <div className="space-y-2">
               <Label htmlFor="quantity" className="text-sm font-semibold">
@@ -636,7 +603,6 @@ export default function Adjustments() {
                 placeholder="0"
               />
             </div>
-
             {/* Motivo */}
             <div className="space-y-2">
               <Label htmlFor="reason" className="text-sm font-semibold">
@@ -649,7 +615,6 @@ export default function Adjustments() {
                 placeholder="Ej. Ajuste por inventario físico"
               />
             </div>
-
             {/* Fecha */}
             <div className="space-y-2">
               <Label htmlFor="date" className="text-sm font-semibold">
@@ -662,7 +627,6 @@ export default function Adjustments() {
                 onChange={(e) => handleNewAdjustmentChange('date', e.target.value)}
               />
             </div>
-
             {/* Notas */}
             <div className="space-y-2">
               <Label htmlFor="notes" className="text-sm font-semibold">
@@ -680,7 +644,6 @@ export default function Adjustments() {
               />
             </div>
           </div>
-
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsModalOpen(false)}>
               Cancelar

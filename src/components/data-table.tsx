@@ -1,10 +1,8 @@
 'use client'
-
 import { Button } from './ui/button'
 import { Badge } from './ui/badge'
 import { Skeleton } from './ui/skeleton'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-
 interface DataTableProps {
   data: Array<{
     id: number
@@ -20,7 +18,6 @@ interface DataTableProps {
   loading?: boolean
   emptyMessage?: string
 }
-
 const getStatusBadge = (status: string) => {
   const statusStyles: Record<string, { variant: 'success' | 'warning' | 'secondary' | 'destructive'; label: string }> = {
     'Activo': { variant: 'success', label: 'Activo' },
@@ -29,7 +26,6 @@ const getStatusBadge = (status: string) => {
     'Completado': { variant: 'success', label: 'Completado' },
     'Error': { variant: 'destructive', label: 'Error' },
   }
-
   const style = statusStyles[status] || statusStyles['Inactivo']
   return (
     <Badge variant={style.variant} size="sm">
@@ -37,7 +33,6 @@ const getStatusBadge = (status: string) => {
     </Badge>
   )
 }
-
 export default function DataTable({
   data,
   currentPage,
@@ -97,14 +92,12 @@ export default function DataTable({
           </tbody>
         </table>
       </div>
-
       {/* Pagination */}
       {!loading && data.length > 0 && (
         <div className="bg-muted/30 border-t border-border px-4 py-3 flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
             Página <span className="font-semibold text-foreground">{currentPage}</span> de <span className="font-semibold text-foreground">{totalPages}</span>
           </div>
-
           <div className="flex items-center gap-2">
             <Button
               onClick={() => onPageChange(currentPage - 1)}
@@ -114,7 +107,6 @@ export default function DataTable({
             >
               <ChevronLeft size={16} />
             </Button>
-
             <div className="flex items-center gap-1">
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                 let pageNum
@@ -127,7 +119,6 @@ export default function DataTable({
                 } else {
                   pageNum = currentPage - 2 + i
                 }
-
                 return (
                   <Button
                     key={pageNum}
@@ -140,7 +131,6 @@ export default function DataTable({
                 )
               })}
             </div>
-
             <Button
               onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage === totalPages}

@@ -4,7 +4,6 @@ import { Mail, Lock, Eye, EyeOff, Building2, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import logo from '/ovelix-claro.png';
 import { motion } from 'framer-motion';
-
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -16,7 +15,6 @@ export default function Login() {
     rememberMe: false
   });
   const [isLoading, setIsLoading] = useState(false);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, type, checked, value } = e.target;
     setFormData(prev => ({
@@ -24,7 +22,6 @@ export default function Login() {
       [name]: type === 'checkbox' ? checked : value
     }));
   };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
@@ -50,7 +47,6 @@ export default function Login() {
       setIsLoading(false);
     }
   };
-
   return (
     <main className="flex min-h-screen flex-col lg:flex-row bg-[#f9f9ff] text-[#191b23] select-none">
       {/* Sección izquierda (branding) - la dejamos igual */}
@@ -92,21 +88,18 @@ export default function Login() {
           </div>
         </div>
       </section>
-
       {/* Sección derecha (formulario) */}
       <section className="flex-1 flex flex-col justify-between min-h-screen p-6 lg:p-12 relative pattern-bg">
         {/* Logo móvil */}
         <div className="w-full lg:hidden flex items-center justify-center py-4">
           <img src={logo} alt="Overlix" className="w-32 h-32 sm:w-40 sm:h-40 rounded-full object-cover border-4 border-white/80 bg-black/30" />
         </div>
-
         <div className="flex-1 flex items-center justify-center py-8">
           <div className="w-full max-w-[440px] bg-white rounded-2xl shadow-xl border border-[#c2c6d6]/60 p-8 lg:p-10">
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-[#191b23] tracking-tight mb-2">Bienvenido</h2>
               <p className="text-sm text-[#424754]">Inicia sesión para acceder a tu panel de administración.</p>
             </div>
-
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Email */}
               <div className="space-y-1.5">
@@ -127,7 +120,6 @@ export default function Login() {
                   />
                 </div>
               </div>
-
               {/* Código de empresa (NUEVO) */}
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-[#424754]" htmlFor="codigoEmpresa">
@@ -149,7 +141,6 @@ export default function Login() {
                   />
                 </div>
               </div>
-
               {/* Contraseña */}
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center">
@@ -183,7 +174,6 @@ export default function Login() {
                   </button>
                 </div>
               </div>
-
               <button
                 type="submit"
                 disabled={isLoading}
@@ -193,7 +183,6 @@ export default function Login() {
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
               </button>
             </form>
-
           <div className="text-center mt-6">
               <p className="text-sm text-[#424754]">
                 ¿No tienes una cuenta?{' '}

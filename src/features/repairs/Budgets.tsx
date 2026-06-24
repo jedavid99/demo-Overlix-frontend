@@ -38,7 +38,6 @@ import {
   DialogFooter,
 } from '@/shared/components/ui/dialog'
 import { exportToCSV } from '@/shared/lib/export'
-
 // Tipos
 interface Budget {
   id: string
@@ -51,21 +50,17 @@ interface Budget {
   date: Date
   technician: string
 }
-
 // Datos mock eliminados – conectar con API real
 // const sampleBudgets: Budget[] = [ ... ]
-
 const STATUS_COLORS = {
   Pendiente: '#f59e0b', // amber
   Aprobado: '#10b981', // green
   Rechazado: '#ef4444', // red
   Completado: '#3b82f6', // blue
 }
-
 const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value)
 }
-
 const Budgets = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
@@ -75,7 +70,6 @@ const Budgets = () => {
   const [budgets, setBudgets] = useState<Budget[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
-
   // Estado del modal
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [newBudget, setNewBudget] = useState({
@@ -89,7 +83,6 @@ const Budgets = () => {
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
-
   useEffect(() => {
     // 🔌 Conectar con API real:
     // api.get('/budgets').then(res => setBudgets(res.data)).catch(() => setError(true)).finally(() => setLoading(false))
@@ -98,7 +91,6 @@ const Budgets = () => {
       setLoading(false)
     }, 800)
   }, [])
-
   // Filtrar presupuestos
   const filteredBudgets = budgets.filter((budget) => {
     const matchesSearch =
@@ -108,13 +100,11 @@ const Budgets = () => {
     const matchesStatus = statusFilter === 'all' || budget.status === statusFilter
     return matchesSearch && matchesStatus
   })
-
   // KPIs
   const totalBudgets = filteredBudgets.length
   const totalPending = filteredBudgets.filter((b) => b.status === 'Pendiente').length
   const totalApproved = filteredBudgets.filter((b) => b.status === 'Aprobado').length
   const totalValue = filteredBudgets.reduce((sum, b) => sum + b.total, 0)
-
   // Datos para gráfico de estado
   const statusData = [
     { name: 'Pendiente', value: totalPending },
@@ -128,14 +118,12 @@ const Budgets = () => {
       value: filteredBudgets.filter((b) => b.status === 'Completado').length,
     },
   ].filter((d) => d.value > 0)
-
   // Paginación
   const paginatedBudgets = filteredBudgets.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   )
   const totalPages = Math.ceil(filteredBudgets.length / itemsPerPage)
-
   // Exportar CSV
   const handleExport = () => {
     const csvData = filteredBudgets.map((budget) => ({
@@ -151,14 +139,12 @@ const Budgets = () => {
     }))
     exportToCSV(csvData, 'presupuestos')
   }
-
   const handleRetry = () => {
     setError(false)
     setLoading(true)
     // api.get('/budgets').then(...)
     setLoading(false)
   }
-
   const getStatusBadge = (status: Budget['status']) => {
     const variants = {
       Pendiente: 'warning',
@@ -168,7 +154,6 @@ const Budgets = () => {
     }
     return variants[status] as 'warning' | 'success' | 'destructive' | 'default'
   }
-
   // Manejadores del modal
   const handleNewBudgetChange = (field: string, value: string | number) => {
     setNewBudget((prev) => ({ ...prev, [field]: value }))
@@ -176,7 +161,6 @@ const Budgets = () => {
       setErrors((prev) => ({ ...prev, [field]: '' }))
     }
   }
-
   const validateNewBudget = (): boolean => {
     const newErrors: Record<string, string> = {}
     if (!newBudget.clientName.trim()) newErrors.clientName = 'El nombre del cliente es obligatorio'
@@ -189,7 +173,6 @@ const Budgets = () => {
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
-
   const handleSaveBudget = async () => {
     if (!validateNewBudget()) return
     setIsSubmitting(true)
@@ -218,10 +201,8 @@ const Budgets = () => {
     setErrors({})
     setIsSubmitting(false)
   }
-
   const deviceTypes = ['Celular', 'Tablet', 'Portátil', 'Consola', 'Smartwatch', 'Otro']
   const technicians = ['Carlos López', 'Ana Martínez', 'Pedro Sánchez', 'Laura Díaz']
-
   if (loading) {
     return (
       <motion.div
@@ -244,7 +225,6 @@ const Budgets = () => {
       </motion.div>
     )
   }
-
   if (error) {
     return (
       <motion.div
@@ -262,7 +242,6 @@ const Budgets = () => {
       </motion.div>
     )
   }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -287,7 +266,6 @@ const Budgets = () => {
           </Button>
         </div>
       </div>
-
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
@@ -301,7 +279,6 @@ const Budgets = () => {
             <p className="text-sm text-muted-foreground">Total de presupuestos</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -313,7 +290,6 @@ const Budgets = () => {
             <p className="text-sm text-muted-foreground">Pendientes de aprobación</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -325,7 +301,6 @@ const Budgets = () => {
             <p className="text-sm text-muted-foreground">Aprobados</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -338,7 +313,6 @@ const Budgets = () => {
           </CardContent>
         </Card>
       </div>
-
       {/* Filtros */}
       <Card className="p-4">
         <div className="flex flex-wrap items-center gap-3">
@@ -380,7 +354,6 @@ const Budgets = () => {
           )}
         </div>
       </Card>
-
       {/* Gráfico de estado y tabla */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Tabla de presupuestos (ocupa 2 columnas) */}
@@ -496,7 +469,6 @@ const Budgets = () => {
             )}
           </CardContent>
         </Card>
-
         {/* Gráfico de distribución por estado */}
         <Card>
           <CardHeader>
@@ -573,7 +545,6 @@ const Budgets = () => {
           </CardContent>
         </Card>
       </div>
-
       {/* Modal para agregar nuevo presupuesto */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
@@ -583,7 +554,6 @@ const Budgets = () => {
               Nuevo Presupuesto
             </DialogTitle>
           </DialogHeader>
-
           <div className="space-y-4 py-4">
             {/* Datos del cliente */}
             <div className="space-y-3">
@@ -631,7 +601,6 @@ const Budgets = () => {
                 </div>
               </div>
             </div>
-
             {/* Datos del dispositivo */}
             <div className="space-y-3">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Datos del Dispositivo</h3>
@@ -699,7 +668,6 @@ const Budgets = () => {
                 )}
               </div>
             </div>
-
             {/* Costo y técnico */}
             <div className="space-y-3">
               <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Costo y Asignación</h3>
@@ -750,7 +718,6 @@ const Budgets = () => {
               </div>
             </div>
           </div>
-
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsModalOpen(false)} disabled={isSubmitting}>
               Cancelar
@@ -769,5 +736,4 @@ const Budgets = () => {
     </motion.div>
   )
 }
-
 export default Budgets

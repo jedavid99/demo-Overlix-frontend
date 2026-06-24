@@ -21,7 +21,6 @@ import { Card, CardContent } from '@/shared/components/ui/card'
 import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
 import { MdCheck } from 'react-icons/md'
-
 export default function CanjeNew() {
   const navigate = useNavigate()
   const [step, setStep] = useState(1)
@@ -34,32 +33,25 @@ export default function CanjeNew() {
   const [checks, setChecks] = useState({ screen: false, faceid: false, backglass: false, cameras: false })
   const [selectedNew, setSelectedNew] = useState({ id: '', name: '', desc: '', price: 0 })
   const [damages, setDamages] = useState<{ id: number; label: string; amount: number }[]>([])
-
   // 📦 Catálogo de dispositivos para canje – vacío (cargar desde API)
   const availableDevices: { id: string; name: string; storage: string; image: string; basePrice: number }[] = []
-
   // 📦 Catálogo de dispositivos nuevos – vacío (cargar desde API)
   const newDevices: { id: string; name: string; desc: string; price: number }[] = []
-
   const addDamage = (label = 'Scratch', amount = 15) => setDamages(d => [...d, { id: d.length + 1, label, amount }])
   const removeDamage = (id: number) => setDamages(d => d.filter(x => x.id !== id))
-
   // Tabla de precios base – vacía
   const tradeInBase: Record<string, number> = {}
-
   const tradeInCredit = useMemo(() => {
     const base = tradeInBase[device.model] ?? 0
     const batteryFactor = device.battery / 100
     const damageTotal = damages.reduce((s, x) => s + x.amount, 0)
     return Math.max(0, Math.round((base * batteryFactor - damageTotal) * 100) / 100)
   }, [device, damages, tradeInBase])
-
   const finalize = () => {
     const id = `TC-${Math.floor(Math.random() * 900000) + 100000}`
     alert(`Transacción completada: ${id}`)
     navigate('/iphone-canje')
   }
-
   // 🎨 Colores – pueden venir de la API
   const colorOptions = [
     { name: 'Negro Espacial', value: 'space-black', hex: '#3b3c36' },
@@ -68,7 +60,6 @@ export default function CanjeNew() {
     { name: 'Plata', value: 'silver', hex: '#a8a9ad' },
     { name: 'Púrpura Profundo', value: 'purple', hex: '#2c445a' }
   ]
-
   const StepperComponent = ({ current }: { current: number }) => (
     <div className="mb-12">
       <div className="flex items-center justify-between relative">
@@ -99,7 +90,6 @@ export default function CanjeNew() {
       </div>
     </div>
   )
-
   return (
     <div className="space-y-6">
       <StepperComponent current={step} />
@@ -116,7 +106,6 @@ export default function CanjeNew() {
           {step === 3 && 'Paso 3: Revise y confirme la transacción de canje.'}
         </p>
       </div>
-
       {step === 1 && (
         <div className="space-y-6">
           <Card>
@@ -125,7 +114,6 @@ export default function CanjeNew() {
                 <ShoppingBag className="text-primary p-2 bg-primary/10 rounded-lg w-8 h-8" />
                 <h2 className="text-xl font-bold text-foreground">Seleccione su Dispositivo de Canje</h2>
               </div>
-
               {/* Buscador (opcional, mejora UX) */}
               <div className="mb-4">
                 <input
@@ -134,7 +122,6 @@ export default function CanjeNew() {
                   className="w-full px-4 py-2 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/20"
                 />
               </div>
-
               {availableDevices.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
                   <Smartphone className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
@@ -172,7 +159,6 @@ export default function CanjeNew() {
               )}
             </CardContent>
           </Card>
-
           {selectedDeviceId && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-6">
@@ -215,7 +201,6 @@ export default function CanjeNew() {
                     </div>
                   </CardContent>
                 </Card>
-
                 <Card>
                   <CardContent className="p-8">
                     <div className="flex items-center gap-3 mb-6">
@@ -253,7 +238,6 @@ export default function CanjeNew() {
                   </CardContent>
                 </Card>
               </div>
-
               {/* Estimated Price */}
               <div className="lg:col-span-1 flex flex-col gap-6">
                 <Card className="bg-gradient-to-br from-primary to-primary/80 text-white border-0">
@@ -276,7 +260,6 @@ export default function CanjeNew() {
                     </div>
                   </CardContent>
                 </Card>
-
                 <div className="flex flex-col gap-3">
                   <Button variant="outline" onClick={() => navigate('/iphone-canje')} className="w-full">
                     <X size={16} className="mr-2" />
@@ -292,7 +275,6 @@ export default function CanjeNew() {
           )}
         </div>
       )}
-
       {step === 2 && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-7 space-y-8">
@@ -326,7 +308,6 @@ export default function CanjeNew() {
                 </div>
               </CardContent>
             </Card>
-
             {/* Functional Inspection */}
             <Card>
               <CardContent className="p-8">
@@ -366,7 +347,6 @@ export default function CanjeNew() {
                       <CheckCircle className="text-muted peer-checked:text-primary w-5 h-5" />
                     </div>
                   </label>
-
                   <label className="relative group cursor-pointer">
                     <input 
                       type="checkbox" 
@@ -382,7 +362,6 @@ export default function CanjeNew() {
                       <CheckCircle className="text-muted peer-checked:text-primary w-5 h-5" />
                     </div>
                   </label>
-
                   <label className="relative group cursor-pointer">
                     <input 
                       type="checkbox" 
@@ -401,7 +380,6 @@ export default function CanjeNew() {
                 </div>
               </CardContent>
             </Card>
-
             {/* Estimated Credit */}
             <Card className="bg-primary text-white border-0 shadow-xl shadow-primary/20">
               <CardContent className="p-8 flex items-center justify-between relative overflow-hidden">
@@ -421,7 +399,6 @@ export default function CanjeNew() {
               </CardContent>
             </Card>
           </div>
-
           {/* Damage Mapping */}
           <div className="lg:col-span-5">
             <Card className="h-full">
@@ -456,7 +433,6 @@ export default function CanjeNew() {
                       <span className="text-muted-foreground font-bold text-xs uppercase opacity-40">Vista Frontal</span>
                     </div>
                   </div>
-
                   {/* Damage List */}
                   <div className="w-full space-y-3">
                     {damages.length === 0 ? (
@@ -473,7 +449,6 @@ export default function CanjeNew() {
                       ))
                     )}
                   </div>
-
                   {/* Quick Add Damages */}
                   <div className="w-full grid grid-cols-3 gap-2 pt-4 border-t border-border">
                     <Button 
@@ -504,7 +479,6 @@ export default function CanjeNew() {
           </div>
         </div>
       )}
-
       {step === 3 && (
         <div className="space-y-6">
           <div className="flex justify-between items-end mb-8">
@@ -517,7 +491,6 @@ export default function CanjeNew() {
               <span className="font-mono text-lg font-bold text-foreground">#{Math.floor(Math.random() * 90000) + 10000}-XC</span>
             </div>
           </div>
-
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-8 space-y-6">
               <Card>
@@ -549,7 +522,6 @@ export default function CanjeNew() {
                         </div>
                       </div>
                     </div>
-
                     <div className="p-8 bg-primary/5">
                       <div className="flex items-center gap-2 text-primary/60 mb-6 uppercase tracking-wider text-[10px] font-bold">
                         <CheckCircle className="w-4 h-4" />
@@ -578,7 +550,6 @@ export default function CanjeNew() {
                   </div>
                 </CardContent>
               </Card>
-
               <Card>
                 <CardContent className="p-8">
                   <div className="flex items-center justify-between mb-6">
@@ -598,7 +569,6 @@ export default function CanjeNew() {
                 </CardContent>
               </Card>
             </div>
-
             <div className="lg:col-span-4">
               <div className="sticky top-24 space-y-4">
                 <Card className="bg-slate-900 text-white border-0 shadow-2xl relative overflow-hidden">
@@ -630,12 +600,10 @@ export default function CanjeNew() {
                         </div>
                       </div>
                     </div>
-
                     <Button onClick={finalize} className="w-full" size="lg">
                       <CheckCircle size={20} className="mr-2" />
                       Completar e Imprimir
                     </Button>
-
                     <div className="mt-6 space-y-3 relative z-10">
                       <div className="flex items-center gap-3 text-[10px] text-slate-500 font-bold uppercase tracking-wider">
                         <CheckCircle className="w-4 h-4" />
@@ -648,7 +616,6 @@ export default function CanjeNew() {
                     </div>
                   </CardContent>
                 </Card>
-
                 <Card>
                   <CardContent className="p-4 flex flex-col gap-2">
                     <Button variant="outline" onClick={() => setStep(2)} className="w-full justify-between">
@@ -666,7 +633,6 @@ export default function CanjeNew() {
           </div>
         </div>
       )}
-
       {step > 1 && step < 3 && (
         <div className="mt-8 flex gap-4">
           <Button variant="outline" onClick={() => setStep(step - 1)} className="flex-1">

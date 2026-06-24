@@ -19,7 +19,6 @@ import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge'
 import { Input } from '@/shared/components/ui/input'
 import DataTable from '@/shared/components/data-table'
-
 interface Invoice {
   id: string;
   number: string;
@@ -29,7 +28,6 @@ interface Invoice {
   amount: number;
   status: 'authorized' | 'pending' | 'error';
 }
-
 export default function InvoicesList() {
   const [dateRange, setDateRange] = useState('Last 30 Days');
   const [invoiceType, setInvoiceType] = useState('All');
@@ -37,7 +35,6 @@ export default function InvoicesList() {
   const [arcaStatus, setArcaStatus] = useState('Any Status');
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
-
   const invoices: Invoice[] = [
     {
       id: '1',
@@ -76,7 +73,6 @@ export default function InvoicesList() {
       status: 'authorized',
     },
   ];
-
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'authorized':
@@ -104,7 +100,6 @@ export default function InvoicesList() {
         return <Badge variant="outline">{status}</Badge>;
     }
   };
-
   const filteredInvoices = invoices.filter(invoice => {
     const matchesSearch = invoice.number.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          invoice.customer.toLowerCase().includes(searchQuery.toLowerCase());
@@ -114,11 +109,9 @@ export default function InvoicesList() {
                          (arcaStatus === 'Error' && invoice.status === 'error');
     return matchesSearch && matchesStatus;
   });
-
   const totalAmount = invoices.reduce((sum, inv) => sum + inv.amount, 0);
   const pendingCount = invoices.filter(inv => inv.status === 'pending').length;
   const unpaidAmount = 8120.50;
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -139,7 +132,6 @@ export default function InvoicesList() {
           </Link>
         </div>
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
@@ -154,7 +146,6 @@ export default function InvoicesList() {
             </div>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-start justify-between mb-4">
@@ -165,7 +156,6 @@ export default function InvoicesList() {
             <p className="text-sm text-muted-foreground mt-2">Requieren acción ARCA</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-start justify-between mb-4">
@@ -177,7 +167,6 @@ export default function InvoicesList() {
           </CardContent>
         </Card>
       </div>
-
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-6">
@@ -198,7 +187,6 @@ export default function InvoicesList() {
                 <option>Personalizado</option>
               </select>
             </div>
-
             <div className="space-y-2">
               <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Tipo de factura</label>
               <div className="flex gap-2 flex-wrap">
@@ -214,7 +202,6 @@ export default function InvoicesList() {
                 ))}
               </div>
             </div>
-
             <div className="space-y-2">
               <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Estado de pago</label>
               <select
@@ -228,7 +215,6 @@ export default function InvoicesList() {
                 <option>Parcialmente pagada</option>
               </select>
             </div>
-
             <div className="space-y-2">
               <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Estado ARCA</label>
               <select
@@ -245,7 +231,6 @@ export default function InvoicesList() {
           </div>
         </CardContent>
       </Card>
-
       <DataTable
         data={filteredInvoices.map(inv => ({
           id: inv.id,
@@ -264,4 +249,3 @@ export default function InvoicesList() {
     </div>
   );
 }
-

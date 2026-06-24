@@ -8,41 +8,31 @@ import { Input } from '../components/ui/input'
 import { Badge } from '../components/ui/badge'
 import { Skeleton } from '../components/ui/skeleton'
 import DataTable from '../components/data-table'
-
 // Datos mock eliminados - conectar con API real
-
 export default function Clients() {
   const [query, setQuery] = useState('')
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(false)
   const [statusFilter, setStatusFilter] = useState<'all' | 'activo' | 'inactivo'>('all')
   const pageSize = 5
-
   // Conectar con API real: api.get('/clients')
   const [clients, setClients] = useState<any[]>([])
-
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     let result = clients
-
     if (q) {
       result = result.filter(c => (
         c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || c.dni.toLowerCase().includes(q)
       ))
     }
-
     if (statusFilter !== 'all') {
       result = result.filter(c => c.status.toLowerCase() === statusFilter)
     }
-
     return result
   }, [query, statusFilter])
-
   const total = filtered.length
   const pages = Math.max(1, Math.ceil(total / pageSize))
-
   const onSearch = (v: string) => { setQuery(v); setPage(1) }
-
   const tableData = filtered.slice((page - 1) * pageSize, page * pageSize).map(c => ({
     id: c.id,
     name: c.name,
@@ -51,7 +41,6 @@ export default function Clients() {
     joinDate: c.joinDate,
     transactions: c.transactions,
   }))
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -71,7 +60,6 @@ export default function Clients() {
           </Button>
         </Link>
       </div>
-
       <div className="flex flex-wrap gap-4 items-center">
         <div className="relative flex-1 min-w-[200px] max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
@@ -106,7 +94,6 @@ export default function Clients() {
           </Badge>
         </div>
       </div>
-
       {loading ? (
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -144,4 +131,3 @@ export default function Clients() {
     </motion.div>
   )
 }
-

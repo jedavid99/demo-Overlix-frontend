@@ -9,9 +9,7 @@ import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/shared/components/ui/dialog'
-
 // Datos mock eliminados - conectar con API real
-
 // const salesData = [
   // { name: 'Lun', ingresos: 45000 },
   // { name: 'Mar', ingresos: 52000 },
@@ -21,20 +19,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
   // { name: 'Sáb', ingresos: 72000 },
   // { name: 'Dom', ingresos: 25000 },
 // ]
-
 // const pendingDeliveries = [
   // { id: '1', client: 'María González', device: 'iPhone 13', date: 'Hoy', status: 'Hoy' },
   // { id: '2', client: 'Juan Pérez', device: 'MacBook Pro', date: 'Mañana', status: 'Mañana' },
   // { id: '3', client: 'Carlos López', device: 'Samsung S22', date: '12/10/2024', status: 'Atrasado' },
   // { id: '4', client: 'Ana Martínez', device: 'iPad Air', date: 'Mañana', status: 'Mañana' },
 // ]
-
 // const stockAlerts = [
   // { id: '1', name: 'Pantalla iPhone 14', quantity: 2, unit: 'uds' },
   // { id: '2', name: 'Batería MacBook Air M2', quantity: 1, unit: 'uds' },
   // { id: '3', name: 'Cámara Samsung S23', quantity: 4, unit: 'uds' },
 // ]
-
 // const repairStatesData = [
   // { name: 'Diagnóstico', value: 12, color: '#F59E0B' },
   // { name: 'En reparación', value: 8, color: '#3B82F6' },
@@ -42,13 +37,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
   // { name: 'Completado', value: 15, color: '#10B981' },
   // { name: 'Entregado', value: 20, color: '#6B7280' },
 // ]
-
 // const recentClients = [
   // { id: '1', name: 'Roberto García', phone: '555-1234', lastVisit: 'Hace 2 días' },
   // { id: '2', name: 'Laura Fernández', phone: '555-5678', lastVisit: 'Hace 5 días' },
   // { id: '3', name: 'Diego Rodríguez', phone: '555-9012', lastVisit: 'Hace 1 semana' },
 // ]
-
 const getStatusBadge = (status: string) => {
   switch (status) {
     case 'diagnostic': return { variant: 'warning' as const, label: <span className="inline-flex items-center gap-1"><MdSearch size={14} /> Diagnóstico</span> }
@@ -58,7 +51,6 @@ const getStatusBadge = (status: string) => {
     default: return { variant: 'secondary' as const, label: status }
   }
 }
-
 const getDeliveryBadge = (status: string) => {
   switch (status) {
     case 'Hoy': return { variant: 'success' as const, label: 'Hoy' }
@@ -67,11 +59,9 @@ const getDeliveryBadge = (status: string) => {
     default: return { variant: 'secondary' as const, label: status }
   }
 }
-
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(amount)
 }
-
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
@@ -85,7 +75,6 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   }
   return null
 }
-
 const CustomPieTooltip = ({ active, payload, repairStatesData }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0]
@@ -100,12 +89,10 @@ const CustomPieTooltip = ({ active, payload, repairStatesData }: any) => {
   }
   return null
 }
-
 export default function Dashboard() {
   const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-
   // State for API data
   const [repairs, setRepairs] = useState<any[]>([])
   const [dailyActivities, setDailyActivities] = useState<any[]>([])
@@ -114,14 +101,12 @@ export default function Dashboard() {
   const [stockAlerts, setStockAlerts] = useState<any[]>([])
   const [repairStatesData, setRepairStatesData] = useState<any[]>([])
   const [recentClients, setRecentClients] = useState<any[]>([])
-
   // KPIs - will be calculated from real data
   const totalActiveOrders = repairs.filter(r => r.status !== 'completed').length
   const totalToDeliver = 0
   const totalRevenueToday = 0
   const totalEfficiency = 0
   const avgRepairTime = 0
-
   // Placeholder function for API integration
   const fetchDashboardData = async () => {
     // TODO: Replace with actual API calls
@@ -149,12 +134,10 @@ export default function Dashboard() {
     //   setLoading(false)
     // }
   }
-
   // Uncomment to enable data fetching on mount
   // useEffect(() => {
   //   fetchDashboardData()
   // }, [])
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -166,7 +149,6 @@ export default function Dashboard() {
         <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
         <p className="text-muted-foreground">Bienvenido al panel de administración</p>
       </div>
-
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
@@ -188,7 +170,6 @@ export default function Dashboard() {
             )}
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -208,7 +189,6 @@ export default function Dashboard() {
             )}
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -228,7 +208,6 @@ export default function Dashboard() {
             )}
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -248,7 +227,6 @@ export default function Dashboard() {
             )}
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -269,10 +247,8 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
-
       {/* Acciones Rápidas */}
       
-
       {/* Contenido principal: gráficos + tablas */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
         {/* Columna izquierda (3/5) */}
@@ -361,7 +337,6 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </div>
-
         {/* Columna derecha (2/5) */}
         <div className="lg:col-span-2 space-y-5">
           <Card className="flex flex-col h-full">
@@ -390,10 +365,8 @@ export default function Dashboard() {
              
             </CardContent>
           </Card>
-
           {/* Gráfico de torta: ahora con overflow-hidden */}
           
-
           {/* Últimos clientes */}
           <Card>
             <CardHeader className="p-4 pb-2">
@@ -418,7 +391,6 @@ export default function Dashboard() {
           </Card>
         </div>
       </div>
-
       {/* Fila inferior: Entregas pendientes y Stock crítico */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <Card>
@@ -446,7 +418,6 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
-
         <Card>
           <CardHeader className="p-4 pb-2">
             <div className="flex items-center justify-between">
@@ -481,7 +452,6 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
-
       {/* Modal de movimiento */}
      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-md">
@@ -500,7 +470,6 @@ export default function Dashboard() {
               </div>
               <span className="text-sm font-semibold text-foreground">Registrar Venta</span>
             </button>
-
             {/* Agregar Cliente */}
             <button
               onClick={() => { setIsModalOpen(false); navigate('/clients/add') }}
@@ -511,7 +480,6 @@ export default function Dashboard() {
               </div>
               <span className="text-sm font-semibold text-foreground">Agregar Cliente</span>
             </button>
-
             {/* Agregar Producto */}
             <button
               onClick={() => { setIsModalOpen(false); navigate('/stock/add') }}
@@ -522,7 +490,6 @@ export default function Dashboard() {
               </div>
               <span className="text-sm font-semibold text-foreground">Agregar Producto</span>
             </button>
-
             {/* Nuevo Gasto */}
             <button
               onClick={() => { setIsModalOpen(false); navigate('/expenses/add') }}
@@ -533,7 +500,6 @@ export default function Dashboard() {
               </div>
               <span className="text-sm font-semibold text-foreground">Nuevo Gasto</span>
             </button>
-
             {/* Nueva Reparación (ocupa toda la fila) */}
             <button
               onClick={() => { setIsModalOpen(false); navigate('/reparaciones/add') }}
@@ -553,8 +519,3 @@ export default function Dashboard() {
     </motion.div>
   )
 }
-
-
-
-
-

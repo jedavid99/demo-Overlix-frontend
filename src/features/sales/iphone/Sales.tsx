@@ -21,7 +21,6 @@ import { MdPhoneAndroid } from 'react-icons/md';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
-
 interface CartItem {
   id: string;
   model: string;
@@ -31,7 +30,6 @@ interface CartItem {
   quantity: number;
   insurance?: string;
 }
-
 interface IPhoneProduct {
   id: string;
   name: string;
@@ -42,7 +40,6 @@ interface IPhoneProduct {
   stock: 'in' | 'low' | 'out';
   quantity?: number;
 }
-
 export default function IPhoneSales() {
   const [searchQuery, setSearchQuery] = useState('');
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -50,13 +47,10 @@ export default function IPhoneSales() {
   const [customerInfo, setCustomerInfo] = useState({ name: '', email: '', phone: '', address: '' });
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [insuranceSelection, setInsuranceSelection] = useState<Record<string, string>>({});
-
   // 📦 Catálogo de productos – vacío (cargar desde API)
   const iphones: IPhoneProduct[] = [];
-
   // 📦 Planes de seguro – vacío (cargar desde API o dejar vacío)
   const insurancePlans: { id: string; name: string; price: number; features?: string }[] = [];
-
   const addToCart = (phone: IPhoneProduct) => {
     if (phone.stock === 'out') return;
     
@@ -70,7 +64,6 @@ export default function IPhoneSales() {
     };
     setCart([...cart, cartItem]);
   };
-
   const updateQuantity = (id: string, delta: number) => {
     setCart(cart.map(item => 
       item.id === id 
@@ -78,11 +71,9 @@ export default function IPhoneSales() {
         : item
     ));
   };
-
   const removeFromCart = (id: string) => {
     setCart(cart.filter(item => item.id !== id));
   };
-
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const tax = subtotal * 0.08;
   const insuranceTotal = cart.reduce((sum, item) => {
@@ -90,7 +81,6 @@ export default function IPhoneSales() {
     return sum + (plan ? plan.price * item.quantity : 0);
   }, 0);
   const total = subtotal + tax + insuranceTotal;
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -104,7 +94,6 @@ export default function IPhoneSales() {
           {cart.length} en carrito
         </Badge>
       </div>
-
       {/* KPI Cards (datos en 0) */}
       {currentStep === 1 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -123,7 +112,6 @@ export default function IPhoneSales() {
               </div>
             </CardContent>
           </Card>
-
           <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
             <CardContent className="p-6">
               <div className="flex items-start justify-between mb-4">
@@ -136,7 +124,6 @@ export default function IPhoneSales() {
               <p className="text-muted-foreground text-sm">{cart.length} en carrito</p>
             </CardContent>
           </Card>
-
           <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
             <CardContent className="p-6">
               <div className="flex items-start justify-between mb-4">
@@ -151,7 +138,6 @@ export default function IPhoneSales() {
           </Card>
         </div>
       )}
-
       {/* Step Indicator */}
       <div className="flex items-center justify-center gap-4">
         {[1, 2, 3, 4].map(step => (
@@ -170,7 +156,6 @@ export default function IPhoneSales() {
           </React.Fragment>
         ))}
       </div>
-
       {/* Step 1: Product Catalog (vacío) */}
       {currentStep === 1 && (
         <div className="space-y-6">
@@ -184,7 +169,6 @@ export default function IPhoneSales() {
               className="w-full pl-10 pr-4 py-3 rounded-lg border border-input bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/20"
             />
           </div>
-
           {iphones.length === 0 ? (
             <Card>
               <CardContent className="p-12 text-center">
@@ -198,7 +182,6 @@ export default function IPhoneSales() {
               {/* Aquí irían los productos si hubiera */}
             </div>
           )}
-
           <div className="flex justify-end gap-3 pt-4">
             <Button
               onClick={() => setCurrentStep(2)}
@@ -209,12 +192,10 @@ export default function IPhoneSales() {
           </div>
         </div>
       )}
-
       {/* Step 2: Shopping Cart */}
       {currentStep === 2 && (
         <div className="space-y-6">
           <h2 className="text-2xl font-bold text-foreground">Carrito de compras ({cart.length})</h2>
-
           {cart.length > 0 ? (
             <div className="grid lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-4">
@@ -230,7 +211,6 @@ export default function IPhoneSales() {
                           <X size={16} className="text-destructive" />
                         </Button>
                       </div>
-
                       <div className="flex items-center gap-4 mb-4">
                         <Button variant="outline" size="icon-sm" onClick={() => updateQuantity(item.id, -1)}>
                           <Minus size={16} />
@@ -240,7 +220,6 @@ export default function IPhoneSales() {
                           <Plus size={16} />
                         </Button>
                       </div>
-
                       {/* Insurance - oculto si no hay planes */}
                       {insurancePlans.length > 0 && (
                         <div className="border-t border-border pt-4">
@@ -262,7 +241,6 @@ export default function IPhoneSales() {
                           </div>
                         </div>
                       )}
-
                       <div className="flex justify-between items-center mt-4 pt-4 border-t border-border">
                         <span className="font-bold text-foreground">Subtotal:</span>
                         <span className="text-lg font-bold text-primary">${(item.price * item.quantity).toFixed(2)}</span>
@@ -271,7 +249,6 @@ export default function IPhoneSales() {
                   </Card>
                 ))}
               </div>
-
               <Card className="h-fit sticky top-20">
                 <CardContent className="p-6">
                   <h3 className="font-bold text-foreground mb-4">Resumen del pedido</h3>
@@ -317,12 +294,10 @@ export default function IPhoneSales() {
           )}
         </div>
       )}
-
       {/* Step 3: Customer Information */}
       {currentStep === 3 && (
         <div className="max-w-2xl mx-auto space-y-6">
           <h2 className="text-2xl font-bold text-foreground">Información del cliente</h2>
-
           <Card>
             <CardContent className="p-6 space-y-5">
               <div>
@@ -337,7 +312,6 @@ export default function IPhoneSales() {
                   placeholder="Nombre completo"
                 />
               </div>
-
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
@@ -364,7 +338,6 @@ export default function IPhoneSales() {
                   />
                 </div>
               </div>
-
               <div>
                 <label className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
                   <MapPin size={16} /> Dirección
@@ -379,7 +352,6 @@ export default function IPhoneSales() {
               </div>
             </CardContent>
           </Card>
-
           <div className="flex gap-3 justify-end">
             <Button onClick={() => setCurrentStep(2)} variant="outline">
               Atrás
@@ -393,12 +365,10 @@ export default function IPhoneSales() {
           </div>
         </div>
       )}
-
       {/* Step 4: Payment & Checkout */}
       {currentStep === 4 && (
         <div className="max-w-2xl mx-auto space-y-6">
           <h2 className="text-2xl font-bold text-foreground">Pago y confirmación</h2>
-
           <Card>
             <CardContent className="p-6 space-y-6">
               <div>
@@ -415,7 +385,6 @@ export default function IPhoneSales() {
                   ))}
                 </div>
               </div>
-
               <div className="border-t border-border pt-6">
                 <h3 className="font-semibold text-foreground mb-4">Entregar a</h3>
                 <p className="text-foreground">{customerInfo.name}</p>
@@ -423,7 +392,6 @@ export default function IPhoneSales() {
                 <p className="text-sm text-muted-foreground">{customerInfo.phone}</p>
                 <p className="text-sm text-muted-foreground">{customerInfo.address}</p>
               </div>
-
               <div className="border-t border-border pt-6">
                 <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                   <CreditCard size={18} /> Método de pago
@@ -455,7 +423,6 @@ export default function IPhoneSales() {
                   ))}
                 </div>
               </div>
-
               <div className="bg-muted/50 p-4 rounded-lg space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
@@ -478,7 +445,6 @@ export default function IPhoneSales() {
               </div>
             </CardContent>
           </Card>
-
           <div className="flex gap-3">
             <Button onClick={() => setCurrentStep(3)} variant="outline" className="flex-1">
               Atrás

@@ -17,13 +17,11 @@ import {
   SelectValue,
 } from '@/shared/components/ui/select'
 import { AlertCircle, UserPlus, X } from 'lucide-react'
-
 interface CreateUserModalProps {
   isOpen: boolean
   onClose: () => void
   onCreateUser: (user: any) => void
 }
-
 const CreateUserModal: React.FC<CreateUserModalProps> = ({
   isOpen,
   onClose,
@@ -40,7 +38,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
-
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {}
     if (!formData.fullName.trim()) newErrors.fullName = 'El nombre completo es obligatorio'
@@ -54,7 +51,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!validate()) return
@@ -75,7 +71,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
       })
     }, 1000)
   }
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
@@ -85,7 +80,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
             Crear Nuevo Usuario
           </DialogTitle>
         </DialogHeader>
-
         <form onSubmit={handleSubmit} className="space-y-4 pt-2">
           {/* Nombre completo */}
           <div className="space-y-1.5">
@@ -105,7 +99,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
               </p>
             )}
           </div>
-
           {/* Email */}
           <div className="space-y-1.5">
             <Label htmlFor="email" className="text-sm font-semibold">
@@ -125,7 +118,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
               </p>
             )}
           </div>
-
           {/* Teléfono */}
           <div className="space-y-1.5">
             <Label htmlFor="phone" className="text-sm font-semibold">
@@ -144,7 +136,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
               </p>
             )}
           </div>
-
           {/* Rol */}
           <div className="space-y-1.5">
             <Label htmlFor="role" className="text-sm font-semibold">
@@ -206,7 +197,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
               </p>
             )}
           </div>
-
           {/* Departamento (opcional) */}
           <div className="space-y-1.5">
             <Label htmlFor="department" className="text-sm font-semibold">
@@ -219,7 +209,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
               placeholder="Ej: Taller, Ventas, Administración"
             />
           </div>
-
           {/* Contraseña */}
           <div className="space-y-1.5">
             <Label htmlFor="password" className="text-sm font-semibold">
@@ -239,7 +228,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
               </p>
             )}
           </div>
-
           {/* Confirmar contraseña */}
           <div className="space-y-1.5">
             <Label htmlFor="confirmPassword" className="text-sm font-semibold">
@@ -259,7 +247,6 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
               </p>
             )}
           </div>
-
           <DialogFooter className="gap-2 pt-2">
             <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
               Cancelar
@@ -273,5 +260,4 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({
     </Dialog>
   )
 }
-
 export default CreateUserModal

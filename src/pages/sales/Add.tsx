@@ -2,11 +2,8 @@ import React, { useMemo, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, Filter, Plus, Minus, CreditCard, DollarSign, ShoppingCart, ChevronRight } from 'lucide-react'
 import axios from 'axios'
-
 type CatalogItem = { id: string; name: string; price: number; stock?: number; category?: string }
-
 const API_URL = 'https://overlix-demo-backend-production.up.railway.app/api'
-
 export default function SaleAdd() {
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
@@ -14,7 +11,6 @@ export default function SaleAdd() {
   const [catalog, setCatalog] = useState<CatalogItem[]>([])
   const [items, setItems] = useState<{ item: CatalogItem; qty: number }[]>([])
   const [isLoading, setIsLoading] = useState(true)
-
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -31,9 +27,7 @@ export default function SaleAdd() {
     }
     fetchProducts()
   }, [])
-
   const filtered = useMemo(() => catalog.filter(c => c.name.toLowerCase().includes(query.toLowerCase())), [query, catalog])
-
   const addItem = (it: CatalogItem) => {
     setItems(prev => {
       const existing = prev.find(p => p.item.id === it.id)
@@ -41,18 +35,14 @@ export default function SaleAdd() {
       return [{ item: it, qty: 1 }, ...prev]
     })
   }
-
   const changeQty = (id: string, delta: number) => {
     setItems(prev => prev.map(p => p.item.id === id ? { ...p, qty: Math.max(1, Math.min((p.qty||1)+delta, p.item.stock||9999)) } : p))
   }
-
   const removeItem = (id: string) => setItems(prev => prev.filter(p => p.item.id !== id))
-
   const subtotal = items.reduce((s, p) => s + p.item.price * p.qty, 0)
   const taxRate = 0.08
   const tax = +(subtotal * taxRate).toFixed(2)
   const total = +(subtotal + tax).toFixed(2)
-
   return (
     <div className="h-full flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -62,7 +52,6 @@ export default function SaleAdd() {
           <button className="px-4 py-2 rounded-lg bg-primary text-white font-bold">Custom Item</button>
         </div>
       </div>
-
       <div className="flex-1 flex gap-4 min-h-0">
         {/* Catalog */}
         <section className="flex-1 min-w-0 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm flex flex-col">
@@ -74,7 +63,6 @@ export default function SaleAdd() {
               </button>
             </div>
           </div>
-
           <div className="p-4 flex gap-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -84,7 +72,6 @@ export default function SaleAdd() {
               <Filter size={16} />
             </button>
           </div>
-
           <div className="flex border-b border-slate-100 dark:border-slate-800 px-4">
             <button className="px-4 py-3 text-sm font-bold border-b-2 border-primary text-primary">All Items</button>
             <button className="px-4 py-3 text-sm font-semibold text-slate-500">Repair Services</button>
@@ -92,7 +79,6 @@ export default function SaleAdd() {
             <button className="px-4 py-3 text-sm font-semibold text-slate-500">Batteries</button>
             <button className="px-4 py-3 text-sm font-semibold text-slate-500">Accessories</button>
           </div>
-
           <div className="flex-1 overflow-y-auto p-4">
             {isLoading ? (
               <div className="flex items-center justify-center h-full">
@@ -116,7 +102,6 @@ export default function SaleAdd() {
             )}
           </div>
         </section>
-
         {/* Current Sale */}
         <section className="w-[420px] shrink-0 flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
           <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col gap-3">
@@ -135,7 +120,6 @@ export default function SaleAdd() {
               </div>
             </div>
           </div>
-
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {items.map(p => (
               <div key={p.item.id} className="flex items-start gap-3">
@@ -159,7 +143,6 @@ export default function SaleAdd() {
               </div>
             ))}
           </div>
-
           <div className="p-4 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 space-y-3">
             <div className="flex items-center justify-between text-sm text-slate-500 font-medium">
               <span>Subtotal</span>
@@ -206,5 +189,3 @@ export default function SaleAdd() {
     </div>
   )
 }
-
-

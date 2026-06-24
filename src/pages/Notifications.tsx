@@ -11,7 +11,6 @@ import {
 import { Card, CardContent } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { Badge } from '../components/ui/badge'
-
 interface NotificationItem {
   id: string
   type: 'urgent' | 'system' | 'sale' | 'general'
@@ -22,7 +21,6 @@ interface NotificationItem {
   icon: keyof typeof iconMap
   read?: boolean
 }
-
 interface ChatMessage {
   id: string
   author?: string
@@ -32,7 +30,6 @@ interface ChatMessage {
   self?: boolean
   system?: boolean
 }
-
 interface TeamMember {
   name: string
   role: string
@@ -40,7 +37,6 @@ interface TeamMember {
   online: boolean
   status: string
 }
-
 interface Ticket {
   id: string
   title: string
@@ -49,14 +45,12 @@ interface Ticket {
   active: number
   device: string
 }
-
 const iconMap = {
   warning: AlertTriangle,
   hardware: Cpu,
   check_circle: CheckCircle,
   schedule: Clock,
 }
-
 const initialNotifications: NotificationItem[] = [
   {
     id: '1',
@@ -99,7 +93,6 @@ const initialNotifications: NotificationItem[] = [
     read: true
   },
 ]
-
 const initialChat: ChatMessage[] = [
   {
     id: 'm1',
@@ -145,7 +138,6 @@ const initialChat: ChatMessage[] = [
     ),
   },
 ]
-
 const teamMembers: TeamMember[] = [
   { name: 'Alex Chen', role: 'Senior Tech', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150', online: true, status: 'Working on #TK-8842' },
   { name: 'Sarah Johnson', role: 'Manager', avatar: 'https://images.unsplash.com/photo-1494790108777-466d853a7733?w=150', online: true, status: 'In meeting' },
@@ -153,13 +145,11 @@ const teamMembers: TeamMember[] = [
   { name: 'Lisa Wang', role: 'Sales', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150', online: true, status: 'With customer' },
   { name: 'Carlos Mendez', role: 'Technician', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', online: true, status: 'Break' },
 ]
-
 const tickets: Ticket[] = [
   { id: '#TK-8842', title: 'S23 Ultra Water Damage', status: 'In Progress', priority: 'High', active: 3, device: 'Samsung S23 Ultra' },
   { id: '#TK-8843', title: 'iPhone 14 Screen', status: 'Waiting Parts', priority: 'Medium', active: 2, device: 'iPhone 14' },
   { id: '#TK-8844', title: 'Pixel 7 Battery', status: 'Completed', priority: 'Low', active: 0, device: 'Google Pixel 7' },
 ]
-
 export default function Notifications() {
   const [filter, setFilter] = useState<'all' | 'unread' | 'urgent' | 'system'>('all')
   const [notifications, setNotifications] = useState<NotificationItem[]>(initialNotifications)
@@ -167,7 +157,6 @@ export default function Notifications() {
   const [input, setInput] = useState('')
   const [activeTab, setActiveTab] = useState<'equipo' | 'tickets'>('equipo')
   const [selectedTicket, setSelectedTicket] = useState<string>('#TK-8842')
-
   const filteredNotifications = notifications.filter(n => {
     if (filter === 'all') return true
     if (filter === 'unread') return !n.read
@@ -175,13 +164,10 @@ export default function Notifications() {
     if (filter === 'system') return n.type === 'system'
     return true
   })
-
   const unreadCount = notifications.filter(n => !n.read).length
-
   const sendMessage = (e: FormEvent) => {
     e.preventDefault()
     if (!input.trim()) return
-
     const newMessage: ChatMessage = {
       id: `m${messages.length + 1}`,
       author: 'You',
@@ -189,17 +175,14 @@ export default function Notifications() {
       self: true,
       content: input,
     }
-
     setMessages(prev => [...prev, newMessage])
     setInput('')
   }
-
   const markAsRead = (id: string) => {
     setNotifications(prev =>
       prev.map(n => n.id === id ? { ...n, read: true } : n)
     )
   }
-
   return (
     <div className="space-y-6">
       {/* Main Content */}
@@ -230,7 +213,6 @@ export default function Notifications() {
                 Tickets
               </button>
             </div>
-
             {/* Contenido */}
             <CardContent className="p-3">
               {activeTab === 'equipo' ? (
@@ -289,7 +271,6 @@ export default function Notifications() {
             </CardContent>
           </Card>
         </div>
-
         {/* Panel Central - Chat */}
         <div className="col-span-12 lg:col-span-6">
           <Card className="flex flex-col h-[calc(100vh-10rem)]">
@@ -320,7 +301,6 @@ export default function Notifications() {
                 </Button>
               </div>
             </div>
-
             {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map(msg => {
@@ -339,7 +319,6 @@ export default function Notifications() {
                     </div>
                   )
                 }
-
                 return (
                   <div key={msg.id} className="flex gap-3">
                     <img src={msg.avatar} alt={msg.author} className="w-8 h-8 rounded-lg object-cover" />
@@ -356,7 +335,6 @@ export default function Notifications() {
                 )
               })}
             </div>
-
             {/* Chat Input */}
             <form onSubmit={sendMessage} className="p-4 border-t border-border">
               <div className="flex items-end gap-2">
@@ -390,7 +368,6 @@ export default function Notifications() {
             </form>
           </Card>
         </div>
-
         {/* Panel Derecho - Notificaciones */}
         <div className="col-span-12 lg:col-span-3">
           <Card>
@@ -418,7 +395,6 @@ export default function Notifications() {
                 ))}
               </div>
             </div>
-
             <div className="overflow-y-auto max-h-[calc(100vh-20rem)] p-3 space-y-3">
               {filteredNotifications.map(n => {
                 const IconComponent = iconMap[n.icon as keyof typeof iconMap] || AlertTriangle
@@ -484,5 +460,3 @@ export default function Notifications() {
     </div>
   )
 }
-
-

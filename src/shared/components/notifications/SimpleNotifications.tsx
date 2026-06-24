@@ -1,8 +1,5 @@
-"use client"
-
 import React from 'react'
 import { Bell, X, Check } from 'lucide-react'
-
 export interface SimpleNotification {
   id: number
   title: string
@@ -11,7 +8,6 @@ export interface SimpleNotification {
   icon: string
   read: boolean
 }
-
 interface SimpleNotificationsProps {
   notifications: SimpleNotification[]
   onRead: (id: number) => void
@@ -19,7 +15,6 @@ interface SimpleNotificationsProps {
   onMarkAllRead: () => void
   unreadCount: number
 }
-
 export const SimpleNotifications: React.FC<SimpleNotificationsProps> = ({
   notifications,
   onRead,
@@ -55,7 +50,6 @@ export const SimpleNotifications: React.FC<SimpleNotificationsProps> = ({
           </button>
         )}
       </div>
-
       {/* Lista con scroll personalizado */}
       <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-border/20 scrollbar-track-transparent hover:scrollbar-thumb-border/40">
         {notifications.length === 0 ? (
@@ -86,13 +80,11 @@ export const SimpleNotifications: React.FC<SimpleNotificationsProps> = ({
                     <div className="w-2 h-2 bg-primary rounded-full animate-pulse shadow-lg shadow-primary/50" />
                   </div>
                 )}
-
                 <div className="flex items-start gap-4">
                   {/* Icono con fondo gradiente */}
                   <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center text-xl shrink-0 shadow-sm">
                     {notification.icon}
                   </div>
-
                   {/* Contenido */}
                   <div className="flex-1 min-w-0 pr-8">
                     <h4 className={`text-sm font-semibold mb-1.5 leading-snug ${notification.read ? 'text-muted-foreground' : 'text-foreground'}`}>
@@ -110,7 +102,6 @@ export const SimpleNotifications: React.FC<SimpleNotificationsProps> = ({
                       </p>
                     </div>
                   </div>
-
                   {/* Botón eliminar con hover mejorado */}
                   <button
                     onClick={(e) => {
@@ -128,7 +119,6 @@ export const SimpleNotifications: React.FC<SimpleNotificationsProps> = ({
           </div>
         )}
       </div>
-
       {/* Pie con borde sutil */}
       <div className="p-3 border-t border-border/50 bg-muted/20 backdrop-blur-sm">
         <div className="flex items-center justify-between text-xs text-muted-foreground">

@@ -11,11 +11,9 @@ import { Button } from '../../shared/components/ui/button';
 import { Input } from '../../shared/components/ui/input';
 import { Label } from '../../shared/components/ui/label';
 import logo from '/ovelix-claro.png';
-
 // Admin credentials (you should change these in production)
 const ADMIN_EMAIL = 'admin@overlix.com';
 const ADMIN_PASSWORD = 'admin123';
-
 export default function AdminLogin() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -23,12 +21,10 @@ export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-
     // Simulate API call delay
     setTimeout(() => {
       if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
@@ -42,7 +38,6 @@ export default function AdminLogin() {
       setIsLoading(false);
     }, 500);
   };
-
   return (
     <main className="flex min-h-screen flex-col lg:flex-row bg-[#f9f9ff] text-[#191b23] select-none">
       {/* Left section - branding */}
@@ -79,14 +74,12 @@ export default function AdminLogin() {
           </div>
         </div>
       </section>
-
       {/* Right section - form */}
       <section className="flex-1 flex flex-col justify-between min-h-screen p-6 lg:p-12 relative">
         {/* Mobile logo */}
         <div className="w-full lg:hidden flex items-center justify-center py-4">
           <img src={logo} alt="Overlix" className="w-32 h-32 sm:w-40 sm:h-40 rounded-full object-cover border-4 border-white/80 bg-black/30" />
         </div>
-
         <div className="flex-1 flex items-center justify-center py-8">
           <div className="w-full max-w-[440px]">
             <motion.div
@@ -103,7 +96,6 @@ export default function AdminLogin() {
                   Ingresa tus credenciales para generar códigos de activación
                 </p>
               </div>
-
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="space-y-1.5">
                   <Label htmlFor="email">Email</Label>
@@ -116,7 +108,6 @@ export default function AdminLogin() {
                     error={error}
                   />
                 </div>
-
                 <div className="space-y-1.5">
                   <Label htmlFor="password">Contraseña</Label>
                   <div className="relative">
@@ -137,7 +128,6 @@ export default function AdminLogin() {
                     </button>
                   </div>
                 </div>
-
                 {error && (
                   <motion.p
                     initial={{ opacity: 0 }}
@@ -147,7 +137,6 @@ export default function AdminLogin() {
                     {error}
                   </motion.p>
                 )}
-
                 <Button
                   type="submit"
                   disabled={isLoading}
@@ -157,7 +146,6 @@ export default function AdminLogin() {
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
                 </Button>
               </form>
-
               <div className="mt-6 text-center">
                 <button
                   onClick={() => navigate('/')}

@@ -1,4 +1,4 @@
-ï»¿    import React, { useState } from 'react';
+    import React, { useState } from 'react';
     import {
       Search,
       Download,
@@ -16,7 +16,6 @@
     import { Button } from '@/shared/components/ui/button';
     import { Badge } from '@/shared/components/ui/badge';
     import { useNavigate } from 'react-router-dom';
-
     interface Device {
       id: string;
       saleId: string;
@@ -38,7 +37,6 @@
         center: string;
       }[];
     }
-
     export default function IPhoneInsurance() {
       const navigate = useNavigate()  
       const [searchQuery, setSearchQuery] = useState('');
@@ -66,10 +64,8 @@
         startDate: new Date().toISOString().split('T')[0],
         expiryDate: '',
       });
-
-      // ðŸ“¦ Lista de dispositivos â€“ vacÃ­a (cargar desde API)
+      // ?? Lista de dispositivos – vacía (cargar desde API)
       const devices: Device[] = [];
-
       const handleSearchClient = () => {
         const foundDevices = devices.filter(d => d.email.toLowerCase() === searchEmail.toLowerCase());
         if (foundDevices.length > 0) {
@@ -83,7 +79,6 @@
           setShowRegisterClient(false);
         }
       };
-
       const handleRegisterNewClient = () => {
         const newDevice: Device = {
           id: String(devices.length + 1),
@@ -101,7 +96,6 @@
         setInsuranceStep(1);
         setNewClient({ name: '', email: '', phone: '' });
       };
-
       const getStatusBadge = (status: string) => {
         switch (status) {
           case 'active':
@@ -114,7 +108,6 @@
             return <Badge variant="outline">Desconocido</Badge>;
         }
       };
-
       return (
         <div className="space-y-6">
           {/* Header */}
@@ -122,7 +115,7 @@
             <div className="flex flex-col gap-2">
               <h1 className="text-2xl font-bold text-foreground tracking-tight">Dispositivos Vendidos y Asegurados</h1>
               <p className="text-muted-foreground text-base max-w-lg">
-                Gestione registros de ventas detallados, rastree pÃ³lizas de seguro activas y monitoree fechas de vencimiento para todas las unidades iPhone.
+                Gestione registros de ventas detallados, rastree pólizas de seguro activas y monitoree fechas de vencimiento para todas las unidades iPhone.
               </p>
             </div>
             <div className="flex gap-3">
@@ -135,7 +128,6 @@
                   </Button>
             </div>
           </div>
-
           {/* Filters */}
           <div className="flex gap-3 flex-wrap items-center">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card border border-input">
@@ -151,7 +143,6 @@
                 <option>iPhone 14</option>
               </select>
             </div>
-
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card border border-input">
               <span className="text-xs font-semibold uppercase text-muted-foreground">Seguro:</span>
               <select
@@ -165,7 +156,6 @@
                 <option>Sin Seguro</option>
               </select>
             </div>
-
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card border border-input">
               <span className="text-xs font-semibold uppercase text-muted-foreground">Vencimiento:</span>
               <select
@@ -173,18 +163,16 @@
                 onChange={(e) => setExpirationFilter(e.target.value)}
                 className="bg-transparent border-none focus:outline-none text-sm font-semibold text-foreground cursor-pointer"
               >
-                <option>PrÃ³ximo a Vencer</option>
+                <option>Próximo a Vencer</option>
                 <option>Expirado</option>
                 <option>Activo</option>
               </select>
             </div>
-
             <button className="ml-auto text-primary text-sm font-semibold flex items-center gap-1 hover:opacity-80">
               <FilterX size={16} />
               Limpiar Filtros
             </button>
           </div>
-
           {/* Table */}
           <Card>
             <CardContent className="p-0">
@@ -207,7 +195,7 @@
                         <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
                           <Smartphone size={48} className="mx-auto text-muted-foreground/40 mb-4" />
                           <p className="font-medium">No hay dispositivos registrados</p>
-                          <p className="text-sm">Agrega ventas desde el panel de administraciÃ³n</p>
+                          <p className="text-sm">Agrega ventas desde el panel de administración</p>
                         </td>
                       </tr>
                     ) : (
@@ -237,7 +225,6 @@
                   </tbody>
                 </table>
               </div>
-
               {/* Pagination */}
               <div className="flex items-center justify-between px-6 py-4 bg-muted/30 border-t border-border">
                 <span className="text-sm text-muted-foreground">Mostrando {devices.length} de {devices.length} entradas</span>
@@ -253,7 +240,6 @@
               </div>
             </CardContent>
           </Card>
-
           {/* Side Drawer */}
           {selectedDevice && (
             <>
@@ -263,21 +249,20 @@
                   {/* Drawer Header */}
                   <div className="p-6 border-b border-border flex justify-between items-center bg-muted/30 sticky top-0">
                     <div>
-                      <h3 className="text-lg font-bold text-foreground">Detalles de PÃ³liza</h3>
-                      <p className="text-sm text-muted-foreground">Venta {selectedDevice.saleId} â€¢ {selectedDevice.customer}</p>
+                      <h3 className="text-lg font-bold text-foreground">Detalles de Póliza</h3>
+                      <p className="text-sm text-muted-foreground">Venta {selectedDevice.saleId} • {selectedDevice.customer}</p>
                     </div>
                     <Button variant="ghost" size="icon-sm" onClick={() => setSelectedDevice(null)}>
                       <X size={20} />
                     </Button>
                   </div>
-
                   {/* Drawer Content */}
                   <div className="flex-1 overflow-y-auto p-6 space-y-8">
                     {/* Insurance Policy */}
                     {selectedDevice.status !== 'none' && (
                       <section>
                         <div className="flex justify-between items-center mb-4">
-                          <h4 className="text-sm font-bold uppercase tracking-widest text-primary">PÃ³liza de Seguro</h4>
+                          <h4 className="text-sm font-bold uppercase tracking-widest text-primary">Póliza de Seguro</h4>
                           <Badge variant={selectedDevice.status === 'active' ? 'success' : 'destructive'}>
                             {selectedDevice.status === 'active' ? 'ACTIVO' : 'EXPIRADO'}
                           </Badge>
@@ -287,26 +272,25 @@
                             <div className="grid grid-cols-2 gap-y-4">
                               <div>
                                 <p className="text-[10px] text-muted-foreground font-bold uppercase">Tipo de Plan</p>
-                                <p className="text-sm font-semibold text-foreground">{selectedDevice.planType || 'â€”'}</p>
+                                <p className="text-sm font-semibold text-foreground">{selectedDevice.planType || '—'}</p>
                               </div>
                               <div>
-                                <p className="text-[10px] text-muted-foreground font-bold uppercase">ID de PÃ³liza</p>
-                                <p className="text-sm font-semibold text-foreground">{selectedDevice.policyId || 'â€”'}</p>
+                                <p className="text-[10px] text-muted-foreground font-bold uppercase">ID de Póliza</p>
+                                <p className="text-sm font-semibold text-foreground">{selectedDevice.policyId || '—'}</p>
                               </div>
                               <div>
                                 <p className="text-[10px] text-muted-foreground font-bold uppercase">Fecha Inicio</p>
-                                <p className="text-sm font-semibold text-foreground">{selectedDevice.startDate || 'â€”'}</p>
+                                <p className="text-sm font-semibold text-foreground">{selectedDevice.startDate || '—'}</p>
                               </div>
                               <div>
                                 <p className="text-[10px] text-muted-foreground font-bold uppercase">Expira</p>
-                                <p className="text-sm font-semibold text-foreground">{selectedDevice.expiryDate || 'â€”'}</p>
+                                <p className="text-sm font-semibold text-foreground">{selectedDevice.expiryDate || '—'}</p>
                               </div>
                             </div>
                           </CardContent>
                         </Card>
                       </section>
                     )}
-
                     {/* Device Details */}
                     <section>
                       <h4 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-4 flex items-center gap-2">
@@ -315,19 +299,18 @@
                       <div className="space-y-3">
                         <div className="flex justify-between border-b border-border pb-2">
                           <span className="text-sm text-muted-foreground">Modelo</span>
-                          <span className="text-sm font-medium text-foreground">{selectedDevice.model || 'â€”'}</span>
+                          <span className="text-sm font-medium text-foreground">{selectedDevice.model || '—'}</span>
                         </div>
                         <div className="flex justify-between border-b border-border pb-2">
                           <span className="text-sm text-muted-foreground">IMEI</span>
-                          <span className="text-sm font-mono text-foreground">{selectedDevice.imei || 'â€”'}</span>
+                          <span className="text-sm font-mono text-foreground">{selectedDevice.imei || '—'}</span>
                         </div>
                         <div className="flex justify-between border-b border-border pb-2">
                           <span className="text-sm text-muted-foreground">Fecha Venta</span>
-                          <span className="text-sm font-medium text-foreground">{selectedDevice.saleDate || 'â€”'}</span>
+                          <span className="text-sm font-medium text-foreground">{selectedDevice.saleDate || '—'}</span>
                         </div>
                       </div>
                     </section>
-
                     {/* Claims */}
                     {selectedDevice.claims && selectedDevice.claims.length > 0 && (
                       <section>

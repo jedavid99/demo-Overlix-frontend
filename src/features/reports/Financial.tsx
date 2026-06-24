@@ -1,7 +1,6 @@
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card'
 import { DollarSign } from 'lucide-react'
-
 export default function FinancialReport() {
   return (
     <div className="p-6">
@@ -20,5 +19,3 @@ export default function FinancialReport() {
     </div>
   )
 }
-
-

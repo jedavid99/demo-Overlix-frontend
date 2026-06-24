@@ -17,7 +17,6 @@ import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Label } from '@/shared/components/ui/label';
 import { useToast } from '@/shared/components/ui/use-toast';
-
 interface InvoiceItem {
   id: string;
   description: string;
@@ -26,7 +25,6 @@ interface InvoiceItem {
   unitPrice: number;
   iva: number;
 }
-
 export default function CreateInvoice() {
   const { toast } = useToast()
   const [selectedCustomer, setSelectedCustomer] = useState('Tech Repair Hub S.A. (CUIT: 30-71452678-9)');
@@ -55,7 +53,6 @@ export default function CreateInvoice() {
       iva: 21,
     },
   ]);
-
   const addItem = () => {
     const newItem: InvoiceItem = {
       id: Date.now().toString(),
@@ -66,28 +63,23 @@ export default function CreateInvoice() {
     };
     setItems([...items, newItem]);
   };
-
   const removeItem = (id: string) => {
     setItems(items.filter(item => item.id !== id));
   };
-
   const updateItem = (id: string, field: keyof InvoiceItem, value: any) => {
     setItems(items.map(item =>
       item.id === id ? { ...item, [field]: value } : item
     ));
   };
-
   const calculateSubtotal = (item: InvoiceItem) => {
     const subtotal = item.quantity * item.unitPrice;
     const tax = (subtotal * item.iva) / 100;
     return subtotal + tax;
   };
-
   const calculateTotals = () => {
     let neto = 0;
     let iva21 = 0;
     let iva105 = 0;
-
     items.forEach(item => {
       const subtotal = item.quantity * item.unitPrice;
       neto += subtotal;
@@ -98,7 +90,6 @@ export default function CreateInvoice() {
         iva105 += (subtotal * 10.5) / 100;
       }
     });
-
     return {
       neto,
       iva21,
@@ -106,9 +97,7 @@ export default function CreateInvoice() {
       total: neto + iva21 + iva105,
     };
   };
-
   const totals = calculateTotals();
-
   const handleSubmit = async () => {
     setIsSubmitting(true)
     // Simulate API call
@@ -119,7 +108,6 @@ export default function CreateInvoice() {
       description: "La factura ha sido generada y autorizada por ARCA.",
     })
   }
-
   return (
     <div className="max-w-2xl mx-auto">
       <Card>
@@ -142,7 +130,6 @@ export default function CreateInvoice() {
               <option>Gomez, Juan Alberto (DNI: 28.456.123)</option>
             </select>
           </div>
-
           {/* Date */}
           <div className="space-y-2">
             <Label htmlFor="date">Fecha</Label>
@@ -153,7 +140,6 @@ export default function CreateInvoice() {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDueDate(e.target.value)}
             />
           </div>
-
           {/* Items */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -200,7 +186,6 @@ export default function CreateInvoice() {
               ))}
             </div>
           </div>
-
           {/* Total */}
           <div className="border-t border-border pt-4">
             <div className="text-2xl font-bold text-foreground">
@@ -220,4 +205,3 @@ export default function CreateInvoice() {
     </div>
   );
 }
-

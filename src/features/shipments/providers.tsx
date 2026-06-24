@@ -6,13 +6,11 @@ import { Card, CardContent } from '@/shared/components/ui/card'
 import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
 import DataTable from '@/shared/components/data-table'
-
 export default function Providers() {
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
   const [activeFilter, setActiveFilter] = useState('all')
   const [currentPage, setCurrentPage] = useState(1)
-
   // 📦 Datos vacíos (cargar desde API)
   const suppliers: {
     id: number
@@ -26,7 +24,6 @@ export default function Providers() {
     color: string
     icon: React.ElementType
   }[] = []
-
   const filterOptions = {
     all: { label: 'Todos', suppliers },
     local: { label: 'Local', suppliers: suppliers.filter(s => s.type === 'Local') },
@@ -34,18 +31,15 @@ export default function Providers() {
     oem: { label: 'OEM', suppliers: suppliers.filter(s => s.type === 'OEM') },
     thirdparty: { label: 'Terceros', suppliers: suppliers.filter(s => s.type === 'Third-party') },
   }
-
   const filtered: any[] = filterOptions[activeFilter as keyof typeof filterOptions].suppliers.filter(s =>
     s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     s.contact.toLowerCase().includes(searchTerm.toLowerCase()) ||
     s.location.toLowerCase().includes(searchTerm.toLowerCase())
   )
-
   const totalSuppliers = suppliers.length
   const localSuppliers = suppliers.filter(s => s.type === 'Local').length
   const internationalSuppliers = suppliers.filter(s => s.type === 'International').length
   const averageDeliveryDays = 0
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -65,7 +59,6 @@ export default function Providers() {
             Nuevo proveedor
           </Button>
         </div>
-
         {/* KPI Cards compactas */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
@@ -97,7 +90,6 @@ export default function Providers() {
             )
           })}
         </div>
-
         {/* Filtros más compactos */}
         <Card>
           <CardContent className="p-4">
@@ -127,7 +119,6 @@ export default function Providers() {
             </div>
           </CardContent>
         </Card>
-
         {/* Tabla de proveedores */}
         <DataTable
           data={filtered}

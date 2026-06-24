@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { format, subDays, subMonths, startOfYear } from 'date-fns'
@@ -12,7 +10,6 @@ import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { exportToCSV } from '@/shared/lib/export'
-
 // Tipos
 interface Sale {
   id: string
@@ -24,20 +21,16 @@ interface Sale {
   status: 'Completada' | 'Pendiente' | 'Cancelada'
   category: string
 }
-
 // Datos de ejemplo (comentados – descomentar para probar diseño)
 // const sampleSales: Sale[] = [
 //   { id: '1', date: new Date(2024, 0, 15), client: 'Cliente A', product: 'iPhone 13', quantity: 2, total: 1200, status: 'Completada', category: 'Celulares' },
 //   { id: '2', date: new Date(2024, 0, 16), client: 'Cliente B', product: 'Batería S22', quantity: 1, total: 45, status: 'Completada', category: 'Baterías' },
 //   { id: '3', date: new Date(2024, 0, 17), client: 'Cliente C', product: 'Pantalla OLED', quantity: 3, total: 360, status: 'Pendiente', category: 'Pantallas' },
 // ]
-
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
-
 const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value)
 }
-
 const SalesReport = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
@@ -47,7 +40,6 @@ const SalesReport = () => {
   const [sales, setSales] = useState<Sale[]>([]) // Inicialmente vacío
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
-
   useEffect(() => {
     // 🔌 Conectar con API real:
     // api.get('/reports/sales').then(res => setSales(res.data)).catch(() => setError(true)).finally(() => setLoading(false))
@@ -61,7 +53,6 @@ const SalesReport = () => {
       setLoading(false)
     }, 800)
   }, [])
-
   // Filtrar ventas por período
   const filteredSales = sales.filter((sale) => {
     if (period === 'Personalizado' && customRange.start && customRange.end) {
@@ -85,7 +76,6 @@ const SalesReport = () => {
         return true
     }
   })
-
   // Calcular KPIs
   const totalRevenue = filteredSales.reduce((sum, sale) => sum + sale.total, 0)
   const totalSales = filteredSales.length
@@ -101,7 +91,6 @@ const SalesReport = () => {
   }, {} as Record<string, number>)
   
   const topProduct = Object.entries(productSales).sort((a, b) => b[1] - a[1])[0]
-
   // Datos para gráfico de evolución
   const evolutionData = filteredSales
     .filter(s => s.status === 'Completada')
@@ -116,7 +105,6 @@ const SalesReport = () => {
       return acc
     }, [] as { date: string; amount: number }[])
     .sort((a, b) => a.date.localeCompare(b.date))
-
   // Datos para gráfico de categorías
   const categoryData = filteredSales
     .filter(s => s.status === 'Completada')
@@ -130,19 +118,15 @@ const SalesReport = () => {
       }
       return acc
     }, [] as { name: string; value: number; count: number }[])
-
   // Top 5 productos
   const topProducts = Object.entries(productSales)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
     .map(([name, quantity], index) => ({ name, quantity, position: index + 1 }))
-
   const maxQuantity = Math.max(...topProducts.map(p => p.quantity), 1)
-
   // Paginación
   const paginatedSales = filteredSales.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
   const totalPages = Math.ceil(filteredSales.length / itemsPerPage)
-
   // Exportar CSV
   const handleExport = () => {
     const csvData = filteredSales.map(sale => ({
@@ -156,14 +140,12 @@ const SalesReport = () => {
     }))
     exportToCSV(csvData, 'reporte-ventas')
   }
-
   const handleRetry = () => {
     setError(false)
     setLoading(true)
     // Conectar con API real: api.get('/reports/sales')
     setLoading(false)
   }
-
   if (loading) {
     return (
       <motion.div
@@ -190,7 +172,6 @@ const SalesReport = () => {
       </motion.div>
     )
   }
-
   if (error) {
     return (
       <motion.div
@@ -208,7 +189,6 @@ const SalesReport = () => {
       </motion.div>
     )
   }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -227,7 +207,6 @@ const SalesReport = () => {
           Exportar
         </Button>
       </div>
-
       {/* Filtros */}
       <Card className="p-4">
         <div className="flex flex-wrap items-center gap-2">
@@ -260,7 +239,6 @@ const SalesReport = () => {
           )}
         </div>
       </Card>
-
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
@@ -280,7 +258,6 @@ const SalesReport = () => {
             <p className="text-sm text-muted-foreground">Total de ingresos</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -298,7 +275,6 @@ const SalesReport = () => {
             <p className="text-sm text-muted-foreground">Cantidad de ventas</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -316,7 +292,6 @@ const SalesReport = () => {
             <p className="text-sm text-muted-foreground">Ticket promedio</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -329,7 +304,6 @@ const SalesReport = () => {
           </CardContent>
         </Card>
       </div>
-
       {/* Gráfico de evolución */}
       <Card>
         <CardHeader>
@@ -379,7 +353,6 @@ const SalesReport = () => {
           )}
         </CardContent>
       </Card>
-
       {/* Tabla de ventas y gráfico de categorías */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Tabla de ventas */}
@@ -458,7 +431,6 @@ const SalesReport = () => {
             )}
           </CardContent>
         </Card>
-
         {/* Gráfico de categorías */}
         <Card>
           <CardHeader>
@@ -523,7 +495,6 @@ const SalesReport = () => {
           </CardContent>
         </Card>
       </div>
-
       {/* Top 5 productos */}
       <Card>
         <CardHeader>
@@ -562,5 +533,4 @@ const SalesReport = () => {
     </motion.div>
   )
 }
-
 export default SalesReport

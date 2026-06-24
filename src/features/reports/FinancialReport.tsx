@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { format, subDays, startOfYear } from 'date-fns'
@@ -11,7 +9,6 @@ import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { exportToCSV } from '@/shared/lib/export'
-
 // Tipos
 interface Transaction {
   id: string
@@ -21,14 +18,12 @@ interface Transaction {
   category: string
   amount: number
 }
-
 interface CashFlow {
   month: string
   income: number
   expense: number
   balance: number
 }
-
 // Datos de ejemplo (comentados – descomentar para probar diseño)
 // const sampleTransactions: Transaction[] = [
 //   { id: '1', date: new Date(2024, 0, 15), description: 'Venta iPhone 13', type: 'Ingreso', category: 'Ventas', amount: 1200 },
@@ -37,19 +32,15 @@ interface CashFlow {
 //   { id: '4', date: new Date(2024, 0, 18), description: 'Venta Samsung S23', type: 'Ingreso', category: 'Ventas', amount: 800 },
 //   { id: '5', date: new Date(2024, 0, 20), description: 'Salarios empleados', type: 'Egreso', category: 'Salarios', amount: 1200 },
 // ]
-
 // const sampleCashFlow: CashFlow[] = [
 //   { month: 'Ene', income: 2500, expense: 1800, balance: 700 },
 //   { month: 'Feb', income: 3000, expense: 2100, balance: 900 },
 //   { month: 'Mar', income: 2800, expense: 1900, balance: 900 },
 // ]
-
 const EXPENSE_COLORS = ['#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', '#22c55e', '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6', '#6366f1', '#8b5cf6']
-
 const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value)
 }
-
 const FinancialReport = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -59,7 +50,6 @@ const FinancialReport = () => {
   const [cashFlow, setCashFlow] = useState<CashFlow[]>([]) // Inicialmente vacío
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
-
   useEffect(() => {
     // 🔌 Conectar con API real:
     // api.get('/reports/financial').then(res => {
@@ -78,7 +68,6 @@ const FinancialReport = () => {
       setLoading(false)
     }, 800)
   }, [])
-
   // Filtrar transacciones por período
   const filteredTransactions = transactions.filter((transaction) => {
     if (period === 'Personalizado' && customRange.start && customRange.end) {
@@ -102,13 +91,11 @@ const FinancialReport = () => {
         return true
     }
   })
-
   // Calcular KPIs
   const totalIncome = filteredTransactions.filter(t => t.type === 'Ingreso').reduce((sum, t) => sum + t.amount, 0)
   const totalExpense = filteredTransactions.filter(t => t.type === 'Egreso').reduce((sum, t) => sum + t.amount, 0)
   const netProfit = totalIncome - totalExpense
   const profitMargin = totalIncome > 0 ? (netProfit / totalIncome) * 100 : 0
-
   // Datos para gráfico de ingresos vs egresos
   const evolutionData = filteredTransactions
     .reduce((acc, transaction) => {
@@ -132,7 +119,6 @@ const FinancialReport = () => {
       return acc
     }, [] as { date: string; income: number; expense: number; balance: number }[])
     .sort((a, b) => a.date.localeCompare(b.date))
-
   // Datos para gráfico de distribución de gastos
   const expenseData = filteredTransactions
     .filter(t => t.type === 'Egreso')
@@ -145,15 +131,12 @@ const FinancialReport = () => {
       }
       return acc
     }, [] as { name: string; value: number }[])
-
   // Paginación
   const paginatedTransactions = filteredTransactions.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
   const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage)
-
   // Totales de la página actual
   const pageIncome = paginatedTransactions.filter(t => t.type === 'Ingreso').reduce((sum, t) => sum + t.amount, 0)
   const pageExpense = paginatedTransactions.filter(t => t.type === 'Egreso').reduce((sum, t) => sum + t.amount, 0)
-
   // Exportar CSV
   const handleExport = () => {
     const csvData = filteredTransactions.map(transaction => ({
@@ -165,14 +148,12 @@ const FinancialReport = () => {
     }))
     exportToCSV(csvData, 'reporte-financiero')
   }
-
   const handleRetry = () => {
     setError(false)
     setLoading(true)
     // Conectar con API real: api.get('/reports/financial')
     setLoading(false)
   }
-
   if (loading) {
     return (
       <motion.div
@@ -199,7 +180,6 @@ const FinancialReport = () => {
       </motion.div>
     )
   }
-
   if (error) {
     return (
       <motion.div
@@ -217,7 +197,6 @@ const FinancialReport = () => {
       </motion.div>
     )
   }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -236,7 +215,6 @@ const FinancialReport = () => {
           Exportar
         </Button>
       </div>
-
       {/* Filtros */}
       <Card className="p-4">
         <div className="flex flex-wrap items-center gap-2">
@@ -269,7 +247,6 @@ const FinancialReport = () => {
           )}
         </div>
       </Card>
-
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
@@ -289,7 +266,6 @@ const FinancialReport = () => {
             <p className="text-sm text-muted-foreground">Ingresos Totales</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -307,7 +283,6 @@ const FinancialReport = () => {
             <p className="text-sm text-muted-foreground">Egresos Totales</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -327,7 +302,6 @@ const FinancialReport = () => {
             <p className="text-sm text-muted-foreground">Ganancia Neta</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -348,7 +322,6 @@ const FinancialReport = () => {
           </CardContent>
         </Card>
       </div>
-
       {/* Gráfico de ingresos vs egresos */}
       <Card>
         <CardHeader>
@@ -401,7 +374,6 @@ const FinancialReport = () => {
           )}
         </CardContent>
       </Card>
-
       {/* Tabla de transacciones y gráfico de gastos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Tabla de transacciones */}
@@ -495,7 +467,6 @@ const FinancialReport = () => {
             )}
           </CardContent>
         </Card>
-
         {/* Gráfico de distribución de gastos */}
         <Card>
           <CardHeader>
@@ -561,7 +532,6 @@ const FinancialReport = () => {
           </CardContent>
         </Card>
       </div>
-
       {/* Flujo de caja */}
       <Card>
         <CardHeader>
@@ -605,5 +575,4 @@ const FinancialReport = () => {
     </motion.div>
   )
 }
-
 export default FinancialReport

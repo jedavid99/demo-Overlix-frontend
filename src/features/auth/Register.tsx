@@ -31,7 +31,6 @@ import {
   SelectValue,
 } from '../../shared/components/ui/select';
 import logo from '/ovelix-claro.png';
-
 // ============================================================================
 // TIPOS
 // ============================================================================
@@ -44,7 +43,6 @@ interface Company {
   nif?: string;
   codigoEmpresa: string;
 }
-
 interface UserData {
   fullName: string;
   email: string;
@@ -54,7 +52,6 @@ interface UserData {
   codigoEmpresa?: string;
   role?: string;
 }
-
 interface CompanyData {
   razonSocial: string;
   nombreFantasia: string;
@@ -69,7 +66,6 @@ interface CompanyData {
   nif?: string;
   codigoEmpresa: string;
 }
-
 // ============================================================================
 // DATOS HARCODEADOS (simulación)
 // ============================================================================
@@ -99,7 +95,6 @@ const EXISTING_COMPANIES: Company[] = [
     codigoEmpresa: 'TP-2024',
   },
 ];
-
 // ============================================================================
 // ANIMACIONES
 // ============================================================================
@@ -120,7 +115,6 @@ const stepVariants = {
     scale: 0.95,
   }),
 };
-
 // ============================================================================
 // COMPONENTE PRINCIPAL
 // ============================================================================
@@ -157,7 +151,6 @@ export default function Register() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
-
   // Redirect if already authenticated
   useEffect(() => {
     const token = localStorage.getItem('access_token');
@@ -165,21 +158,18 @@ export default function Register() {
       navigate('/dashboard');
     }
   }, [navigate]);
-
   // ==========================================================================
   // FUNCIONES DE VALIDACIÓN
   // ==========================================================================
   const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const validatePhone = (phone: string) =>
     /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/.test(phone);
-
   // Generador de código de empresa
   const generateCompanyCode = (name: string) => {
     const prefix = name.substring(0, 3).toUpperCase();
     const random = Math.floor(1000 + Math.random() * 9000);
     return `${prefix}-${random}`;
   };
-
   // Validación del código de activación
   const validateActivationCode = () => {
     if (!activationCode.trim()) {
@@ -212,7 +202,6 @@ export default function Register() {
     setActivationError('');
     return true;
   };
-
   // Validación del formulario de empresa
   const validateCompanyForm = () => {
     const newErrors: Record<string, string> = {};
@@ -226,7 +215,6 @@ export default function Register() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   // Validación del formulario de usuario
   const validateUserForm = () => {
     const newErrors: Record<string, string> = {};
@@ -248,7 +236,6 @@ export default function Register() {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   // ==========================================================================
   // MANEJADORES DE PASOS
   // ==========================================================================
@@ -256,12 +243,10 @@ export default function Register() {
     setDirection(1);
     setStep((prev) => prev + 1);
   };
-
   const handlePreviousStep = () => {
     setDirection(-1);
     setStep((prev) => prev - 1);
   };
-
   const handleActivationSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateActivationCode()) {
@@ -272,14 +257,12 @@ export default function Register() {
       }
     }
   };
-
   const handleCompanySubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateCompanyForm()) {
       // Generar código de empresa
       const codigo = generateCompanyCode(companyData.nombreFantasia);
       setCompanyData((prev) => ({ ...prev, codigoEmpresa: codigo }));
-
       // Guardar en localStorage (simulación)
       const newCompany: Company = {
         id: Date.now().toString(),
@@ -294,7 +277,6 @@ export default function Register() {
       setStep(3); // Ir a usuario
     }
   };
-
   const handleUserSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateUserForm()) {
@@ -322,7 +304,6 @@ export default function Register() {
           });
           localStorage.setItem('activation_codes', JSON.stringify(updatedCodes));
         }
-
         const registrationData = {
           userData,
           companyData: hasCompanyRegistered ? existingCompanyData : companyData,
@@ -337,11 +318,9 @@ export default function Register() {
       }, 1500);
     }
   };
-
   const handleGoToLogin = () => {
     navigate('/');
   };
-
   // Función para copiar el código de empresa
   const handleCopyCode = (code: string) => {
     if (!code) return;
@@ -349,7 +328,6 @@ export default function Register() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
-
   // ==========================================================================
   // STEPPER
   // ==========================================================================
@@ -368,13 +346,11 @@ export default function Register() {
           { number: 4, label: 'Usuario' },
           { number: 5, label: 'Confirmación' },
         ];
-
     const getStepStatus = (stepNumber: number) => {
       if (stepNumber < step + 1) return 'completed';
       if (stepNumber === step + 1) return 'current';
       return 'pending';
     };
-
     return (
       <div className="flex items-center justify-center gap-2 mb-8">
         {steps.map((s, index) => (
@@ -413,7 +389,6 @@ export default function Register() {
       </div>
     );
   };
-
   // ==========================================================================
   // RENDERIZADO
   // ==========================================================================
@@ -468,7 +443,6 @@ export default function Register() {
           </div>
         </div>
       </section>
-
       {/* Right section - form */}
       <section className="flex-1 flex flex-col justify-between min-h-screen p-6 lg:p-12 relative">
         {/* Mobile logo */}
@@ -479,7 +453,6 @@ export default function Register() {
             className="w-32 h-32 sm:w-40 sm:h-40 rounded-full object-cover border-4 border-white/80 bg-black/30"
           />
         </div>
-
         <div className="flex-1 flex items-center justify-center py-8">
           <div className="w-full max-w-[500px]">
             <Stepper />
@@ -505,7 +478,6 @@ export default function Register() {
                       WhatsApp.
                     </p>
                   </div>
-
                   <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-6">
                     <div className="flex items-start gap-4">
                       <div className="p-3 bg-green-100 rounded-full">
@@ -521,7 +493,6 @@ export default function Register() {
                       </div>
                     </div>
                   </div>
-
                   <a
                     href="https://wa.me/1234567890?text=Hola,%20me%20gustaría%20solicitar%20un%20código%20de%20activación%20para%20registrarme%20en%20Overlix"
                     target="_blank"
@@ -533,7 +504,6 @@ export default function Register() {
                       Solicitar código por WhatsApp
                     </Button>
                   </a>
-
                   <div className="mt-6 text-center">
                     <p className="text-xs text-[#727785]">
                       ¿Ya tienes tu código?{' '}
@@ -545,13 +515,11 @@ export default function Register() {
                       </button>
                     </p>
                   </div>
-
                   <Button variant="outline" onClick={handleGoToLogin} className="w-full mt-4">
                     Volver al login
                   </Button>
                 </motion.div>
               )}
-
               {/* STEP 1: Activación */}
               {step === 1 && (
                 <motion.div
@@ -572,7 +540,6 @@ export default function Register() {
                       Ingresa el código de activación que te proporcionamos por WhatsApp.
                     </p>
                   </div>
-
                   <form onSubmit={handleActivationSubmit} className="space-y-5">
                     <div className="space-y-1.5">
                       <Label htmlFor="activationCode">Código de activación</Label>
@@ -590,13 +557,11 @@ export default function Register() {
                         error={activationError}
                       />
                     </div>
-
                     <Button type="submit" className="w-full bg-[#0058be] hover:bg-[#2170e4]" size="lg">
                       Verificar código
                       <ArrowRight className="w-5 h-5" />
                     </Button>
                   </form>
-
                   <div className="mt-6 text-center">
                     <p className="text-xs text-[#727785]">
                       ¿Ya tienes una cuenta?{' '}
@@ -607,7 +572,6 @@ export default function Register() {
                   </div>
                 </motion.div>
               )}
-
               {/* STEP 2: Datos de empresa (solo si no existe) */}
               {step === 2 && !hasCompanyRegistered && (
                 <motion.div
@@ -626,7 +590,6 @@ export default function Register() {
                     </h2>
                     <p className="text-sm text-[#424754]">Ingresa la información de tu negocio.</p>
                   </div>
-
                   <form onSubmit={handleCompanySubmit} className="space-y-4">
                     {/* Razón Social */}
                     <div className="space-y-1.5">
@@ -640,7 +603,6 @@ export default function Register() {
                         error={errors.razonSocial}
                       />
                     </div>
-
                     {/* Nombre Fantasía */}
                     <div className="space-y-1.5">
                       <Label htmlFor="nombreFantasia">Nombre del taller *</Label>
@@ -653,7 +615,6 @@ export default function Register() {
                         error={errors.nombreFantasia}
                       />
                     </div>
-
                     {/* Dirección */}
                     <div className="space-y-1.5">
                       <Label htmlFor="companyAddress">Dirección *</Label>
@@ -666,7 +627,6 @@ export default function Register() {
                         error={errors.address}
                       />
                     </div>
-
                     {/* Google Maps */}
                     <div className="space-y-1.5">
                       <Label htmlFor="googleMapsLink">Link de Google Maps (opcional)</Label>
@@ -678,7 +638,6 @@ export default function Register() {
                         leftIcon={<MapPin className="w-5 h-5" />}
                       />
                     </div>
-
                     {/* Teléfono */}
                     <div className="space-y-1.5">
                       <Label htmlFor="companyPhone">Teléfono *</Label>
@@ -691,7 +650,6 @@ export default function Register() {
                         error={errors.phone}
                       />
                     </div>
-
                     {/* Email */}
                     <div className="space-y-1.5">
                       <Label htmlFor="companyEmail">Email *</Label>
@@ -705,7 +663,6 @@ export default function Register() {
                         error={errors.email}
                       />
                     </div>
-
                     {/* NIF opcional */}
                     <div className="space-y-1.5">
                       <Label htmlFor="companyNif">NIF/CIF (opcional)</Label>
@@ -717,7 +674,6 @@ export default function Register() {
                         leftIcon={<FileText className="w-5 h-5" />}
                       />
                     </div>
-
                     <div className="flex gap-3 pt-4">
                       <Button
                         type="button"
@@ -736,7 +692,6 @@ export default function Register() {
                   </form>
                 </motion.div>
               )}
-
               {/* STEP 3: Datos del usuario */}
               {step === 3 && (
                 <motion.div
@@ -777,7 +732,6 @@ export default function Register() {
                       </div>
                     )}
                   </div>
-
                   <form onSubmit={handleUserSubmit} className="space-y-4">
                     {/* Nombre completo */}
                     <div className="space-y-1.5">
@@ -791,7 +745,6 @@ export default function Register() {
                         error={errors.fullName}
                       />
                     </div>
-
                     {/* Email */}
                     <div className="space-y-1.5">
                       <Label htmlFor="userEmail">Email *</Label>
@@ -805,7 +758,6 @@ export default function Register() {
                         error={errors.email}
                       />
                     </div>
-
                     {/* Teléfono */}
                     <div className="space-y-1.5">
                       <Label htmlFor="userPhone">Teléfono *</Label>
@@ -818,7 +770,6 @@ export default function Register() {
                         error={errors.phone}
                       />
                     </div>
-
                     {/* Código de empresa (solo si es existente) */}
                     {hasCompanyRegistered && (
                       <div className="space-y-1.5">
@@ -838,7 +789,6 @@ export default function Register() {
                         </p>
                       </div>
                     )}
-
                     {/* Rol (solo si empresa existente) */}
                     {hasCompanyRegistered && (
                       <div className="space-y-1.5">
@@ -862,7 +812,6 @@ export default function Register() {
                         {errors.role && <p className="text-xs text-destructive mt-1">{errors.role}</p>}
                       </div>
                     )}
-
                     {/* Contraseña */}
                     <div className="space-y-1.5">
                       <Label htmlFor="password">Contraseña *</Label>
@@ -876,7 +825,6 @@ export default function Register() {
                         error={errors.password}
                       />
                     </div>
-
                     {/* Confirmar contraseña */}
                     <div className="space-y-1.5">
                       <Label htmlFor="confirmPassword">Confirmar contraseña *</Label>
@@ -890,7 +838,6 @@ export default function Register() {
                         error={errors.confirmPassword}
                       />
                     </div>
-
                     <div className="flex gap-3 pt-4">
                       <Button
                         type="button"
@@ -914,7 +861,6 @@ export default function Register() {
                   </form>
                 </motion.div>
               )}
-
               {/* STEP 4: Confirmación final */}
               {step === 4 && (
                 <motion.div
@@ -935,14 +881,12 @@ export default function Register() {
                   >
                     <CheckCircle2 className="w-16 h-16 text-green-500" />
                   </motion.div>
-
                   <h2 className="text-2xl font-bold text-[#191b23] tracking-tight mb-3">
                     ¡Registro completado!
                   </h2>
                   <p className="text-sm text-[#424754] mb-8">
                     ¡Gracias por confiar en Overlix! Ahora eres parte de nuestra comunidad de talleres.
                   </p>
-
                   {/* Resumen del registro */}
                   <div className="bg-blue-50 rounded-lg p-4 mb-6 text-left">
                     <h3 className="font-semibold text-[#191b23] mb-2 text-sm">Resumen del registro:</h3>
@@ -970,7 +914,6 @@ export default function Register() {
                         </p>
                       )}
                     </div>
-
                     {/* Código de empresa con botón copiar */}
                     <div className="mt-4 pt-3 border-t border-blue-200">
                       <p className="text-xs font-medium text-[#191b23]">🔑 Código de acceso a la empresa:</p>
@@ -1010,7 +953,6 @@ export default function Register() {
                       </div>
                     </div>
                   </div>
-
                   <Button onClick={handleGoToLogin} className="w-full bg-[#0058be] hover:bg-[#2170e4]" size="lg">
                     Ir al login
                     <ArrowRight className="w-5 h-5 ml-2" />

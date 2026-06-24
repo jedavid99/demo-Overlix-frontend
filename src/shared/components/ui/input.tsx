@@ -1,14 +1,11 @@
 import * as React from 'react'
-
 import { cn } from '../../lib/utils'
-
 function Input({ className, type, error, size = 'default', leftIcon, rightIcon, ...props }: React.ComponentProps<'input'> & { error?: boolean | string; size?: 'default' | 'sm' | 'lg'; leftIcon?: React.ReactNode; rightIcon?: React.ReactNode }) {
   const sizeClasses: Record<string, string> = {
     default: 'h-10 px-4 py-2.5 text-sm',
     sm: 'h-8 px-3 py-2 text-xs',
     lg: 'h-12 px-5 py-3 text-base',
   }
-
   return (
     <div className="relative">
       {leftIcon && (
@@ -42,5 +39,4 @@ function Input({ className, type, error, size = 'default', leftIcon, rightIcon, 
     </div>
   )
 }
-
 export { Input }

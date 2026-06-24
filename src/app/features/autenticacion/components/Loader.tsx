@@ -1,5 +1,4 @@
 import React from 'react'
-
 export default function Loader({ size = 'inline' }: { size?: 'inline' | 'full' }) {
   if (size === 'full') {
     return (
@@ -12,7 +11,6 @@ export default function Loader({ size = 'inline' }: { size?: 'inline' | 'full' }
       </div>
     )
   }
-
   return (
     <div className="ovelix-loader-small" aria-hidden>
       <div className="loader-small" />

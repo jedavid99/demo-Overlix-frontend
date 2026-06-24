@@ -27,7 +27,6 @@ import { Badge } from '@/shared/components/ui/badge'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
-
 interface Remise {
   id: string
   plate: string
@@ -45,10 +44,8 @@ interface Remise {
   assignedTo?: string
   notes?: string
 }
-
 // 📦 Datos vacíos – conectar con API real
 const initialRemises: Remise[] = []
-
 export default function Remises() {
   const navigate = useNavigate()
   const [searchTerm, setSearchTerm] = useState('')
@@ -60,7 +57,6 @@ export default function Remises() {
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
   const [remises, setRemises] = useState<Remise[]>(initialRemises)
-
   // Estado del formulario para nuevo remise
   const [newRemise, setNewRemise] = useState<Omit<Remise, 'id' | 'lastUpdate'>>({
     plate: '',
@@ -77,7 +73,6 @@ export default function Remises() {
     assignedTo: '',
     notes: '',
   })
-
   const filteredRemises = remises.filter((r) => {
     const matchesSearch =
       r.plate.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -87,18 +82,15 @@ export default function Remises() {
     const matchesStatus = statusFilter === 'all' || r.status === statusFilter
     return matchesSearch && matchesStatus
   })
-
   const paginatedRemises = filteredRemises.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   )
   const totalPages = Math.ceil(filteredRemises.length / itemsPerPage)
-
   const totalRemises = remises.length
   const disponibles = remises.filter((r) => r.status === 'disponible').length
   const enRuta = remises.filter((r) => r.status === 'en_ruta').length
   const mantenimiento = remises.filter((r) => r.status === 'mantenimiento').length
-
   const kpiData = [
     {
       label: 'Total Remises',
@@ -129,7 +121,6 @@ export default function Remises() {
       bgColor: 'bg-amber-500/10',
     },
   ]
-
   const getStatusBadge = (status: Remise['status']) => {
     const variants = {
       disponible: { variant: 'success' as const, label: 'Disponible' },
@@ -139,7 +130,6 @@ export default function Remises() {
     }
     return variants[status]
   }
-
   const getStatusIcon = (status: Remise['status']) => {
     switch (status) {
       case 'disponible':
@@ -152,17 +142,14 @@ export default function Remises() {
         return <AlertCircle size={14} className="text-destructive" />
     }
   }
-
   const openDetails = (remise: Remise) => {
     setSelectedRemise(remise)
     setShowDetailsModal(true)
   }
-
   const closeDetailsModal = () => {
     setShowDetailsModal(false)
     setSelectedRemise(null)
   }
-
   // Manejar cambios en el formulario
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target
@@ -171,7 +158,6 @@ export default function Remises() {
       [name]: type === 'number' ? Number(value) : value,
     }))
   }
-
   // Guardar nuevo remise (simulación)
   const handleSaveRemise = () => {
     // Validación básica
@@ -179,16 +165,13 @@ export default function Remises() {
       alert('Por favor completa los campos obligatorios: Placa, Conductor y Vehículo.')
       return
     }
-
     const newId = `REM-${String(remises.length + 1).padStart(4, '0')}`
     const now = new Date().toLocaleString()
-
     const remiseToAdd: Remise = {
       ...newRemise,
       id: newId,
       lastUpdate: now,
     }
-
     setRemises((prev) => [...prev, remiseToAdd])
     setShowAddModal(false)
     setNewRemise({
@@ -208,7 +191,6 @@ export default function Remises() {
     })
     alert(`Remise ${newId} agregado correctamente.`)
   }
-
   // Modal de detalles
   const DetailsModal = () => {
     if (!selectedRemise) return null
@@ -314,7 +296,6 @@ export default function Remises() {
       </div>
     )
   }
-
   // Modal para agregar remise
   const AddModal = () => {
     return (
@@ -333,7 +314,6 @@ export default function Remises() {
                 <X size={20} className="text-muted-foreground" />
               </button>
             </div>
-
             <div className="p-6 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -479,7 +459,6 @@ export default function Remises() {
                 </div>
               </div>
             </div>
-
             <div className="flex items-center justify-end gap-3 p-4 border-t border-border">
               <Button variant="outline" onClick={() => setShowAddModal(false)}>
                 Cancelar
@@ -494,7 +473,6 @@ export default function Remises() {
       </div>
     )
   }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -513,7 +491,6 @@ export default function Remises() {
           Nuevo remise
         </Button>
       </div>
-
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {kpiData.map((kpi, idx) => {
@@ -533,7 +510,6 @@ export default function Remises() {
           )
         })}
       </div>
-
       {/* Filtros */}
       <Card className="p-4">
         <div className="flex flex-wrap items-center gap-3">
@@ -583,7 +559,6 @@ export default function Remises() {
           )}
         </div>
       </Card>
-
       {/* Tabla */}
       <Card>
         <CardContent className="p-0">
@@ -707,7 +682,6 @@ export default function Remises() {
           )}
         </CardContent>
       </Card>
-
       {/* Modales */}
       {showDetailsModal && <DetailsModal />}
       {showAddModal && <AddModal />}

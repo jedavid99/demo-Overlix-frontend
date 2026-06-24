@@ -24,7 +24,6 @@ import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
 import { Badge } from '@/shared/components/ui/badge'
 import { MdBarcodeReader } from 'react-icons/md'
-
 export default function StockAdd() {
   const navigate = useNavigate()
   const [form, setForm] = useState({
@@ -39,14 +38,11 @@ export default function StockAdd() {
     sellingPrice: '',
     tax: '',
   })
-
   const [compatibility, setCompatibility] = useState<string[]>([])
   const [compatibilityInput, setCompatibilityInput] = useState('')
-
   const handleChange = (field: string, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }))
   }
-
   const addCompatibility = (device: string) => {
     const newDevice = device || compatibilityInput
     if (newDevice && !compatibility.includes(newDevice)) {
@@ -54,25 +50,21 @@ export default function StockAdd() {
       setCompatibilityInput('')
     }
   }
-
   const removeCompatibility = (device: string) => {
     setCompatibility(compatibility.filter(d => d !== device))
   }
-
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       e.preventDefault()
       addCompatibility(compatibilityInput)
     }
   }
-
   const handleSubmit = (e: React.FormEvent, asDraft: boolean = false) => {
     e.preventDefault()
     console.log('Producto guardado:', { ...form, compatibility })
     alert('Producto guardado correctamente')
     navigate('/stock')
   }
-
   const categories = [
     { value: '', label: 'Seleccionar categoría' },
     { value: 'screens', label: 'Pantallas' },
@@ -82,7 +74,6 @@ export default function StockAdd() {
     { value: 'cameras', label: 'Cámaras' },
     { value: 'accessories', label: 'Accesorios' },
   ]
-
   const sectionVariants = {
     hidden: { opacity: 0, y: 10 },
     visible: (i: number) => ({
@@ -91,7 +82,6 @@ export default function StockAdd() {
       transition: { delay: i * 0.06, duration: 0.3, ease: 'easeOut' },
     }),
   }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -116,7 +106,6 @@ export default function StockAdd() {
             </Button>
           </div>
         </div>
-
         <form onSubmit={(e) => handleSubmit(e, false)} className="space-y-4 pb-12">
           {/* Sección 1: Información General */}
           <motion.section
@@ -187,7 +176,6 @@ export default function StockAdd() {
               </div>
             </div>
           </motion.section>
-
           {/* Sección 2: Detalles de inventario */}
           <motion.section
             variants={sectionVariants}
@@ -242,7 +230,6 @@ export default function StockAdd() {
               </div>
             </div>
           </motion.section>
-
           {/* Sección 3: Precios */}
           <motion.section
             variants={sectionVariants}
@@ -304,7 +291,6 @@ export default function StockAdd() {
               </div>
             </div>
           </motion.section>
-
           {/* Sección 4: Compatibilidad */}
           <motion.section
             variants={sectionVariants}
@@ -366,7 +352,6 @@ export default function StockAdd() {
               </div>
             </div>
           </motion.section>
-
           {/* Sección 5: Imagen del producto */}
           <motion.section
             variants={sectionVariants}
@@ -404,7 +389,6 @@ export default function StockAdd() {
               </div>
             </div>
           </motion.section>
-
           {/* Botones de acción */}
           <motion.div
             variants={sectionVariants}

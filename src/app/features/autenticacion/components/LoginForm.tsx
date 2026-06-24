@@ -1,15 +1,11 @@
-"use client"
-
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../../../contexts/AuthContext'
 import Loader from './Loader'
-
 interface LoginFormProps {
   onSwitchToRegister?: () => void
 }
-
 export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
   const navigate = useNavigate()
   const { login, error: authError } = useAuth()
@@ -17,24 +13,19 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formMessage, setFormMessage] = useState<{ type: 'error' | 'info' | 'success' | null; text: string }>({ type: null, text: '' })
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-
     const username = formData.username.trim()
     const password = formData.password
-
     if (!username || !password) {
       setFormMessage({ type: 'error', text: 'Por favor completa usuario y contraseña.' })
       setIsLoading(false)
       return
     }
-
     try {
       // In this preview we simulate a login by calling the stub login()
       await login()
@@ -50,7 +41,6 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
       setIsLoading(false)
     }
   }
-
   if (isLoading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
@@ -58,7 +48,6 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
       </div>
     )
   }
-
   return (
     <motion.div
       key="login"
@@ -72,7 +61,6 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
         <h3 className="font-bold text-2xl text-slate-900">Iniciar sesión</h3>
         <p className="text-slate-500 mt-1">¿No tienes cuenta? <button onClick={() => { onSwitchToRegister?.(); setFormMessage({ type: null, text: '' }) }} className="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors">Regístrate</button></p>
       </motion.div>
-
       {(formMessage.type || authError) && (
         <motion.div className={`mb-6 px-4 py-3 rounded-xl text-sm font-medium ${(authError || formMessage.type === 'error') ? 'bg-red-50 text-red-700 border border-red-200' : formMessage.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-blue-50 text-blue-700 border border-blue-200'}`} initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
           <div className="flex items-center">
@@ -90,7 +78,6 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
           </div>
         </motion.div>
       )}
-
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="space-y-5">
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.15 }}>
@@ -104,7 +91,6 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
               </div>
             </div>
           </motion.div>
-
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.2 }} className="relative">
             <input className="w-full text-sm px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all pr-10" placeholder="Contraseña" type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} required />
             <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
@@ -121,7 +107,6 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
               </button>
             </div>
           </motion.div>
-
           <motion.div className="flex items-center justify-between text-sm" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.25 }}>
             <label className="flex items-center">
               <input type="checkbox" className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
@@ -129,7 +114,6 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
             </label>
             <a href="#" className="text-indigo-600 hover:text-indigo-500 font-medium transition-colors">¿Olvidaste tu contraseña?</a>
           </motion.div>
-
           <motion.button initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: 0.3 }} type="submit" disabled={isLoading} className="w-full flex justify-center items-center bg-linear-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white py-3.5 px-4 rounded-xl tracking-wide font-semibold shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed">
             {isLoading ? (
               <>
@@ -143,14 +127,12 @@ export default function LoginForm({ onSwitchToRegister }: LoginFormProps) {
               'Iniciar sesión'
             )}
           </motion.button>
-
           <motion.div className="mt-6 border-t border-slate-200 pt-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.35 }}>
             <div className="text-sm text-slate-600">¿No tienes el sistema?</div>
             <a href="/landing" className="mt-2 inline-flex items-center justify-center w-full px-4 py-3 rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition-colors font-medium">Conoce el Sistema de Gestión</a>
           </motion.div>
         </div>
       </form>
-
       <motion.div className="mt-8 text-center text-slate-400 text-xs" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3, delay: 0.4 }}>
         &copy; 2024 RepairFlow. Todos los derechos reservados.
       </motion.div>

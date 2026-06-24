@@ -1,7 +1,6 @@
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'
 import { ClipboardList } from 'lucide-react'
-
 export default function Orders() {
   return (
     <div className="p-6">
@@ -20,5 +19,3 @@ export default function Orders() {
     </div>
   )
 }
-
-

@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Menu, Bell, User, ChevronDown, ArrowRightToLine, LogOut } from 'lucide-react'
@@ -15,7 +13,6 @@ import {
   DropdownMenuTrigger,
 } from '../../components/ui/dropdown-menu'
 import { SimpleNotifications, SimpleNotification } from '../notifications/SimpleNotifications'
-
 const categories = [
   { value: 'all', label: 'Todo', placeholder: 'Buscar en Overlix...', route: '/dashboard', icon: <MdSearch size={16} /> },
   { value: 'sales', label: 'Ventas', placeholder: 'Buscar venta...', route: '/sales', icon: <MdReceipt size={16} /> },
@@ -29,7 +26,6 @@ const categories = [
   { value: 'reports-stock', label: 'Reporte Stock', placeholder: 'Buscar en reporte de stock...', route: '/reports/stock', icon: <MdInventory2 size={16} /> },
   { value: 'reports-financial', label: 'Reporte Financiero', placeholder: 'Buscar en reporte financiero...', route: '/reports/financial', icon: <MdAttachMoney size={16} /> },
 ]
-
 export const AdminTopBar = ({
   onMenuClick = () => {},
   onToggleCollapse = () => {},
@@ -47,13 +43,10 @@ export const AdminTopBar = ({
   const notificationsRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const navigateL = useNavigate()
-
   const handleLogout = () => {
     navigateL('/')
   }
-
   const currentCategory = categories.find(cat => cat.value === selectedCategory) || categories[0]
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -64,23 +57,19 @@ export const AdminTopBar = ({
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
-
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
         setNotificationsOpen(false)
       }
     }
-
     if (notificationsOpen) {
       document.addEventListener('mousedown', handleClickOutside)
     }
-
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [notificationsOpen])
-
   const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && searchQuery.trim()) {
       const route = currentCategory.route
@@ -88,12 +77,9 @@ export const AdminTopBar = ({
       setSearchQuery('')
     }
   }
-
   // 📦 ESTADO DE NOTIFICACIONES – VACÍO (conectar con API)
   const [notifications, setNotifications] = useState<SimpleNotification[]>([])
-
   const unreadCount = notifications.filter(n => !n.read).length
-
   const handleNotificationRead = (id: number) => {
     setNotifications(prev => 
       prev.map(notif => 
@@ -101,17 +87,14 @@ export const AdminTopBar = ({
       )
     )
   }
-
   const handleNotificationDelete = (id: number) => {
     setNotifications(prev => prev.filter(notif => notif.id !== id))
   }
-
   const handleMarkAllRead = () => {
     setNotifications(prev => 
       prev.map(notif => ({ ...notif, read: true }))
     )
   }
-
   return (
     <header className="h-14 flex items-center justify-between px-4 lg:px-6 bg-card/80 backdrop-blur-md border-b border-border z-30 sticky top-0">
       <div className="flex items-center gap-3">
@@ -122,7 +105,6 @@ export const AdminTopBar = ({
           <ArrowRightToLine size={18} className={`transition-transform ${sidebarCollapsed ? 'rotate-180' : ''}`} />
         </Button>
       </div>
-
       <div className="flex items-center gap-3">
         {/* Global Search */}
         <div className="hidden md:flex items-center gap-0 w-64">
@@ -163,7 +145,6 @@ export const AdminTopBar = ({
             />
           </div>
         </div>
-
         {/* 🪟 Notificaciones – vacías por defecto */}
         <div className="relative" ref={notificationsRef}>
           <Button 
@@ -192,7 +173,6 @@ export const AdminTopBar = ({
             </div>
           )}
         </div>
-
         {/* Profile */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -230,5 +210,4 @@ export const AdminTopBar = ({
     </header>
   )
 }
-
 export default AdminTopBar

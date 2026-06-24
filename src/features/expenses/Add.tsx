@@ -8,7 +8,6 @@ import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
 import { Badge } from '@/shared/components/ui/badge'
-
 export default function ExpensesAdd() {
   const navigate = useNavigate()
   const [form, setForm] = useState({
@@ -23,20 +22,17 @@ export default function ExpensesAdd() {
   const [file, setFile] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
-
   const handleChange = (field: string, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }))
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }))
     }
   }
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
       setFile(e.target.files[0])
     }
   }
-
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {}
     if (!form.title.trim()) newErrors.title = 'La descripción es obligatoria'
@@ -47,7 +43,6 @@ export default function ExpensesAdd() {
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!validate()) return
@@ -58,7 +53,6 @@ export default function ExpensesAdd() {
     setIsLoading(false)
     navigate('/expenses')
   }
-
   const categories = [
     { value: 'spare_parts', label: 'Repuestos' },
     { value: 'utilities', label: 'Servicios' },
@@ -67,21 +61,18 @@ export default function ExpensesAdd() {
     { value: 'marketing', label: 'Marketing' },
     { value: 'other', label: 'Otros' },
   ]
-
   const suppliers = [
     { value: '1', label: 'Logística Global S.A.' },
     { value: '2', label: 'Propiedades Main Street' },
     { value: '3', label: 'Tech Supplies Co.' },
     { value: '4', label: 'Red Eléctrica' },
   ]
-
   const currencies = [
     { value: 'USD', label: 'USD' },
     { value: 'EUR', label: 'EUR' },
     { value: 'GBP', label: 'GBP' },
     { value: 'JPY', label: 'JPY' },
   ]
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -110,7 +101,6 @@ export default function ExpensesAdd() {
             </Button>
           </div>
         </div>
-
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Tarjeta única con todos los campos */}
           <Card>
@@ -182,7 +172,6 @@ export default function ExpensesAdd() {
                   )}
                 </div>
               </div>
-
               {/* Fila 2: Monto + Moneda + Fecha + Método de pago */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div className="space-y-1">
@@ -269,7 +258,6 @@ export default function ExpensesAdd() {
                   </div>
                 </div>
               </div>
-
               {/* Fila 3: Adjuntar comprobante (más compacto) */}
               <div className="border-t border-border pt-4">
                 <div className="flex items-center gap-3">
@@ -317,7 +305,6 @@ export default function ExpensesAdd() {
               </div>
             </CardContent>
           </Card>
-
           {/* Botones de acción (ya están en el header, pero mantenemos uno al final para consistencia) */}
           <div className="flex justify-end gap-2 pt-2 border-t border-border">
             <Button variant="outline" onClick={() => navigate('/expenses')} size="sm">

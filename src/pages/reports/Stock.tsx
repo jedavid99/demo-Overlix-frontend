@@ -1,7 +1,6 @@
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'
 import { Package } from 'lucide-react'
-
 export default function StockReport() {
   return (
     <div className="p-6">
@@ -20,5 +19,3 @@ export default function StockReport() {
     </div>
   )
 }
-
-

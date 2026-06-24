@@ -11,7 +11,6 @@ const sections = [
   { id: 'api', label: 'API e integraciones', icon: <Cloud size={16} /> },
   { id: 'pdf', label: 'Configuración PDF', icon: <FileText size={16} /> },
 ]
-
 function LeftNav({ current, onChange }: { current: string; onChange: (id: string) => void }) {
   return (
     <aside className="w-64 pr-6 hidden lg:block">
@@ -37,26 +36,21 @@ function LeftNav({ current, onChange }: { current: string; onChange: (id: string
     </aside>
   )
 }
-
 export default function Settings() {
   const [section, setSection] = useState('general')
-
   // Función simulada para guardar cambios (conectar con API)
   const handleSave = (sectionId: string) => {
     alert(`Guardando cambios de la sección: ${sections.find(s => s.id === sectionId)?.label}`)
   }
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 p-6 lg:p-8">
       <div className="max-w-7xl mx-auto flex gap-6">
         <LeftNav current={section} onChange={setSection} />
-
         <main className="flex-1">
           {/* Header sin botones */}
           <div className="mb-6">
             {/* Eliminamos los botones del header */}
           </div>
-
           {/* Sections */}
           {section === 'general' && (
             <div className="space-y-6 pb-24">
@@ -90,7 +84,6 @@ export default function Settings() {
                   </div>
                 </div>
               </section>
-
               {/* System Preferences */}
               <section className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
                 <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
@@ -131,7 +124,6 @@ export default function Settings() {
                   </div>
                 </div>
               </section>
-
               {/* Repair Statuses */}
               <section className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
                 <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
@@ -150,7 +142,6 @@ export default function Settings() {
                   </div>
                 </div>
               </section>
-
               {/* Payment Methods */}
               <section className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
                 <div className="p-6 border-b border-slate-100 dark:border-slate-800">
@@ -205,7 +196,6 @@ export default function Settings() {
                   </div>
                 </div>
               </section>
-
               {/* 🔽 Botón Guardar al final de la sección */}
               <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
                 <button
@@ -217,7 +207,6 @@ export default function Settings() {
               </div>
             </div>
           )}
-
           {section === 'business' && (
             <div className="space-y-6">
               {/* Legal Information Section */}
@@ -252,7 +241,6 @@ export default function Settings() {
                   </div>
                 </div>
               </div>
-
               {/* Operating Hours Section */}
               <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
                 <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
@@ -271,7 +259,6 @@ export default function Settings() {
                       <div className="col-span-3 text-center">Cierre</div>
                       <div className="col-span-1"></div>
                     </div>
-
                     {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map((day, idx) => (
                       <div key={idx} className="grid grid-cols-12 gap-4 items-center p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                         <div className="col-span-3 font-semibold text-slate-900 dark:text-white">{day}</div>
@@ -294,7 +281,6 @@ export default function Settings() {
                   </div>
                 </div>
               </div>
-
               {/* 🔽 Botón Guardar al final de la sección */}
               <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
                 <button
@@ -306,7 +292,6 @@ export default function Settings() {
               </div>
             </div>
           )}
-
           {section === 'Categoria' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
@@ -318,14 +303,12 @@ export default function Settings() {
                   <Plus size={18} /> Agregar categoría
                 </button>
               </div>
-
               <div className="space-y-4">
                 <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8 text-center text-slate-500">
                   <p className="font-medium">No hay categorías configuradas</p>
                   <p className="text-sm">Agrega tu primera categoría para empezar a organizar tus servicios</p>
                 </div>
               </div>
-
               <div className="mt-6 p-6 bg-slate-900 dark:bg-slate-800 rounded-2xl text-white flex items-center justify-between">
                 <div className="flex items-center gap-6">
                   <div>
@@ -348,7 +331,6 @@ export default function Settings() {
                   <p className="text-sm text-slate-300 max-w-xs">Define exactamente qué dispositivos acepta tu sistema para agilizar el proceso de admisión.</p>
                 </div>
               </div>
-
               {/* 🔽 Botón Guardar al final de la sección */}
               <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
                 <button
@@ -360,7 +342,6 @@ export default function Settings() {
               </div>
             </div>
           )}
-
           {section === 'taxes' && (
             <div className="space-y-6 pb-24">
               {/* Tax Configuration */}
@@ -386,7 +367,6 @@ export default function Settings() {
                   </div>
                 </div>
               </div>
-
               {/* Invoice Settings */}
               <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
                 <div className="p-6 border-b border-slate-100 dark:border-slate-800">
@@ -410,7 +390,6 @@ export default function Settings() {
                   </div>
                 </div>
               </div>
-
               {/* Payment Gateway Integrations */}
               <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
                 <div className="p-6 border-b border-slate-100 dark:border-slate-800">
@@ -453,7 +432,6 @@ export default function Settings() {
                   </div>
                 </div>
               </div>
-
               {/* Saved Bank Accounts */}
               <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
                 <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
@@ -472,7 +450,6 @@ export default function Settings() {
                   </div>
                 </div>
               </div>
-
               {/* 🔽 Botón Guardar al final de la sección */}
               <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
                 <button
@@ -484,7 +461,6 @@ export default function Settings() {
               </div>
             </div>
           )}
-
           {section === 'notificationes' && (
             <div className="space-y-6 pb-24">
               {/* Event Notifications */}
@@ -546,7 +522,6 @@ export default function Settings() {
                   </table>
                 </div>
               </div>
-
               {/* Template Editor */}
               <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
                 <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
@@ -573,19 +548,16 @@ export default function Settings() {
                         ))}
                       </div>
                     </div>
-
                     <div>
                       <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Asunto del email</label>
                       <input type="text" placeholder="Ej. Actualización de reparación: Ticket {ticket_id}" className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-slate-900 dark:text-white" />
                     </div>
-
                     <div>
                       <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Cuerpo del mensaje</label>
                       <textarea rows={8} placeholder="Escribe tu mensaje aquí..." className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-slate-900 dark:text-white font-mono text-sm leading-relaxed" />
                     </div>
                   </div>
                 </div>
-
                 <div className="px-6 py-4 bg-slate-50 dark:bg-slate-800 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
                   <p className="text-xs text-slate-500 dark:text-slate-400 italic">Los cambios aquí afectan solo a la plantilla seleccionada.</p>
                   <div className="flex gap-3">
@@ -598,7 +570,6 @@ export default function Settings() {
                   </div>
                 </div>
               </div>
-
               {/* 🔽 Botón Guardar al final de la sección */}
               <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
                 <button
@@ -610,7 +581,6 @@ export default function Settings() {
               </div>
             </div>
           )}
-
           {section === 'api' && (
             <div className="space-y-6">
               {/* API Keys */}
@@ -646,7 +616,6 @@ export default function Settings() {
                   </table>
                 </div>
               </div>
-
               {/* Webhooks */}
               <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
                 <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
@@ -665,7 +634,6 @@ export default function Settings() {
                   </div>
                 </div>
               </div>
-
               {/* Third-Party Integrations */}
               <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
                 <div className="p-6 border-b border-slate-100 dark:border-slate-800">
@@ -695,7 +663,6 @@ export default function Settings() {
                   ))}
                 </div>
               </div>
-
               {/* 🔽 Botón Guardar al final de la sección */}
               <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
                 <button

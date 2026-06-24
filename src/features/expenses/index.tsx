@@ -3,12 +3,10 @@ import { Calendar, Filter, CreditCard, Download, TrendingUp, Clock, AlertCircle,
 import { Card, CardContent } from '@/shared/components/ui/card'
 import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
-
 export default function Expenses() {
   const [dateFilter, setDateFilter] = useState('last-30')
   const [categoryFilter, setCategoryFilter] = useState('all')
   const [paymentFilter, setPaymentFilter] = useState('all')
-
   // 📦 Datos de muestra ELIMINADOS – array vacío (cargar desde API)
   const expenses: {
     id: number
@@ -20,12 +18,10 @@ export default function Expenses() {
     amount: number
     status: string
   }[] = []
-
   // KPIs calculados (todos en 0)
   const totalMonth = expenses.reduce((sum, e) => sum + e.amount, 0)
   const pendingCount = expenses.filter(e => e.status === 'Pending').length
   const pendingApproval = expenses.filter(e => e.status === 'Pending').length // simplificado
-
   // Agrupar por categoría para el gráfico (vacío)
   const categoryTotals: Record<string, number> = {}
   expenses.forEach(e => {
@@ -33,7 +29,6 @@ export default function Expenses() {
   })
   const categories = Object.keys(categoryTotals)
   const totalSpent = Object.values(categoryTotals).reduce((a, b) => a + b, 0)
-
   // Colores para el gráfico (solo si hay datos)
   const categoryColors: Record<string, string> = {
     Parts: 'text-primary',
@@ -41,7 +36,6 @@ export default function Expenses() {
     Salaries: 'text-rose-500',
     Tools: 'text-amber-500',
   }
-
   const getCategoryBadge = (color: string) => {
     switch (color) {
       case 'blue': return { variant: 'default' as const }
@@ -51,13 +45,11 @@ export default function Expenses() {
       default: return { variant: 'outline' as const }
     }
   }
-
   const getStatusBadge = (status: string) => {
     return status === 'Paid'
       ? { variant: 'success' as const }
       : { variant: 'warning' as const }
   }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -70,7 +62,6 @@ export default function Expenses() {
           Nuevo gasto
         </Button>
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
@@ -86,7 +77,6 @@ export default function Expenses() {
             </div>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-start justify-between mb-4">
@@ -99,7 +89,6 @@ export default function Expenses() {
             <p className="text-muted-foreground text-sm mt-2">Esperando aprobación: {pendingApproval}</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-start justify-between mb-4">
@@ -113,7 +102,6 @@ export default function Expenses() {
           </CardContent>
         </Card>
       </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <Card>
@@ -165,7 +153,6 @@ export default function Expenses() {
               </div>
             </CardContent>
           </Card>
-
           <Card>
             <CardContent className="p-0">
               {expenses.length === 0 ? (
@@ -228,7 +215,6 @@ export default function Expenses() {
             </CardContent>
           </Card>
         </div>
-
         <div className="space-y-6">
           <Card>
             <CardContent className="p-6">
@@ -236,7 +222,6 @@ export default function Expenses() {
                 <PieChart size={18} className="text-primary" />
                 Distribución por Categoría
               </h3>
-
               {expenses.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   <p className="font-medium">Sin datos</p>
@@ -254,7 +239,6 @@ export default function Expenses() {
                       <span className="text-xl font-bold text-foreground">${totalSpent.toFixed(2)}</span>
                     </div>
                   </div>
-
                   <div className="space-y-4">
                     {categories.map(cat => (
                       <div key={cat} className="flex items-center justify-between">
@@ -268,13 +252,11 @@ export default function Expenses() {
                   </div>
                 </>
               )}
-
               <Button variant="outline" className="w-full mt-6">
                 Ver reporte detallado
               </Button>
             </CardContent>
           </Card>
-
           <Card className="bg-primary/10 dark:bg-primary/5 border-primary/10">
             <CardContent className="p-6">
               <h4 className="text-primary font-semibold text-sm uppercase tracking-wider mb-4 flex items-center gap-2">

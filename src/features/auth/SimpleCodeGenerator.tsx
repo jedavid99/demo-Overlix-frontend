@@ -27,14 +27,12 @@ import {
   SelectValue,
 } from '@/shared/components/ui/select';
 import logo from '/ovelix-claro.png';
-
 // Subscription plans
 const SUBSCRIPTION_PLANS = {
   monthly: { name: 'Mensual', duration: 30, price: '$29.99' },
   quarterly: { name: 'Trimestral', duration: 90, price: '$79.99' },
   annual: { name: 'Anual', duration: 365, price: '$299.99' },
 };
-
 interface ActivationCode {
   id: string;
   code: string;
@@ -59,7 +57,6 @@ interface ActivationCode {
   };
   status: 'active' | 'expired' | 'expiring_soon';
 }
-
 export default function SimpleCodeGenerator() {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -76,7 +73,6 @@ export default function SimpleCodeGenerator() {
     workshopType: '',
     paymentMethod: '',
   });
-
   // Check admin session
   useEffect(() => {
     const adminSession = localStorage.getItem('admin_session');
@@ -88,7 +84,6 @@ export default function SimpleCodeGenerator() {
     }
     setIsChecking(false);
   }, [navigate]);
-
   // Update code statuses
   useEffect(() => {
     const updateStatuses = () => {
@@ -98,23 +93,18 @@ export default function SimpleCodeGenerator() {
         const daysUntilExpiry = Math.ceil(
           (expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
         );
-
         let status: 'active' | 'expired' | 'expiring_soon' = 'active';
         if (daysUntilExpiry <= 0) {
           status = 'expired';
         } else if (daysUntilExpiry <= 7) {
           status = 'expiring_soon';
         }
-
         return { ...code, status };
       });
-
       setCodes(updatedCodes);
     };
-
     updateStatuses();
   }, [codes.length]);
-
   // Load codes from localStorage
   const loadCodes = () => {
     const storedCodes = localStorage.getItem('activation_codes');
@@ -122,17 +112,14 @@ export default function SimpleCodeGenerator() {
       setCodes(JSON.parse(storedCodes));
     }
   };
-
   // Generate activation code
   const generateCode = () => {
     setIsGenerating(true);
-
     setTimeout(() => {
       const code = 'OVERLIX-' + Math.random().toString(36).substring(2, 8).toUpperCase();
       const plan = SUBSCRIPTION_PLANS[selectedPlan];
       const createdAt = new Date();
       const expiresAt = new Date(createdAt.getTime() + plan.duration * 24 * 60 * 60 * 1000);
-
       const newActivationCode: ActivationCode = {
         id: Date.now().toString(),
         code,
@@ -153,7 +140,6 @@ export default function SimpleCodeGenerator() {
           workshopType: companyData.workshopType,
         },
       };
-
       const updatedCodes = [newActivationCode, ...codes];
       localStorage.setItem('activation_codes', JSON.stringify(updatedCodes));
       setCodes(updatedCodes);
@@ -161,14 +147,12 @@ export default function SimpleCodeGenerator() {
       setIsGenerating(false);
     }, 500);
   };
-
   // Copy code to clipboard
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2000);
   };
-
   // Delete code
   const deleteCode = (id: string) => {
     const updatedCodes = codes.filter((c) => c.id !== id);
@@ -176,7 +160,6 @@ export default function SimpleCodeGenerator() {
     setCodes(updatedCodes);
     setShowDeleteConfirm(null);
   };
-
   // Send WhatsApp reminder
   const sendWhatsAppReminder = (code: ActivationCode) => {
     const message = `Hola ${code.userName || 'usuario'}, tu código de activación ${code.code} vence el ${new Date(
@@ -185,7 +168,6 @@ export default function SimpleCodeGenerator() {
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
-
   // Send Gmail reminder
   const sendGmailReminder = (code: ActivationCode) => {
     const subject = 'Recordatorio: Tu suscripción de Overlix está por vencer';
@@ -197,14 +179,12 @@ export default function SimpleCodeGenerator() {
     )}&body=${encodeURIComponent(body)}`;
     window.open(gmailUrl, '_blank');
   };
-
   // Logout
   const handleLogout = () => {
     localStorage.removeItem('admin_session');
     localStorage.removeItem('admin_email');
     navigate('/admin/login');
   };
-
   if (isChecking) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#f9f9ff]">
@@ -215,11 +195,9 @@ export default function SimpleCodeGenerator() {
       </div>
     );
   }
-
   if (!isLoggedIn) {
     return null;
   }
-
   return (
     <main className="min-h-screen bg-[#f9f9ff] text-[#191b23]">
       {/* Header */}
@@ -238,7 +216,6 @@ export default function SimpleCodeGenerator() {
           </Button>
         </div>
       </header>
-
       <div className="max-w-4xl mx-auto p-6">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
@@ -253,7 +230,6 @@ export default function SimpleCodeGenerator() {
               </div>
             </div>
           </Card>
-
           <Card className="p-6 bg-white border border-[#c2c6d6]/60">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-green-100 rounded-lg">
@@ -267,7 +243,6 @@ export default function SimpleCodeGenerator() {
               </div>
             </div>
           </Card>
-
           <Card className="p-6 bg-white border border-[#c2c6d6]/60">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-orange-100 rounded-lg">
@@ -281,7 +256,6 @@ export default function SimpleCodeGenerator() {
               </div>
             </div>
           </Card>
-
           <Card className="p-6 bg-white border border-[#c2c6d6]/60">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-red-100 rounded-lg">
@@ -296,7 +270,6 @@ export default function SimpleCodeGenerator() {
             </div>
           </Card>
         </div>
-
         {/* Generate Code Section */}
         <Card className="p-6 bg-white border border-[#c2c6d6]/60 mb-8">
           <div className="mb-6">
@@ -305,7 +278,6 @@ export default function SimpleCodeGenerator() {
               Selecciona el plan de suscripción, ingresa los datos de la empresa y genera el código
             </p>
           </div>
-
           <div className="mb-6">
             <Label className="text-sm font-semibold text-[#191b23] mb-3 block">Plan de Suscripción</Label>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -329,7 +301,6 @@ export default function SimpleCodeGenerator() {
               ))}
             </div>
           </div>
-
           <div className="mb-6">
             <Label className="text-sm font-semibold text-[#191b23] mb-3 block">Datos de la Empresa</Label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -400,7 +371,6 @@ export default function SimpleCodeGenerator() {
               </div>
             </div>
           </div>
-
           <div className="flex items-center justify-between">
             <div className="text-sm text-[#727785]">
               <span className="font-medium text-[#191b23]">Plan seleccionado:</span>{' '}
@@ -424,7 +394,6 @@ export default function SimpleCodeGenerator() {
               )}
             </Button>
           </div>
-
           {newCode && (
             <AnimatePresence>
               <motion.div
@@ -464,13 +433,11 @@ export default function SimpleCodeGenerator() {
             </AnimatePresence>
           )}
         </Card>
-
         {/* Codes List */}
         <Card className="bg-white border border-[#c2c6d6]/60">
           <div className="p-6 border-b border-[#c2c6d6]/60">
             <h2 className="text-lg font-semibold text-[#191b23]">Historial de Códigos</h2>
           </div>
-
           <div className="divide-y divide-[#c2c6d6]/60">
             {codes.length === 0 ? (
               <div className="p-12 text-center">
@@ -483,7 +450,6 @@ export default function SimpleCodeGenerator() {
                 const daysUntilExpiry = Math.ceil(
                   (expiresAt.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
                 );
-
                 return (
                   <motion.div
                     key={code.id}
@@ -605,7 +571,6 @@ export default function SimpleCodeGenerator() {
                           </div>
                         </div>
                       </div>
-
                       <div className="flex items-center gap-2 shrink-0">
                         {!code.used && code.status !== 'expired' && (
                           <Button
@@ -627,7 +592,6 @@ export default function SimpleCodeGenerator() {
                             )}
                           </Button>
                         )}
-
                         {code.status === 'expiring_soon' && (
                           <>
                             <Button
@@ -650,7 +614,6 @@ export default function SimpleCodeGenerator() {
                             </Button>
                           </>
                         )}
-
                         <Button
                           variant="outline"
                           size="sm"
@@ -662,7 +625,6 @@ export default function SimpleCodeGenerator() {
                         </Button>
                       </div>
                     </div>
-
                     {showDeleteConfirm === code.id && (
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}

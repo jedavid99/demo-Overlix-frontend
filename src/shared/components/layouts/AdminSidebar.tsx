@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -11,7 +9,7 @@ import {
   Building2, HelpCircle, Bell, FileText, Printer, PanelLeft, Receipt
 } from 'lucide-react'
 import { Badge } from '../../components/ui/badge'
-
+import { useAuth } from '../../contexts/AuthContext'
 interface NavItem {
   title: string
   href: string
@@ -19,7 +17,6 @@ interface NavItem {
   children?: NavItem[]
   badge?: number
 }
-
 // Organización por módulos
 const navItems: NavItem[] = [
   {
@@ -175,7 +172,6 @@ const navItems: NavItem[] = [
   //   ]
   // }
 ]
-
 export const AdminSidebar = ({
   isOpen = false,
   onClose = () => {},
@@ -192,7 +188,6 @@ export const AdminSidebar = ({
   notificationsCount?: number
 }) => {
   const location = useLocation()
-
   // apply dynamic notification count if provided
   const itemsWithBadge = navItems.map(section => {
     if (section.title === 'ADMINISTRACIÓN' && section.children) {
@@ -208,15 +203,12 @@ export const AdminSidebar = ({
   const navigate = useNavigate()
   const { logout } = useAuth()
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({})
-
   const toggleSection = (key: string) => {
     setOpenSections(prev => ({ ...prev, [key]: !prev[key] }))
   }
-
   const handleLogout = () => {
     logout()
   }
-
   // Auto-expandir secciones basado en la ruta actual
   useEffect(() => {
     const path = location.pathname
@@ -237,7 +229,6 @@ export const AdminSidebar = ({
     
     setOpenSections(prev => ({ ...prev, ...newOpenSections }))
   }, [location.pathname])
-
   const isActive = (href: string) => location.pathname === href
   const isChildActive = (children?: NavItem[]) => {
     if (!children) return false
@@ -246,13 +237,11 @@ export const AdminSidebar = ({
       item.children?.some(sub => sub.href === location.pathname)
     )
   }
-
   const renderNavItem = (item: NavItem, depth = 0) => {
     const hasChildren = item.children && item.children.length > 0
     const isItemActive = isActive(item.href)
     const isParentActive = hasChildren && isChildActive(item.children)
     const paddingLeft = depth * 12
-
     if (hasChildren) {
       return (
         <div key={item.title} className="mb-1">
@@ -283,7 +272,6 @@ export const AdminSidebar = ({
               </>
             )}
           </button>
-
           <AnimatePresence>
             {openSections[item.title] && !collapsed && item.children && (
               <motion.div
@@ -302,7 +290,6 @@ export const AdminSidebar = ({
         </div>
       )
     }
-
     return (
       <Link
         key={item.href}
@@ -328,7 +315,6 @@ export const AdminSidebar = ({
       </Link>
     )
   }
-
   return (
     <>
       {/* Overlay para mobile */}
@@ -344,7 +330,6 @@ export const AdminSidebar = ({
           />
         )}
       </AnimatePresence>
-
       {/* Sidebar */}
       <motion.aside
         initial={isOpen ? { x: -280 } : { x: 0 }}
@@ -372,7 +357,6 @@ export const AdminSidebar = ({
                   </div>
                 )}
               </Link>
-
               {/* Botón cerrar mobile */}
               <button
                 onClick={onClose}
@@ -382,7 +366,6 @@ export const AdminSidebar = ({
               </button>
             </div>
           </div>
-
           {/* Navegación principal */}
           <div className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-4 scrollbar-thin scrollbar-thumb-slate-300">
             {itemsWithBadge.map(section => (
@@ -400,7 +383,6 @@ export const AdminSidebar = ({
               </div>
             ))}
           </div>
-
           {/* Footer */}
           <div className="border-t border-border-light dark:border-border-dark p-4 space-y-2">
             <button
@@ -420,6 +402,4 @@ export const AdminSidebar = ({
     </>
   )
 }
-
 export default AdminSidebar
-

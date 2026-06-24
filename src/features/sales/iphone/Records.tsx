@@ -15,14 +15,12 @@ import {
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
-
 export default function IPhoneRecords() {
   const [currentStep, setCurrentStep] = useState(1);
   const [insuranceEnabled, setInsuranceEnabled] = useState(true);
   const [billingCycle, setBillingCycle] = useState('monthly');
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [searchQuery, setSearchQuery] = useState('');
-
   const [formData, setFormData] = useState({
     model: 'iPhone 15 Pro Max',
     color: 'Titanium Black',
@@ -32,18 +30,14 @@ export default function IPhoneRecords() {
     insurancePlan: 'Full Coverage (Theft + Damage)',
     premium: 14.99,
   });
-
   const handleInputChange = (field: string, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
-
   const devicePrice = 1199.00;
   const salesTax = devicePrice * 0.08;
   const insurancePremium = insuranceEnabled ? formData.premium : 0;
   const total = devicePrice + salesTax + insurancePremium;
-
   const progressPercentage = (currentStep / 4) * 100;
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -61,7 +55,6 @@ export default function IPhoneRecords() {
           ></div>
         </div>
       </div>
-
       <div className="space-y-6">
         {/* Section 1: Product Selection */}
         <Card>
@@ -112,7 +105,6 @@ export default function IPhoneRecords() {
             </div>
           </CardContent>
         </Card>
-
         {/* Section 2: Customer Info */}
         <Card>
           <CardContent className="p-6">
@@ -150,7 +142,6 @@ export default function IPhoneRecords() {
             </div>
           </CardContent>
         </Card>
-
         {/* Section 3: Insurance Options */}
         <Card>
           <CardContent className="p-6">
@@ -172,7 +163,6 @@ export default function IPhoneRecords() {
                 <span className="ml-3 text-sm font-medium text-foreground">Activar Cobertura</span>
               </label>
             </div>
-
             {insuranceEnabled && (
               <div className="mt-4 p-4 rounded-lg bg-primary/5 border border-primary/20">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -190,7 +180,6 @@ export default function IPhoneRecords() {
                       <option>Básico (Extendido de Fabricante)</option>
                     </select>
                   </label>
-
                   <div>
                     <span className="text-sm font-semibold text-foreground block mb-2">Ciclo de Facturación</span>
                     <div className="flex bg-background p-1 rounded-lg border border-input">
@@ -212,7 +201,6 @@ export default function IPhoneRecords() {
                       </Button>
                     </div>
                   </div>
-
                   <label className="flex flex-col gap-2">
                     <span className="text-sm font-semibold text-foreground">Prima del Seguro</span>
                     <div className="relative">
@@ -230,7 +218,6 @@ export default function IPhoneRecords() {
             )}
           </CardContent>
         </Card>
-
         {/* Section 4: Payment Details */}
         <Card>
           <CardContent className="p-6">
@@ -240,7 +227,6 @@ export default function IPhoneRecords() {
               </div>
               <h2 className="text-foreground text-xl font-bold">Detalles de Pago</h2>
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <Button
@@ -255,7 +241,6 @@ export default function IPhoneRecords() {
                   </div>
                   {paymentMethod === 'card' && <CheckCircle size={20} />}
                 </Button>
-
                 <Button
                   variant={paymentMethod === 'finance' ? 'default' : 'outline'}
                   onClick={() => setPaymentMethod('finance')}
@@ -269,7 +254,6 @@ export default function IPhoneRecords() {
                   {paymentMethod === 'finance' && <CheckCircle size={20} />}
                 </Button>
               </div>
-
               <Card className="bg-muted/50">
                 <CardContent className="p-6 flex flex-col gap-3">
                   <div className="flex justify-between text-sm">
@@ -296,7 +280,6 @@ export default function IPhoneRecords() {
             </div>
           </CardContent>
         </Card>
-
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between py-6 border-t border-border">
           <Button
@@ -318,5 +301,3 @@ export default function IPhoneRecords() {
     </div>
   );
 }
-
-

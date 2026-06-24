@@ -15,10 +15,8 @@ import {
 import { Button } from '../../shared/components/ui/button';
 import { Card } from '../../shared/components/ui/card';
 import logo from '/ovelix-claro.png';
-
 // Admin email for access control
 const ADMIN_EMAIL = 'admin@overlix.com';
-
 interface ActivationCode {
   id: string;
   code: string;
@@ -26,7 +24,6 @@ interface ActivationCode {
   used: boolean;
   usedAt?: string;
 }
-
 export default function AdminActivationCodes() {
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
@@ -36,7 +33,6 @@ export default function AdminActivationCodes() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
-
   // Check admin access
   useEffect(() => {
     const checkAdminAccess = () => {
@@ -47,7 +43,6 @@ export default function AdminActivationCodes() {
         navigate('/');
         return;
       }
-
       // Check if user is admin (you can modify this logic as needed)
       if (userEmail === ADMIN_EMAIL) {
         setIsAdmin(true);
@@ -58,10 +53,8 @@ export default function AdminActivationCodes() {
       
       setIsChecking(false);
     };
-
     checkAdminAccess();
   }, [navigate]);
-
   // Load codes from localStorage
   const loadCodes = () => {
     const storedCodes = localStorage.getItem('activation_codes');
@@ -69,7 +62,6 @@ export default function AdminActivationCodes() {
       setCodes(JSON.parse(storedCodes));
     }
   };
-
   // Generate activation code
   const generateCode = () => {
     setIsGenerating(true);
@@ -82,7 +74,6 @@ export default function AdminActivationCodes() {
         createdAt: new Date().toISOString(),
         used: false
       };
-
       const updatedCodes = [newActivationCode, ...codes];
       localStorage.setItem('activation_codes', JSON.stringify(updatedCodes));
       setCodes(updatedCodes);
@@ -90,14 +81,12 @@ export default function AdminActivationCodes() {
       setIsGenerating(false);
     }, 500);
   };
-
   // Copy code to clipboard
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2000);
   };
-
   // Delete code
   const deleteCode = (id: string) => {
     const updatedCodes = codes.filter(c => c.id !== id);
@@ -105,7 +94,6 @@ export default function AdminActivationCodes() {
     setCodes(updatedCodes);
     setShowDeleteConfirm(null);
   };
-
   // Mark code as used
   const markAsUsed = (id: string) => {
     const updatedCodes = codes.map(c => 
@@ -116,14 +104,12 @@ export default function AdminActivationCodes() {
     localStorage.setItem('activation_codes', JSON.stringify(updatedCodes));
     setCodes(updatedCodes);
   };
-
   // Logout
   const handleLogout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('user_email');
     navigate('/');
   };
-
   if (isChecking) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#f9f9ff]">
@@ -134,11 +120,9 @@ export default function AdminActivationCodes() {
       </div>
     );
   }
-
   if (!isAdmin) {
     return null;
   }
-
   return (
     <main className="min-h-screen bg-[#f9f9ff] text-[#191b23]">
       {/* Header */}
@@ -161,7 +145,6 @@ export default function AdminActivationCodes() {
           </Button>
         </div>
       </header>
-
       <div className="max-w-7xl mx-auto p-6">
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -176,7 +159,6 @@ export default function AdminActivationCodes() {
               </div>
             </div>
           </Card>
-
           <Card className="p-6 bg-white border border-[#c2c6d6]/60">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-green-100 rounded-lg">
@@ -188,7 +170,6 @@ export default function AdminActivationCodes() {
               </div>
             </div>
           </Card>
-
           <Card className="p-6 bg-white border border-[#c2c6d6]/60">
             <div className="flex items-center gap-4">
               <div className="p-3 bg-orange-100 rounded-lg">
@@ -201,7 +182,6 @@ export default function AdminActivationCodes() {
             </div>
           </Card>
         </div>
-
         {/* Generate Code Section */}
         <Card className="p-6 bg-white border border-[#c2c6d6]/60 mb-8">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -227,7 +207,6 @@ export default function AdminActivationCodes() {
               )}
             </Button>
           </div>
-
           {newCode && (
             <AnimatePresence>
               <motion.div
@@ -267,13 +246,11 @@ export default function AdminActivationCodes() {
             </AnimatePresence>
           )}
         </Card>
-
         {/* Codes List */}
         <Card className="bg-white border border-[#c2c6d6]/60">
           <div className="p-6 border-b border-[#c2c6d6]/60">
             <h2 className="text-lg font-semibold text-[#191b23]">Historial de Códigos</h2>
           </div>
-
           <div className="divide-y divide-[#c2c6d6]/60">
             {codes.length === 0 ? (
               <div className="p-12 text-center">
@@ -312,7 +289,6 @@ export default function AdminActivationCodes() {
                         </div>
                       </div>
                     </div>
-
                     <div className="flex items-center gap-2">
                       {!code.used && (
                         <Button
@@ -346,7 +322,6 @@ export default function AdminActivationCodes() {
                       </Button>
                     </div>
                   </div>
-
                   {showDeleteConfirm === code.id && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}

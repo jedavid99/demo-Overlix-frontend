@@ -1,5 +1,4 @@
 import React from 'react'
-
 export default function Developer() {
   return (
     <div>
@@ -8,4 +7,3 @@ export default function Developer() {
     </div>
   )
 }
-

@@ -1,5 +1,4 @@
 import { cn } from '../../lib/utils'
-
 function Skeleton({
   className,
   variant = 'default',
@@ -11,7 +10,6 @@ function Skeleton({
     text: 'h-4 w-full rounded',
     rectangular: 'h-10 w-full rounded-md',
   }
-
   return (
     <div
       className={cn(
@@ -23,5 +21,4 @@ function Skeleton({
     />
   )
 }
-
 export { Skeleton }

@@ -1,5 +1,4 @@
 import React from 'react'
-
 interface ServiceOrderData {
   companyName: string
   companyAddress: string
@@ -39,12 +38,10 @@ interface ServiceOrderData {
   showWatermark: boolean
   watermarkUrl: string
 }
-
 interface ServiceOrderPreviewProps {
   data: ServiceOrderData
   className?: string
 }
-
 export default function ServiceOrderPreviewOptimized({ data, className = '' }: ServiceOrderPreviewProps) {
   const texts = {
     authorizedCenter: 'Centro de Servicio Técnico Autorizado',
@@ -82,7 +79,6 @@ export default function ServiceOrderPreviewOptimized({ data, className = '' }: S
     warranty: 'GARANTÍA',
     warrantyTerms: 'Términos y Condiciones de Garantía',
   }
-
   return (
     <div className={`bg-white text-[#191c1d] font-sans ${className}`} style={{ fontFamily: 'Inter, sans-serif', fontSize: '11px' }}>
       <div className="max-w-[800px] mx-auto border border-[#c3c5d7] shadow-sm print-container overflow-hidden relative">
@@ -98,7 +94,6 @@ export default function ServiceOrderPreviewOptimized({ data, className = '' }: S
             )}
           </div>
         )}
-
         {/* SECTION 1: CUSTOMER ORDER */}
         <section className="p-4 relative z-10">
           {/* Header */}
@@ -117,7 +112,6 @@ export default function ServiceOrderPreviewOptimized({ data, className = '' }: S
               <div className="text-xs font-mono text-[#434654] mt-0.5">{texts.date}: {data.orderDate || '24 oct 2024'}</div>
             </div>
           </div>
-
           {/* Customer & Device Info */}
           <div className="grid grid-cols-2 gap-4 mb-3">
             <div className="border border-[#c3c5d7] p-3">
@@ -137,7 +131,6 @@ export default function ServiceOrderPreviewOptimized({ data, className = '' }: S
               </div>
             </div>
           </div>
-
           {/* Problem Description */}
           <div className="mb-3 border border-[#c3c5d7]">
             <div className="bg-[#f3f4f5] px-3 py-1.5 border-b border-[#c3c5d7] text-[10px] font-semibold uppercase text-[#191c1d] tracking-wider">
@@ -147,7 +140,6 @@ export default function ServiceOrderPreviewOptimized({ data, className = '' }: S
               {data.repairDescription || 'El cliente reporta estrangulamiento térmico frecuente y apagados repentinos durante tareas de alto rendimiento. El ventilador emite un ruido metálico. Solicita limpieza interna, reemplazo de pasta térmica y diagnóstico de hardware.'}
             </div>
           </div>
-
           {/* Warranty Terms */}
           {data.warrantyTerms && (
             <div className="mt-3 border border-[#c3c5d7]">
@@ -174,7 +166,6 @@ export default function ServiceOrderPreviewOptimized({ data, className = '' }: S
             </div>
           </div>
         </section>
-
         {/* PERFORATION LINE */}
         <div className="relative py-3 flex items-center justify-center z-10">
           <div className="absolute inset-0 flex items-center">
@@ -185,7 +176,6 @@ export default function ServiceOrderPreviewOptimized({ data, className = '' }: S
             <span className="text-[10px] font-semibold italic tracking-wider">{texts.cutHere}</span>
           </div>
         </div>
-
         {/* SECTION 2: TECHNICAL ORDER */}
         <section className="p-4 bg-[#ffffff] relative z-10">
           <div className="flex justify-between items-center mb-3 border-b border-[#c3c5d7] pb-2">
@@ -200,7 +190,6 @@ export default function ServiceOrderPreviewOptimized({ data, className = '' }: S
               </div>
             </div>
           </div>
-
           <div className="grid grid-cols-3 gap-4 mb-3">
             {/* Left column: Diagnostic & Time */}
             <div className="col-span-1 space-y-3">
@@ -239,7 +228,6 @@ export default function ServiceOrderPreviewOptimized({ data, className = '' }: S
                 </div>
               </div>
             </div>
-
             {/* Right column: Parts table & Notes */}
             <div className="col-span-2">
               <div className="border border-[#c3c5d7] overflow-hidden">
@@ -267,7 +255,6 @@ export default function ServiceOrderPreviewOptimized({ data, className = '' }: S
                   </tbody>
                 </table>
               </div>
-
               <div className="mt-3 border border-[#c3c5d7]">
                 <div className="bg-[#f3f4f5] px-3 py-1.5 border-b border-[#c3c5d7] text-[10px] font-semibold uppercase text-[#191c1d] tracking-wider">
                   {texts.technicianProgressNotes}
@@ -278,7 +265,6 @@ export default function ServiceOrderPreviewOptimized({ data, className = '' }: S
               </div>
             </div>
           </div>
-
           {/* Footer */}
           <div className="flex justify-between items-end border-t border-[#c3c5d7] pt-3">
             <div className="w-1/3">
@@ -295,7 +281,6 @@ export default function ServiceOrderPreviewOptimized({ data, className = '' }: S
             </div>
           </div>
         </section>
-
         {/* Footer */}
         <footer className="p-3 border-t border-[#c3c5d7] flex justify-between bg-white font-mono text-[9px] text-[#737686] uppercase relative z-10">
           <span>{texts.formId}</span>

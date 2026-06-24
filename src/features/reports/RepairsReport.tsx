@@ -1,5 +1,3 @@
-"use client"
-
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
@@ -12,7 +10,6 @@ import { Button } from '@/shared/components/ui/button'
 import { Badge } from '@/shared/components/ui/badge'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 import { exportToCSV } from '@/shared/lib/export'
-
 // Tipos
 interface Repair {
   id: string
@@ -27,24 +24,20 @@ interface Repair {
   cost: number
   technician: string
 }
-
 interface RepairByStatus {
   name: string
   value: number
   color: string
 }
-
 interface RepairByDevice {
   name: string
   value: number
 }
-
 interface RepairTimeline {
   date: string
   repairs: number
   revenue: number
 }
-
 // Datos de ejemplo (comentados – descomentar para probar diseño)
 // const sampleRepairs: Repair[] = [
 //   { id: '1', ticketId: 'REP-001', client: 'Juan Pérez', device: 'iPhone 13', deviceType: 'Celular', issue: 'Pantalla rota', status: 'Completado', date: new Date(2024, 0, 15), completedDate: new Date(2024, 0, 17), cost: 150, technician: 'Carlos López' },
@@ -53,20 +46,16 @@ interface RepairTimeline {
 //   { id: '4', ticketId: 'REP-004', client: 'Laura Díaz', device: 'iPad Air', deviceType: 'Tablet', issue: 'Carga', status: 'Completado', date: new Date(2024, 0, 18), completedDate: new Date(2024, 0, 19), cost: 90, technician: 'Ana Martínez' },
 //   { id: '5', ticketId: 'REP-005', client: 'Roberto Ruiz', device: 'PS5', deviceType: 'Consola', issue: 'HDMI', status: 'Cancelado', date: new Date(2024, 0, 19), cost: 120, technician: 'Carlos López' },
 // ]
-
 const STATUS_COLORS = {
   'Pendiente': '#f59e0b',
   'En Progreso': '#3b82f6',
   'Completado': '#10b981',
   'Cancelado': '#ef4444',
 }
-
 const DEVICE_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4']
-
 const formatCurrency = (value: number): string => {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(value)
 }
-
 const RepairsReport = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
@@ -76,7 +65,6 @@ const RepairsReport = () => {
   const [repairs, setRepairs] = useState<Repair[]>([]) // Inicialmente vacío
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
-
   useEffect(() => {
     // 🔌 Conectar con API real:
     // api.get('/reports/repairs').then(res => setRepairs(res.data)).catch(() => setError(true)).finally(() => setLoading(false))
@@ -90,7 +78,6 @@ const RepairsReport = () => {
       setLoading(false)
     }, 800)
   }, [])
-
   // Filtrar reparaciones por período
   const filteredRepairs = repairs.filter((repair) => {
     const now = new Date()
@@ -108,20 +95,17 @@ const RepairsReport = () => {
     }
     return matchesPeriod
   })
-
   // Calcular KPIs
   const totalRepairs = filteredRepairs.length
   const completedRepairs = filteredRepairs.filter(r => r.status === 'Completado').length
   const pendingRepairs = filteredRepairs.filter(r => r.status === 'Pendiente' || r.status === 'En Progreso').length
   const totalRevenue = filteredRepairs.filter(r => r.status === 'Completado').reduce((sum, r) => sum + r.cost, 0)
   const averageRepairCost = completedRepairs > 0 ? totalRevenue / completedRepairs : 0
-
   // Calcular tiempo promedio de reparación (en días)
   const completedWithDate = filteredRepairs.filter(r => r.status === 'Completado' && r.completedDate)
   const averageRepairTime = completedWithDate.length > 0 
     ? completedWithDate.reduce((sum, r) => sum + (r.completedDate!.getTime() - r.date.getTime()), 0) / completedWithDate.length / (1000 * 60 * 60 * 24)
     : 0
-
   // Datos para gráfico por estado
   const repairsByStatus: RepairByStatus[] = [
     { name: 'Pendiente', value: filteredRepairs.filter(r => r.status === 'Pendiente').length, color: STATUS_COLORS['Pendiente'] },
@@ -129,14 +113,12 @@ const RepairsReport = () => {
     { name: 'Completado', value: filteredRepairs.filter(r => r.status === 'Completado').length, color: STATUS_COLORS['Completado'] },
     { name: 'Cancelado', value: filteredRepairs.filter(r => r.status === 'Cancelado').length, color: STATUS_COLORS['Cancelado'] },
   ]
-
   // Datos para gráfico por tipo de dispositivo
   const deviceCounts = filteredRepairs.reduce((acc, r) => {
     acc[r.deviceType] = (acc[r.deviceType] || 0) + 1
     return acc
   }, {} as Record<string, number>)
   const repairsByDevice: RepairByDevice[] = Object.entries(deviceCounts).map(([name, value]) => ({ name, value }))
-
   // Datos para línea de tiempo
   const getTimelineData = (): RepairTimeline[] => {
     const days = 7
@@ -163,11 +145,9 @@ const RepairsReport = () => {
     }))
   }
   const timelineData = getTimelineData()
-
   // Paginación
   const paginatedRepairs = filteredRepairs.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
   const totalPages = Math.ceil(filteredRepairs.length / itemsPerPage)
-
   // Exportar CSV
   const handleExport = () => {
     const csvData = filteredRepairs.map(repair => ({
@@ -183,7 +163,6 @@ const RepairsReport = () => {
     }))
     exportToCSV(csvData, 'reporte-reparaciones')
   }
-
   const handleRetry = () => {
     setError(false)
     setLoading(true)
@@ -192,7 +171,6 @@ const RepairsReport = () => {
       setLoading(false)
     }, 800)
   }
-
   if (loading) {
     return (
       <motion.div
@@ -218,7 +196,6 @@ const RepairsReport = () => {
       </motion.div>
     )
   }
-
   if (error) {
     return (
       <motion.div
@@ -236,7 +213,6 @@ const RepairsReport = () => {
       </motion.div>
     )
   }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -255,7 +231,6 @@ const RepairsReport = () => {
           Exportar
         </Button>
       </div>
-
       {/* Filtros */}
       <Card className="p-4">
         <div className="flex flex-wrap items-center gap-4">
@@ -297,7 +272,6 @@ const RepairsReport = () => {
           )}
         </div>
       </Card>
-
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
@@ -317,7 +291,6 @@ const RepairsReport = () => {
             <p className="text-sm text-muted-foreground">Total de reparaciones</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -335,7 +308,6 @@ const RepairsReport = () => {
             <p className="text-sm text-muted-foreground">Reparaciones completadas</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -347,7 +319,6 @@ const RepairsReport = () => {
             <p className="text-sm text-muted-foreground">Reparaciones pendientes</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -360,7 +331,6 @@ const RepairsReport = () => {
           </CardContent>
         </Card>
       </div>
-
       {/* KPIs secundarios */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
@@ -374,7 +344,6 @@ const RepairsReport = () => {
             <p className="text-sm text-muted-foreground">Tiempo promedio de reparación</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <div className="flex items-start justify-between mb-3">
@@ -387,7 +356,6 @@ const RepairsReport = () => {
           </CardContent>
         </Card>
       </div>
-
       {/* Gráficos */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Gráfico por estado */}
@@ -435,7 +403,6 @@ const RepairsReport = () => {
             )}
           </CardContent>
         </Card>
-
         {/* Gráfico por tipo de dispositivo */}
         <Card>
           <CardHeader>
@@ -477,7 +444,6 @@ const RepairsReport = () => {
           </CardContent>
         </Card>
       </div>
-
       {/* Línea de tiempo */}
       <Card>
         <CardHeader>
@@ -528,7 +494,6 @@ const RepairsReport = () => {
           )}
         </CardContent>
       </Card>
-
       {/* Tabla de reparaciones */}
       <Card>
         <CardHeader>
@@ -616,5 +581,4 @@ const RepairsReport = () => {
     </motion.div>
   )
 }
-
 export default RepairsReport

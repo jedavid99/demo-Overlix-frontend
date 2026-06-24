@@ -2,7 +2,6 @@ import React from 'react'
 import { CreditCard, TrendingUp, AlertCircle } from 'lucide-react'
 import { Card, CardContent } from '@/shared/components/ui/card'
 import { Button } from '@/shared/components/ui/button'
-
 export default function Billing() {
   return (
     <div className="space-y-6">
@@ -16,7 +15,6 @@ export default function Billing() {
           Actualizar método de pago
         </Button>
       </div>
-
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
@@ -30,7 +28,6 @@ export default function Billing() {
             <p className="text-muted-foreground text-sm">$49/mes</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-start justify-between mb-4">
@@ -43,7 +40,6 @@ export default function Billing() {
             <p className="text-muted-foreground text-sm">En 14 días</p>
           </CardContent>
         </Card>
-
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-start justify-between mb-4">
@@ -57,7 +53,6 @@ export default function Billing() {
           </CardContent>
         </Card>
       </div>
-
       <Card>
         <CardContent className="p-6">
           <h3 className="text-lg font-semibold text-foreground mb-4">Historial de facturas</h3>
@@ -67,4 +62,3 @@ export default function Billing() {
     </div>
   )
 }
-

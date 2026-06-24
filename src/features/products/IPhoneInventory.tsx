@@ -17,7 +17,6 @@ import { Card, CardContent } from '@/shared/components/ui/card'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
-
 interface IPhoneFormData {
   model: string
   storage: string
@@ -33,7 +32,6 @@ interface IPhoneFormData {
   retailPrice: string
   taxRate: string
 }
-
 export default function IPhoneInventory() {
   const navigate = useNavigate()  // ← AGREGAR ESTA LÍNEA
   const [formData, setFormData] = useState<IPhoneFormData>({
@@ -51,19 +49,16 @@ export default function IPhoneInventory() {
     retailPrice: '1199.00',
     taxRate: '8.5',
   })
-
   const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([])
   const [autoSaveTime] = useState('14:24')
   const [isSaving, setIsSaving] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
-
   const handleInputChange = (field: keyof IPhoneFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: '' }))
     }
   }
-
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {}
     if (!formData.model) newErrors.model = 'Selecciona un modelo'
@@ -78,7 +73,6 @@ export default function IPhoneInventory() {
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
-
   const handleSubmit = () => {
     if (!validate()) return
     setIsSaving(true)
@@ -87,15 +81,12 @@ export default function IPhoneInventory() {
       setIsSaving(false)
     }, 1500)
   }
-
   const calculatedMargin = formData.retailPrice && formData.purchaseCost
     ? (((parseFloat(formData.retailPrice) - parseFloat(formData.purchaseCost)) / parseFloat(formData.retailPrice)) * 100).toFixed(1)
     : '0.0'
-
   const projectedProfit = formData.retailPrice && formData.purchaseCost
     ? (parseFloat(formData.retailPrice) - parseFloat(formData.purchaseCost)).toFixed(2)
     : '0.00'
-
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files) return
@@ -111,23 +102,19 @@ export default function IPhoneInventory() {
     // Resetear el input para permitir seleccionar el mismo archivo de nuevo
     e.target.value = ''
   }
-
   const removePhoto = (index: number, e: React.MouseEvent) => {
     e.stopPropagation() // Evita que el clic llegue al label y abra el selector
     setUploadedPhotos((prev) => prev.filter((_, i) => i !== index))
   }
-
   const colors = [
     { name: 'Titanium Black', value: 'Titanium Black', class: 'bg-slate-800' },
     { name: 'Natural Titanium', value: 'Natural Titanium', class: 'bg-slate-200' },
     { name: 'Blue Titanium', value: 'Blue Titanium', class: 'bg-blue-200' },
     { name: 'White Titanium', value: 'White Titanium', class: 'bg-white' },
   ]
-
   const models = ['iPhone 15 Pro Max', 'iPhone 15 Pro', 'iPhone 15 Plus', 'iPhone 15']
   const storageOptions = ['128 GB', '256 GB', '512 GB', '1 TB']
   const suppliers = ['Apple Inc. Official', 'Tech Distribution Co.', 'Global Wholesale']
-
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
@@ -144,7 +131,6 @@ export default function IPhoneInventory() {
             </Button>
           </div>
         </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Columna izquierda (2/3) */}
           <div className="lg:col-span-2 space-y-4">
@@ -227,7 +213,6 @@ export default function IPhoneInventory() {
                 </div>
               </CardContent>
             </Card>
-
             {/* Sección 2: Identificación única */}
             <Card>
               <CardContent className="p-5 space-y-4">
@@ -285,7 +270,6 @@ export default function IPhoneInventory() {
                 </div>
               </CardContent>
             </Card>
-
             {/* Sección 3: Abastecimiento */}
             <Card>
               <CardContent className="p-5 space-y-4">
@@ -339,7 +323,6 @@ export default function IPhoneInventory() {
               </CardContent>
             </Card>
           </div>
-
           {/* Columna derecha (1/3) */}
           <div className="space-y-4">
             {/* Sección 4: Información de venta */}
@@ -393,7 +376,6 @@ export default function IPhoneInventory() {
                 </div>
               </CardContent>
             </Card>
-
             {/* Sección 5: Multimedia (CORREGIDA) */}
             <Card>
               <CardContent className="p-5 space-y-4">
@@ -419,7 +401,6 @@ export default function IPhoneInventory() {
                       className="hidden"
                     />
                   </label>
-
                   {/* Previsualización de fotos */}
                   {uploadedPhotos.length > 0 && (
                     <div className="grid grid-cols-3 gap-2 mt-3">
@@ -436,7 +417,6 @@ export default function IPhoneInventory() {
                       ))}
                     </div>
                   )}
-
                   <div className="flex items-start gap-2 mt-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-900/40">
                     <Info size={14} className="text-blue-600 flex-shrink-0 mt-0.5" />
                     <p className="text-[10px] text-blue-700 dark:text-blue-300">Asegura que IMEI y Serie sean visibles en al menos una foto.</p>
@@ -444,7 +424,6 @@ export default function IPhoneInventory() {
                 </div>
               </CardContent>
             </Card>
-
             {/* Botón de acción final */}
                        {/* Botón de acción final */}
             <Button onClick={handleSubmit} className="w-full" disabled={isSaving}>
