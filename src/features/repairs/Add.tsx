@@ -325,42 +325,16 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
     setSubmitting(true);
     try {
       const payload = {
-        // === CAMPOS REQUERIDOS ===
         cliente_id: state.selectedClient.id,
         dispositivo: state.brand && state.model ? `${state.brand} ${state.model}` : state.deviceType,
-        problema_reportado: state.issueDescription,
-        fecha_ingreso: new Date().toISOString().split('T')[0],
-        
-        // === CAMPOS OPCIONALES - DISPOSITIVO ===
-        categoria_dispositivo: state.deviceType === 'notebook' ? 'laptop' : state.deviceType === 'phone' ? 'phone' : state.deviceType === 'pc' ? 'pc' : state.deviceType === 'console' ? 'console' : state.deviceType === 'tablet' ? 'tablet' : 'other',
         marca: state.brand || undefined,
         modelo: state.model || undefined,
-        numero_serie: state.serial || undefined,
-        condicion_estetica: state.aestheticCondition || undefined,
-        accesorios_incluidos: state.accessories && state.accessories.length > 0 ? state.accessories : undefined,
-        
-        // === CAMPOS OPCIONALES - ASIGNACIÓN ===
+        problema_reportado: state.issueDescription,
+        diagnosis: undefined,
         prioridad: state.priority === 'Normal' ? 'medium' : state.priority === 'Baja' ? 'low' : state.priority === 'Alta' ? 'high' : 'critical',
+        fecha_ingreso: new Date().toISOString().split('T')[0],
         tecnico_asignado_id: undefined,
-        fecha_estimada_entrega: new Date(Date.now() + state.estimatedDays * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        tiempo_estimado_minutos: state.estimatedDays * 24 * 60,
-        
-        // === CAMPOS OPCIONALES - COSTOS ===
-        total_reparacion: parseFloat(repairPrice) || undefined,
-        pagado: false,
-        metodo_pago_id: undefined,
-        
-        // === CAMPOS OPCIONALES - NOTAS ===
-        notas: state.technicianNotes || undefined,
-        
-        // === CAMPOS OPCIONALES - SEGURIDAD ===
-        tipo_seguridad: state.securityType === 'ninguno' ? 'none' : state.securityType === 'pin' ? 'pin' : state.securityType === 'patron' ? 'pattern' : state.securityType === 'huella' ? 'fingerprint' : 'none',
-        pin_acceso: state.accessPin || undefined,
-        patron_puntos: state.patternDots || undefined,
-        secuencia_patron: state.patternSequence || undefined,
-        
-        // === CAMPOS OPCIONALES - HARDWARE ===
-        chequeo_hardware: state.hardwareChecks || undefined
+        notas: state.technicianNotes || undefined
       };
 
       console.log('Enviando payload:', payload);
