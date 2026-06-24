@@ -68,47 +68,56 @@ export interface RepairPart {
 }
 
 export interface RepairCreate {
+  // === CAMPOS REQUERIDOS ===
   cliente_id: string;
-  
-  // Datos del dispositivo
-  categoria_dispositivo?: 'phone' | 'pc' | 'laptop' | 'console' | 'tablet';
   dispositivo: string;
+  problema_reportado: string;
+  fecha_ingreso: string;
+  
+  // === CAMPOS OPCIONALES - DISPOSITIVO ===
+  categoria_dispositivo?: 'phone' | 'laptop' | 'tablet' | 'watch' | 'console' | 'other';
   marca?: string;
   modelo?: string;
   numero_serie?: string;
-  
-  // Estado del equipo
   condicion_estetica?: string;
   accesorios_incluidos?: string[];
   
-  // Seguridad
-  tipo_seguridad?: 'pin' | 'pattern' | 'fingerprint' | 'face' | 'none';
-  pin_acceso?: string;
-  patron_puntos?: string[];
-  secuencia_patron?: string;
-  
-  // Diagnóstico
-  problema_reportado: string;
-  diagnosis?: string;
-  reparacion_realizada?: string;
-  chequeo_hardware?: Record<string, boolean>;
-  
-  // Estados
+  // === CAMPOS OPCIONALES - ASIGNACIÓN ===
   prioridad?: 'low' | 'medium' | 'high' | 'critical';
   tecnico_asignado_id?: string;
-  
-  // Fechas
-  fecha_ingreso?: string;
   fecha_estimada_entrega?: string;
+  tiempo_estimado_minutos?: number;
   
-  // Financiero
+  // === CAMPOS OPCIONALES - COSTOS ===
   total_reparacion?: number;
-  metodo_pago_id?: string;
   pagado?: boolean;
-  garantia_meses?: number;
+  metodo_pago_id?: string;
   
-  // Notas
+  // === CAMPOS OPCIONALES - NOTAS ===
   notas?: string;
+  
+  // === CAMPOS OPCIONALES - SEGURIDAD ===
+  tipo_seguridad?: 'none' | 'pin' | 'pattern' | 'fingerprint' | 'face';
+  pin_acceso?: string;
+  patron_puntos?: number[];
+  secuencia_patron?: number[];
+  
+  // === CAMPOS OPCIONALES - HARDWARE ===
+  chequeo_hardware?: {
+    audio?: string;
+    boton_power?: string;
+    camara_frontal?: string;
+    camara_trasera?: string;
+    pantalla?: string;
+    bateria?: string;
+    senal_wifi?: string;
+    bluetooth?: string;
+    altavoces?: string;
+    microfono?: string;
+    puerto_carga?: string;
+    botones_volumen?: string;
+    sensor_huellas?: string;
+  };
 }
 
 export interface RepairUpdate extends Partial<RepairCreate> {
