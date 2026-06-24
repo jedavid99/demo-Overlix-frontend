@@ -57,6 +57,7 @@ import ReportsFinancial from '../features/reports/FinancialReport'
 import Docs from '../features/settings/docs'
 import Help from '../features/settings/help'
 import RepairsReport from '@/features/reports/RepairsReport'
+import OrderConfirmation from '../features/repairs/OrderConfirmation'
 import ProtectedRoute from '../components/ProtectedRoute'
 import PublicRoute from '../components/PublicRoute'
 export function AppRouter() {
@@ -93,6 +94,7 @@ export function AppRouter() {
       <Route path="/reparaciones/list" element={<ProtectedRoute><AdminLayout><RepairsList /></AdminLayout></ProtectedRoute>} />
       <Route path="/reparaciones/add" element={<ProtectedRoute><AdminLayout><RepairFlow /></AdminLayout></ProtectedRoute>} />
       <Route path="/reparaciones/add-simple" element={<ProtectedRoute><AdminLayout><RepairAddSimple /></AdminLayout></ProtectedRoute>} />
+      <Route path="/reparaciones/confirmation" element={<ProtectedRoute><AdminLayout><OrderConfirmation /></AdminLayout></ProtectedRoute>} />
       <Route path="/reparaciones/budgets" element={<ProtectedRoute><AdminLayout><Budgets /></AdminLayout></ProtectedRoute>} />
       <Route path="/billing/ARCA" element={<ProtectedRoute><AdminLayout><ARCA /></AdminLayout></ProtectedRoute>} />
       <Route path="/billing/ARCA/iva" element={<ProtectedRoute><AdminLayout><ARCAIVA /></AdminLayout></ProtectedRoute>} />

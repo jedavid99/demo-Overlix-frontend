@@ -1,12 +1,9 @@
-import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { clientService } from '@/services/clientService';
 import { repairService } from '@/services/repairService';
 import { Client } from '@/types/client.types';
 import { toast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
-import ServiceOrderPreview from '@/features/settings/ServiceOrderPreview';
 import {
   Search,
   UserPlus,
@@ -22,7 +19,6 @@ import {
   Settings,
   Power,
   Volume,
-  Eye,
   Camera,
   Wifi,
   Fingerprint,
@@ -46,11 +42,8 @@ import {
   CreditCard,
   Building2,
   Hash,
-  MessageCircle,
-  Printer,
   ArrowLeft,
   Loader2,
-  Download,
 } from 'lucide-react';
 import { MdPerson, MdBuild, MdCheck } from 'react-icons/md';
 import { RiSimCard2Line } from 'react-icons/ri';
@@ -209,12 +202,9 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
   const [loadingClients, setLoadingClients] = useState(true);
   
   // Estados para flujo de orden
-  const [orderStep, setOrderStep] = useState<'form' | 'confirm' | 'success'>('form');
+  const [orderStep, setOrderStep] = useState<'form' | 'confirm'>('form');
   const [repairPrice, setRepairPrice] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [createdOrder, setCreatedOrder] = useState<any>(null);
-  const [generatingPDF, setGeneratingPDF] = useState(false);
-  const pdfRef = useRef<HTMLDivElement>(null);
   
   // Cargar último cliente al montar
   useEffect(() => {
@@ -348,12 +338,14 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
       console.log('Enviando payload:', payload);
       const response = await repairService.create(payload as any);
       console.log('Respuesta:', response);
-      setCreatedOrder(response);
-      setOrderStep('success');
+      
       toast({
         title: 'Orden creada',
         description: 'La orden de servicio se ha creado exitosamente'
       });
+      
+      // Navegar a la página de confirmación con el ID de la orden
+      navigate(`/reparaciones/confirmation?orderId=${response.id}`);
     } catch (error: any) {
       console.error('Error al crear orden:', error);
       console.error('Error response:', error.response?.data);
@@ -368,165 +360,9 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
     }
   };
 
-  const handleSendWhatsApp = () => {
-    if (!createdOrder || !state.selectedClient) return;
-    
-    const orderNumber = createdOrder.numero_reparacion || 'N/A';
-    const message = `Hola ${state.selectedClient.name}, su orden de servicio ${orderNumber} ha sido creada exitosamente. Dispositivo: ${state.brand} ${state.model}. Precio: $${repairPrice}.`;
-    const phone = state.selectedClient.phone?.replace(/\D/g, '');
-    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-  };
-
-  const handlePrintOrder = () => {
-    window.print();
-  };
-
   const handleBackToForm = () => {
     setOrderStep('form');
   };
-
-  const handleNewOrder = () => {
-    setOrderStep('form');
-    setRepairPrice('');
-    setCreatedOrder(null);
-    applyUpdate({
-      selectedClient: null,
-      brand: '',
-      model: '',
-      serial: '',
-      issueDescription: '',
-      technicianNotes: ''
-    } as any);
-  };
-
-  // Función para generar PDF con la plantilla configurada
-  const generateServiceOrderPDF = async (): Promise<Blob | null> => {
-    if (!pdfRef.current || !createdOrder) return null;
-
-    setGeneratingPDF(true);
-    try {
-      const canvas = await html2canvas(pdfRef.current, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        logging: false,
-      });
-
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'px',
-        format: 'a4',
-      });
-
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-
-      // Convertir a Blob
-      const pdfBlob = pdf.output('blob');
-      return pdfBlob;
-    } catch (error) {
-      console.error('Error al generar el PDF:', error);
-      toast({
-        title: 'Error',
-        description: 'No se pudo generar el PDF',
-        variant: 'destructive'
-      });
-      return null;
-    } finally {
-      setGeneratingPDF(false);
-    }
-  };
-
-  // Función para enviar PDF por WhatsApp
-  const handleSendWhatsAppWithPDF = async () => {
-    if (!createdOrder || !state.selectedClient) return;
-
-    const pdfBlob = await generateServiceOrderPDF();
-    if (!pdfBlob) return;
-
-    // Crear URL del archivo
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-    const orderNumber = createdOrder.id || createdOrder.numero_reparacion || 'N/A';
-    const message = `Hola ${state.selectedClient.name}, su orden de servicio ${orderNumber} ha sido creada exitosamente. Dispositivo: ${state.brand} ${state.model}. Adjuntamos el PDF con los detalles.`;
-    const phone = state.selectedClient.phone?.replace(/\D/g, '');
-
-    // Nota: WhatsApp Web no permite enviar archivos directamente
-    // Mostramos un mensaje al usuario con instrucciones
-    toast({
-      title: 'PDF Generado',
-      description: 'El PDF se ha descargado. Para enviarlo por WhatsApp, adjúntalo manualmente al chat.',
-    });
-
-    // Abrir WhatsApp con el mensaje
-    const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-
-    // Descargar el PDF automáticamente
-    const link = document.createElement('a');
-    link.href = pdfUrl;
-    link.download = `orden-servicio-${orderNumber}.pdf`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  // Obtener configuración de PDF desde localStorage
-  const getPDFConfig = () => {
-    try {
-      const savedConfig = localStorage.getItem('pdfConfig');
-      if (savedConfig) {
-        return JSON.parse(savedConfig);
-      }
-    } catch (error) {
-      console.error('Error al cargar configuración PDF:', error);
-    }
-    // Configuración por defecto
-    return {
-      companyName: 'TechFix Reparaciones',
-      companyAddress: 'Av. Corrientes 1234, CABA, Argentina',
-      companyPhone: '+54 11 4321-1234',
-      companyEmail: 'info@techfix.com',
-      orderNumber: createdOrder?.id || createdOrder?.numero_reparacion || 'N/A',
-      orderDate: new Date().toLocaleDateString('es-AR'),
-      clientName: state.selectedClient?.name || '',
-      clientPhone: state.selectedClient?.phone || '',
-      clientEmail: state.selectedClient?.email || '',
-      clientAddress: '',
-      clientId: '',
-      deviceModel: `${state.brand} ${state.model}`.trim(),
-      deviceImei: state.deviceType === 'phone' ? state.serial : '',
-      deviceSerial: state.deviceType !== 'phone' ? state.serial : '',
-      deviceColor: '',
-      deviceStorage: '',
-      deviceDescription: state.deviceType,
-      repairDescription: state.issueDescription,
-      repairDiagnostic: state.technicianNotes || '',
-      laborCost: '0.00',
-      partsCost: '0.00',
-      totalPrice: repairPrice || '0.00',
-      warrantyMonths: '12',
-      warrantyTerms: 'Garantía por defectos de fabricación y mano de obra por 12 meses.',
-      securityType: 'none' as const,
-      securityPin: '',
-      securityPattern: '',
-      securityNotes: '',
-      technicianName: '',
-      technicianNotes: state.technicianNotes || '',
-      estimatedTime: `${state.estimatedDays} días`,
-      showHeader: true,
-      showFooter: true,
-      headerText: 'ORDEN DE SERVICIO',
-      footerText: 'Este documento es un comprobante de recepción de equipo.',
-      showWatermark: false,
-      watermarkUrl: '',
-    };
-  };
-  
-  console.log('Render - orderStep:', orderStep, 'orderNumber:', (state as any).orderNumber);
   
   // Obtener items de hardware según categoría
   const currentHardwareItems = useMemo(() => {
@@ -1341,144 +1177,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
                           Confirmar Orden
                         </>
                       )}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Paso de Éxito */}
-        <AnimatePresence>
-          {orderStep === 'success' && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4"
-            >
-              <Card className="max-w-2xl w-full">
-                <CardHeader className="text-center">
-                  <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                    <Check className="text-green-600" size={32} />
-                  </div>
-                  <CardTitle className="text-2xl">¡Orden Creada Exitosamente!</CardTitle>
-                  <p className="text-muted-foreground">La orden de servicio ha sido registrada en el sistema</p>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Código de orden destacado */}
-                  <div className="bg-primary/10 border-2 border-primary rounded-lg p-6 text-center">
-                    <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2">Código de Orden de Servicio</p>
-                    <p className="text-4xl font-bold text-primary">{createdOrder?.id || createdOrder?.numero_reparacion || 'N/A'}</p>
-                  </div>
-
-                  {/* Vista previa de la orden */}
-                  <div className="border rounded-lg p-6 bg-white">
-                    <div className="text-center mb-6">
-                      <h2 className="text-xl font-bold">ORDEN DE SERVICIO</h2>
-                      <p className="text-lg font-semibold text-primary">{createdOrder?.id || createdOrder?.numero_reparacion || 'N/A'}</p>
-                    </div>
-                    
-                    <div className="space-y-4 text-sm">
-                      <div className="flex justify-between border-b pb-2">
-                        <span className="text-muted-foreground">Cliente:</span>
-                        <span className="font-medium">{state.selectedClient?.name}</span>
-                      </div>
-                      <div className="flex justify-between border-b pb-2">
-                        <span className="text-muted-foreground">Teléfono:</span>
-                        <span className="font-medium">{state.selectedClient?.phone}</span>
-                      </div>
-                      <div className="flex justify-between border-b pb-2">
-                        <span className="text-muted-foreground">Dispositivo:</span>
-                        <span className="font-medium">{state.brand} {state.model}</span>
-                      </div>
-                      <div className="flex justify-between border-b pb-2">
-                        <span className="text-muted-foreground">Serial:</span>
-                        <span className="font-medium">{state.serial || '—'}</span>
-                      </div>
-                      <div className="flex justify-between border-b pb-2">
-                        <span className="text-muted-foreground">Problema:</span>
-                        <span className="font-medium">{state.issueDescription}</span>
-                      </div>
-                      <div className="flex justify-between border-b pb-2">
-                        <span className="text-muted-foreground">Fecha:</span>
-                        <span className="font-medium">{new Date().toLocaleDateString('es-AR')}</span>
-                      </div>
-                      <div className="flex justify-between text-lg font-bold">
-                        <span>Total:</span>
-                        <span className="text-primary">${repairPrice}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Vista previa del PDF con plantilla configurada */}
-                  <div className="border rounded-lg overflow-hidden bg-muted/30">
-                    <div className="flex items-center gap-2 mb-4 p-4 bg-muted/50 border-b">
-                      <Eye size={18} className="text-primary" />
-                      <h3 className="font-bold text-foreground">Vista previa de Orden de Servicio</h3>
-                      <Badge variant="outline" className="ml-auto text-[10px] font-mono">
-                        A4
-                      </Badge>
-                    </div>
-                    <div className="transform scale-[0.5] origin-top-left w-[200%] overflow-hidden">
-                      <div ref={pdfRef}>
-                        <ServiceOrderPreview data={getPDFConfig()} />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Botones de acción */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <Button
-                      variant="outline"
-                      onClick={handleSendWhatsAppWithPDF}
-                      disabled={generatingPDF}
-                      className="flex items-center justify-center gap-2"
-                    >
-                      {generatingPDF ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Generando PDF...
-                        </>
-                      ) : (
-                        <>
-                          <MessageCircle className="h-4 w-4" />
-                          Enviar por WhatsApp
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={generateServiceOrderPDF}
-                      disabled={generatingPDF}
-                      className="flex items-center justify-center gap-2"
-                    >
-                      {generatingPDF ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Generando...
-                        </>
-                      ) : (
-                        <>
-                          <Download className="h-4 w-4" />
-                          Descargar PDF
-                        </>
-                      )}
-                    </Button>
-                  </div>
-
-                  <div className=" flex items-center justify-center gap-3 pt-4 border-t">
-                    <Button
-                      variant="ghost"
-                      onClick={handleNewOrder}
-                    >
-                      Crear Nueva Orden
-                    </Button>
-                    <Button
-                      onClick={() => navigate('/reparaciones/list')}
-                    >
-                      Ver Lista de Reparaciones
                     </Button>
                   </div>
                 </CardContent>
