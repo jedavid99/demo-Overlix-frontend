@@ -51,7 +51,7 @@ import {
 import { MdPerson, MdBuild, MdCheck } from 'react-icons/md';
 import { RiSimCard2Line } from 'react-icons/ri';
 import type { RepairData } from './RepairFlow';
-import { Card, CardContent } from '@/shared/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
@@ -293,6 +293,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
 
   // Handlers para flujo de orden
   const handleCreateOrder = () => {
+    console.log('handleCreateOrder llamado', { selectedClient: state.selectedClient, orderStep });
     if (!state.selectedClient) {
       toast({
         title: 'Error',
@@ -302,8 +303,11 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
       return;
     }
     const orderNum = `ORD-${String(Math.floor(Math.random() * 90000) + 10000)}`;
+    console.log('Generando orden:', orderNum);
     applyUpdate({ orderNumber: orderNum } as any);
+    console.log('Cambiando a confirm step');
     setOrderStep('confirm');
+    console.log('orderStep después de setOrderStep:', orderStep);
   };
 
   const handleConfirmOrder = async () => {
@@ -393,6 +397,9 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
       technicianNotes: ''
     } as any);
   };
+  
+  console.log('Render - orderStep:', orderStep, 'orderNumber:', (state as any).orderNumber);
+  
   // Obtener items de hardware según categoría
   const currentHardwareItems = useMemo(() => {
     return hardwareByCategory[state.deviceType] || [];
@@ -1122,7 +1129,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4"
             >
               <Card className="max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                 <CardHeader>
@@ -1221,7 +1228,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4"
             >
               <Card className="max-w-2xl w-full">
                 <CardHeader className="text-center">
