@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Check, ArrowLeft, MessageCircle, Download, Loader2, , Printer, EyeIcon } from 'lucide-react'
+import { Check, ArrowLeft, MessageCircle, Download, Loader2,  Printer, EyeIcon } from 'lucide-react'
 import html2canvas from 'html2canvas'
 import jsPDF from 'jspdf'
 import ServiceOrderPreview from '@/features/settings/ServiceOrderPreview'
