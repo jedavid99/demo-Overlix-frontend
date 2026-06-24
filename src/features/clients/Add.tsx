@@ -109,10 +109,7 @@ export default function ClientAdd() {
                 </div>
                 
               </div>
-              <div>
-                <label className="block text-sm text-gray-600 mb-2">Notas de Referencia</label>
-                <textarea name="notes" value={form.notes} onChange={handleChange} className="w-full px-4 py-3 border rounded-lg bg-gray-50" placeholder="Piso, puerta, horario de entrega..." rows={4} />
-              </div>
+              
             </div>
           </section>
         </div>
