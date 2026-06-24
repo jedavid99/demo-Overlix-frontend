@@ -121,7 +121,7 @@ export default function RepairEdit() {
         'cancelled': [],
       };
 
-      // Construir payload solo con campos que tienen valores según backend
+      // Construir payload con campos que han cambiado
       const payload: any = {};
       
       // Solo incluir estado si cambió y es una transición válida
@@ -139,16 +139,29 @@ export default function RepairEdit() {
         payload.estado = formData.estado;
       }
       
-      if (formData.diagnosis) payload.diagnosis = formData.diagnosis;
-      if (formData.reparacion_realizada) payload.reparacion_realizada = formData.reparacion_realizada;
-      if (formData.tecnico_asignado_id) payload.tecnico_asignado_id = formData.tecnico_asignado_id;
-      if (formData.fecha_estimada_entrega) payload.fecha_estimada_entrega = formData.fecha_estimada_entrega;
-      if (formData.costo_piezas && formData.costo_piezas > 0) payload.costo_piezas = formData.costo_piezas;
-      if (formData.costo_mano_obra && formData.costo_mano_obra > 0) payload.costo_mano_obra = formData.costo_mano_obra;
-      if (formData.total_reparacion && formData.total_reparacion > 0) payload.total_reparacion = formData.total_reparacion;
-      if (formData.notas) payload.notas = formData.notas;
+      // Comparar con valores originales para enviar solo cambios
+      if (formData.diagnosis !== (repairData.diagnosis || '')) payload.diagnosis = formData.diagnosis;
+      if (formData.reparacion_realizada !== (repairData.reparacion_realizada || '')) payload.reparacion_realizada = formData.reparacion_realizada;
+      if (formData.tecnico_asignado_id !== (repairData.tecnico_asignado_id || '')) payload.tecnico_asignado_id = formData.tecnico_asignado_id;
+      if (formData.fecha_estimada_entrega !== (repairData.fecha_estimada_entrega || '')) payload.fecha_estimada_entrega = formData.fecha_estimada_entrega;
+      if (formData.costo_piezas !== (repairData.costo_piezas || 0)) payload.costo_piezas = formData.costo_piezas;
+      if (formData.costo_mano_obra !== (repairData.costo_mano_obra || 0)) payload.costo_mano_obra = formData.costo_mano_obra;
+      if (formData.total_reparacion !== (repairData.total_reparacion || 0)) payload.total_reparacion = formData.total_reparacion;
+      if (formData.notas !== (repairData.notas || '')) payload.notas = formData.notas;
 
       console.log('Payload enviado:', payload);
+      
+      // Verificar si hay cambios para enviar
+      if (Object.keys(payload).length === 0) {
+        toast({
+          title: 'Aviso',
+          description: 'No hay cambios para guardar',
+          variant: 'default'
+        });
+        setSaving(false);
+        return;
+      }
+      
       await repairService.update(repairData.id, payload);
       
       toast({
