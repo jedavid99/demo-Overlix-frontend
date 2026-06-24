@@ -48,10 +48,14 @@ export default function RepairEdit() {
     problema_reportado: '',
     diagnosis: '',
     reparacion_realizada: '',
-    estado: 'pending',
+    estado: 'diagnostic',
+    costo_piezas: 0,
+    costo_mano_obra: 0,
     total_reparacion: 0,
     notas: '',
     foto_evidencia: '',
+    tecnico_asignado_id: '',
+    fecha_estimada_entrega: '',
   });
   const [repuestos, setRepuestos] = useState<RepairPart[]>([]);
   const [nuevoRepuesto, setNuevoRepuesto] = useState({
@@ -78,10 +82,14 @@ export default function RepairEdit() {
         problema_reportado: orderData.problema_reportado || '',
         diagnosis: orderData.diagnosis || '',
         reparacion_realizada: orderData.reparacion_realizada || '',
-        estado: orderData.estado || 'pending',
+        estado: orderData.estado || 'diagnostic',
+        costo_piezas: orderData.costo_piezas || 0,
+        costo_mano_obra: orderData.costo_mano_obra || 0,
         total_reparacion: orderData.total_reparacion || 0,
         notas: orderData.notas || '',
         foto_evidencia: orderData.foto_evidencia || '',
+        tecnico_asignado_id: orderData.tecnico_asignado_id || '',
+        fecha_estimada_entrega: orderData.fecha_estimada_entrega || '',
       });
       setRepuestos(orderData.repuestos || []);
     } catch (error: any) {
@@ -103,14 +111,13 @@ export default function RepairEdit() {
     try {
       setSaving(true);
       
-      // Validar transición de estado
+      // Validar transición de estado según backend
       const validTransitions: Record<string, string[]> = {
-        'pending': ['diagnostic', 'in_progress', 'cancelled'],
         'diagnostic': ['in_progress', 'cancelled'],
-        'in_progress': ['waiting_parts', 'ready', 'cancelled'],
+        'in_progress': ['waiting_parts', 'testing', 'completed', 'cancelled'],
         'waiting_parts': ['in_progress', 'cancelled'],
-        'ready': ['delivered', 'cancelled'],
-        'delivered': [],
+        'testing': ['in_progress', 'completed', 'cancelled'],
+        'completed': [],
         'cancelled': [],
       };
 
@@ -127,25 +134,18 @@ export default function RepairEdit() {
         }
       }
       
-      // Construir payload solo con campos que tienen valores
+      // Construir payload solo con campos que tienen valores según backend
       const payload: any = {};
       
-      if (formData.problema_reportado) payload.problema_reportado = formData.problema_reportado;
+      if (formData.estado) payload.estado = formData.estado;
       if (formData.diagnosis) payload.diagnosis = formData.diagnosis;
       if (formData.reparacion_realizada) payload.reparacion_realizada = formData.reparacion_realizada;
-      if (formData.estado) payload.estado = formData.estado;
-      if (formData.total_reparacion && formData.total_reparacion > 0) payload.costo_final = formData.total_reparacion;
+      if (formData.tecnico_asignado_id) payload.tecnico_asignado_id = formData.tecnico_asignado_id;
+      if (formData.fecha_estimada_entrega) payload.fecha_estimada_entrega = formData.fecha_estimada_entrega;
+      if (formData.costo_piezas && formData.costo_piezas > 0) payload.costo_piezas = formData.costo_piezas;
+      if (formData.costo_mano_obra && formData.costo_mano_obra > 0) payload.costo_mano_obra = formData.costo_mano_obra;
+      if (formData.total_reparacion && formData.total_reparacion > 0) payload.total_reparacion = formData.total_reparacion;
       if (formData.notas) payload.notas = formData.notas;
-      
-      // Convertir repuestos al formato esperado por el backend
-      if (repuestos.length > 0) {
-        payload.repuestos_usados = repuestos.map(r => ({
-          repuesto_id: r.id,
-          nombre: r.nombre,
-          cantidad: r.cantidad,
-          costo_unitario: r.costo_unitario,
-        }));
-      }
 
       console.log('Payload enviado:', payload);
       await repairService.update(repairData.id, payload);
@@ -333,12 +333,11 @@ export default function RepairEdit() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="pending">Pendiente</SelectItem>
                 <SelectItem value="diagnostic">Diagnóstico</SelectItem>
                 <SelectItem value="in_progress">En Progreso</SelectItem>
                 <SelectItem value="waiting_parts">Esperando Repuestos</SelectItem>
-                <SelectItem value="ready">Listo</SelectItem>
-                <SelectItem value="delivered">Entregado</SelectItem>
+                <SelectItem value="testing">Pruebas</SelectItem>
+                <SelectItem value="completed">Completado</SelectItem>
                 <SelectItem value="cancelled">Cancelado</SelectItem>
               </SelectContent>
             </Select>
@@ -406,20 +405,70 @@ export default function RepairEdit() {
           </CardContent>
         </Card>
 
-        {/* Precio Total */}
+        {/* Costos */}
         <Card>
           <CardHeader>
-            <CardTitle>Precio Total</CardTitle>
+            <CardTitle>Costos</CardTitle>
           </CardHeader>
-          <CardContent>
-            <Input
-              type="number"
-              value={formData.total_reparacion}
-              onChange={(e) => setFormData({ ...formData, total_reparacion: parseFloat(e.target.value) || 0 })}
-              placeholder="Precio total de la reparación"
-              min={0}
-              step={0.01}
-            />
+          <CardContent className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Costo de Piezas</label>
+              <Input
+                type="number"
+                value={formData.costo_piezas}
+                onChange={(e) => setFormData({ ...formData, costo_piezas: parseFloat(e.target.value) || 0 })}
+                placeholder="Costo de piezas"
+                min={0}
+                step={0.01}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Costo de Mano de Obra</label>
+              <Input
+                type="number"
+                value={formData.costo_mano_obra}
+                onChange={(e) => setFormData({ ...formData, costo_mano_obra: parseFloat(e.target.value) || 0 })}
+                placeholder="Costo de mano de obra"
+                min={0}
+                step={0.01}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Total de Reparación</label>
+              <Input
+                type="number"
+                value={formData.total_reparacion}
+                onChange={(e) => setFormData({ ...formData, total_reparacion: parseFloat(e.target.value) || 0 })}
+                placeholder="Precio total de la reparación"
+                min={0}
+                step={0.01}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Asignación */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Asignación</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">ID del Técnico</label>
+              <Input
+                value={formData.tecnico_asignado_id}
+                onChange={(e) => setFormData({ ...formData, tecnico_asignado_id: e.target.value })}
+                placeholder="UUID del técnico asignado"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Fecha Estimada de Entrega</label>
+              <Input
+                type="datetime-local"
+                value={formData.fecha_estimada_entrega}
+                onChange={(e) => setFormData({ ...formData, fecha_estimada_entrega: e.target.value })}
+              />
+            </div>
           </CardContent>
         </Card>
 
