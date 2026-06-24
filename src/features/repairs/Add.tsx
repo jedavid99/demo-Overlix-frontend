@@ -203,8 +203,17 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
     const fetchLastClient = async () => {
       try {
         const response = await clientService.list({ limit: 1, sort: 'created_at:desc' });
-        if (response?.data?.length > 0) {
-          setLastClient(response.data[0]);
+        console.log('Respuesta último cliente:', response);
+        
+        // Extraer datos según la estructura real (igual que en página de clientes)
+        let clientesArray = response?.data?.data?.clientes ||
+                           response?.data?.data?.data ||
+                           response?.data?.data ||
+                           response?.data ||
+                           response;
+        
+        if (Array.isArray(clientesArray) && clientesArray.length > 0) {
+          setLastClient(clientesArray[0]);
         }
       } catch (error) {
         console.error('Error al cargar último cliente:', error);
@@ -222,7 +231,20 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
         setSearching(true);
         try {
           const response = await clientService.list({ search: search, limit: 10 });
-          setSearchResults(response?.data || []);
+          console.log('Respuesta búsqueda:', response);
+          
+          // Extraer datos según la estructura real (igual que en página de clientes)
+          let clientesArray = response?.data?.data?.clientes ||
+                             response?.data?.data?.data ||
+                             response?.data?.data ||
+                             response?.data ||
+                             response;
+          
+          if (Array.isArray(clientesArray)) {
+            setSearchResults(clientesArray);
+          } else {
+            setSearchResults([]);
+          }
         } catch (error) {
           console.error('Error en búsqueda:', error);
           setSearchResults([]);
