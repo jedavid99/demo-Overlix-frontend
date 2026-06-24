@@ -25,12 +25,6 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu';
 import { repairService } from '@/services/repairService';
 import { toast } from '@/hooks/use-toast';
 
@@ -74,6 +68,7 @@ export default function RepairsList() {
   const [repairs, setRepairs] = useState<any[]>([]);
   const [totalRepairs, setTotalRepairs] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   useEffect(() => {
     loadRepairs();
@@ -347,41 +342,81 @@ export default function RepairsList() {
                       <td className="px-4 py-3 text-sm text-muted-foreground">
                         {repair.fecha_ingreso ? new Date(repair.fecha_ingreso).toLocaleDateString('es-AR') : '—'}
                       </td>
-                      <td className="px-4 py-3 text-sm text-right" onClick={(e) => e.stopPropagation()}>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/reparaciones/confirmation?orderId=${repair.id}`); }}>
-                              <Eye className="h-4 w-4 mr-2" />
-                              Vista Previa
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/reparaciones/edit/${repair.id}`); }}>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Editar
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); navigate(`/reparaciones/confirmation?orderId=${repair.id}&print=true`); }}>
-                              <FileText className="h-4 w-4 mr-2" />
-                              PDF Orden
-                            </DropdownMenuItem>
-                            {repair.estado !== 'delivered' && (
-                              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleMarkAsDelivered(repair.id); }}>
-                                <Package className="h-4 w-4 mr-2" />
-                                Marcar Entregado
-                              </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem 
-                              onClick={(e) => { e.stopPropagation(); handleDelete(repair.id); }}
-                              className="text-destructive"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Eliminar
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                      <td className="px-4 py-3 text-sm text-right relative">
+                        <div className="relative">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveDropdown(activeDropdown === repair.id ? null : repair.id);
+                            }}
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                          
+                          {activeDropdown === repair.id && (
+                            <div className="absolute right-0 top-full mt-1 w-48 bg-card border border-border rounded-lg shadow-lg z-50 py-1">
+                              <div 
+                                className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setActiveDropdown(null);
+                                  navigate(`/reparaciones/confirmation?orderId=${repair.id}`);
+                                }}
+                              >
+                                <Eye className="h-4 w-4" />
+                                Vista Previa
+                              </div>
+                              <div 
+                                className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setActiveDropdown(null);
+                                  navigate(`/reparaciones/edit/${repair.id}`);
+                                }}
+                              >
+                                <Edit className="h-4 w-4" />
+                                Editar
+                              </div>
+                              <div 
+                                className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setActiveDropdown(null);
+                                  navigate(`/reparaciones/confirmation?orderId=${repair.id}&print=true`);
+                                }}
+                              >
+                                <FileText className="h-4 w-4" />
+                                PDF Orden
+                              </div>
+                              {repair.estado !== 'delivered' && (
+                                <div 
+                                  className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setActiveDropdown(null);
+                                    handleMarkAsDelivered(repair.id);
+                                  }}
+                                >
+                                  <Package className="h-4 w-4" />
+                                  Marcar Entregado
+                                </div>
+                              )}
+                              <div 
+                                className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer text-destructive"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setActiveDropdown(null);
+                                  handleDelete(repair.id);
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                Eliminar
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
