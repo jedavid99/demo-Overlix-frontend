@@ -39,8 +39,10 @@ export default function OrderConfirmation() {
 
   useEffect(() => {
     if (orderId) {
+      console.log('Cargando orden con ID:', orderId)
       fetchOrderData(orderId)
     } else {
+      console.error('No se proporcionó ID de orden')
       toast({
         title: 'Error',
         description: 'No se proporcionó ID de orden',
@@ -52,13 +54,16 @@ export default function OrderConfirmation() {
 
   const fetchOrderData = async (id: string) => {
     try {
+      console.log('Intentando obtener orden:', id)
       const response = await repairService.getById(id)
+      console.log('Respuesta de orden:', response)
       setOrderData(response)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al cargar orden:', error)
+      console.error('Error response:', error.response?.data)
       toast({
         title: 'Error',
-        description: 'No se pudo cargar la orden de servicio',
+        description: `No se pudo cargar la orden de servicio: ${error.response?.data?.message || error.message}`,
         variant: 'destructive'
       })
     } finally {

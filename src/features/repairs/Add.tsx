@@ -338,7 +338,8 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
 
       console.log('Enviando payload:', payload);
       const response = await repairService.create(payload as any);
-      console.log('Respuesta:', response);
+      console.log('Respuesta completa:', response);
+      console.log('Campos de respuesta:', Object.keys(response || {}));
       
       toast({
         title: 'Orden creada',
@@ -346,7 +347,10 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
       });
       
       // Navegar a la página de confirmación con el ID de la orden
-      navigate(`/reparaciones/confirmation?orderId=${response.id}`);
+      // Usar el campo correcto según la respuesta del backend
+      const orderId = response.id || response.numero_reparacion || response._id;
+      console.log('ID de orden a usar:', orderId);
+      navigate(`/reparaciones/confirmation?orderId=${orderId}`);
     } catch (error: any) {
       console.error('Error al crear orden:', error);
       console.error('Error response:', error.response?.data);
