@@ -30,8 +30,8 @@ export default function Clients() {
       return []
     }
     
-    // El backend envuelve la respuesta: { data: { success: true, data: [...] } }
-    // Accedemos a clientsData.data.data para obtener el array de clientes
+    // El backend envuelve la respuesta: { data: { success: true, data: { clientes: [...], total: 1, pagina: 1, total_paginas: 1 } } }
+    // Accedemos a clientsData.data.data.clientes para obtener el array de clientes
     const backendData = clientsData.data?.data
     console.log('Clients - backendData (clientsData.data.data):', backendData)
     
@@ -40,10 +40,19 @@ export default function Clients() {
       return []
     }
     
-    // Verificar si backendData es un array
-    if (Array.isArray(backendData)) {
-      console.log('Clients - backendData es un array con', backendData.length, 'clientes')
-      return backendData.map((client: any) => ({
+    // El backend usa la propiedad 'clientes' para el array
+    const clientesArray = backendData.clientes
+    console.log('Clients - clientesArray:', clientesArray)
+    
+    if (!clientesArray) {
+      console.log('Clients - clientesArray es null/undefined')
+      return []
+    }
+    
+    // Verificar si clientesArray es un array
+    if (Array.isArray(clientesArray)) {
+      console.log('Clients - clientesArray es un array con', clientesArray.length, 'clientes')
+      return clientesArray.map((client: any) => ({
         id: client.id,
         name: client.nombre_completo,
         dni: client.dni || '',
@@ -54,21 +63,7 @@ export default function Clients() {
       }))
     }
     
-    // Si backendData tiene una propiedad data que es array
-    if (backendData.data && Array.isArray(backendData.data)) {
-      console.log('Clients - backendData.data es un array')
-      return backendData.data.map((client: any) => ({
-        id: client.id,
-        name: client.nombre_completo,
-        dni: client.dni || '',
-        phone: client.telefono || '',
-        address: client.direccion || '',
-        fecha_registro: client.fecha_registro,
-        equipos_reparados: 0,
-      }))
-    }
-    
-    console.log('Clients - Estructura no reconocida:', typeof backendData)
+    console.log('Clients - Estructura no reconocida:', typeof clientesArray)
     return []
   }, [clientsData])
   const filtered = useMemo(() => {
