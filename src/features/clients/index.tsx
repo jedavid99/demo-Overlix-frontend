@@ -25,12 +25,12 @@ export default function Clients() {
     return clientsData.data.map((client: any) => ({
       id: client.id,
       name: client.nombre_completo,
-      email: client.email || '',
-      dni: client.dni || '',
-      phone: client.telefono || '',
-      status: client.estado, // 'activo' | 'inactivo'
-      joinDate: client.fecha_registro,
-      transactions: client.deuda_actual || 0,
+      // email: client.email || '',
+      // dni: client.dni || '',
+      // phone: client.telefono || '',
+      // status: client.estado, // 'activo' | 'inactivo'
+      // joinDate: client.fecha_registro,
+      // transactions: client.deuda_actual || 0,
     }))
   }, [clientsData])
   const filtered = useMemo(() => {
@@ -38,11 +38,11 @@ export default function Clients() {
     let result = clients
     if (q) {
       result = result.filter(c => (
-        c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || c.dni.toLowerCase().includes(q)
+        c.name.toLowerCase().includes(q)
       ))
     }
     if (statusFilter !== 'all') {
-      result = result.filter(c => c.status.toLowerCase() === statusFilter)
+      // result = result.filter(c => c.status.toLowerCase() === statusFilter)
     }
     return result
   }, [query, statusFilter])
@@ -52,10 +52,10 @@ export default function Clients() {
   const tableData = filtered.slice((page - 1) * pageSize, page * pageSize).map(c => ({
     id: c.id,
     name: c.name,
-    email: c.email,
-    status: c.status,
-    joinDate: c.joinDate,
-    transactions: c.transactions,
+    // email: c.email,
+    // status: c.status,
+    // joinDate: c.joinDate,
+    // transactions: c.transactions,
   }))
   return (
     <motion.div
