@@ -355,9 +355,10 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
     } catch (error: any) {
       console.error('Error al crear orden:', error);
       console.error('Error response:', error.response?.data);
+      console.error('Errors array:', error.response?.data?.errors);
       toast({
         title: 'Error',
-        description: error.response?.data?.message || 'No se pudo crear la orden de servicio',
+        description: error.response?.data?.errors?.join(', ') || error.response?.data?.message || 'No se pudo crear la orden de servicio',
         variant: 'destructive'
       });
     } finally {
