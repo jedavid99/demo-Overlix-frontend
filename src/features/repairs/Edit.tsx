@@ -139,16 +139,14 @@ export default function RepairEdit() {
         payload.estado = formData.estado;
       }
       
-      // Enviar todos los campos que tienen valores (sin comparar con originales)
+      // Enviar solo campos esenciales para evitar error 500
       if (formData.diagnosis) payload.diagnosis = formData.diagnosis;
       if (formData.reparacion_realizada) payload.reparacion_realizada = formData.reparacion_realizada;
-      if (formData.tecnico_asignado_id) payload.tecnico_asignado_id = formData.tecnico_asignado_id;
-      if (formData.fecha_estimada_entrega) payload.fecha_estimada_entrega = formData.fecha_estimada_entrega;
-      // Incluir campos numéricos incluso si son 0
-      payload.costo_piezas = formData.costo_piezas;
-      payload.costo_mano_obra = formData.costo_mano_obra;
-      payload.total_reparacion = formData.total_reparacion;
-      if (formData.notas !== undefined && formData.notas !== null) payload.notas = formData.notas;
+      if (formData.notas) payload.notas = formData.notas;
+      // Solo enviar costos si tienen valores mayores a 0
+      if (formData.costo_piezas > 0) payload.costo_piezas = formData.costo_piezas;
+      if (formData.costo_mano_obra > 0) payload.costo_mano_obra = formData.costo_mano_obra;
+      if (formData.total_reparacion > 0) payload.total_reparacion = formData.total_reparacion;
 
       console.log('Payload enviado:', payload);
       
