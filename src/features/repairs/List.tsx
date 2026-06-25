@@ -141,7 +141,7 @@ export default function RepairsList() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [selectedRepairId, setSelectedRepairId] = useState<string | null>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const dropdownRefs = useRef<Record<string, HTMLDivElement>>({});
 
   // Estado para el modal de "Marcar Entregado"
   const [isMarkDeliveredModalOpen, setIsMarkDeliveredModalOpen] = useState(false);
@@ -209,7 +209,7 @@ export default function RepairsList() {
   // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (activeDropdown && dropdownRefs.current[activeDropdown] && !dropdownRefs.current[activeDropdown].contains(event.target as Node)) {
         setActiveDropdown(null);
       }
     };
@@ -503,8 +503,8 @@ export default function RepairsList() {
                             </span>
                           </Badge>
                         </td>
-                        <td className="px-4 py-3 text-sm text-right relative" ref={dropdownRef}>
-                          <div className="relative">
+                        <td className="px-4 py-3 text-sm text-right relative">
+                          <div className="relative" ref={(el) => { if (el) dropdownRefs.current[repair.id] = el; }}>
                             <Button
                               variant="ghost"
                               size="icon"
@@ -681,3 +681,13 @@ export default function RepairsList() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
