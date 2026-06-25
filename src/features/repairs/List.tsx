@@ -29,28 +29,96 @@ import { repairService } from '@/services/repairService';
 import { toast } from '@/hooks/use-toast';
 import RepairPreviewModal from './RepairPreviewModal';
 
-// ✅ Helpers (sin cambios)
+// ✅ Estados con colores personalizados
 const getStatusBadge = (status: string) => {
-  switch (status) {
-    case 'pending': return { variant: 'warning' as const, label: 'Pendiente' };
-    case 'diagnostic': return { variant: 'default' as const, label: 'Diagnóstico' };
-    case 'in_progress': return { variant: 'default' as const, label: 'En Progreso' };
-    case 'waiting_parts': return { variant: 'warning' as const, label: 'Esperando Repuestos' };
-    case 'ready': return { variant: 'success' as const, label: 'Listo' };
-    case 'delivered': return { variant: 'outline' as const, label: 'Entregado' };
-    case 'cancelled': return { variant: 'destructive' as const, label: 'Cancelado' };
-    default: return { variant: 'outline' as const, label: status };
-  }
+  const statusMap: Record<string, { bg: string; text: string; border: string; label: string }> = {
+    pending: {
+      bg: 'bg-yellow-100 dark:bg-yellow-900/30',
+      text: 'text-yellow-800 dark:text-yellow-300',
+      border: 'border-yellow-300 dark:border-yellow-700',
+      label: 'Pendiente',
+    },
+    diagnostic: {
+      bg: 'bg-blue-100 dark:bg-blue-900/30',
+      text: 'text-blue-800 dark:text-blue-300',
+      border: 'border-blue-300 dark:border-blue-700',
+      label: 'Diagnóstico',
+    },
+    in_progress: {
+      bg: 'bg-indigo-100 dark:bg-indigo-900/30',
+      text: 'text-indigo-800 dark:text-indigo-300',
+      border: 'border-indigo-300 dark:border-indigo-700',
+      label: 'En Progreso',
+    },
+    waiting_parts: {
+      bg: 'bg-orange-100 dark:bg-orange-900/30',
+      text: 'text-orange-800 dark:text-orange-300',
+      border: 'border-orange-300 dark:border-orange-700',
+      label: 'Esperando Repuestos',
+    },
+    ready: {
+      bg: 'bg-emerald-100 dark:bg-emerald-900/30',
+      text: 'text-emerald-800 dark:text-emerald-300',
+      border: 'border-emerald-300 dark:border-emerald-700',
+      label: 'Listo',
+    },
+    delivered: {
+      bg: 'bg-green-100 dark:bg-green-900/30',
+      text: 'text-green-800 dark:text-green-300',
+      border: 'border-green-300 dark:border-green-700',
+      label: 'Entregado',
+    },
+    cancelled: {
+      bg: 'bg-red-100 dark:bg-red-900/30',
+      text: 'text-red-800 dark:text-red-300',
+      border: 'border-red-300 dark:border-red-700',
+      label: 'Cancelado',
+    },
+  };
+
+  return statusMap[status] || {
+    bg: 'bg-gray-100 dark:bg-gray-800',
+    text: 'text-gray-800 dark:text-gray-300',
+    border: 'border-gray-300 dark:border-gray-600',
+    label: status || 'Desconocido',
+  };
 };
 
+// ✅ Prioridades con colores personalizados
 const getPriorityBadge = (priority: string) => {
-  switch (priority) {
-    case 'low': return { variant: 'outline' as const, label: 'Baja' };
-    case 'medium': return { variant: 'default' as const, label: 'Media' };
-    case 'high': return { variant: 'warning' as const, label: 'Alta' };
-    case 'critical': return { variant: 'destructive' as const, label: 'Crítica' };
-    default: return { variant: 'outline' as const, label: priority };
-  }
+  const priorityMap: Record<string, { bg: string; text: string; border: string; label: string }> = {
+    low: {
+      bg: 'bg-slate-100 dark:bg-slate-800',
+      text: 'text-slate-600 dark:text-slate-300',
+      border: 'border-slate-300 dark:border-slate-600',
+      label: 'Baja',
+    },
+    medium: {
+      bg: 'bg-blue-100 dark:bg-blue-900/30',
+      text: 'text-blue-700 dark:text-blue-300',
+      border: 'border-blue-300 dark:border-blue-700',
+      label: 'Media',
+    },
+    high: {
+      bg: 'bg-orange-100 dark:bg-orange-900/30',
+      text: 'text-orange-700 dark:text-orange-300',
+      border: 'border-orange-300 dark:border-orange-700',
+      label: 'Alta',
+    },
+    critical: {
+      bg: 'bg-red-100 dark:bg-red-900/30',
+      text: 'text-red-700 dark:text-red-300',
+      border: 'border-red-300 dark:border-red-700',
+      label: 'Crítica',
+    },
+  };
+
+  return priorityMap[priority] || {
+    bg: 'bg-gray-100 dark:bg-gray-800',
+    text: 'text-gray-600 dark:text-gray-300',
+    border: 'border-gray-300 dark:border-gray-600',
+    label: priority || '—',
+  };
 };
 
 const formatCurrency = (amount: number) => {
@@ -72,35 +140,35 @@ export default function RepairsList() {
   const [selectedRepairId, setSelectedRepairId] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // ✅ Cargar reparaciones con orden por updated_at (más reciente primero)
   const loadRepairs = useCallback(async () => {
     try {
       setLoading(true);
       const response = await repairService.list({
         page: currentPage,
         limit: 10,
-        sort: 'updated_at:desc', // 🔥 CAMBIO CLAVE: orden por última actualización
+        sort: 'updated_at:desc',
       }) as any;
 
-      console.log('Respuesta de reparaciones:', response);
+      const repairsArray =
+        response?.data?.data?.reparaciones ||
+        response?.data?.reparaciones ||
+        response?.reparaciones ||
+        response?.data?.data?.data ||
+        response?.data?.data ||
+        response?.data ||
+        [];
 
-      const repairsArray = response?.data?.data?.reparaciones ||
-                         response?.data?.reparaciones ||
-                         response?.reparaciones ||
-                         response?.data?.data?.data ||
-                         response?.data?.data ||
-                         response?.data ||
-                         [];
+      const total =
+        response?.data?.data?.total ||
+        response?.data?.total ||
+        response?.total ||
+        0;
 
-      const total = response?.data?.data?.total ||
-                   response?.data?.total ||
-                   response?.total ||
-                   0;
-
-      const totalPages = response?.data?.data?.total_paginas ||
-                       response?.data?.total_paginas ||
-                       response?.total_pages ||
-                       1;
+      const totalPages =
+        response?.data?.data?.total_paginas ||
+        response?.data?.total_paginas ||
+        response?.total_pages ||
+        1;
 
       setRepairs(Array.isArray(repairsArray) ? repairsArray : []);
       setTotalRepairs(total);
@@ -110,28 +178,24 @@ export default function RepairsList() {
       toast({
         title: 'Error',
         description: 'No se pudieron cargar las reparaciones',
-        variant: 'destructive'
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
     }
   }, [currentPage]);
 
-  // ✅ Cargar al montar y al cambiar de página
   useEffect(() => {
     loadRepairs();
   }, [loadRepairs]);
 
-  // ✅ Recargar cuando se vuelve de editar (detecta cambio en location.state)
   useEffect(() => {
     if (location.state?.reload) {
       loadRepairs();
-      // Limpiar el estado para evitar recargas infinitas
       navigate(location.pathname, { replace: true, state: {} });
     }
   }, [location, loadRepairs, navigate]);
 
-  // ✅ Cerrar dropdown al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -142,18 +206,18 @@ export default function RepairsList() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // ✅ Calcular KPIs con datos reales
-  const pendingToday = repairs.filter(r => r.estado === 'pending' || r.estado === 'diagnostic').length;
-  const expiringSoon = repairs.filter(r => r.estado === 'waiting_parts').length;
-  const readyToPickup = repairs.filter(r => r.estado === 'ready').length;
+  // KPIs
+  const pendingToday = repairs.filter(
+    (r) => r.estado === 'pending' || r.estado === 'diagnostic'
+  ).length;
+  const expiringSoon = repairs.filter((r) => r.estado === 'waiting_parts').length;
+  const readyToPickup = repairs.filter((r) => r.estado === 'ready').length;
   const totalRevenue = repairs
-    .filter(r => r.estado === 'delivered' && r.total_reparacion)
+    .filter((r) => r.estado === 'delivered' && r.total_reparacion)
     .reduce((sum, r) => sum + (Number(r.total_reparacion) || 0), 0);
 
-  // ✅ Funciones CRUD
   const handleDelete = async (repairId: string) => {
     if (!confirm('¿Estás seguro de que deseas eliminar esta reparación?')) return;
-
     try {
       await repairService.delete(repairId);
       toast({ title: 'Éxito', description: 'Reparación eliminada correctamente' });
@@ -162,7 +226,7 @@ export default function RepairsList() {
       toast({
         title: 'Error',
         description: 'No se pudo eliminar la reparación',
-        variant: 'destructive'
+        variant: 'destructive',
       });
     }
   };
@@ -171,22 +235,22 @@ export default function RepairsList() {
     try {
       await repairService.updateStatus(repairId, { estado: 'delivered' });
       toast({ title: 'Éxito', description: 'Reparación marcada como entregada' });
-      loadRepairs(); // 🔥 Recargar para actualizar orden y KPIs
+      loadRepairs();
     } catch (error: any) {
       toast({
         title: 'Error',
         description: 'No se pudo marcar la reparación como entregada',
-        variant: 'destructive'
+        variant: 'destructive',
       });
     }
   };
 
-  // ✅ Filtros locales
-  const filteredRepairs = repairs.filter(repair => {
+  const filteredRepairs = repairs.filter((repair) => {
     const matchesStatus = filterStatus === 'all' || repair.estado === filterStatus;
-    const matchesSearch = repair.cliente_nombre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         repair.dispositivo?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         repair.numero_reparacion?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch =
+      repair.cliente_nombre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      repair.dispositivo?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      repair.numero_reparacion?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesStatus && matchesSearch;
   });
 
@@ -204,7 +268,7 @@ export default function RepairsList() {
         </Button>
       </div>
 
-      {/* KPIs con datos reales */}
+      {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
@@ -314,7 +378,6 @@ export default function RepairsList() {
                 Entregados
               </Button>
             </div>
-            {/* Búsqueda */}
             <div className="flex-1 min-w-[200px]">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
@@ -358,110 +421,137 @@ export default function RepairsList() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {filteredRepairs.map((repair) => (
-                    <tr
-                      key={repair.id}
-                      className="hover:bg-muted/50 transition-colors"
-                    >
-                      <td className="px-4 py-3 text-sm text-muted-foreground font-mono">
-                        {repair.numero_reparacion || repair.id?.substring(0, 8)}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-foreground font-medium">
-                        {repair.cliente_nombre || '—'}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground">
-                        {repair.dispositivo || '—'}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground max-w-xs truncate">
-                        {repair.problema_reportado || '—'}
-                      </td>
-                      <td className="px-4 py-3 text-sm">
-                        <Badge variant={getStatusBadge(repair.estado)?.variant} size="sm">
-                          {getStatusBadge(repair.estado)?.label}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-3 text-sm">
-                        <Badge variant={getPriorityBadge(repair.prioridad)?.variant} size="sm">
-                          {getPriorityBadge(repair.prioridad)?.label}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-muted-foreground">
-                        {repair.updated_at ? new Date(repair.updated_at).toLocaleDateString('es-AR') : '—'}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-right relative" ref={dropdownRef}>
-                        <div className="relative">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setActiveDropdown(activeDropdown === repair.id ? null : repair.id);
-                            }}
-                          >
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
+                  {filteredRepairs.map((repair) => {
+                    // ✅ Obtener estilos para estado y prioridad
+                    const statusStyle = getStatusBadge(repair.estado);
+                    const priorityStyle = getPriorityBadge(repair.prioridad);
 
-                          {activeDropdown === repair.id && (
-                            <div className="absolute right-0 top-full mt-1 w-48 bg-card border border-border rounded-lg shadow-lg z-50 py-1">
-                              <div
-                                className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer"
-                                onClick={() => {
-                                  setActiveDropdown(null);
-                                  setSelectedRepairId(repair.id);
-                                  setPreviewModalOpen(true);
-                                }}
-                              >
-                                <Eye className="h-4 w-4" />
-                                Vista Previa
-                              </div>
-                              <div
-                                className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer"
-                                onClick={() => {
-                                  setActiveDropdown(null);
-                                  navigate(`/reparaciones/edit/${repair.id}`, { state: { reload: true } });
-                                }}
-                              >
-                                <Edit className="h-4 w-4" />
-                                Editar
-                              </div>
-                              <div
-                                className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer"
-                                onClick={() => {
-                                  setActiveDropdown(null);
-                                  navigate(`/reparaciones/confirmation?orderId=${repair.id}&print=true`);
-                                }}
-                              >
-                                <FileText className="h-4 w-4" />
-                                PDF Orden
-                              </div>
-                              {repair.estado !== 'delivered' && repair.estado !== 'cancelled' && (
+                    return (
+                      <tr
+                        key={repair.id}
+                        className="hover:bg-muted/50 transition-colors"
+                      >
+                        <td className="px-4 py-3 text-sm text-muted-foreground font-mono">
+                          {repair.numero_reparacion || repair.id?.substring(0, 8)}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-foreground font-medium">
+                          {repair.cliente_nombre || '—'}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground">
+                          {repair.dispositivo || '—'}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground max-w-xs truncate">
+                          {repair.problema_reportado || '—'}
+                        </td>
+                        <td className="px-4 py-3 text-sm">
+                          <Badge
+                            variant="outline"
+                            size="sm"
+                            className={`${statusStyle.bg} ${statusStyle.text} ${statusStyle.border} border`}
+                          >
+                            <span className="flex items-center gap-1.5">
+                              <span className={`w-1.5 h-1.5 rounded-full ${statusStyle.text}`} />
+                              {statusStyle.label}
+                            </span>
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-sm">
+                          <Badge
+                            variant="outline"
+                            size="sm"
+                            className={`${priorityStyle.bg} ${priorityStyle.text} ${priorityStyle.border} border`}
+                          >
+                            <span className="flex items-center gap-1.5">
+                              <span className={`w-1.5 h-1.5 rounded-full ${priorityStyle.text}`} />
+                              {priorityStyle.label}
+                            </span>
+                          </Badge>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground">
+                          {repair.updated_at
+                            ? new Date(repair.updated_at).toLocaleDateString('es-AR')
+                            : '—'}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-right relative" ref={dropdownRef}>
+                          <div className="relative">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveDropdown(activeDropdown === repair.id ? null : repair.id);
+                              }}
+                            >
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+
+                            {activeDropdown === repair.id && (
+                              <div className="absolute right-0 top-full mt-1 w-48 bg-card border border-border rounded-lg shadow-lg z-50 py-1">
                                 <div
                                   className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer"
                                   onClick={() => {
                                     setActiveDropdown(null);
-                                    handleMarkAsDelivered(repair.id);
+                                    setSelectedRepairId(repair.id);
+                                    setPreviewModalOpen(true);
                                   }}
                                 >
-                                  <Package className="h-4 w-4" />
-                                  Marcar Entregado
+                                  <Eye className="h-4 w-4" />
+                                  Vista Previa
                                 </div>
-                              )}
-                              <div
-                                className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer text-destructive"
-                                onClick={() => {
-                                  setActiveDropdown(null);
-                                  handleDelete(repair.id);
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                                Eliminar
+                                <div
+                                  className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer"
+                                  onClick={() => {
+                                    setActiveDropdown(null);
+                                    navigate(`/reparaciones/edit/${repair.id}`, {
+                                      state: { reload: true },
+                                    });
+                                  }}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                  Editar
+                                </div>
+                                <div
+                                  className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer"
+                                  onClick={() => {
+                                    setActiveDropdown(null);
+                                    navigate(
+                                      `/reparaciones/confirmation?orderId=${repair.id}&print=true`
+                                    );
+                                  }}
+                                >
+                                  <FileText className="h-4 w-4" />
+                                  PDF Orden
+                                </div>
+                                {repair.estado !== 'delivered' &&
+                                  repair.estado !== 'cancelled' && (
+                                    <div
+                                      className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer"
+                                      onClick={() => {
+                                        setActiveDropdown(null);
+                                        handleMarkAsDelivered(repair.id);
+                                      }}
+                                    >
+                                      <Package className="h-4 w-4" />
+                                      Marcar Entregado
+                                    </div>
+                                  )}
+                                <div
+                                  className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer text-destructive"
+                                  onClick={() => {
+                                    setActiveDropdown(null);
+                                    handleDelete(repair.id);
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                  Eliminar
+                                </div>
                               </div>
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -471,8 +561,9 @@ export default function RepairsList() {
           {!loading && totalPages > 1 && (
             <div className="flex items-center justify-between mt-6 pt-6 border-t">
               <div className="text-sm text-muted-foreground">
-                Página <span className="font-semibold text-foreground">{currentPage}</span> de <span className="font-semibold text-foreground">{totalPages}</span>
-                {' '}({totalRepairs} reparaciones)
+                Página <span className="font-semibold text-foreground">{currentPage}</span> de{' '}
+                <span className="font-semibold text-foreground">{totalPages}</span> ({totalRepairs}{' '}
+                reparaciones)
               </div>
               <div className="flex items-center gap-2">
                 <Button
