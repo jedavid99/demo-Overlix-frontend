@@ -149,7 +149,10 @@ export default function RepairsList() {
         sort: 'updated_at:desc',
       }) as any;
 
-      const repairsArray =
+      console.log('Respuesta completa:', response); // 👈 Para depurar
+
+      // Extraer array de reparaciones y mapear para asegurar campos
+      const rawArray =
         response?.data?.data?.reparaciones ||
         response?.data?.reparaciones ||
         response?.reparaciones ||
@@ -157,6 +160,14 @@ export default function RepairsList() {
         response?.data?.data ||
         response?.data ||
         [];
+
+      const repairsArray = (Array.isArray(rawArray) ? rawArray : []).map((r: any) => ({
+        ...r,
+        // 🔥 Asegurar que exista problema_reportado y diagnosis
+        problema_reportado: r.problema_reportado || 'Sin problema',
+        diagnosis: r.diagnosis || '',
+        cliente_nombre: r.cliente_nombre || r.cliente?.nombre_completo || 'Cliente no especificado',
+      }));
 
       const total =
         response?.data?.data?.total ||
@@ -170,7 +181,7 @@ export default function RepairsList() {
         response?.total_pages ||
         1;
 
-      setRepairs(Array.isArray(repairsArray) ? repairsArray : []);
+      setRepairs(repairsArray);
       setTotalRepairs(total);
       setTotalPages(totalPages);
     } catch (error: any) {
@@ -416,15 +427,16 @@ export default function RepairsList() {
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Problema</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Estado</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Prioridad</th>
-                    
                     <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {filteredRepairs.map((repair) => {
-                    // ✅ Obtener estilos para estado y prioridad
                     const statusStyle = getStatusBadge(repair.estado);
                     const priorityStyle = getPriorityBadge(repair.prioridad);
+
+                    // 🔥 Mostrar diagnosis si existe, si no, problema_reportado
+                    const problemText = repair.diagnosis || repair.problema_reportado || '—';
 
                     return (
                       <tr
@@ -441,7 +453,7 @@ export default function RepairsList() {
                           {repair.dispositivo || '—'}
                         </td>
                         <td className="px-4 py-3 text-sm text-muted-foreground max-w-xs truncate">
-                          {repair.problema_diagnosis || '—'}
+                          {problemText}
                         </td>
                         <td className="px-4 py-3 text-sm">
                           <Badge
@@ -467,7 +479,6 @@ export default function RepairsList() {
                             </span>
                           </Badge>
                         </td>
-                       
                         <td className="px-4 py-3 text-sm text-right relative" ref={dropdownRef}>
                           <div className="relative">
                             <Button
