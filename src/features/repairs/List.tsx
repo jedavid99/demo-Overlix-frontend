@@ -149,7 +149,9 @@ export default function RepairsList() {
         sort: 'updated_at:desc',
       }) as any;
 
-      const repairsArray =
+      console.log('🔍 Respuesta del backend:', response); // 👈 Para depurar
+
+      const rawArray =
         response?.data?.data?.reparaciones ||
         response?.data?.reparaciones ||
         response?.reparaciones ||
@@ -157,6 +159,14 @@ export default function RepairsList() {
         response?.data?.data ||
         response?.data ||
         [];
+
+      // Mapear para asegurar campos
+      const repairsArray = (Array.isArray(rawArray) ? rawArray : []).map((r: any) => ({
+        ...r,
+        cliente_nombre: r.cliente_nombre || r.cliente?.nombre_completo || 'Cliente no especificado',
+        problema_reportado: r.problema_reportado || 'Sin problema',
+        categoria_dispositivo: r.categoria_dispositivo || 'Sin categoría',
+      }));
 
       const total =
         response?.data?.data?.total ||
@@ -170,7 +180,7 @@ export default function RepairsList() {
         response?.total_pages ||
         1;
 
-      setRepairs(Array.isArray(repairsArray) ? repairsArray : []);
+      setRepairs(repairsArray);
       setTotalRepairs(total);
       setTotalPages(totalPages);
     } catch (error: any) {
@@ -412,17 +422,16 @@ export default function RepairsList() {
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Orden</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Cliente</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Dispositivo</th>`n                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Categoria</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Dispositivo</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Categoria</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Problema</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Estado</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Prioridad</th>
-                    
                     <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {filteredRepairs.map((repair) => {
-                    // ✅ Obtener estilos para estado y prioridad
                     const statusStyle = getStatusBadge(repair.estado);
                     const priorityStyle = getPriorityBadge(repair.prioridad);
 
@@ -439,9 +448,9 @@ export default function RepairsList() {
                         </td>
                         <td className="px-4 py-3 text-sm text-muted-foreground">
                           {repair.dispositivo || '—'}
-                        <td className="px-4 py-3 text-sm text-muted-foreground">
-                          {repair.categoria_dispositivo || '�'}
                         </td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground">
+                          {repair.categoria_dispositivo || 'Sin categoría'}
                         </td>
                         <td className="px-4 py-3 text-sm text-muted-foreground max-w-xs truncate">
                           {repair.problema_reportado || '—'}
@@ -470,7 +479,6 @@ export default function RepairsList() {
                             </span>
                           </Badge>
                         </td>
-                       
                         <td className="px-4 py-3 text-sm text-right relative" ref={dropdownRef}>
                           <div className="relative">
                             <Button
@@ -601,6 +609,3 @@ export default function RepairsList() {
     </div>
   );
 }
-
-
-
