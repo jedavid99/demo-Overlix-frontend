@@ -412,7 +412,7 @@ export default function RepairsList() {
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Orden</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Cliente</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Dispositivo</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Dispositivo</th>`n                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Categor�a</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Problema</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Estado</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Prioridad</th>
@@ -441,7 +441,7 @@ export default function RepairsList() {
                           {repair.dispositivo || '—'}
                         </td>
                         <td className="px-4 py-3 text-sm text-muted-foreground max-w-xs truncate">
-                          {repair.problema_diagnosis || '—'}
+                          {repair.problema_reportado || '—'}
                         </td>
                         <td className="px-4 py-3 text-sm">
                           <Badge
@@ -598,3 +598,4 @@ export default function RepairsList() {
     </div>
   );
 }
+
