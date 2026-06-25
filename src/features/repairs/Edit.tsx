@@ -139,11 +139,11 @@ export default function RepairEdit() {
         payload.estado = formData.estado;
       }
       
-      // PRUEBA BÁSICA: Solo enviar problema_reportado
+      // PRUEBA BÁSICA: Solo enviar problema_reportado y diagnosis
       if (formData.problema_reportado) payload.problema_reportado = formData.problema_reportado;
+      if (formData.diagnosis) payload.diagnosis = formData.diagnosis;
       
       // Campos comentados para prueba
-      // if (formData.diagnosis) payload.diagnosis = formData.diagnosis;
       // if (formData.reparacion_realizada) payload.reparacion_realizada = formData.reparacion_realizada;
       // if (formData.notas) payload.notas = formData.notas;
       // if (formData.costo_piezas > 0) payload.costo_piezas = formData.costo_piezas;
@@ -326,19 +326,12 @@ export default function RepairEdit() {
                 rows={3}
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1">Reparación Realizada</label>
-              <Textarea
-                value={formData.reparacion_realizada}
-                onChange={(e) => setFormData({ ...formData, reparacion_realizada: e.target.value })}
-                rows={3}
-              />
-            </div>
           </CardContent>
         </Card>
 
+        {/* Campos comentados para prueba */}
         {/* Estado */}
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle>Estado de la Reparación</CardTitle>
           </CardHeader>
@@ -357,10 +350,10 @@ export default function RepairEdit() {
               </SelectContent>
             </Select>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Repuestos */}
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle>Repuestos</CardTitle>
           </CardHeader>
@@ -418,10 +411,10 @@ export default function RepairEdit() {
               </div>
             )}
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Costos */}
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle>Costos</CardTitle>
           </CardHeader>
@@ -460,10 +453,10 @@ export default function RepairEdit() {
               />
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Asignación */}
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle>Asignación</CardTitle>
           </CardHeader>
@@ -485,10 +478,10 @@ export default function RepairEdit() {
               />
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Foto de Evidencia */}
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle>Foto de Evidencia</CardTitle>
           </CardHeader>
@@ -538,10 +531,10 @@ export default function RepairEdit() {
               </div>
             )}
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Notas */}
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle>Notas Adicionales</CardTitle>
           </CardHeader>
@@ -553,7 +546,7 @@ export default function RepairEdit() {
               placeholder="Notas adicionales..."
             />
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Botones de acción */}
         <div className="flex gap-4">
