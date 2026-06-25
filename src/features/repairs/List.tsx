@@ -77,6 +77,11 @@ export default function RepairsList() {
     loadRepairs();
   }, [currentPage]);
 
+  // Recargar cuando el componente se monta (al navegar de vuelta desde editar)
+  useEffect(() => {
+    loadRepairs();
+  }, []);
+
   const loadRepairs = async () => {
     try {
       setLoading(true);
