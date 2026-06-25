@@ -416,7 +416,7 @@ export default function RepairsList() {
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Problema</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Estado</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Prioridad</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actualizado</th>
+                    
                     <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">Acciones</th>
                   </tr>
                 </thead>
@@ -467,11 +467,7 @@ export default function RepairsList() {
                             </span>
                           </Badge>
                         </td>
-                        <td className="px-4 py-3 text-sm text-muted-foreground">
-                          {repair.updated_at
-                            ? new Date(repair.updated_at).toLocaleDateString('es-AR')
-                            : '—'}
-                        </td>
+                       
                         <td className="px-4 py-3 text-sm text-right relative" ref={dropdownRef}>
                           <div className="relative">
                             <Button
