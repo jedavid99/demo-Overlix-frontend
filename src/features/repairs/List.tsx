@@ -6,14 +6,10 @@ import {
   ChevronLeft,
   ChevronRight,
   MoreVertical,
-  Smartphone,
-  Laptop,
-  Gamepad2,
   Clock,
   AlertCircle,
   CheckCircle,
   DollarSign,
-  TrendingUp,
   Loader2,
   Eye,
   Trash2,
@@ -25,6 +21,14 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/shared/components/ui/dialog';
 import { repairService } from '@/services/repairService';
 import { toast } from '@/hooks/use-toast';
 import RepairPreviewModal from './RepairPreviewModal';
@@ -132,24 +136,27 @@ export default function RepairsList() {
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
-  const [repairs, setRepairs] = useState<any[]>([]);
+  const [allRepairs, setAllRepairs] = useState<any[]>([]); // TODAS las reparaciones
   const [totalRepairs, setTotalRepairs] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [selectedRepairId, setSelectedRepairId] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Estado para el modal de "Marcar Entregado"
+  const [isMarkDeliveredModalOpen, setIsMarkDeliveredModalOpen] = useState(false);
+  const [selectedRepairIdForDelivery, setSelectedRepairIdForDelivery] = useState<string | null>(null);
+  const [isMarkingDelivered, setIsMarkingDelivered] = useState(false);
+
+  // Cargar TODAS las reparaciones (sin paginación)
   const loadRepairs = useCallback(async () => {
     try {
       setLoading(true);
+      // 🔥 Obtener todas las reparaciones con un límite alto
       const response = await repairService.list({
-        page: currentPage,
-        limit: 10,
+        limit: 1000, // Ajusta según la cantidad esperada
         sort: 'updated_at:desc',
       }) as any;
-
-      console.log('🔍 Respuesta del backend:', response); // 👈 Para depurar
 
       const rawArray =
         response?.data?.data?.reparaciones ||
@@ -160,7 +167,6 @@ export default function RepairsList() {
         response?.data ||
         [];
 
-      // Mapear para asegurar campos
       const repairsArray = (Array.isArray(rawArray) ? rawArray : []).map((r: any) => ({
         ...r,
         cliente_nombre: r.cliente_nombre || r.cliente?.nombre_completo || 'Cliente no especificado',
@@ -172,17 +178,10 @@ export default function RepairsList() {
         response?.data?.data?.total ||
         response?.data?.total ||
         response?.total ||
-        0;
+        repairsArray.length;
 
-      const totalPages =
-        response?.data?.data?.total_paginas ||
-        response?.data?.total_paginas ||
-        response?.total_pages ||
-        1;
-
-      setRepairs(repairsArray);
+      setAllRepairs(repairsArray);
       setTotalRepairs(total);
-      setTotalPages(totalPages);
     } catch (error: any) {
       console.error('Error al cargar reparaciones:', error);
       toast({
@@ -193,12 +192,13 @@ export default function RepairsList() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage]);
+  }, []);
 
   useEffect(() => {
     loadRepairs();
   }, [loadRepairs]);
 
+  // Recargar cuando se vuelve de editar
   useEffect(() => {
     if (location.state?.reload) {
       loadRepairs();
@@ -206,6 +206,7 @@ export default function RepairsList() {
     }
   }, [location, loadRepairs, navigate]);
 
+  // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -216,22 +217,42 @@ export default function RepairsList() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // KPIs
-  const pendingToday = repairs.filter(
+  // ✅ KPIs calculados sobre TODAS las reparaciones (allRepairs)
+  const pendingToday = allRepairs.filter(
     (r) => r.estado === 'pending' || r.estado === 'diagnostic'
   ).length;
-  const expiringSoon = repairs.filter((r) => r.estado === 'waiting_parts').length;
-  const readyToPickup = repairs.filter((r) => r.estado === 'ready').length;
-  const totalRevenue = repairs
+  const expiringSoon = allRepairs.filter((r) => r.estado === 'waiting_parts').length;
+  const readyToPickup = allRepairs.filter((r) => r.estado === 'ready').length;
+  const totalRevenue = allRepairs
     .filter((r) => r.estado === 'delivered' && r.total_reparacion)
     .reduce((sum, r) => sum + (Number(r.total_reparacion) || 0), 0);
 
+  // Filtros
+  const filteredRepairs = allRepairs.filter((repair) => {
+    const matchesStatus = filterStatus === 'all' || repair.estado === filterStatus;
+    const matchesSearch =
+      repair.cliente_nombre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      repair.dispositivo?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      repair.numero_reparacion?.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesStatus && matchesSearch;
+  });
+
+  // Paginación local
+  const pageSize = 10;
+  const totalFiltered = filteredRepairs.length;
+  const totalPages = Math.max(1, Math.ceil(totalFiltered / pageSize));
+  const paginatedRepairs = filteredRepairs.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  // Funciones CRUD
   const handleDelete = async (repairId: string) => {
     if (!confirm('¿Estás seguro de que deseas eliminar esta reparación?')) return;
     try {
       await repairService.delete(repairId);
       toast({ title: 'Éxito', description: 'Reparación eliminada correctamente' });
-      loadRepairs();
+      loadRepairs(); // Recargar lista
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -242,27 +263,30 @@ export default function RepairsList() {
   };
 
   const handleMarkAsDelivered = async (repairId: string) => {
+    setIsMarkingDelivered(true);
     try {
       await repairService.updateStatus(repairId, { estado: 'delivered' });
       toast({ title: 'Éxito', description: 'Reparación marcada como entregada' });
-      loadRepairs();
+      setIsMarkDeliveredModalOpen(false);
+      setSelectedRepairIdForDelivery(null);
+      loadRepairs(); // Recargar lista
     } catch (error: any) {
       toast({
         title: 'Error',
         description: 'No se pudo marcar la reparación como entregada',
         variant: 'destructive',
       });
+    } finally {
+      setIsMarkingDelivered(false);
     }
   };
 
-  const filteredRepairs = repairs.filter((repair) => {
-    const matchesStatus = filterStatus === 'all' || repair.estado === filterStatus;
-    const matchesSearch =
-      repair.cliente_nombre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      repair.dispositivo?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      repair.numero_reparacion?.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesStatus && matchesSearch;
-  });
+  // Abrir modal de marcar entregado
+  const openMarkDeliveredModal = (repairId: string) => {
+    setSelectedRepairIdForDelivery(repairId);
+    setIsMarkDeliveredModalOpen(true);
+    setActiveDropdown(null);
+  };
 
   return (
     <div className="space-y-6">
@@ -278,7 +302,7 @@ export default function RepairsList() {
         </Button>
       </div>
 
-      {/* KPIs */}
+      {/* KPIs con métricas reales (sobre total) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
@@ -411,7 +435,7 @@ export default function RepairsList() {
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
-          ) : filteredRepairs.length === 0 ? (
+          ) : paginatedRepairs.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               No hay reparaciones que coincidan con los filtros
             </div>
@@ -431,7 +455,7 @@ export default function RepairsList() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
-                  {filteredRepairs.map((repair) => {
+                  {paginatedRepairs.map((repair) => {
                     const statusStyle = getStatusBadge(repair.estado);
                     const priorityStyle = getPriorityBadge(repair.prioridad);
 
@@ -533,10 +557,7 @@ export default function RepairsList() {
                                   repair.estado !== 'cancelled' && (
                                     <div
                                       className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer"
-                                      onClick={() => {
-                                        setActiveDropdown(null);
-                                        handleMarkAsDelivered(repair.id);
-                                      }}
+                                      onClick={() => openMarkDeliveredModal(repair.id)}
                                     >
                                       <Package className="h-4 w-4" />
                                       Marcar Entregado
@@ -569,7 +590,7 @@ export default function RepairsList() {
             <div className="flex items-center justify-between mt-6 pt-6 border-t">
               <div className="text-sm text-muted-foreground">
                 Página <span className="font-semibold text-foreground">{currentPage}</span> de{' '}
-                <span className="font-semibold text-foreground">{totalPages}</span> ({totalRepairs}{' '}
+                <span className="font-semibold text-foreground">{totalPages}</span> ({totalFiltered}{' '}
                 reparaciones)
               </div>
               <div className="flex items-center gap-2">
@@ -594,6 +615,57 @@ export default function RepairsList() {
           )}
         </CardContent>
       </Card>
+
+      {/* Modal para marcar entregado */}
+      <Dialog
+        open={isMarkDeliveredModalOpen}
+        onOpenChange={(open) => {
+          if (!isMarkingDelivered) {
+            setIsMarkDeliveredModalOpen(open);
+            if (!open) setSelectedRepairIdForDelivery(null);
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Marcar como Entregado</DialogTitle>
+            <DialogDescription>
+              ¿Estás seguro de que quieres marcar esta reparación como entregada?
+              Esta acción cambiará el estado a "Entregado" y no se podrá deshacer.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsMarkDeliveredModalOpen(false);
+                setSelectedRepairIdForDelivery(null);
+              }}
+              disabled={isMarkingDelivered}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="default"
+              onClick={() => {
+                if (selectedRepairIdForDelivery) {
+                  handleMarkAsDelivered(selectedRepairIdForDelivery);
+                }
+              }}
+              disabled={isMarkingDelivered}
+            >
+              {isMarkingDelivered ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Procesando...
+                </>
+              ) : (
+                'Confirmar Entrega'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Modal de vista previa */}
       {selectedRepairId && (
