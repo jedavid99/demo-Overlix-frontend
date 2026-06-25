@@ -121,7 +121,7 @@ export default function RepairEdit() {
         'cancelled': [],
       };
 
-      // Construir payload con campos que han cambiado
+      // Construir payload con todos los campos que tienen valores
       const payload: any = {};
       
       // Solo incluir estado si cambió y es una transición válida
@@ -139,42 +139,16 @@ export default function RepairEdit() {
         payload.estado = formData.estado;
       }
       
-      // Comparar con valores originales para enviar solo cambios
-      console.log('formData:', formData);
-      console.log('repairData:', repairData);
-      
-      if (formData.diagnosis !== (repairData.diagnosis || '')) {
-        console.log('diagnosis cambió:', repairData.diagnosis, '->', formData.diagnosis);
-        payload.diagnosis = formData.diagnosis;
-      }
-      if (formData.reparacion_realizada !== (repairData.reparacion_realizada || '')) {
-        console.log('reparacion_realizada cambió:', repairData.reparacion_realizada, '->', formData.reparacion_realizada);
-        payload.reparacion_realizada = formData.reparacion_realizada;
-      }
-      if (formData.tecnico_asignado_id !== (repairData.tecnico_asignado_id || '')) {
-        console.log('tecnico_asignado_id cambió:', repairData.tecnico_asignado_id, '->', formData.tecnico_asignado_id);
-        payload.tecnico_asignado_id = formData.tecnico_asignado_id;
-      }
-      if (formData.fecha_estimada_entrega !== (repairData.fecha_estimada_entrega || '')) {
-        console.log('fecha_estimada_entrega cambió:', repairData.fecha_estimada_entrega, '->', formData.fecha_estimada_entrega);
-        payload.fecha_estimada_entrega = formData.fecha_estimada_entrega;
-      }
-      if (formData.costo_piezas !== (repairData.costo_piezas || 0)) {
-        console.log('costo_piezas cambió:', repairData.costo_piezas, '->', formData.costo_piezas);
-        payload.costo_piezas = formData.costo_piezas;
-      }
-      if (formData.costo_mano_obra !== (repairData.costo_mano_obra || 0)) {
-        console.log('costo_mano_obra cambió:', repairData.costo_mano_obra, '->', formData.costo_mano_obra);
-        payload.costo_mano_obra = formData.costo_mano_obra;
-      }
-      if (formData.total_reparacion !== (repairData.total_reparacion || 0)) {
-        console.log('total_reparacion cambió:', repairData.total_reparacion, '->', formData.total_reparacion);
-        payload.total_reparacion = formData.total_reparacion;
-      }
-      if (formData.notas !== (repairData.notas || '')) {
-        console.log('notas cambió:', repairData.notas, '->', formData.notas);
-        payload.notas = formData.notas;
-      }
+      // Enviar todos los campos que tienen valores (sin comparar con originales)
+      if (formData.diagnosis) payload.diagnosis = formData.diagnosis;
+      if (formData.reparacion_realizada) payload.reparacion_realizada = formData.reparacion_realizada;
+      if (formData.tecnico_asignado_id) payload.tecnico_asignado_id = formData.tecnico_asignado_id;
+      if (formData.fecha_estimada_entrega) payload.fecha_estimada_entrega = formData.fecha_estimada_entrega;
+      // Incluir campos numéricos incluso si son 0
+      payload.costo_piezas = formData.costo_piezas;
+      payload.costo_mano_obra = formData.costo_mano_obra;
+      payload.total_reparacion = formData.total_reparacion;
+      if (formData.notas !== undefined && formData.notas !== null) payload.notas = formData.notas;
 
       console.log('Payload enviado:', payload);
       
