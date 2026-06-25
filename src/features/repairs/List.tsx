@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Plus,
   Search,
@@ -21,7 +21,7 @@ import {
   FileText,
   Package,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
@@ -29,6 +29,7 @@ import { repairService } from '@/services/repairService';
 import { toast } from '@/hooks/use-toast';
 import RepairPreviewModal from './RepairPreviewModal';
 
+// ✅ Helpers (sin cambios)
 const getStatusBadge = (status: string) => {
   switch (status) {
     case 'pending': return { variant: 'warning' as const, label: 'Pendiente' };
@@ -52,16 +53,13 @@ const getPriorityBadge = (priority: string) => {
   }
 };
 
-const deviceIcons = {
-  phone: <Smartphone className="text-primary" size={20} />,
-  laptop: <Laptop className="text-primary" size={20} />,
-  pc: <Gamepad2 className="text-primary" size={20} />,
-  console: <Gamepad2 className="text-primary" size={20} />,
-  tablet: <Smartphone className="text-primary" size={20} />,
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(amount);
 };
 
 export default function RepairsList() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [currentPage, setCurrentPage] = useState(1);
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -72,28 +70,20 @@ export default function RepairsList() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [selectedRepairId, setSelectedRepairId] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    loadRepairs();
-  }, [currentPage]);
-
-  // Recargar cuando el componente se monta (al navegar de vuelta desde editar)
-  useEffect(() => {
-    loadRepairs();
-  }, []);
-
-  const loadRepairs = async () => {
+  // ✅ Cargar reparaciones con orden por updated_at (más reciente primero)
+  const loadRepairs = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await repairService.list({ 
-        page: currentPage, 
+      const response = await repairService.list({
+        page: currentPage,
         limit: 10,
-        sort: 'created_at:desc'
+        sort: 'updated_at:desc', // 🔥 CAMBIO CLAVE: orden por última actualización
       }) as any;
-      
+
       console.log('Respuesta de reparaciones:', response);
-      
-      // Extraer datos según la estructura: {data: {reparaciones: [...], total: 10, pagina: 1, total_paginas: 10}}
+
       const repairsArray = response?.data?.data?.reparaciones ||
                          response?.data?.reparaciones ||
                          response?.reparaciones ||
@@ -101,17 +91,17 @@ export default function RepairsList() {
                          response?.data?.data ||
                          response?.data ||
                          [];
-      
+
       const total = response?.data?.data?.total ||
                    response?.data?.total ||
                    response?.total ||
                    0;
-      
+
       const totalPages = response?.data?.data?.total_paginas ||
                        response?.data?.total_paginas ||
                        response?.total_pages ||
                        1;
-      
+
       setRepairs(Array.isArray(repairsArray) ? repairsArray : []);
       setTotalRepairs(total);
       setTotalPages(totalPages);
@@ -125,22 +115,50 @@ export default function RepairsList() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage]);
 
-  const handleDelete = async (repairId: string) => {
-    if (!confirm('¿Estás seguro de que deseas eliminar esta reparación?')) {
-      return;
+  // ✅ Cargar al montar y al cambiar de página
+  useEffect(() => {
+    loadRepairs();
+  }, [loadRepairs]);
+
+  // ✅ Recargar cuando se vuelve de editar (detecta cambio en location.state)
+  useEffect(() => {
+    if (location.state?.reload) {
+      loadRepairs();
+      // Limpiar el estado para evitar recargas infinitas
+      navigate(location.pathname, { replace: true, state: {} });
     }
+  }, [location, loadRepairs, navigate]);
+
+  // ✅ Cerrar dropdown al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setActiveDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // ✅ Calcular KPIs con datos reales
+  const pendingToday = repairs.filter(r => r.estado === 'pending' || r.estado === 'diagnostic').length;
+  const expiringSoon = repairs.filter(r => r.estado === 'waiting_parts').length;
+  const readyToPickup = repairs.filter(r => r.estado === 'ready').length;
+  const totalRevenue = repairs
+    .filter(r => r.estado === 'delivered' && r.total_reparacion)
+    .reduce((sum, r) => sum + (Number(r.total_reparacion) || 0), 0);
+
+  // ✅ Funciones CRUD
+  const handleDelete = async (repairId: string) => {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta reparación?')) return;
 
     try {
       await repairService.delete(repairId);
-      toast({
-        title: 'Éxito',
-        description: 'Reparación eliminada correctamente',
-      });
+      toast({ title: 'Éxito', description: 'Reparación eliminada correctamente' });
       loadRepairs();
     } catch (error: any) {
-      console.error('Error al eliminar reparación:', error);
       toast({
         title: 'Error',
         description: 'No se pudo eliminar la reparación',
@@ -152,13 +170,9 @@ export default function RepairsList() {
   const handleMarkAsDelivered = async (repairId: string) => {
     try {
       await repairService.updateStatus(repairId, { estado: 'delivered' });
-      toast({
-        title: 'Éxito',
-        description: 'Reparación marcada como entregada',
-      });
-      loadRepairs();
+      toast({ title: 'Éxito', description: 'Reparación marcada como entregada' });
+      loadRepairs(); // 🔥 Recargar para actualizar orden y KPIs
     } catch (error: any) {
-      console.error('Error al marcar como entregada:', error);
       toast({
         title: 'Error',
         description: 'No se pudo marcar la reparación como entregada',
@@ -167,6 +181,7 @@ export default function RepairsList() {
     }
   };
 
+  // ✅ Filtros locales
   const filteredRepairs = repairs.filter(repair => {
     const matchesStatus = filterStatus === 'all' || repair.estado === filterStatus;
     const matchesSearch = repair.cliente_nombre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -174,8 +189,10 @@ export default function RepairsList() {
                          repair.numero_reparacion?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesStatus && matchesSearch;
   });
+
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground tracking-tight">Reparaciones</h1>
@@ -186,6 +203,8 @@ export default function RepairsList() {
           Nueva reparación
         </Button>
       </div>
+
+      {/* KPIs con datos reales */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
@@ -195,27 +214,22 @@ export default function RepairsList() {
                 <Clock className="h-5 w-5 text-primary" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-foreground mb-2"></p>
-            <div className="flex items-center gap-1 text-green-600 text-sm mt-2">
-              <TrendingUp size={16} />
-              <span>% vs ayer</span>
-            </div>
+            <p className="text-3xl font-bold text-foreground mb-2">{pendingToday}</p>
           </CardContent>
         </Card>
+
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-start justify-between mb-4">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Expirando Pronto</p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Esperando Repuestos</p>
               <div className="h-8 w-8 rounded-lg bg-orange-500/10 flex items-center justify-center">
                 <AlertCircle className="h-5 w-5 text-orange-500" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-foreground mb-2"></p>
-            <div className="flex items-center gap-1 text-red-500 text-sm mt-2">
-              <span>% en 24h</span>
-            </div>
+            <p className="text-3xl font-bold text-foreground mb-2">{expiringSoon}</p>
           </CardContent>
         </Card>
+
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-start justify-between mb-4">
@@ -224,12 +238,10 @@ export default function RepairsList() {
                 <CheckCircle className="h-5 w-5 text-green-600" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-foreground mb-2"></p>
-            <div className="flex items-center gap-1 text-muted-foreground text-sm mt-2">
-              <span>% listos para cerrar</span>
-            </div>
+            <p className="text-3xl font-bold text-foreground mb-2">{readyToPickup}</p>
           </CardContent>
         </Card>
+
         <Card variant="interactive" className="hover:shadow-md hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-start justify-between mb-4">
@@ -238,14 +250,12 @@ export default function RepairsList() {
                 <DollarSign className="h-5 w-5 text-primary" />
               </div>
             </div>
-            <p className="text-3xl font-bold text-foreground mb-2"></p>
-            <div className="flex items-center gap-1 text-green-600 text-sm mt-2">
-              <TrendingUp size={16} />
-              <span>%</span>
-            </div>
+            <p className="text-3xl font-bold text-foreground mb-2">{formatCurrency(totalRevenue)}</p>
           </CardContent>
         </Card>
       </div>
+
+      {/* Filtros */}
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center gap-2 mb-6">
@@ -253,7 +263,7 @@ export default function RepairsList() {
             <h3 className="text-lg font-semibold text-foreground">Filtros</h3>
           </div>
           <div className="flex flex-wrap gap-3">
-            <div className="flex gap-1">
+            <div className="flex gap-1 flex-wrap">
               <Button
                 variant={filterStatus === 'all' ? 'default' : 'outline'}
                 size="sm"
@@ -269,11 +279,25 @@ export default function RepairsList() {
                 Pendientes
               </Button>
               <Button
+                variant={filterStatus === 'diagnostic' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilterStatus('diagnostic')}
+              >
+                Diagnóstico
+              </Button>
+              <Button
                 variant={filterStatus === 'in_progress' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setFilterStatus('in_progress')}
               >
                 En Progreso
+              </Button>
+              <Button
+                variant={filterStatus === 'waiting_parts' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilterStatus('waiting_parts')}
+              >
+                Espera Repuestos
               </Button>
               <Button
                 variant={filterStatus === 'ready' ? 'default' : 'outline'}
@@ -290,10 +314,24 @@ export default function RepairsList() {
                 Entregados
               </Button>
             </div>
+            {/* Búsqueda */}
+            <div className="flex-1 min-w-[200px]">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+                <input
+                  type="text"
+                  placeholder="Buscar por orden, cliente o dispositivo..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
-      
+
+      {/* Tabla */}
       <Card>
         <CardContent className="p-6">
           {loading ? (
@@ -302,7 +340,7 @@ export default function RepairsList() {
             </div>
           ) : filteredRepairs.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              No hay reparaciones
+              No hay reparaciones que coincidan con los filtros
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -315,7 +353,7 @@ export default function RepairsList() {
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Problema</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Estado</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Prioridad</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Fecha</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Actualizado</th>
                     <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">Acciones</th>
                   </tr>
                 </thead>
@@ -348,13 +386,13 @@ export default function RepairsList() {
                         </Badge>
                       </td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">
-                        {repair.fecha_ingreso ? new Date(repair.fecha_ingreso).toLocaleDateString('es-AR') : '—'}
+                        {repair.updated_at ? new Date(repair.updated_at).toLocaleDateString('es-AR') : '—'}
                       </td>
-                      <td className="px-4 py-3 text-sm text-right relative">
+                      <td className="px-4 py-3 text-sm text-right relative" ref={dropdownRef}>
                         <div className="relative">
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={(e) => {
                               e.stopPropagation();
                               setActiveDropdown(activeDropdown === repair.id ? null : repair.id);
@@ -362,13 +400,12 @@ export default function RepairsList() {
                           >
                             <MoreVertical className="h-4 w-4" />
                           </Button>
-                          
+
                           {activeDropdown === repair.id && (
                             <div className="absolute right-0 top-full mt-1 w-48 bg-card border border-border rounded-lg shadow-lg z-50 py-1">
-                              <div 
+                              <div
                                 className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer"
-                                onClick={(e) => {
-                                  e.stopPropagation();
+                                onClick={() => {
                                   setActiveDropdown(null);
                                   setSelectedRepairId(repair.id);
                                   setPreviewModalOpen(true);
@@ -377,21 +414,19 @@ export default function RepairsList() {
                                 <Eye className="h-4 w-4" />
                                 Vista Previa
                               </div>
-                              <div 
+                              <div
                                 className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer"
-                                onClick={(e) => {
-                                  e.stopPropagation();
+                                onClick={() => {
                                   setActiveDropdown(null);
-                                  navigate(`/reparaciones/edit/${repair.id}`);
+                                  navigate(`/reparaciones/edit/${repair.id}`, { state: { reload: true } });
                                 }}
                               >
                                 <Edit className="h-4 w-4" />
                                 Editar
                               </div>
-                              <div 
+                              <div
                                 className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer"
-                                onClick={(e) => {
-                                  e.stopPropagation();
+                                onClick={() => {
                                   setActiveDropdown(null);
                                   navigate(`/reparaciones/confirmation?orderId=${repair.id}&print=true`);
                                 }}
@@ -399,11 +434,10 @@ export default function RepairsList() {
                                 <FileText className="h-4 w-4" />
                                 PDF Orden
                               </div>
-                              {repair.estado !== 'delivered' && (
-                                <div 
+                              {repair.estado !== 'delivered' && repair.estado !== 'cancelled' && (
+                                <div
                                   className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
+                                  onClick={() => {
                                     setActiveDropdown(null);
                                     handleMarkAsDelivered(repair.id);
                                   }}
@@ -412,10 +446,9 @@ export default function RepairsList() {
                                   Marcar Entregado
                                 </div>
                               )}
-                              <div 
+                              <div
                                 className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer text-destructive"
-                                onClick={(e) => {
-                                  e.stopPropagation();
+                                onClick={() => {
                                   setActiveDropdown(null);
                                   handleDelete(repair.id);
                                 }}
@@ -433,12 +466,13 @@ export default function RepairsList() {
               </table>
             </div>
           )}
-          
-          {/* Pagination */}
+
+          {/* Paginación */}
           {!loading && totalPages > 1 && (
             <div className="flex items-center justify-between mt-6 pt-6 border-t">
               <div className="text-sm text-muted-foreground">
                 Página <span className="font-semibold text-foreground">{currentPage}</span> de <span className="font-semibold text-foreground">{totalPages}</span>
+                {' '}({totalRepairs} reparaciones)
               </div>
               <div className="flex items-center gap-2">
                 <Button
