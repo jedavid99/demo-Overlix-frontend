@@ -441,7 +441,7 @@ export default function RepairsList() {
                           {repair.dispositivo || '—'}
                         </td>
                         <td className="px-4 py-3 text-sm text-muted-foreground max-w-xs truncate">
-                          {repair.problema_reportado || '—'}
+                          {repair.problema_diagnosis || '—'}
                         </td>
                         <td className="px-4 py-3 text-sm">
                           <Badge
