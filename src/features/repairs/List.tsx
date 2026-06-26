@@ -449,6 +449,7 @@ export default function RepairsList() {
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Dispositivo</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Categoria</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Problema</th>
+                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Diagnostico</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Estado</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">Prioridad</th>
                     <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider">Acciones</th>
@@ -478,6 +479,9 @@ export default function RepairsList() {
                         </td>
                         <td className="px-4 py-3 text-sm text-muted-foreground max-w-xs truncate">
                           {repair.problema_reportado || '—'}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground max-w-xs truncate">
+                          {repair.diagnosis || '—'}
                         </td>
                         <td className="px-4 py-3 text-sm">
                           <Badge

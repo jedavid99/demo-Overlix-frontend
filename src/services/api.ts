@@ -50,7 +50,7 @@ api.interceptors.response.use(
         clearAuthToken();
         // Disparar evento para notificar al AuthContext
         window.dispatchEvent(new CustomEvent('auth:logout'));
-        window.location.href = '/login';
+        window.location.href = '/';
       }
     } else if (error.response?.status === 403) {
       window.location.href = '/unauthorized';
