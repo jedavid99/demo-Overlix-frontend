@@ -682,92 +682,100 @@ export default function RepairEdit() {
             </Card>
 
             {/* Estado y Asignación */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  Estado y Asignación
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-0.5">Estado</label>
-                  <div className="relative" ref={estadoRef}>
-                    <button
-                      type="button"
-                      onClick={() => setIsEstadoOpen(!isEstadoOpen)}
-                      className="w-full h-9 flex items-center justify-between rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    >
-                      <span className="flex items-center gap-2">
-                        <CurrentIcon className="h-4 w-4 text-muted-foreground" />
-                        {estadoOptions.find(o => o.value === formData.estado)?.label || 'Seleccionar'}
-                      </span>
-                      <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${isEstadoOpen ? 'rotate-180' : ''}`} />
-                    </button>
-                    {isEstadoOpen && (
-                      <div className="absolute z-50 mt-1 w-full rounded-md border border-border bg-popover shadow-lg overflow-hidden">
-                        {estadoOptions.map(option => {
-                          const Icon = option.icon;
-                          return (
-                            <button
-                              key={option.value}
-                              type="button"
-                              onClick={() => {
-                                setFormData({ ...formData, estado: option.value });
-                                setIsEstadoOpen(false);
-                              }}
-                              className={`w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-muted ${
-                                formData.estado === option.value ? 'bg-muted/50 font-medium' : ''
-                              }`}
-                            >
-                              <Icon className="h-4 w-4 text-muted-foreground" />
-                              {option.label}
-                              {formData.estado === option.value && (
-                                <CheckCircle className="h-4 w-4 text-primary ml-auto" />
-                              )}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                </div>
+           <Card>
+  <CardHeader className="pb-2">
+    <CardTitle className="flex items-center gap-2 text-base">
+      <Clock className="h-4 w-4 text-muted-foreground" />
+      Estado y Asignación
+    </CardTitle>
+  </CardHeader>
+  <CardContent className="space-y-3">
+    {/* Estado - Custom Dropdown con Lucide icons */}
+    <div>
+      <label className="block text-xs font-medium text-muted-foreground mb-0.5">Estado</label>
+      <div className="relative" ref={estadoRef}>
+        <button
+          type="button"
+          onClick={() => setIsEstadoOpen(!isEstadoOpen)}
+          className="w-full h-9 flex items-center justify-between rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <span className="flex items-center gap-2">
+            {(() => {
+              const current = estadoOptions.find((o) => o.value === formData.estado);
+              const Icon = current?.icon || Search;
+              return <Icon className="h-4 w-4 text-muted-foreground" />;
+            })()}
+            {estadoOptions.find((o) => o.value === formData.estado)?.label || formData.estado || 'Seleccionar'}
+          </span>
+          <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${isEstadoOpen ? 'rotate-180' : ''}`} />
+        </button>
 
-                <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-0.5">Técnico</label>
-                  <Input
-                    className="h-9"
-                    value={formData.tecnico_asignado_id}
-                    onChange={e => setFormData({ ...formData, tecnico_asignado_id: e.target.value })}
-                    placeholder="Nombre o ID del técnico"
-                  />
-                </div>
+        {isEstadoOpen && (
+          <div className="absolute z-50 mt-1 w-full rounded-md border border-border bg-white shadow-lg overflow-hidden">
+            {estadoOptions.map((option) => {
+              const Icon = option.icon;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => {
+                    setFormData({ ...formData, estado: option.value });
+                    setIsEstadoOpen(false);
+                  }}
+                  className={`w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-gray-100 ${
+                    formData.estado === option.value ? 'bg-gray-50 font-medium' : ''
+                  }`}
+                >
+                  <Icon className="h-4 w-4 text-muted-foreground" />
+                  {option.label}
+                  {formData.estado === option.value && (
+                    <CheckCircle className="h-4 w-4 text-primary ml-auto" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-medium text-muted-foreground mb-0.5">Fecha Estimada</label>
-                    <Input
-                      type="date"
-                      className="h-9"
-                      value={formData.fecha_estimada_entrega}
-                      onChange={e => setFormData({ ...formData, fecha_estimada_entrega: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-muted-foreground mb-0.5">Tiempo (min)</label>
-                    <Input
-                      type="number"
-                      className="h-9"
-                      value={formData.tiempo_estimado_minutos}
-                      onChange={e => setFormData({ ...formData, tiempo_estimado_minutos: parseInt(e.target.value) || 0 })}
-                      placeholder="Minutos"
-                      min={0}
-                      step={5}
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+    {/* Técnico */}
+    <div>
+      <label className="block text-xs font-medium text-muted-foreground mb-0.5">Técnico</label>
+      <Input
+        className="h-9"
+        value={formData.tecnico_asignado_id}
+        onChange={(e) => setFormData({ ...formData, tecnico_asignado_id: e.target.value })}
+        placeholder="Nombre o ID del técnico"
+      />
+    </div>
+
+    {/* Fecha Estimada y Tiempo */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div>
+        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Fecha Estimada</label>
+        <Input
+          type="date"
+          className="h-9"
+          value={formData.fecha_estimada_entrega}
+          onChange={(e) => setFormData({ ...formData, fecha_estimada_entrega: e.target.value })}
+        />
+      </div>
+      <div>
+        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Tiempo (min)</label>
+        <Input
+          type="number"
+          className="h-9"
+          value={formData.tiempo_estimado_minutos}
+          onChange={(e) => setFormData({ ...formData, tiempo_estimado_minutos: parseInt(e.target.value) || 0 })}
+          placeholder="Minutos"
+          min={0}
+          step={5}
+        />
+      </div>
+    </div>
+  </CardContent>
+</Card>
 
             {/* Costos y Pago */}
             <Card>
