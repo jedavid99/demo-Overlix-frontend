@@ -557,70 +557,7 @@ export default function RepairEdit() {
               </CardContent>
             </Card>
 
-            {/* 3. Seguridad */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Shield className="h-4 w-4 text-muted-foreground" />
-                  Seguridad
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-0.5">Tipo de Seguridad</label>
-                  <Select
-                    value={formData.tipo_seguridad}
-                    onValueChange={(v) => setFormData({ ...formData, tipo_seguridad: v })}
-                  >
-                    <SelectTrigger className="h-9">
-                      <SelectValue placeholder="Ninguno" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">🔓 Ninguno</SelectItem>
-                      <SelectItem value="pin">🔢 PIN</SelectItem>
-                      <SelectItem value="patron">🎨 Patrón</SelectItem>
-                      <SelectItem value="huella">👆 Huella</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {formData.tipo_seguridad === 'pin' && (
-                  <div>
-                    <label className="block text-xs font-medium text-muted-foreground mb-0.5">PIN</label>
-                    <Input
-                      className="h-9"
-                      value={formData.pin_acceso}
-                      onChange={(e) => setFormData({ ...formData, pin_acceso: e.target.value })}
-                      placeholder="4-10 dígitos"
-                      maxLength={10}
-                    />
-                  </div>
-                )}
-
-                {formData.tipo_seguridad === 'patron' && (
-                  <>
-                    <div>
-                      <label className="block text-xs font-medium text-muted-foreground mb-0.5">Puntos</label>
-                      <Input
-                        className="h-9"
-                        value={formData.patron_puntos}
-                        onChange={(e) => setFormData({ ...formData, patron_puntos: e.target.value })}
-                        placeholder="Ej: 1,2,3,4"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-muted-foreground mb-0.5">Secuencia</label>
-                      <Input
-                        className="h-9"
-                        value={formData.secuencia_patron}
-                        onChange={(e) => setFormData({ ...formData, secuencia_patron: e.target.value })}
-                        placeholder="Ej: 1,2,3,4"
-                      />
-                    </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
+            
           </div>
 
           {/* Columna Derecha */}
@@ -701,31 +638,7 @@ export default function RepairEdit() {
                     placeholder="Nombre o ID del técnico"
                   />
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-medium text-muted-foreground mb-0.5">Fecha Estimada</label>
-                    <Input
-                      type="date"
-                      className="h-9"
-                      value={formData.fecha_estimada_entrega}
-                      onChange={(e) => setFormData({ ...formData, fecha_estimada_entrega: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-muted-foreground mb-0.5">Tiempo (min)</label>
-                    <Input
-                      type="number"
-                      className="h-9"
-                      value={formData.tiempo_estimado_minutos}
-                      onChange={(e) =>
-                        setFormData({ ...formData, tiempo_estimado_minutos: parseInt(e.target.value) || 0 })
-                      }
-                      placeholder="Minutos"
-                      min={0}
-                      step={5}
-                    />
-                  </div>
-                </div>
+            
               </CardContent>
             </Card>
 
@@ -985,20 +898,7 @@ export default function RepairEdit() {
           </Card>
         </div>
 
-        {/* Hardward Check (opcional) */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Chequeo de Hardware (JSON)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Textarea
-              className="min-h-[80px] font-mono text-sm resize-none"
-              value={formData.chequeo_hardware}
-              onChange={(e) => setFormData({ ...formData, chequeo_hardware: e.target.value })}
-              placeholder={`{\n  "pantalla": true,\n  "bateria": false\n}`}
-            />
-          </CardContent>
-        </Card>
+       
 
         {/* Botón de acción fijo (opcional) */}
         <div className="flex justify-end gap-3 pt-2 border-t border-border">
