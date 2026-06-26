@@ -469,8 +469,12 @@ export default function RepairsList() {
                           {repair.numero_reparacion || repair.id?.substring(0, 8)}
                         </td>
                         <td className="px-4 py-3 text-sm text-foreground font-medium">
-                          {repair.cliente_nombre || '—'}
-                          {repair.dni|| '—'}
+                          <div>
+                            {repair.cliente_nombre || '—'}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            DNI: {repair.dni || '—'}
+                          </div>
                         </td>
                         <td className="px-4 py-3 text-sm text-muted-foreground">
                           {repair.dispositivo || '—'}
