@@ -484,17 +484,7 @@ export default function RepairEdit() {
             <CardTitle>Costos</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1">Costo de Piezas</label>
-              <Input
-                type="number"
-                value={formData.costo_piezas}
-                onChange={(e) => setFormData({ ...formData, costo_piezas: parseFloat(e.target.value) || 0 })}
-                placeholder="Costo de piezas"
-                min={0}
-                step={0.01}
-              />
-            </div>
+           
             <div>
               <label className="block text-sm font-medium text-muted-foreground mb-1">Costo de Mano de Obra</label>
               <Input
@@ -527,101 +517,19 @@ export default function RepairEdit() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1">ID del Técnico</label>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Nombre del tecnico</label>
               <Input
                 value={formData.tecnico_asignado_id}
                 onChange={(e) => setFormData({ ...formData, tecnico_asignado_id: e.target.value })}
                 placeholder="UUID del técnico asignado"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1">Fecha Estimada de Entrega</label>
-              <Input
-                type="datetime-local"
-                value={formData.fecha_estimada_entrega}
-                onChange={(e) => setFormData({ ...formData, fecha_estimada_entrega: e.target.value })}
-              />
-            </div>
+            
           </CardContent>
         </Card>
 
         {/* Dispositivo */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Información del Dispositivo</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-1">Categoría</label>
-                <Select value={formData.categoria_dispositivo} onValueChange={(value) => setFormData({ ...formData, categoria_dispositivo: value })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar categoría" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="phone">Teléfono</SelectItem>
-                    <SelectItem value="laptop">Laptop</SelectItem>
-                    <SelectItem value="tablet">Tablet</SelectItem>
-                    <SelectItem value="watch">Reloj</SelectItem>
-                    <SelectItem value="console">Consola</SelectItem>
-                    <SelectItem value="other">Otro</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-1">Marca</label>
-                <Input
-                  value={formData.marca}
-                  onChange={(e) => setFormData({ ...formData, marca: e.target.value })}
-                  placeholder="Marca del dispositivo"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-1">Modelo</label>
-                <Input
-                  value={formData.modelo}
-                  onChange={(e) => setFormData({ ...formData, modelo: e.target.value })}
-                  placeholder="Modelo específico"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-1">Número de Serie / IMEI</label>
-                <Input
-                  value={formData.numero_serie}
-                  onChange={(e) => setFormData({ ...formData, numero_serie: e.target.value })}
-                  placeholder="Número de serie o IMEI"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1">Condición Estética</label>
-              <Input
-                value={formData.condicion_estetica}
-                onChange={(e) => setFormData({ ...formData, condicion_estetica: e.target.value })}
-                placeholder="Bueno, Regular, Dañado, etc."
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1">Accesorios Incluidos</label>
-              <Input
-                value={formData.accesorios_incluidos}
-                onChange={(e) => setFormData({ ...formData, accesorios_incluidos: e.target.value })}
-                placeholder="Cargador, cables, caja, etc. (separados por comas)"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1">Tiempo Estimado (minutos)</label>
-              <Input
-                type="number"
-                value={formData.tiempo_estimado_minutos}
-                onChange={(e) => setFormData({ ...formData, tiempo_estimado_minutos: parseInt(e.target.value) || 0 })}
-                placeholder="Tiempo estimado en minutos"
-                min={0}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
+      
         {/* Foto de Evidencia */}
         <Card>
           <CardHeader>
@@ -719,73 +627,8 @@ export default function RepairEdit() {
           </CardContent>
         </Card>
 
-        {/* Seguridad */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Información de Seguridad</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1">Tipo de Seguridad</label>
-              <Select value={formData.tipo_seguridad} onValueChange={(value) => setFormData({ ...formData, tipo_seguridad: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar tipo de seguridad" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Ninguna</SelectItem>
-                  <SelectItem value="pin">PIN</SelectItem>
-                  <SelectItem value="pattern">Patrón</SelectItem>
-                  <SelectItem value="fingerprint">Huella Digital</SelectItem>
-                  <SelectItem value="face">Reconocimiento Facial</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1">PIN de Acceso</label>
-              <Input
-                type="password"
-                value={formData.pin_acceso}
-                onChange={(e) => setFormData({ ...formData, pin_acceso: e.target.value })}
-                placeholder="PIN del dispositivo"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1">Puntos del Patrón (separados por comas)</label>
-              <Input
-                value={formData.patron_puntos}
-                onChange={(e) => setFormData({ ...formData, patron_puntos: e.target.value })}
-                placeholder="Ej: 1,2,3,4,5"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1">Secuencia del Patrón (separados por comas)</label>
-              <Input
-                value={formData.secuencia_patron}
-                onChange={(e) => setFormData({ ...formData, secuencia_patron: e.target.value })}
-                placeholder="Ej: 1,2,3,4,5"
-              />
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Hardware */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Chequeo de Hardware</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Ingresa el estado de los componentes del dispositivo en formato JSON.
-            </p>
-            <Textarea
-              value={formData.chequeo_hardware}
-              onChange={(e) => setFormData({ ...formData, chequeo_hardware: e.target.value })}
-              rows={8}
-              placeholder='Ej: { "pantalla": "dañada", "bateria": "80%", "audio": "funcional", "cargador": "no funciona" }'
-              className="font-mono text-sm"
-            />
-          </CardContent>
-        </Card>
+     
 
         {/* Botones de acción */}
         <div className="flex gap-4">
