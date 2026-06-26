@@ -608,7 +608,75 @@ export default function RepairEdit() {
             
               </CardContent>
             </Card>
+   <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Plus className="h-4 w-4 text-muted-foreground" />
+              Repuestos
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex flex-wrap gap-2 items-end">
+              <div className="flex-1 min-w-[140px]">
+                <label className="block text-xs font-medium text-muted-foreground mb-0.5">Nombre</label>
+                <Input
+                  className="h-9"
+                  value={nuevoRepuesto.nombre}
+                  onChange={(e) => setNuevoRepuesto({ ...nuevoRepuesto, nombre: e.target.value })}
+                  placeholder="Repuesto"
+                />
+              </div>
+              <div className="w-20">
+                <label className="block text-xs font-medium text-muted-foreground mb-0.5">Cant</label>
+                <Input
+                  type="number"
+                  className="h-9"
+                  value={nuevoRepuesto.cantidad}
+                  onChange={(e) =>
+                    setNuevoRepuesto({ ...nuevoRepuesto, cantidad: parseInt(e.target.value) || 0 })
+                  }
+                  min={1}
+                />
+              </div>
+              <div className="w-28">
+                <label className="block text-xs font-medium text-muted-foreground mb-0.5">Costo unit.</label>
+                <Input
+                  type="number"
+                  className="h-9"
+                  value={nuevoRepuesto.costo_unitario}
+                  onChange={(e) =>
+                    setNuevoRepuesto({ ...nuevoRepuesto, costo_unitario: parseFloat(e.target.value) || 0 })
+                  }
+                  min={0}
+                  step={0.01}
+                />
+              </div>
+              <Button onClick={handleAddRepuesto} className="h-9 gap-1">
+                <Plus className="h-4 w-4" />
+                Agregar
+              </Button>
+            </div>
 
+            {repuestos.length > 0 && (
+              <div className="space-y-1 max-h-48 overflow-y-auto">
+                {repuestos.map((r) => (
+                  <div key={r.id} className="flex items-center justify-between p-2 bg-muted rounded-md">
+                    <div>
+                      <span className="font-medium">{r.nombre}</span>
+                      <span className="text-sm text-muted-foreground ml-2">
+                        {r.cantidad} x {formatCurrency(r.costo_unitario)} ={' '}
+                        <span className="font-semibold">{formatCurrency(r.cantidad * r.costo_unitario)}</span>
+                      </span>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={() => handleRemoveRepuesto(r.id)}>
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
             {/* 6. Costos y Pago */}
             <Card>
               <CardHeader className="pb-2">
@@ -732,75 +800,7 @@ export default function RepairEdit() {
         </div>
 
         {/* Sección a ancho completo: Repuestos */}
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Plus className="h-4 w-4 text-muted-foreground" />
-              Repuestos
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex flex-wrap gap-2 items-end">
-              <div className="flex-1 min-w-[140px]">
-                <label className="block text-xs font-medium text-muted-foreground mb-0.5">Nombre</label>
-                <Input
-                  className="h-9"
-                  value={nuevoRepuesto.nombre}
-                  onChange={(e) => setNuevoRepuesto({ ...nuevoRepuesto, nombre: e.target.value })}
-                  placeholder="Repuesto"
-                />
-              </div>
-              <div className="w-20">
-                <label className="block text-xs font-medium text-muted-foreground mb-0.5">Cant</label>
-                <Input
-                  type="number"
-                  className="h-9"
-                  value={nuevoRepuesto.cantidad}
-                  onChange={(e) =>
-                    setNuevoRepuesto({ ...nuevoRepuesto, cantidad: parseInt(e.target.value) || 0 })
-                  }
-                  min={1}
-                />
-              </div>
-              <div className="w-28">
-                <label className="block text-xs font-medium text-muted-foreground mb-0.5">Costo unit.</label>
-                <Input
-                  type="number"
-                  className="h-9"
-                  value={nuevoRepuesto.costo_unitario}
-                  onChange={(e) =>
-                    setNuevoRepuesto({ ...nuevoRepuesto, costo_unitario: parseFloat(e.target.value) || 0 })
-                  }
-                  min={0}
-                  step={0.01}
-                />
-              </div>
-              <Button onClick={handleAddRepuesto} className="h-9 gap-1">
-                <Plus className="h-4 w-4" />
-                Agregar
-              </Button>
-            </div>
-
-            {repuestos.length > 0 && (
-              <div className="space-y-1 max-h-48 overflow-y-auto">
-                {repuestos.map((r) => (
-                  <div key={r.id} className="flex items-center justify-between p-2 bg-muted rounded-md">
-                    <div>
-                      <span className="font-medium">{r.nombre}</span>
-                      <span className="text-sm text-muted-foreground ml-2">
-                        {r.cantidad} x {formatCurrency(r.costo_unitario)} ={' '}
-                        <span className="font-semibold">{formatCurrency(r.cantidad * r.costo_unitario)}</span>
-                      </span>
-                    </div>
-                    <Button variant="ghost" size="icon" onClick={() => handleRemoveRepuesto(r.id)}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+     
 
         {/* Sección a ancho completo: Notas y Evidencia */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
