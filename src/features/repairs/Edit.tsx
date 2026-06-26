@@ -608,8 +608,7 @@ export default function RepairEdit() {
               />
             </CardContent>
           </Card>
-          </div>
- <Card>
+          <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Foto de Evidencia</CardTitle>
             </CardHeader>
@@ -654,6 +653,8 @@ export default function RepairEdit() {
               )}
             </CardContent>
           </Card>
+          </div>
+ 
           {/* Columna Derecha */}
           <div className="space-y-6">
             {/* 4. Diagnóstico */}
