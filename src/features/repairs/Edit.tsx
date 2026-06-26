@@ -697,45 +697,63 @@ export default function RepairEdit() {
             </Card>
 
             {/* 5. Estado y Asignación */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  Estado y Asignación
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-0.5">Estado</label>
-                  <Select
-                    value={formData.estado}
-                    onValueChange={(v) => setFormData({ ...formData, estado: v })}
-                  >
-                    <SelectTrigger className="h-9">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="diagnostic">🔍 Diagnóstico</SelectItem>
-                      <SelectItem value="in_progress">⚙️ En Progreso</SelectItem>
-                      <SelectItem value="waiting_parts">⏳ Esperando Repuestos</SelectItem>
-                      <SelectItem value="testing">🧪 Pruebas</SelectItem>
-                      <SelectItem value="completed">✅ Completado</SelectItem>
-                      <SelectItem value="cancelled">❌ Cancelado</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-0.5">Técnico</label>
-                  <Input
-                    className="h-9"
-                    value={formData.tecnico_asignado_id}
-                    onChange={(e) => setFormData({ ...formData, tecnico_asignado_id: e.target.value })}
-                    placeholder="Nombre o ID del técnico"
-                  />
-                </div>
-            
-              </CardContent>
-            </Card>
+           <Card>
+  <CardHeader className="pb-2">
+    <CardTitle className="flex items-center gap-2 text-base">
+      <Clock className="h-4 w-4 text-muted-foreground" />
+      Estado y Asignación
+    </CardTitle>
+  </CardHeader>
+  <CardContent className="space-y-3">
+    <div>
+      <label className="block text-xs font-medium text-muted-foreground mb-0.5">Estado</label>
+      <select
+        value={formData.estado}
+        onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
+        className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
+        <option value="diagnostic">🔍 Diagnóstico</option>
+        <option value="in_progress">⚙️ En Progreso</option>
+        <option value="waiting_parts">⏳ Esperando Repuestos</option>
+        <option value="testing">🧪 Pruebas</option>
+        <option value="completed">✅ Completado</option>
+        <option value="cancelled">❌ Cancelado</option>
+      </select>
+    </div>
+    <div>
+      <label className="block text-xs font-medium text-muted-foreground mb-0.5">Técnico</label>
+      <Input
+        className="h-9"
+        value={formData.tecnico_asignado_id}
+        onChange={(e) => setFormData({ ...formData, tecnico_asignado_id: e.target.value })}
+        placeholder="Nombre o ID del técnico"
+      />
+    </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div>
+        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Fecha Estimada</label>
+        <Input
+          type="date"
+          className="h-9"
+          value={formData.fecha_estimada_entrega}
+          onChange={(e) => setFormData({ ...formData, fecha_estimada_entrega: e.target.value })}
+        />
+      </div>
+      <div>
+        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Tiempo (min)</label>
+        <Input
+          type="number"
+          className="h-9"
+          value={formData.tiempo_estimado_minutos}
+          onChange={(e) => setFormData({ ...formData, tiempo_estimado_minutos: parseInt(e.target.value) || 0 })}
+          placeholder="Minutos"
+          min={0}
+          step={5}
+        />
+      </div>
+    </div>
+  </CardContent>
+</Card>
    
             {/* 6. Costos y Pago */}
             <Card>
