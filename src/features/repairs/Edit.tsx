@@ -859,17 +859,7 @@ export default function RepairEdit() {
           </div>
         </div>
 
-        {/* Sección a ancho completo: Repuestos */}
-     
-
-        {/* Sección a ancho completo: Notas y Evidencia */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-
-         
-        </div>
-
-       
+    
 
         {/* Botón de acción fijo (opcional) */}
         <div className="flex justify-end gap-3 pt-2 border-t border-border">
