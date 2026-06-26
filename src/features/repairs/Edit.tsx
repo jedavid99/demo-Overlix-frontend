@@ -139,16 +139,18 @@ export default function RepairEdit() {
         payload.estado = formData.estado;
       }
       
-      // PRUEBA BÁSICA: Solo enviar problema_reportado y diagnosis
+      // Enviar todos los campos que tienen valores
       if (formData.problema_reportado) payload.problema_reportado = formData.problema_reportado;
       if (formData.diagnosis) payload.diagnosis = formData.diagnosis;
-      
-      // Campos comentados para prueba
-      // if (formData.reparacion_realizada) payload.reparacion_realizada = formData.reparacion_realizada;
-      // if (formData.notas) payload.notas = formData.notas;
-      // if (formData.costo_piezas > 0) payload.costo_piezas = formData.costo_piezas;
-      // if (formData.costo_mano_obra > 0) payload.costo_mano_obra = formData.costo_mano_obra;
-      // if (formData.total_reparacion > 0) payload.total_reparacion = formData.total_reparacion;
+      if (formData.reparacion_realizada) payload.reparacion_realizada = formData.reparacion_realizada;
+      if (formData.notas) payload.notas = formData.notas;
+      if (formData.costo_piezas > 0) payload.costo_piezas = formData.costo_piezas;
+      if (formData.costo_mano_obra > 0) payload.costo_mano_obra = formData.costo_mano_obra;
+      if (formData.total_reparacion > 0) payload.total_reparacion = formData.total_reparacion;
+      if (formData.foto_evidencia) payload.foto_evidencia = formData.foto_evidencia;
+      if (formData.tecnico_asignado_id) payload.tecnico_asignado_id = formData.tecnico_asignado_id;
+      if (formData.fecha_estimada_entrega) payload.fecha_estimada_entrega = formData.fecha_estimada_entrega;
+      if (repuestos.length > 0) payload.repuestos = repuestos;
 
       console.log('Payload enviado:', payload);
       
@@ -326,12 +328,19 @@ export default function RepairEdit() {
                 rows={3}
               />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Reparación Realizada</label>
+              <Textarea
+                value={formData.reparacion_realizada}
+                onChange={(e) => setFormData({ ...formData, reparacion_realizada: e.target.value })}
+                rows={3}
+              />
+            </div>
           </CardContent>
         </Card>
 
-        {/* Campos comentados para prueba */}
         {/* Estado */}
-        {/* <Card>
+        <Card>
           <CardHeader>
             <CardTitle>Estado de la Reparación</CardTitle>
           </CardHeader>
@@ -350,10 +359,10 @@ export default function RepairEdit() {
               </SelectContent>
             </Select>
           </CardContent>
-        </Card> */}
+        </Card>
 
         {/* Repuestos */}
-        {/* <Card>
+        <Card>
           <CardHeader>
             <CardTitle>Repuestos</CardTitle>
           </CardHeader>
@@ -411,10 +420,10 @@ export default function RepairEdit() {
               </div>
             )}
           </CardContent>
-        </Card> */}
+        </Card>
 
         {/* Costos */}
-        {/* <Card>
+        <Card>
           <CardHeader>
             <CardTitle>Costos</CardTitle>
           </CardHeader>
@@ -453,10 +462,10 @@ export default function RepairEdit() {
               />
             </div>
           </CardContent>
-        </Card> */}
+        </Card>
 
         {/* Asignación */}
-        {/* <Card>
+        <Card>
           <CardHeader>
             <CardTitle>Asignación</CardTitle>
           </CardHeader>
@@ -478,10 +487,10 @@ export default function RepairEdit() {
               />
             </div>
           </CardContent>
-        </Card> */}
+        </Card>
 
         {/* Foto de Evidencia */}
-        {/* <Card>
+        <Card>
           <CardHeader>
             <CardTitle>Foto de Evidencia</CardTitle>
           </CardHeader>
@@ -531,10 +540,10 @@ export default function RepairEdit() {
               </div>
             )}
           </CardContent>
-        </Card> */}
+        </Card>
 
         {/* Notas */}
-        {/* <Card>
+        <Card>
           <CardHeader>
             <CardTitle>Notas Adicionales</CardTitle>
           </CardHeader>
@@ -546,7 +555,7 @@ export default function RepairEdit() {
               placeholder="Notas adicionales..."
             />
           </CardContent>
-        </Card> */}
+        </Card>
 
         {/* Botones de acción */}
         <div className="flex gap-4">
