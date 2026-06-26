@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -18,7 +18,8 @@ import {
   Shield,
   Wrench,
   CheckCircle,
-  AlertCircle,
+  Search,
+  ChevronDown,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
@@ -57,38 +58,27 @@ interface RepairData {
   repuestos?: RepairPart[];
 }
 
-// Helper para el icono según categoría
+// Icono según categoría
 const getDeviceIcon = (categoria: string) => {
   switch (categoria) {
-    case 'telefono':
-      return <Smartphone className="h-5 w-5" />;
+    case 'telefono': return <Smartphone className="h-5 w-5" />;
     case 'laptop':
-    case 'pc':
-      return <Laptop className="h-5 w-5" />;
-    case 'consola':
-      return <Gamepad2 className="h-5 w-5" />;
-    default:
-      return <Smartphone className="h-5 w-5" />;
+    case 'pc': return <Laptop className="h-5 w-5" />;
+    case 'consola': return <Gamepad2 className="h-5 w-5" />;
+    default: return <Smartphone className="h-5 w-5" />;
   }
 };
 
-// Helper para el color del estado
+// Color del estado (actualizado)
 const getStatusColor = (estado: string) => {
   switch (estado) {
-    case 'diagnostic':
-      return 'bg-blue-100 text-blue-800 border-blue-300';
-    case 'in_progress':
-      return 'bg-indigo-100 text-indigo-800 border-indigo-300';
-    case 'waiting_parts':
-      return 'bg-orange-100 text-orange-800 border-orange-300';
-    case 'testing':
-      return 'bg-purple-100 text-purple-800 border-purple-300';
-    case 'completed':
-      return 'bg-emerald-100 text-emerald-800 border-emerald-300';
-    case 'cancelled':
-      return 'bg-red-100 text-red-800 border-red-300';
-    default:
-      return 'bg-gray-100 text-gray-800 border-gray-300';
+    case 'diagnostic': return 'bg-blue-100 text-blue-800 border-blue-300';
+    case 'in_progress': return 'bg-indigo-100 text-indigo-800 border-indigo-300';
+    case 'waiting_parts': return 'bg-orange-100 text-orange-800 border-orange-300';
+    case 'repaired': return 'bg-emerald-100 text-emerald-800 border-emerald-300';
+    case 'warranty': return 'bg-purple-100 text-purple-800 border-purple-300';
+    case 'irreparable': return 'bg-red-100 text-red-800 border-red-300';
+    default: return 'bg-gray-100 text-gray-800 border-gray-300';
   }
 };
 
@@ -103,30 +93,19 @@ export default function RepairEdit() {
   const [saving, setSaving] = useState(false);
   const [repairData, setRepairData] = useState<RepairData | null>(null);
 
-  // Estado completo del formulario
+  // Estado del formulario
   const [formData, setFormData] = useState({
-    // Diagnóstico
     problema_reportado: '',
     diagnosis: '',
     reparacion_realizada: '',
-
-    // Estado
     estado: 'diagnostic',
-
-    // Costos
     costo_piezas: 0,
     costo_mano_obra: 0,
     total_reparacion: 0,
-
-    // Notas y evidencia
     notas: '',
     foto_evidencia: '',
-
-    // Asignación
     tecnico_asignado_id: '',
     fecha_estimada_entrega: '',
-
-    // Dispositivo
     categoria_dispositivo: '',
     dispositivo: '',
     marca: '',
@@ -135,19 +114,13 @@ export default function RepairEdit() {
     condicion_estetica: '',
     accesorios_incluidos: '',
     tiempo_estimado_minutos: 0,
-
-    // Pago
     pagado: false,
     metodo_pago: '',
     monto_pagado: 0,
-
-    // Seguridad
     tipo_seguridad: 'none',
     pin_acceso: '',
     patron_puntos: '',
     secuencia_patron: '',
-
-    // Hardware
     chequeo_hardware: '',
   });
 
@@ -159,11 +132,32 @@ export default function RepairEdit() {
   });
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
+  // Dropdown de estado
+  const estadoOptions = [
+    { value: 'diagnostic', label: 'Diagnóstico', icon: Search },
+    { value: 'in_progress', label: 'En Progreso', icon: Wrench },
+    { value: 'waiting_parts', label: 'Esperando Repuestos', icon: Clock },
+    { value: 'repaired', label: 'Reparado', icon: CheckCircle },
+    { value: 'warranty', label: 'Garantía', icon: Shield },
+    { value: 'irreparable', label: 'Irreparable', icon: XCircle },
+  ];
+  const [isEstadoOpen, setIsEstadoOpen] = useState(false);
+  const estadoRef = useRef<HTMLDivElement>(null);
+
+  // Cerrar dropdown al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (estadoRef.current && !estadoRef.current.contains(event.target as Node)) {
+        setIsEstadoOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   // Cargar datos
   useEffect(() => {
-    if (id) {
-      loadRepairData(id);
-    }
+    if (id) loadRepairData(id);
   }, [id]);
 
   const loadRepairData = async (repairId: string) => {
@@ -171,7 +165,6 @@ export default function RepairEdit() {
       setLoading(true);
       const response = await repairService.getById(repairId) as any;
       const orderData = response?.data?.data || response?.data || response;
-
       setRepairData(orderData);
 
       setFormData({
@@ -207,10 +200,9 @@ export default function RepairEdit() {
         secuencia_patron: Array.isArray(orderData.secuencia_patron)
           ? orderData.secuencia_patron.join(', ')
           : orderData.secuencia_patron || '',
-        chequeo_hardware:
-          typeof orderData.chequeo_hardware === 'object'
-            ? JSON.stringify(orderData.chequeo_hardware, null, 2)
-            : orderData.chequeo_hardware || '',
+        chequeo_hardware: typeof orderData.chequeo_hardware === 'object'
+          ? JSON.stringify(orderData.chequeo_hardware, null, 2)
+          : orderData.chequeo_hardware || '',
       });
 
       setRepuestos(orderData.repuestos || []);
@@ -223,7 +215,7 @@ export default function RepairEdit() {
     }
   };
 
-  // Guardar cambios
+  // Guardar
   const handleSave = async () => {
     if (!repairData) return;
 
@@ -231,17 +223,16 @@ export default function RepairEdit() {
       setSaving(true);
 
       const validTransitions: Record<string, string[]> = {
-        diagnostic: ['in_progress', 'cancelled'],
-        in_progress: ['waiting_parts', 'testing', 'completed', 'cancelled'],
-        waiting_parts: ['in_progress', 'cancelled'],
-        testing: ['in_progress', 'completed', 'cancelled'],
-        completed: [],
-        cancelled: [],
+        diagnostic: ['in_progress', 'irreparable'],
+        in_progress: ['waiting_parts', 'repaired', 'irreparable'],
+        waiting_parts: ['in_progress', 'repaired', 'irreparable'],
+        repaired: ['warranty'],
+        warranty: [],
+        irreparable: [],
       };
 
       const payload: any = {};
 
-      // Validar cambio de estado
       if (formData.estado !== repairData.estado) {
         const allowed = validTransitions[repairData.estado] || [];
         if (!allowed.includes(formData.estado)) {
@@ -261,12 +252,9 @@ export default function RepairEdit() {
       if (formData.diagnosis) payload.diagnosis = formData.diagnosis;
       if (formData.reparacion_realizada) payload.reparacion_realizada = formData.reparacion_realizada;
       if (formData.notas) payload.notas = formData.notas;
-
-      // Costos
       if (formData.costo_piezas > 0) payload.costo_piezas = formData.costo_piezas;
       if (formData.costo_mano_obra > 0) payload.costo_mano_obra = formData.costo_mano_obra;
       if (formData.total_reparacion > 0) payload.total_reparacion = formData.total_reparacion;
-
       if (formData.foto_evidencia) payload.foto_evidencia = formData.foto_evidencia;
       if (formData.tecnico_asignado_id) payload.tecnico_asignado_id = formData.tecnico_asignado_id;
       if (formData.fecha_estimada_entrega) payload.fecha_estimada_entrega = formData.fecha_estimada_entrega;
@@ -281,8 +269,8 @@ export default function RepairEdit() {
       if (formData.accesorios_incluidos) {
         payload.accesorios_incluidos = formData.accesorios_incluidos
           .split(',')
-          .map((s) => s.trim())
-          .filter((s) => s);
+          .map(s => s.trim())
+          .filter(Boolean);
       }
       if (formData.tiempo_estimado_minutos > 0) {
         payload.tiempo_estimado_minutos = formData.tiempo_estimado_minutos;
@@ -301,22 +289,22 @@ export default function RepairEdit() {
       if (formData.patron_puntos) {
         payload.patron_puntos = formData.patron_puntos
           .split(',')
-          .map((s) => parseInt(s.trim()))
-          .filter((n) => !isNaN(n));
+          .map(s => parseInt(s.trim()))
+          .filter(n => !isNaN(n));
       }
       if (formData.secuencia_patron) {
         payload.secuencia_patron = formData.secuencia_patron
           .split(',')
-          .map((s) => parseInt(s.trim()))
-          .filter((n) => !isNaN(n));
+          .map(s => parseInt(s.trim()))
+          .filter(n => !isNaN(n));
       }
 
       // Hardware
       if (formData.chequeo_hardware) {
         try {
           payload.chequeo_hardware = JSON.parse(formData.chequeo_hardware);
-        } catch (e) {
-          console.error('Error parsing chequeo_hardware:', e);
+        } catch {
+          // ignore
         }
       }
 
@@ -349,27 +337,23 @@ export default function RepairEdit() {
       toast({ title: 'Error', description: 'Complete los datos del repuesto', variant: 'destructive' });
       return;
     }
-
     const repuesto: RepairPart = {
       id: Date.now().toString(),
       nombre: nuevoRepuesto.nombre,
       cantidad: nuevoRepuesto.cantidad,
       costo_unitario: nuevoRepuesto.costo_unitario,
     };
-
     setRepuestos([...repuestos, repuesto]);
     setNuevoRepuesto({ nombre: '', cantidad: 1, costo_unitario: 0 });
   };
 
   const handleRemoveRepuesto = (repuestoId: string) => {
-    setRepuestos(repuestos.filter((r) => r.id !== repuestoId));
+    setRepuestos(repuestos.filter(r => r.id !== repuestoId));
   };
 
-  // Foto
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     try {
       setUploadingPhoto(true);
       const reader = new FileReader();
@@ -378,8 +362,7 @@ export default function RepairEdit() {
         setUploadingPhoto(false);
       };
       reader.readAsDataURL(file);
-    } catch (error) {
-      console.error('Error al subir foto:', error);
+    } catch {
       toast({ title: 'Error', description: 'No se pudo subir la foto', variant: 'destructive' });
       setUploadingPhoto(false);
     }
@@ -389,6 +372,7 @@ export default function RepairEdit() {
     return repuestos.reduce((sum, r) => sum + r.cantidad * r.costo_unitario, 0);
   };
 
+  // Estado de carga
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -404,6 +388,13 @@ export default function RepairEdit() {
       </div>
     );
   }
+
+  // Obtener icono del estado actual
+  const getCurrentEstadoIcon = () => {
+    const found = estadoOptions.find(o => o.value === formData.estado);
+    return found?.icon || Search;
+  };
+  const CurrentIcon = getCurrentEstadoIcon();
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-6">
@@ -425,16 +416,14 @@ export default function RepairEdit() {
                 {formData.estado === 'diagnostic' && 'Diagnóstico'}
                 {formData.estado === 'in_progress' && 'En Progreso'}
                 {formData.estado === 'waiting_parts' && 'Esperando Repuestos'}
-                {formData.estado === 'testing' && 'Pruebas'}
-                {formData.estado === 'completed' && 'Completado'}
-                {formData.estado === 'cancelled' && 'Cancelado'}
+                {formData.estado === 'repaired' && 'Reparado'}
+                {formData.estado === 'warranty' && 'Garantía'}
+                {formData.estado === 'irreparable' && 'Irreparable'}
               </Badge>
             </p>
           </div>
           <div className="flex gap-2 ml-auto">
-            <Button variant="outline" onClick={() => navigate('/reparaciones/list')}>
-              Cancelar
-            </Button>
+            <Button variant="outline" onClick={() => navigate('/reparaciones/list')}>Cancelar</Button>
             <Button onClick={handleSave} disabled={saving} className="gap-2">
               <Save className="h-4 w-4" />
               {saving ? 'Guardando...' : 'Guardar Cambios'}
@@ -442,222 +431,217 @@ export default function RepairEdit() {
           </div>
         </div>
 
-        {/* Layout en 2 columnas para pantallas grandes */}
+        {/* Layout dos columnas */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Columna Izquierda */}
           <div className="space-y-6">
-            {/* 1. Cliente */}
+            {/* Cliente (solo lectura) */}
             <Card>
-  <CardHeader className="pb-2">
-    <CardTitle className="flex items-center gap-2 text-base">
-      <User className="h-4 w-4 text-muted-foreground" />
-      Cliente
-    </CardTitle>
-  </CardHeader>
-  <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-    <div className="flex items-center gap-2">
-      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
-        {repairData.cliente_nombre?.charAt(0).toUpperCase() || '?'}
-      </div>
-      <div>
-        <p className="text-sm font-medium text-foreground">{repairData.cliente_nombre || '—'}</p>
-        <p className="text-xs text-muted-foreground">Cliente</p>
-      </div>
-    </div>
-    <div className="flex items-center gap-2">
-      <Phone className="h-4 w-4 text-muted-foreground" />
-      <div>
-        <p className="text-sm font-medium text-foreground">{repairData.cliente_telefono || '—'}</p>
-        <p className="text-xs text-muted-foreground">Teléfono</p>
-      </div>
-    </div>
-  </CardContent>
-  
-</Card>
-
-{/* 2. Dispositivo - SOLO LECTURA */}
-<Card>
-  <CardHeader className="pb-2">
-    <CardTitle className="flex items-center gap-2 text-base">
-      {getDeviceIcon(formData.categoria_dispositivo)}
-      Dispositivo
-    </CardTitle>
-  </CardHeader>
-  <CardContent className="space-y-3">
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <div>
-        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Categoría</label>
-        <p className="text-sm font-medium text-foreground">
-          {formData.categoria_dispositivo === 'telefono' && '📱 Teléfono'}
-          {formData.categoria_dispositivo === 'pc' && '💻 PC'}
-          {formData.categoria_dispositivo === 'laptop' && '💻 Laptop'}
-          {formData.categoria_dispositivo === 'consola' && '🎮 Consola'}
-          {formData.categoria_dispositivo === 'tablet' && '📱 Tablet'}
-          {!formData.categoria_dispositivo && '—'}
-        </p>
-      </div>
-      <div>
-        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Dispositivo</label>
-        <p className="text-sm font-medium text-foreground">{formData.dispositivo || '—'}</p>
-      </div>
-    </div>
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <div>
-        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Marca</label>
-        <p className="text-sm text-foreground">{formData.marca || '—'}</p>
-      </div>
-      <div>
-        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Modelo</label>
-        <p className="text-sm text-foreground">{formData.modelo || '—'}</p>
-      </div>
-    </div>
-    <div>
-      <label className="block text-xs font-medium text-muted-foreground mb-0.5">N° de Serie</label>
-      <p className="text-sm font-mono text-foreground">{formData.numero_serie || '—'}</p>
-    </div>
-    <div>
-      <label className="block text-xs font-medium text-muted-foreground mb-0.5">Condición Estética</label>
-      <p className="text-sm text-foreground">{formData.condicion_estetica || '—'}</p>
-    </div>
-    <div>
-      <label className="block text-xs font-medium text-muted-foreground mb-0.5">Accesorios</label>
-      <p className="text-sm text-foreground">{formData.accesorios_incluidos || '—'}</p>
-    </div>
-  </CardContent>
-</Card>      
-
-<Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Plus className="h-4 w-4 text-muted-foreground" />
-              Repuestos
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex flex-wrap gap-2 items-end">
-              <div className="flex-1 min-w-[140px]">
-                <label className="block text-xs font-medium text-muted-foreground mb-0.5">Nombre</label>
-                <Input
-                  className="h-9"
-                  value={nuevoRepuesto.nombre}
-                  onChange={(e) => setNuevoRepuesto({ ...nuevoRepuesto, nombre: e.target.value })}
-                  placeholder="Repuesto"
-                />
-              </div>
-              <div className="w-20">
-                <label className="block text-xs font-medium text-muted-foreground mb-0.5">Cant</label>
-                <Input
-                  type="number"
-                  className="h-9"
-                  value={nuevoRepuesto.cantidad}
-                  onChange={(e) =>
-                    setNuevoRepuesto({ ...nuevoRepuesto, cantidad: parseInt(e.target.value) || 0 })
-                  }
-                  min={1}
-                />
-              </div>
-              <div className="w-28">
-                <label className="block text-xs font-medium text-muted-foreground mb-0.5">Costo unit.</label>
-                <Input
-                  type="number"
-                  className="h-9"
-                  value={nuevoRepuesto.costo_unitario}
-                  onChange={(e) =>
-                    setNuevoRepuesto({ ...nuevoRepuesto, costo_unitario: parseFloat(e.target.value) || 0 })
-                  }
-                  min={0}
-                  step={0.01}
-                />
-              </div>
-              <Button onClick={handleAddRepuesto} className="h-9 gap-1">
-                <Plus className="h-4 w-4" />
-                Agregar
-              </Button>
-            </div>
-
-            {repuestos.length > 0 && (
-              <div className="space-y-1 max-h-48 overflow-y-auto">
-                {repuestos.map((r) => (
-                  <div key={r.id} className="flex items-center justify-between p-2 bg-muted rounded-md">
-                    <div>
-                      <span className="font-medium">{r.nombre}</span>
-                      <span className="text-sm text-muted-foreground ml-2">
-                        {r.cantidad} x {formatCurrency(r.costo_unitario)} ={' '}
-                        <span className="font-semibold">{formatCurrency(r.cantidad * r.costo_unitario)}</span>
-                      </span>
-                    </div>
-                    <Button variant="ghost" size="icon" onClick={() => handleRemoveRepuesto(r.id)}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  Cliente
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
+                    {repairData.cliente_nombre?.charAt(0).toUpperCase() || '?'}
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{repairData.cliente_nombre || '—'}</p>
+                    <p className="text-xs text-muted-foreground">Cliente</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{repairData.cliente_telefono || '—'}</p>
+                    <p className="text-xs text-muted-foreground">Teléfono</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Dispositivo (solo lectura) */}
             <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Notas</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                className="min-h-[100px] resize-none"
-                value={formData.notas}
-                onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
-                placeholder="Notas adicionales..."
-              />
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Foto de Evidencia</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {formData.foto_evidencia ? (
-                <div className="relative">
-                  <img
-                    src={formData.foto_evidencia}
-                    alt="Evidencia"
-                    className="w-full h-40 object-cover rounded-md"
-                  />
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    className="absolute top-2 right-2 h-7 w-7"
-                    onClick={() => setFormData({ ...formData, foto_evidencia: '' })}
-                  >
-                    <X className="h-4 w-4" />
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  {getDeviceIcon(formData.categoria_dispositivo)}
+                  Dispositivo
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-0.5">Categoría</label>
+                    <p className="text-sm font-medium text-foreground">
+                      {formData.categoria_dispositivo === 'telefono' && '📱 Teléfono'}
+                      {formData.categoria_dispositivo === 'pc' && '💻 PC'}
+                      {formData.categoria_dispositivo === 'laptop' && '💻 Laptop'}
+                      {formData.categoria_dispositivo === 'consola' && '🎮 Consola'}
+                      {formData.categoria_dispositivo === 'tablet' && '📱 Tablet'}
+                      {!formData.categoria_dispositivo && '—'}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-0.5">Dispositivo</label>
+                    <p className="text-sm font-medium text-foreground">{formData.dispositivo || '—'}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-0.5">Marca</label>
+                    <p className="text-sm text-foreground">{formData.marca || '—'}</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-0.5">Modelo</label>
+                    <p className="text-sm text-foreground">{formData.modelo || '—'}</p>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-0.5">N° de Serie</label>
+                  <p className="text-sm font-mono text-foreground">{formData.numero_serie || '—'}</p>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-0.5">Condición Estética</label>
+                  <p className="text-sm text-foreground">{formData.condicion_estetica || '—'}</p>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-0.5">Accesorios</label>
+                  <p className="text-sm text-foreground">{formData.accesorios_incluidos || '—'}</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Repuestos */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Plus className="h-4 w-4 text-muted-foreground" />
+                  Repuestos
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex flex-wrap gap-2 items-end">
+                  <div className="flex-1 min-w-[140px]">
+                    <label className="block text-xs font-medium text-muted-foreground mb-0.5">Nombre</label>
+                    <Input
+                      className="h-9"
+                      value={nuevoRepuesto.nombre}
+                      onChange={e => setNuevoRepuesto({ ...nuevoRepuesto, nombre: e.target.value })}
+                      placeholder="Repuesto"
+                    />
+                  </div>
+                  <div className="w-20">
+                    <label className="block text-xs font-medium text-muted-foreground mb-0.5">Cant</label>
+                    <Input
+                      type="number"
+                      className="h-9"
+                      value={nuevoRepuesto.cantidad}
+                      onChange={e => setNuevoRepuesto({ ...nuevoRepuesto, cantidad: parseInt(e.target.value) || 0 })}
+                      min={1}
+                    />
+                  </div>
+                  <div className="w-28">
+                    <label className="block text-xs font-medium text-muted-foreground mb-0.5">Costo unit.</label>
+                    <Input
+                      type="number"
+                      className="h-9"
+                      value={nuevoRepuesto.costo_unitario}
+                      onChange={e => setNuevoRepuesto({ ...nuevoRepuesto, costo_unitario: parseFloat(e.target.value) || 0 })}
+                      min={0}
+                      step={0.01}
+                    />
+                  </div>
+                  <Button onClick={handleAddRepuesto} className="h-9 gap-1">
+                    <Plus className="h-4 w-4" /> Agregar
                   </Button>
                 </div>
-              ) : (
-                <div className="border-2 border-dashed border-border rounded-md p-6 text-center">
-                  <Camera className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground mb-2">Sube una foto del equipo</p>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoUpload}
-                    disabled={uploadingPhoto}
-                    className="hidden"
-                    id="photo-upload"
-                  />
-                  <label htmlFor="photo-upload">
-                    <Button asChild disabled={uploadingPhoto} variant="outline" size="sm">
-                      <span>
-                        <Upload className="h-4 w-4 mr-1" />
-                        {uploadingPhoto ? 'Subiendo...' : 'Subir'}
-                      </span>
+
+                {repuestos.length > 0 && (
+                  <div className="space-y-1 max-h-48 overflow-y-auto">
+                    {repuestos.map(r => (
+                      <div key={r.id} className="flex items-center justify-between p-2 bg-muted rounded-md">
+                        <div>
+                          <span className="font-medium">{r.nombre}</span>
+                          <span className="text-sm text-muted-foreground ml-2">
+                            {r.cantidad} x {formatCurrency(r.costo_unitario)} ={' '}
+                            <span className="font-semibold">{formatCurrency(r.cantidad * r.costo_unitario)}</span>
+                          </span>
+                        </div>
+                        <Button variant="ghost" size="icon" onClick={() => handleRemoveRepuesto(r.id)}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Notas */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Notas</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  className="min-h-[100px] resize-none"
+                  value={formData.notas}
+                  onChange={e => setFormData({ ...formData, notas: e.target.value })}
+                  placeholder="Notas adicionales..."
+                />
+              </CardContent>
+            </Card>
+
+            {/* Foto de evidencia */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Foto de Evidencia</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {formData.foto_evidencia ? (
+                  <div className="relative">
+                    <img src={formData.foto_evidencia} alt="Evidencia" className="w-full h-40 object-cover rounded-md" />
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2 h-7 w-7"
+                      onClick={() => setFormData({ ...formData, foto_evidencia: '' })}
+                    >
+                      <X className="h-4 w-4" />
                     </Button>
-                  </label>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                  </div>
+                ) : (
+                  <div className="border-2 border-dashed border-border rounded-md p-6 text-center">
+                    <Camera className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground mb-2">Sube una foto del equipo</p>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoUpload}
+                      disabled={uploadingPhoto}
+                      className="hidden"
+                      id="photo-upload"
+                    />
+                    <label htmlFor="photo-upload">
+                      <Button asChild disabled={uploadingPhoto} variant="outline" size="sm">
+                        <span>
+                          <Upload className="h-4 w-4 mr-1" />
+                          {uploadingPhoto ? 'Subiendo...' : 'Subir'}
+                        </span>
+                      </Button>
+                    </label>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
- 
+
           {/* Columna Derecha */}
           <div className="space-y-6">
-            {/* 4. Diagnóstico */}
+            {/* Diagnóstico */}
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-base">
@@ -671,7 +655,7 @@ export default function RepairEdit() {
                   <Textarea
                     className="min-h-[80px] resize-none"
                     value={formData.problema_reportado}
-                    onChange={(e) => setFormData({ ...formData, problema_reportado: e.target.value })}
+                    onChange={e => setFormData({ ...formData, problema_reportado: e.target.value })}
                     placeholder="Descripción del problema"
                   />
                 </div>
@@ -680,7 +664,7 @@ export default function RepairEdit() {
                   <Textarea
                     className="min-h-[60px] resize-none"
                     value={formData.diagnosis}
-                    onChange={(e) => setFormData({ ...formData, diagnosis: e.target.value })}
+                    onChange={e => setFormData({ ...formData, diagnosis: e.target.value })}
                     placeholder="Diagnóstico técnico"
                   />
                 </div>
@@ -689,73 +673,102 @@ export default function RepairEdit() {
                   <Textarea
                     className="min-h-[60px] resize-none"
                     value={formData.reparacion_realizada}
-                    onChange={(e) => setFormData({ ...formData, reparacion_realizada: e.target.value })}
+                    onChange={e => setFormData({ ...formData, reparacion_realizada: e.target.value })}
                     placeholder="Reparación ejecutada"
                   />
                 </div>
               </CardContent>
             </Card>
 
-            {/* 5. Estado y Asignación */}
-           <Card>
-  <CardHeader className="pb-2">
-    <CardTitle className="flex items-center gap-2 text-base">
-      <Clock className="h-4 w-4 text-muted-foreground" />
-      Estado y Asignación
-    </CardTitle>
-  </CardHeader>
-  <CardContent className="space-y-3">
-    <div>
-      <label className="block text-xs font-medium text-muted-foreground mb-0.5">Estado</label>
-      <select
-        value={formData.estado}
-        onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
-        className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-      >
-        <option value="diagnostic">🔍 Diagnóstico</option>
-        <option value="in_progress">⚙️ En Progreso</option>
-        <option value="waiting_parts">⏳ Esperando Repuestos</option>
-        <option value="testing">🧪 Pruebas</option>
-        <option value="completed">✅ Completado</option>
-        <option value="cancelled">❌ Cancelado</option>
-      </select>
-    </div>
-    <div>
-      <label className="block text-xs font-medium text-muted-foreground mb-0.5">Técnico</label>
-      <Input
-        className="h-9"
-        value={formData.tecnico_asignado_id}
-        onChange={(e) => setFormData({ ...formData, tecnico_asignado_id: e.target.value })}
-        placeholder="Nombre o ID del técnico"
-      />
-    </div>
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <div>
-        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Fecha Estimada</label>
-        <Input
-          type="date"
-          className="h-9"
-          value={formData.fecha_estimada_entrega}
-          onChange={(e) => setFormData({ ...formData, fecha_estimada_entrega: e.target.value })}
-        />
-      </div>
-      <div>
-        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Tiempo (min)</label>
-        <Input
-          type="number"
-          className="h-9"
-          value={formData.tiempo_estimado_minutos}
-          onChange={(e) => setFormData({ ...formData, tiempo_estimado_minutos: parseInt(e.target.value) || 0 })}
-          placeholder="Minutos"
-          min={0}
-          step={5}
-        />
-      </div>
-    </div>
-  </CardContent>
-</Card>
-   
-            {/* 6. Costos y Pago */}
+            {/* Estado y Asignación */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  Estado y Asignación
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-0.5">Estado</label>
+                  <div className="relative" ref={estadoRef}>
+                    <button
+                      type="button"
+                      onClick={() => setIsEstadoOpen(!isEstadoOpen)}
+                      className="w-full h-9 flex items-center justify-between rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      <span className="flex items-center gap-2">
+                        <CurrentIcon className="h-4 w-4 text-muted-foreground" />
+                        {estadoOptions.find(o => o.value === formData.estado)?.label || 'Seleccionar'}
+                      </span>
+                      <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${isEstadoOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {isEstadoOpen && (
+                      <div className="absolute z-50 mt-1 w-full rounded-md border border-border bg-popover shadow-lg overflow-hidden">
+                        {estadoOptions.map(option => {
+                          const Icon = option.icon;
+                          return (
+                            <button
+                              key={option.value}
+                              type="button"
+                              onClick={() => {
+                                setFormData({ ...formData, estado: option.value });
+                                setIsEstadoOpen(false);
+                              }}
+                              className={`w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-muted ${
+                                formData.estado === option.value ? 'bg-muted/50 font-medium' : ''
+                              }`}
+                            >
+                              <Icon className="h-4 w-4 text-muted-foreground" />
+                              {option.label}
+                              {formData.estado === option.value && (
+                                <CheckCircle className="h-4 w-4 text-primary ml-auto" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-0.5">Técnico</label>
+                  <Input
+                    className="h-9"
+                    value={formData.tecnico_asignado_id}
+                    onChange={e => setFormData({ ...formData, tecnico_asignado_id: e.target.value })}
+                    placeholder="Nombre o ID del técnico"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-0.5">Fecha Estimada</label>
+                    <Input
+                      type="date"
+                      className="h-9"
+                      value={formData.fecha_estimada_entrega}
+                      onChange={e => setFormData({ ...formData, fecha_estimada_entrega: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-0.5">Tiempo (min)</label>
+                    <Input
+                      type="number"
+                      className="h-9"
+                      value={formData.tiempo_estimado_minutos}
+                      onChange={e => setFormData({ ...formData, tiempo_estimado_minutos: parseInt(e.target.value) || 0 })}
+                      placeholder="Minutos"
+                      min={0}
+                      step={5}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Costos y Pago */}
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-base">
@@ -771,9 +784,7 @@ export default function RepairEdit() {
                       type="number"
                       className="h-9"
                       value={formData.costo_mano_obra}
-                      onChange={(e) =>
-                        setFormData({ ...formData, costo_mano_obra: parseFloat(e.target.value) || 0 })
-                      }
+                      onChange={e => setFormData({ ...formData, costo_mano_obra: parseFloat(e.target.value) || 0 })}
                       min={0}
                       step={0.01}
                     />
@@ -784,9 +795,7 @@ export default function RepairEdit() {
                       type="number"
                       className="h-9"
                       value={formData.total_reparacion}
-                      onChange={(e) =>
-                        setFormData({ ...formData, total_reparacion: parseFloat(e.target.value) || 0 })
-                      }
+                      onChange={e => setFormData({ ...formData, total_reparacion: parseFloat(e.target.value) || 0 })}
                       min={0}
                       step={0.01}
                     />
@@ -803,7 +812,7 @@ export default function RepairEdit() {
                       type="checkbox"
                       id="pagado"
                       checked={formData.pagado}
-                      onChange={(e) => {
+                      onChange={e => {
                         const isPaid = e.target.checked;
                         setFormData({
                           ...formData,
@@ -822,7 +831,7 @@ export default function RepairEdit() {
                     <label className="block text-xs font-medium text-muted-foreground mb-0.5">Método de Pago</label>
                     <Select
                       value={formData.metodo_pago}
-                      onValueChange={(v) => setFormData({ ...formData, metodo_pago: v })}
+                      onValueChange={v => setFormData({ ...formData, metodo_pago: v })}
                     >
                       <SelectTrigger className="h-9">
                         <SelectValue placeholder="Seleccionar" />
@@ -846,7 +855,7 @@ export default function RepairEdit() {
                         max={formData.total_reparacion || 0}
                         step={0.01}
                         value={formData.monto_pagado ?? 0}
-                        onChange={(e) => {
+                        onChange={e => {
                           const value = parseFloat(e.target.value) || 0;
                           setFormData({
                             ...formData,
@@ -874,16 +883,27 @@ export default function RepairEdit() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Hardware Check */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Chequeo de Hardware (JSON)</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  className="min-h-[80px] font-mono text-sm resize-none"
+                  value={formData.chequeo_hardware}
+                  onChange={e => setFormData({ ...formData, chequeo_hardware: e.target.value })}
+                  placeholder={`{\n  "pantalla": true,\n  "bateria": false\n}`}
+                />
+              </CardContent>
+            </Card>
           </div>
         </div>
 
-    
-
-        {/* Botón de acción fijo (opcional) */}
+        {/* Botones de acción */}
         <div className="flex justify-end gap-3 pt-2 border-t border-border">
-          <Button variant="outline" onClick={() => navigate('/reparaciones/list')}>
-            Cancelar
-          </Button>
+          <Button variant="outline" onClick={() => navigate('/reparaciones/list')}>Cancelar</Button>
           <Button onClick={handleSave} disabled={saving} className="gap-2">
             <Save className="h-4 w-4" />
             {saving ? 'Guardando...' : 'Guardar Cambios'}
