@@ -56,6 +56,20 @@ export default function RepairEdit() {
     foto_evidencia: '',
     tecnico_asignado_id: '',
     fecha_estimada_entrega: '',
+    categoria_dispositivo: '',
+    marca: '',
+    modelo: '',
+    numero_serie: '',
+    condicion_estetica: '',
+    accesorios_incluidos: '',
+    tiempo_estimado_minutos: 0,
+    pagado: false,
+    metodo_pago_id: '',
+    tipo_seguridad: 'none',
+    pin_acceso: '',
+    patron_puntos: '',
+    secuencia_patron: '',
+    chequeo_hardware: '',
   });
   const [repuestos, setRepuestos] = useState<RepairPart[]>([]);
   const [nuevoRepuesto, setNuevoRepuesto] = useState({
@@ -90,6 +104,20 @@ export default function RepairEdit() {
         foto_evidencia: orderData.foto_evidencia || '',
         tecnico_asignado_id: orderData.tecnico_asignado_id || '',
         fecha_estimada_entrega: orderData.fecha_estimada_entrega || '',
+        categoria_dispositivo: orderData.categoria_dispositivo || '',
+        marca: orderData.marca || '',
+        modelo: orderData.modelo || '',
+        numero_serie: orderData.numero_serie || '',
+        condicion_estetica: orderData.condicion_estetica || '',
+        accesorios_incluidos: Array.isArray(orderData.accesorios_incluidos) ? orderData.accesorios_incluidos.join(', ') : orderData.accesorios_incluidos || '',
+        tiempo_estimado_minutos: orderData.tiempo_estimado_minutos || 0,
+        pagado: orderData.pagado || false,
+        metodo_pago_id: orderData.metodo_pago_id || '',
+        tipo_seguridad: orderData.tipo_seguridad || 'none',
+        pin_acceso: orderData.pin_acceso || '',
+        patron_puntos: Array.isArray(orderData.patron_puntos) ? orderData.patron_puntos.join(', ') : orderData.patron_puntos || '',
+        secuencia_patron: Array.isArray(orderData.secuencia_patron) ? orderData.secuencia_patron.join(', ') : orderData.secuencia_patron || '',
+        chequeo_hardware: typeof orderData.chequeo_hardware === 'object' ? JSON.stringify(orderData.chequeo_hardware, null, 2) : orderData.chequeo_hardware || '',
       });
       setRepuestos(orderData.repuestos || []);
     } catch (error: any) {
@@ -151,6 +179,34 @@ export default function RepairEdit() {
       if (formData.tecnico_asignado_id) payload.tecnico_asignado_id = formData.tecnico_asignado_id;
       if (formData.fecha_estimada_entrega) payload.fecha_estimada_entrega = formData.fecha_estimada_entrega;
       if (repuestos.length > 0) payload.repuestos = repuestos;
+      
+      // Campos de Dispositivo
+      if (formData.categoria_dispositivo) payload.categoria_dispositivo = formData.categoria_dispositivo;
+      if (formData.marca) payload.marca = formData.marca;
+      if (formData.modelo) payload.modelo = formData.modelo;
+      if (formData.numero_serie) payload.numero_serie = formData.numero_serie;
+      if (formData.condicion_estetica) payload.condicion_estetica = formData.condicion_estetica;
+      if (formData.accesorios_incluidos) payload.accesorios_incluidos = formData.accesorios_incluidos.split(',').map(s => s.trim()).filter(s => s);
+      if (formData.tiempo_estimado_minutos > 0) payload.tiempo_estimado_minutos = formData.tiempo_estimado_minutos;
+      
+      // Campos de Pago
+      payload.pagado = formData.pagado;
+      if (formData.metodo_pago_id) payload.metodo_pago_id = formData.metodo_pago_id;
+      
+      // Campos de Seguridad
+      if (formData.tipo_seguridad && formData.tipo_seguridad !== 'none') payload.tipo_seguridad = formData.tipo_seguridad;
+      if (formData.pin_acceso) payload.pin_acceso = formData.pin_acceso;
+      if (formData.patron_puntos) payload.patron_puntos = formData.patron_puntos.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+      if (formData.secuencia_patron) payload.secuencia_patron = formData.secuencia_patron.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+      
+      // Campo de Hardware
+      if (formData.chequeo_hardware) {
+        try {
+          payload.chequeo_hardware = JSON.parse(formData.chequeo_hardware);
+        } catch (e) {
+          console.error('Error parsing chequeo_hardware:', e);
+        }
+      }
 
       console.log('Payload enviado:', payload);
       
@@ -489,6 +545,83 @@ export default function RepairEdit() {
           </CardContent>
         </Card>
 
+        {/* Dispositivo */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Información del Dispositivo</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-1">Categoría</label>
+                <Select value={formData.categoria_dispositivo} onValueChange={(value) => setFormData({ ...formData, categoria_dispositivo: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar categoría" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="phone">Teléfono</SelectItem>
+                    <SelectItem value="laptop">Laptop</SelectItem>
+                    <SelectItem value="tablet">Tablet</SelectItem>
+                    <SelectItem value="watch">Reloj</SelectItem>
+                    <SelectItem value="console">Consola</SelectItem>
+                    <SelectItem value="other">Otro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-1">Marca</label>
+                <Input
+                  value={formData.marca}
+                  onChange={(e) => setFormData({ ...formData, marca: e.target.value })}
+                  placeholder="Marca del dispositivo"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-1">Modelo</label>
+                <Input
+                  value={formData.modelo}
+                  onChange={(e) => setFormData({ ...formData, modelo: e.target.value })}
+                  placeholder="Modelo específico"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-muted-foreground mb-1">Número de Serie / IMEI</label>
+                <Input
+                  value={formData.numero_serie}
+                  onChange={(e) => setFormData({ ...formData, numero_serie: e.target.value })}
+                  placeholder="Número de serie o IMEI"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Condición Estética</label>
+              <Input
+                value={formData.condicion_estetica}
+                onChange={(e) => setFormData({ ...formData, condicion_estetica: e.target.value })}
+                placeholder="Bueno, Regular, Dañado, etc."
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Accesorios Incluidos</label>
+              <Input
+                value={formData.accesorios_incluidos}
+                onChange={(e) => setFormData({ ...formData, accesorios_incluidos: e.target.value })}
+                placeholder="Cargador, cables, caja, etc. (separados por comas)"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Tiempo Estimado (minutos)</label>
+              <Input
+                type="number"
+                value={formData.tiempo_estimado_minutos}
+                onChange={(e) => setFormData({ ...formData, tiempo_estimado_minutos: parseInt(e.target.value) || 0 })}
+                placeholder="Tiempo estimado en minutos"
+                min={0}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Foto de Evidencia */}
         <Card>
           <CardHeader>
@@ -553,6 +686,103 @@ export default function RepairEdit() {
               onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
               rows={3}
               placeholder="Notas adicionales..."
+            />
+          </CardContent>
+        </Card>
+
+        {/* Pago */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Información de Pago</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="pagado"
+                checked={formData.pagado}
+                onChange={(e) => setFormData({ ...formData, pagado: e.target.checked })}
+                className="h-4 w-4"
+              />
+              <label htmlFor="pagado" className="text-sm font-medium text-foreground">
+                Pagado
+              </label>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">ID del Método de Pago</label>
+              <Input
+                value={formData.metodo_pago_id}
+                onChange={(e) => setFormData({ ...formData, metodo_pago_id: e.target.value })}
+                placeholder="UUID del método de pago"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Seguridad */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Información de Seguridad</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Tipo de Seguridad</label>
+              <Select value={formData.tipo_seguridad} onValueChange={(value) => setFormData({ ...formData, tipo_seguridad: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar tipo de seguridad" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Ninguna</SelectItem>
+                  <SelectItem value="pin">PIN</SelectItem>
+                  <SelectItem value="pattern">Patrón</SelectItem>
+                  <SelectItem value="fingerprint">Huella Digital</SelectItem>
+                  <SelectItem value="face">Reconocimiento Facial</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">PIN de Acceso</label>
+              <Input
+                type="password"
+                value={formData.pin_acceso}
+                onChange={(e) => setFormData({ ...formData, pin_acceso: e.target.value })}
+                placeholder="PIN del dispositivo"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Puntos del Patrón (separados por comas)</label>
+              <Input
+                value={formData.patron_puntos}
+                onChange={(e) => setFormData({ ...formData, patron_puntos: e.target.value })}
+                placeholder="Ej: 1,2,3,4,5"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1">Secuencia del Patrón (separados por comas)</label>
+              <Input
+                value={formData.secuencia_patron}
+                onChange={(e) => setFormData({ ...formData, secuencia_patron: e.target.value })}
+                placeholder="Ej: 1,2,3,4,5"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Hardware */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Chequeo de Hardware</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Ingresa el estado de los componentes del dispositivo en formato JSON.
+            </p>
+            <Textarea
+              value={formData.chequeo_hardware}
+              onChange={(e) => setFormData({ ...formData, chequeo_hardware: e.target.value })}
+              rows={8}
+              placeholder='Ej: { "pantalla": "dañada", "bateria": "80%", "audio": "funcional", "cargador": "no funciona" }'
+              className="font-mono text-sm"
             />
           </CardContent>
         </Card>
