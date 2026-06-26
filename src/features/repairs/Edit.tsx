@@ -472,7 +472,61 @@ export default function RepairEdit() {
       </div>
     </div>
   </CardContent>
-  <Card>
+  
+</Card>
+
+{/* 2. Dispositivo - SOLO LECTURA */}
+<Card>
+  <CardHeader className="pb-2">
+    <CardTitle className="flex items-center gap-2 text-base">
+      {getDeviceIcon(formData.categoria_dispositivo)}
+      Dispositivo
+    </CardTitle>
+  </CardHeader>
+  <CardContent className="space-y-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div>
+        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Categoría</label>
+        <p className="text-sm font-medium text-foreground">
+          {formData.categoria_dispositivo === 'telefono' && '📱 Teléfono'}
+          {formData.categoria_dispositivo === 'pc' && '💻 PC'}
+          {formData.categoria_dispositivo === 'laptop' && '💻 Laptop'}
+          {formData.categoria_dispositivo === 'consola' && '🎮 Consola'}
+          {formData.categoria_dispositivo === 'tablet' && '📱 Tablet'}
+          {!formData.categoria_dispositivo && '—'}
+        </p>
+      </div>
+      <div>
+        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Dispositivo</label>
+        <p className="text-sm font-medium text-foreground">{formData.dispositivo || '—'}</p>
+      </div>
+    </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div>
+        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Marca</label>
+        <p className="text-sm text-foreground">{formData.marca || '—'}</p>
+      </div>
+      <div>
+        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Modelo</label>
+        <p className="text-sm text-foreground">{formData.modelo || '—'}</p>
+      </div>
+    </div>
+    <div>
+      <label className="block text-xs font-medium text-muted-foreground mb-0.5">N° de Serie</label>
+      <p className="text-sm font-mono text-foreground">{formData.numero_serie || '—'}</p>
+    </div>
+    <div>
+      <label className="block text-xs font-medium text-muted-foreground mb-0.5">Condición Estética</label>
+      <p className="text-sm text-foreground">{formData.condicion_estetica || '—'}</p>
+    </div>
+    <div>
+      <label className="block text-xs font-medium text-muted-foreground mb-0.5">Accesorios</label>
+      <p className="text-sm text-foreground">{formData.accesorios_incluidos || '—'}</p>
+    </div>
+  </CardContent>
+</Card>      
+
+<Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-base">
               <Plus className="h-4 w-4 text-muted-foreground" />
@@ -541,58 +595,6 @@ export default function RepairEdit() {
             )}
           </CardContent>
         </Card>
-</Card>
-
-{/* 2. Dispositivo - SOLO LECTURA */}
-<Card>
-  <CardHeader className="pb-2">
-    <CardTitle className="flex items-center gap-2 text-base">
-      {getDeviceIcon(formData.categoria_dispositivo)}
-      Dispositivo
-    </CardTitle>
-  </CardHeader>
-  <CardContent className="space-y-3">
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <div>
-        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Categoría</label>
-        <p className="text-sm font-medium text-foreground">
-          {formData.categoria_dispositivo === 'telefono' && '📱 Teléfono'}
-          {formData.categoria_dispositivo === 'pc' && '💻 PC'}
-          {formData.categoria_dispositivo === 'laptop' && '💻 Laptop'}
-          {formData.categoria_dispositivo === 'consola' && '🎮 Consola'}
-          {formData.categoria_dispositivo === 'tablet' && '📱 Tablet'}
-          {!formData.categoria_dispositivo && '—'}
-        </p>
-      </div>
-      <div>
-        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Dispositivo</label>
-        <p className="text-sm font-medium text-foreground">{formData.dispositivo || '—'}</p>
-      </div>
-    </div>
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <div>
-        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Marca</label>
-        <p className="text-sm text-foreground">{formData.marca || '—'}</p>
-      </div>
-      <div>
-        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Modelo</label>
-        <p className="text-sm text-foreground">{formData.modelo || '—'}</p>
-      </div>
-    </div>
-    <div>
-      <label className="block text-xs font-medium text-muted-foreground mb-0.5">N° de Serie</label>
-      <p className="text-sm font-mono text-foreground">{formData.numero_serie || '—'}</p>
-    </div>
-    <div>
-      <label className="block text-xs font-medium text-muted-foreground mb-0.5">Condición Estética</label>
-      <p className="text-sm text-foreground">{formData.condicion_estetica || '—'}</p>
-    </div>
-    <div>
-      <label className="block text-xs font-medium text-muted-foreground mb-0.5">Accesorios</label>
-      <p className="text-sm text-foreground">{formData.accesorios_incluidos || '—'}</p>
-    </div>
-  </CardContent>
-</Card>          
             
           </div>
 
