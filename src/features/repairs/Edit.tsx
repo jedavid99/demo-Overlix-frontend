@@ -892,21 +892,8 @@ export default function RepairEdit() {
                 </div>
               </CardContent>
             </Card>
-
             {/* Hardware Check */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">Chequeo de Hardware (JSON)</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Textarea
-                  className="min-h-[80px] font-mono text-sm resize-none"
-                  value={formData.chequeo_hardware}
-                  onChange={e => setFormData({ ...formData, chequeo_hardware: e.target.value })}
-                  placeholder={`{\n  "pantalla": true,\n  "bateria": false\n}`}
-                />
-              </CardContent>
-            </Card>
+         
           </div>
         </div>
 
