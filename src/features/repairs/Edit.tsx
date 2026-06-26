@@ -595,7 +595,19 @@ export default function RepairEdit() {
             )}
           </CardContent>
         </Card>
-            
+            <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Notas</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Textarea
+                className="min-h-[100px] resize-none"
+                value={formData.notas}
+                onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
+                placeholder="Notas adicionales..."
+              />
+            </CardContent>
+          </Card>
           </div>
 
           {/* Columna Derecha */}
@@ -638,69 +650,6 @@ export default function RepairEdit() {
                 </div>
               </CardContent>
             </Card>
-
-
- <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Notas</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Textarea
-                className="min-h-[100px] resize-none"
-                value={formData.notas}
-                onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
-                placeholder="Notas adicionales..."
-              />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Foto de Evidencia</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {formData.foto_evidencia ? (
-                <div className="relative">
-                  <img
-                    src={formData.foto_evidencia}
-                    alt="Evidencia"
-                    className="w-full h-40 object-cover rounded-md"
-                  />
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    className="absolute top-2 right-2 h-7 w-7"
-                    onClick={() => setFormData({ ...formData, foto_evidencia: '' })}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              ) : (
-                <div className="border-2 border-dashed border-border rounded-md p-6 text-center">
-                  <Camera className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground mb-2">Sube una foto del equipo</p>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoUpload}
-                    disabled={uploadingPhoto}
-                    className="hidden"
-                    id="photo-upload"
-                  />
-                  <label htmlFor="photo-upload">
-                    <Button asChild disabled={uploadingPhoto} variant="outline" size="sm">
-                      <span>
-                        <Upload className="h-4 w-4 mr-1" />
-                        {uploadingPhoto ? 'Subiendo...' : 'Subir'}
-                      </span>
-                    </Button>
-                  </label>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
 
             {/* 5. Estado y Asignación */}
             <Card>
@@ -869,7 +818,56 @@ export default function RepairEdit() {
      
 
         {/* Sección a ancho completo: Notas y Evidencia */}
-       
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">Foto de Evidencia</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {formData.foto_evidencia ? (
+                <div className="relative">
+                  <img
+                    src={formData.foto_evidencia}
+                    alt="Evidencia"
+                    className="w-full h-40 object-cover rounded-md"
+                  />
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-2 right-2 h-7 w-7"
+                    onClick={() => setFormData({ ...formData, foto_evidencia: '' })}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-border rounded-md p-6 text-center">
+                  <Camera className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground mb-2">Sube una foto del equipo</p>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoUpload}
+                    disabled={uploadingPhoto}
+                    className="hidden"
+                    id="photo-upload"
+                  />
+                  <label htmlFor="photo-upload">
+                    <Button asChild disabled={uploadingPhoto} variant="outline" size="sm">
+                      <span>
+                        <Upload className="h-4 w-4 mr-1" />
+                        {uploadingPhoto ? 'Subiendo...' : 'Subir'}
+                      </span>
+                    </Button>
+                  </label>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
        
 
         {/* Botón de acción fijo (opcional) */}
