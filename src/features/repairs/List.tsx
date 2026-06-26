@@ -476,7 +476,7 @@ export default function RepairsList() {
                             DNI: {repair.dni || '—'}
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-sm text-muted-foreground">
+                        <td className="px-4 py-3 text-sm text-foreground font-medium">
                           <div> {repair.modelo || '—'}</div>
                          <div className="text-xs text-muted-foreground">{repair.marca || '—'}</div> 
                         </td>
