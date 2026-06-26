@@ -477,8 +477,8 @@ export default function RepairsList() {
                           </div>
                         </td>
                         <td className="px-4 py-3 text-sm text-muted-foreground">
-                          {repair.modelo || '—'}
-                          {repair.marca || '—'}
+                          <div> {repair.modelo || '—'}</div>
+                         <div className="text-xs text-muted-foreground">{repair.marca || '—'}</div> 
                         </td>
                         <td className="px-4 py-3 text-sm text-muted-foreground">
                           {repair.categoria_dispositivo || 'Sin categoría'}
