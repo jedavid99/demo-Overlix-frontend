@@ -470,6 +470,7 @@ export default function RepairsList() {
                         </td>
                         <td className="px-4 py-3 text-sm text-foreground font-medium">
                           {repair.cliente_nombre || '—'}
+                          {repair.dni|| '—'}
                         </td>
                         <td className="px-4 py-3 text-sm text-muted-foreground">
                           {repair.dispositivo || '—'}
