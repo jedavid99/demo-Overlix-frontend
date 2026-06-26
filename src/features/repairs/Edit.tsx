@@ -20,6 +20,7 @@ import {
   CheckCircle,
   Search,
   ChevronDown,
+  XCircle,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
