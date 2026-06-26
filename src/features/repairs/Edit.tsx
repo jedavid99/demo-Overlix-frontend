@@ -70,7 +70,14 @@ export default function RepairEdit() {
     patron_puntos: '',
     secuencia_patron: '',
     chequeo_hardware: '',
+    metodo_pago: '',   
+  
   });
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(amount);
+};
+
+
   const [repuestos, setRepuestos] = useState<RepairPart[]>([]);
   const [nuevoRepuesto, setNuevoRepuesto] = useState({
     nombre: '',
@@ -118,6 +125,8 @@ export default function RepairEdit() {
         patron_puntos: Array.isArray(orderData.patron_puntos) ? orderData.patron_puntos.join(', ') : orderData.patron_puntos || '',
         secuencia_patron: Array.isArray(orderData.secuencia_patron) ? orderData.secuencia_patron.join(', ') : orderData.secuencia_patron || '',
         chequeo_hardware: typeof orderData.chequeo_hardware === 'object' ? JSON.stringify(orderData.chequeo_hardware, null, 2) : orderData.chequeo_hardware || '',
+       
+        metodo_pago: orderData.metodo_pago || '',
       });
       setRepuestos(orderData.repuestos || []);
     } catch (error: any) {
@@ -600,32 +609,95 @@ export default function RepairEdit() {
 
         {/* Pago */}
         <Card>
-          <CardHeader>
-            <CardTitle>Información de Pago</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                id="pagado"
-                checked={formData.pagado}
-                onChange={(e) => setFormData({ ...formData, pagado: e.target.checked })}
-                className="h-4 w-4"
-              />
-              <label htmlFor="pagado" className="text-sm font-medium text-foreground">
-                Pagado
-              </label>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1">ID del Método de Pago</label>
-              <Input
-                value={formData.metodo_pago_id}
-                onChange={(e) => setFormData({ ...formData, metodo_pago_id: e.target.value })}
-                placeholder="UUID del método de pago"
-              />
-            </div>
-          </CardContent>
-        </Card>
+  <CardHeader>
+    <CardTitle>Información de Pago</CardTitle>
+  </CardHeader>
+  <CardContent className="space-y-4">
+    {/* Pagado completo */}
+    <div className="flex items-center gap-3">
+      <input
+        type="checkbox"
+        id="pagado"
+        checked={formData.pagado}
+        onChange={(e) => {
+          const isPaid = e.target.checked;
+          setFormData({
+            ...formData,
+            pagado: isPaid,
+            // Si se marca como pagado, el monto_pagado = total_reparacion
+            monto_pagado: isPaid ? formData.total_reparacion : 0,
+          });
+        }}
+        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+      />
+      <label htmlFor="pagado" className="text-sm font-medium text-foreground">
+        {formData.pagado ? '✅ Pagado completo' : '❌ Pendiente de pago'}
+      </label>
+    </div>
+
+    {/* Método de Pago (select) */}
+    <div>
+      <label htmlFor="metodo_pago" className="block text-sm font-medium text-muted-foreground mb-1">
+        Método de Pago
+      </label>
+      <select
+        id="metodo_pago"
+        value={formData.metodo_pago || ''}
+        onChange={(e) => setFormData({ ...formData, metodo_pago: e.target.value })}
+        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <option value="">Seleccionar método</option>
+        <option value="efectivo">Efectivo</option>
+        <option value="transferencia">Transferencia Bancaria</option>
+        <option value="tarjeta">Tarjeta de Crédito</option>
+        <option value="cuotas">Cuotas</option>
+      </select>
+    </div>
+
+    {/* Si no está pagado, mostrar campos de monto y saldo */}
+    {!formData.pagado && (
+      <>
+        <div>
+          <label htmlFor="monto_pagado" className="block text-sm font-medium text-muted-foreground mb-1">
+            Monto Pagado
+          </label>
+          <Input
+            id="monto_pagado"
+            type="number"
+            min={0}
+            max={formData.total_reparacion || 0}
+            step={0.01}
+            value={formData.monto_pagado ?? 0}
+            onChange={(e) => {
+              const value = parseFloat(e.target.value) || 0;
+              setFormData({
+                ...formData,
+                monto_pagado: Math.min(value, formData.total_reparacion || 0),
+              });
+            }}
+            placeholder="0.00"
+          />
+        </div>
+        <div className="flex items-center justify-between rounded-md bg-muted/50 p-3">
+          <span className="text-sm font-medium text-muted-foreground">Saldo Restante</span>
+          <span className="text-sm font-bold text-destructive">
+            {formatCurrency((formData.total_reparacion || 0) - (formData.monto_pagado || 0))}
+          </span>
+        </div>
+      </>
+    )}
+
+    {/* Si está pagado, mostrar el total pagado */}
+    {formData.pagado && (
+      <div className="flex items-center justify-between rounded-md bg-green-50 p-3 border border-green-200">
+        <span className="text-sm font-medium text-green-700">Total Pagado</span>
+        <span className="text-sm font-bold text-green-700">
+          {formatCurrency(formData.total_reparacion || 0)}
+        </span>
+      </div>
+    )}
+  </CardContent>
+</Card>
 
 
      
