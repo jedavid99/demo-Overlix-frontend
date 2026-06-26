@@ -448,115 +448,82 @@ export default function RepairEdit() {
           <div className="space-y-6">
             {/* 1. Cliente */}
             <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <User className="h-4 w-4 text-muted-foreground" />
-                  Cliente
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-0.5">Nombre</label>
-                  <p className="text-sm font-medium">{repairData.cliente_nombre || '—'}</p>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-0.5">Teléfono</label>
-                  <p className="text-sm flex items-center gap-1">
-                    <Phone className="h-3 w-3 text-muted-foreground" />
-                    {repairData.cliente_telefono || '—'}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+  <CardHeader className="pb-2">
+    <CardTitle className="flex items-center gap-2 text-base">
+      <User className="h-4 w-4 text-muted-foreground" />
+      Cliente
+    </CardTitle>
+  </CardHeader>
+  <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div className="flex items-center gap-2">
+      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
+        {repairData.cliente_nombre?.charAt(0).toUpperCase() || '?'}
+      </div>
+      <div>
+        <p className="text-sm font-medium text-foreground">{repairData.cliente_nombre || '—'}</p>
+        <p className="text-xs text-muted-foreground">Cliente</p>
+      </div>
+    </div>
+    <div className="flex items-center gap-2">
+      <Phone className="h-4 w-4 text-muted-foreground" />
+      <div>
+        <p className="text-sm font-medium text-foreground">{repairData.cliente_telefono || '—'}</p>
+        <p className="text-xs text-muted-foreground">Teléfono</p>
+      </div>
+    </div>
+  </CardContent>
+</Card>
 
-            {/* 2. Dispositivo */}
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  {getDeviceIcon(formData.categoria_dispositivo)}
-                  Dispositivo
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-medium text-muted-foreground mb-0.5">Categoría</label>
-                    <Select
-                      value={formData.categoria_dispositivo}
-                      onValueChange={(v) => setFormData({ ...formData, categoria_dispositivo: v })}
-                    >
-                      <SelectTrigger className="h-9">
-                        <SelectValue placeholder="Seleccionar" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="telefono">📱 Teléfono</SelectItem>
-                        <SelectItem value="pc">💻 PC</SelectItem>
-                        <SelectItem value="laptop">💻 Laptop</SelectItem>
-                        <SelectItem value="consola">🎮 Consola</SelectItem>
-                        <SelectItem value="tablet">📱 Tablet</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-muted-foreground mb-0.5">Dispositivo *</label>
-                    <Input
-                      className="h-9"
-                      value={formData.dispositivo}
-                      onChange={(e) => setFormData({ ...formData, dispositivo: e.target.value })}
-                      placeholder="Ej: iPhone 13"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-medium text-muted-foreground mb-0.5">Marca</label>
-                    <Input
-                      className="h-9"
-                      value={formData.marca}
-                      onChange={(e) => setFormData({ ...formData, marca: e.target.value })}
-                      placeholder="Ej: Apple"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-muted-foreground mb-0.5">Modelo</label>
-                    <Input
-                      className="h-9"
-                      value={formData.modelo}
-                      onChange={(e) => setFormData({ ...formData, modelo: e.target.value })}
-                      placeholder="Ej: A2845"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-0.5">N° de Serie</label>
-                  <Input
-                    className="h-9"
-                    value={formData.numero_serie}
-                    onChange={(e) => setFormData({ ...formData, numero_serie: e.target.value })}
-                    placeholder="Número de serie"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-0.5">Condición Estética</label>
-                  <Textarea
-                    className="min-h-[60px] resize-none"
-                    value={formData.condicion_estetica}
-                    onChange={(e) => setFormData({ ...formData, condicion_estetica: e.target.value })}
-                    placeholder="Rayones, golpes, estado general"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-0.5">Accesorios</label>
-                  <Input
-                    className="h-9"
-                    value={formData.accesorios_incluidos}
-                    onChange={(e) => setFormData({ ...formData, accesorios_incluidos: e.target.value })}
-                    placeholder="Cargador, funda (separados por comas)"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
+{/* 2. Dispositivo - SOLO LECTURA */}
+<Card>
+  <CardHeader className="pb-2">
+    <CardTitle className="flex items-center gap-2 text-base">
+      {getDeviceIcon(formData.categoria_dispositivo)}
+      Dispositivo
+    </CardTitle>
+  </CardHeader>
+  <CardContent className="space-y-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div>
+        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Categoría</label>
+        <p className="text-sm font-medium text-foreground">
+          {formData.categoria_dispositivo === 'telefono' && '📱 Teléfono'}
+          {formData.categoria_dispositivo === 'pc' && '💻 PC'}
+          {formData.categoria_dispositivo === 'laptop' && '💻 Laptop'}
+          {formData.categoria_dispositivo === 'consola' && '🎮 Consola'}
+          {formData.categoria_dispositivo === 'tablet' && '📱 Tablet'}
+          {!formData.categoria_dispositivo && '—'}
+        </p>
+      </div>
+      <div>
+        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Dispositivo</label>
+        <p className="text-sm font-medium text-foreground">{formData.dispositivo || '—'}</p>
+      </div>
+    </div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div>
+        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Marca</label>
+        <p className="text-sm text-foreground">{formData.marca || '—'}</p>
+      </div>
+      <div>
+        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Modelo</label>
+        <p className="text-sm text-foreground">{formData.modelo || '—'}</p>
+      </div>
+    </div>
+    <div>
+      <label className="block text-xs font-medium text-muted-foreground mb-0.5">N° de Serie</label>
+      <p className="text-sm font-mono text-foreground">{formData.numero_serie || '—'}</p>
+    </div>
+    <div>
+      <label className="block text-xs font-medium text-muted-foreground mb-0.5">Condición Estética</label>
+      <p className="text-sm text-foreground">{formData.condicion_estetica || '—'}</p>
+    </div>
+    <div>
+      <label className="block text-xs font-medium text-muted-foreground mb-0.5">Accesorios</label>
+      <p className="text-sm text-foreground">{formData.accesorios_incluidos || '—'}</p>
+    </div>
+  </CardContent>
+</Card>          
             
           </div>
 
