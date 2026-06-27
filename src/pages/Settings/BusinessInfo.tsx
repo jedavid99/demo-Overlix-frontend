@@ -9,88 +9,59 @@ export const BusinessInfo = () => {
   const { updateBusinessInfo, updateLogo, loading: mutationLoading, error: mutationError } = useBusinessInfoMutations();
 
   const [formData, setFormData] = useState<BusinessInfoUpdate>({
-    nombre_empresa: '',
-    razon_social: '',
-    cuit: '',
+    nombre_negocio: '',
+    propietario_nombre: '',
     email: '',
     telefono: '',
     direccion: '',
     ciudad: '',
     provincia: '',
     codigo_postal: '',
-    pais: '',
     sitio_web: '',
     descripcion: '',
-    horario_atencion: '',
-    redes_sociales: {
-      facebook: '',
-      instagram: '',
-      twitter: '',
-      linkedin: ''
-    },
-    configuracion_facturacion: {
-      iva_responsable: '',
-      condicion_iva: '',
-      punto_venta: 1
-    },
-    moneda: 'ARS',
-    idioma: 'es'
+    horarios: {
+      lunes: '09:00-18:00',
+      martes: '09:00-18:00',
+      miercoles: '09:00-18:00',
+      jueves: '09:00-18:00',
+      viernes: '09:00-18:00',
+      sabado: '09:00-13:00',
+      domingo: 'Cerrado'
+    }
   });
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoUrl, setLogoUrl] = useState<string>('');
 
   useEffect(() => {
     if (businessInfo) {
       setFormData({
-        nombre_empresa: businessInfo.nombre_empresa,
-        razon_social: businessInfo.razon_social || '',
-        cuit: businessInfo.cuit || '',
+        nombre_negocio: businessInfo.nombre_negocio,
+        propietario_nombre: businessInfo.propietario_nombre,
         email: businessInfo.email,
         telefono: businessInfo.telefono,
         direccion: businessInfo.direccion,
         ciudad: businessInfo.ciudad,
         provincia: businessInfo.provincia,
-        codigo_postal: businessInfo.codigo_postal || '',
-        pais: businessInfo.pais || '',
-        sitio_web: businessInfo.sitio_web || '',
-        descripcion: businessInfo.descripcion || '',
-        horario_atencion: businessInfo.horario_atencion || '',
-        redes_sociales: businessInfo.redes_sociales || {
-          facebook: '',
-          instagram: '',
-          twitter: '',
-          linkedin: ''
-        },
-        configuracion_facturacion: businessInfo.configuracion_facturacion || {
-          iva_responsable: '',
-          condicion_iva: '',
-          punto_venta: 1
-        },
-        moneda: businessInfo.moneda || 'ARS',
-        idioma: businessInfo.idioma || 'es'
+        codigo_postal: businessInfo.codigo_postal,
+        sitio_web: businessInfo.sitio_web,
+        descripcion: businessInfo.descripcion,
+        horarios: businessInfo.horarios
       });
+      setLogoUrl(businessInfo.logo_url || '');
     }
   }, [businessInfo]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    
-    if (name.startsWith('redes_sociales.')) {
-      const socialField = name.split('.')[1];
+
+    if (name.startsWith('horarios.')) {
+      const dayField = name.split('.')[1];
       setFormData(prev => ({
         ...prev,
-        redes_sociales: {
-          ...prev.redes_sociales,
-          [socialField]: value
-        }
-      }));
-    } else if (name.startsWith('configuracion_facturacion.')) {
-      const configField = name.split('.')[1];
-      setFormData(prev => ({
-        ...prev,
-        configuracion_facturacion: {
-          ...prev.configuracion_facturacion,
-          [configField]: configField === 'punto_venta' ? parseInt(value) || 1 : value
+        horarios: {
+          ...prev.horarios,
+          [dayField]: value
         }
       }));
     } else {
@@ -107,11 +78,14 @@ export const BusinessInfo = () => {
   };
 
   const handleLogoUpload = async () => {
-    if (logoFile) {
-      const result = await updateLogo(logoFile);
+    if (logoUrl) {
+      const result = await updateLogo(logoUrl);
       if (result) {
         refetch();
-        setLogoFile(null);
+        toast({
+          title: 'Logo actualizado',
+          description: 'El logo se ha actualizado exitosamente'
+        });
       }
     }
   };
@@ -140,11 +114,11 @@ export const BusinessInfo = () => {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Nombre de la Empresa *</label>
+              <label className="text-sm font-medium">Nombre del Negocio *</label>
               <input
                 type="text"
-                name="nombre_empresa"
-                value={formData.nombre_empresa}
+                name="nombre_negocio"
+                value={formData.nombre_negocio}
                 onChange={handleChange}
                 required
                 className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
@@ -152,40 +126,15 @@ export const BusinessInfo = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Razón Social</label>
+              <label className="text-sm font-medium">Nombre del Propietario *</label>
               <input
                 type="text"
-                name="razon_social"
-                value={formData.razon_social}
+                name="propietario_nombre"
+                value={formData.propietario_nombre}
                 onChange={handleChange}
+                required
                 className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">CUIT</label>
-              <input
-                type="text"
-                name="cuit"
-                value={formData.cuit}
-                onChange={handleChange}
-                placeholder="XX-XXXXXXXX-X"
-                className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Moneda</label>
-              <select
-                name="moneda"
-                value={formData.moneda}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="ARS">Pesos Argentinos (ARS)</option>
-                <option value="USD">Dólares (USD)</option>
-                <option value="EUR">Euros (EUR)</option>
-              </select>
             </div>
           </div>
 
@@ -308,134 +257,103 @@ export const BusinessInfo = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Código Postal</label>
+              <label className="text-sm font-medium">Código Postal *</label>
               <input
                 type="text"
                 name="codigo_postal"
                 value={formData.codigo_postal}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">País</label>
-              <input
-                type="text"
-                name="pais"
-                value={formData.pais}
-                onChange={handleChange}
+                required
                 className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
           </div>
         </div>
 
-        {/* Redes Sociales */}
+        {/* Horarios */}
         <div className="border rounded-lg p-6 space-y-4">
-          <h2 className="text-lg font-semibold">Redes Sociales</h2>
+          <h2 className="text-lg font-semibold">Horarios de Atención</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <Facebook className="w-4 h-4 text-blue-600" />
-                Facebook
-              </label>
-              <input
-                type="url"
-                name="redes_sociales.facebook"
-                value={formData.redes_sociales?.facebook || ''}
-                onChange={handleChange}
-                placeholder="https://facebook.com/..."
-                className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <Instagram className="w-4 h-4 text-pink-600" />
-                Instagram
-              </label>
-              <input
-                type="url"
-                name="redes_sociales.instagram"
-                value={formData.redes_sociales?.instagram || ''}
-                onChange={handleChange}
-                placeholder="https://instagram.com/..."
-                className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <Twitter className="w-4 h-4 text-blue-400" />
-                Twitter
-              </label>
-              <input
-                type="url"
-                name="redes_sociales.twitter"
-                value={formData.redes_sociales?.twitter || ''}
-                onChange={handleChange}
-                placeholder="https://twitter.com/..."
-                className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium flex items-center gap-2">
-                <Linkedin className="w-4 h-4 text-blue-700" />
-                LinkedIn
-              </label>
-              <input
-                type="url"
-                name="redes_sociales.linkedin"
-                value={formData.redes_sociales?.linkedin || ''}
-                onChange={handleChange}
-                placeholder="https://linkedin.com/..."
-                className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Configuración de Facturación */}
-        <div className="border rounded-lg p-6 space-y-4">
-          <h2 className="text-lg font-semibold">Configuración de Facturación</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Responsable IVA</label>
+              <label className="text-sm font-medium">Lunes</label>
               <input
                 type="text"
-                name="configuracion_facturacion.iva_responsable"
-                value={formData.configuracion_facturacion?.iva_responsable || ''}
+                name="horarios.lunes"
+                value={formData.horarios?.lunes || ''}
                 onChange={handleChange}
+                placeholder="09:00-18:00"
                 className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Condición IVA</label>
-              <select
-                name="configuracion_facturacion.condicion_iva"
-                value={formData.configuracion_facturacion?.condicion_iva || ''}
+              <label className="text-sm font-medium">Martes</label>
+              <input
+                type="text"
+                name="horarios.martes"
+                value={formData.horarios?.martes || ''}
                 onChange={handleChange}
+                placeholder="09:00-18:00"
                 className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              >
-                <option value="">Seleccionar</option>
-                <option value="responsable_inscripto">Responsable Inscripto</option>
-                <option value="monotributo">Monotributo</option>
-                <option value="exento">Exento</option>
-                <option value="consumidor_final">Consumidor Final</option>
-              </select>
+              />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Punto de Venta</label>
+              <label className="text-sm font-medium">Miércoles</label>
               <input
-                type="number"
-                name="configuracion_facturacion.punto_venta"
-                value={formData.configuracion_facturacion?.punto_venta || 1}
+                type="text"
+                name="horarios.miercoles"
+                value={formData.horarios?.miercoles || ''}
                 onChange={handleChange}
-                min="1"
+                placeholder="09:00-18:00"
+                className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Jueves</label>
+              <input
+                type="text"
+                name="horarios.jueves"
+                value={formData.horarios?.jueves || ''}
+                onChange={handleChange}
+                placeholder="09:00-18:00"
+                className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Viernes</label>
+              <input
+                type="text"
+                name="horarios.viernes"
+                value={formData.horarios?.viernes || ''}
+                onChange={handleChange}
+                placeholder="09:00-18:00"
+                className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Sábado</label>
+              <input
+                type="text"
+                name="horarios.sabado"
+                value={formData.horarios?.sabado || ''}
+                onChange={handleChange}
+                placeholder="09:00-13:00"
+                className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+
+            <div className="space-y-2 md:col-span-2">
+              <label className="text-sm font-medium">Domingo</label>
+              <input
+                type="text"
+                name="horarios.domingo"
+                value={formData.horarios?.domingo || ''}
+                onChange={handleChange}
+                placeholder="Cerrado"
                 className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
@@ -445,28 +363,33 @@ export const BusinessInfo = () => {
         {/* Logo */}
         <div className="border rounded-lg p-6 space-y-4">
           <h2 className="text-lg font-semibold">Logo de la Empresa</h2>
-          <div className="flex items-center gap-4">
-            {businessInfo?.logo_url && (
+          <div className="flex items-start gap-4">
+            {logoUrl && (
               <img
-                src={businessInfo.logo_url}
+                src={logoUrl}
                 alt="Logo de la empresa"
                 className="w-32 h-32 object-contain border rounded-lg"
               />
             )}
-            <div className="space-y-2">
+            <div className="flex-1 space-y-2">
+              <label className="text-sm font-medium">URL del Logo</label>
               <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setLogoFile(e.target.files?.[0] || null)}
+                type="url"
+                value={logoUrl}
+                onChange={(e) => setLogoUrl(e.target.value)}
+                placeholder="https://example.com/logo.png"
                 className="w-full px-4 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               />
-              {logoFile && (
-                <Button type="button" onClick={handleLogoUpload} disabled={mutationLoading}>
-                  <Upload className="w-4 h-4 mr-2" />
-                  {mutationLoading ? 'Subiendo...' : 'Subir Logo'}
-                </Button>
-              )}
             </div>
+            <Button
+              type="button"
+              onClick={handleLogoUpload}
+              disabled={!logoUrl || mutationLoading}
+              className="mt-6"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              {mutationLoading ? 'Actualizando...' : 'Actualizar Logo'}
+            </Button>
           </div>
         </div>
 

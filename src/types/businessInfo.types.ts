@@ -2,35 +2,29 @@
 
 export interface BusinessInfo {
   id: string;
-  nombre_empresa: string;
-  razon_social?: string;
-  cuit?: string;
-  email: string;
+  empresa_id: string;
+  nombre_negocio: string;
+  propietario_nombre: string;
   telefono: string;
+  email: string;
   direccion: string;
   ciudad: string;
   provincia: string;
-  codigo_postal?: string;
-  pais?: string;
-  sitio_web?: string;
+  codigo_postal: string;
+  sitio_web: string;
   logo_url?: string;
-  descripcion?: string;
-  horario_atencion?: string;
-  redes_sociales?: {
-    facebook?: string;
-    instagram?: string;
-    twitter?: string;
-    linkedin?: string;
+  descripcion: string;
+  horarios: {
+    lunes: string;
+    martes: string;
+    miercoles: string;
+    jueves: string;
+    viernes: string;
+    sabado: string;
+    domingo: string;
   };
-  configuracion_facturacion?: {
-    iva_responsable?: string;
-    condicion_iva?: string;
-    punto_venta?: number;
-  };
-  moneda?: string;
-  idioma?: string;
-  fecha_creacion?: string;
-  fecha_actualizacion?: string;
+  fecha_creacion: string;
+  fecha_actualizacion: string;
 }
 
-export interface BusinessInfoUpdate extends Partial<BusinessInfo> {}
+export interface BusinessInfoUpdate extends Partial<Omit<BusinessInfo, 'id' | 'empresa_id' | 'fecha_creacion' | 'fecha_actualizacion'>> {}
