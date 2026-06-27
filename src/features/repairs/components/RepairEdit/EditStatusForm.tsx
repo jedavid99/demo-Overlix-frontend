@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { Clock, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Textarea } from '@/shared/components/ui/textarea';
-import { repair_statusOptions } from './RepairEdit.types';
+import { estadoOptions } from './RepairEdit.types';
 import type { FormData } from './RepairEdit.types';
 
 interface EditStatusFormProps {
@@ -28,7 +28,7 @@ export const EditStatusForm: React.FC<EditStatusFormProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const CurrentIcon = repair_statusOptions.find(o => o.value === formData.repair_status)?.icon || repair_statusOptions[0].icon;
+  const CurrentIcon = estadoOptions.find(o => o.value === formData.estado)?.icon || estadoOptions[0].icon;
 
   return (
     <Card>
@@ -50,7 +50,7 @@ export const EditStatusForm: React.FC<EditStatusFormProps> = ({
             >
               <span className="flex items-center gap-2">
                 <CurrentIcon className="h-4 w-4 text-muted-foreground" />
-                {repair_statusOptions.find(o => o.value === formData.repair_status)?.label || 'Seleccionar'}
+                {estadoOptions.find(o => o.value === formData.estado)?.label || 'Seleccionar'}
               </span>
               <svg
                 className={`h-4 w-4 text-muted-foreground transition-transform ${isEstadoOpen ? 'rotate-180' : ''}`}
@@ -63,23 +63,23 @@ export const EditStatusForm: React.FC<EditStatusFormProps> = ({
             </button>
             {isEstadoOpen && (
               <div className="absolute z-50 mt-1 w-full rounded-md border border-border bg-white shadow-lg overflow-hidden">
-                {repair_statusOptions.map(option => {
+                {estadoOptions.map(option => {
                   const Icon = option.icon;
                   return (
                     <button
                       key={option.value}
                       type="button"
                       onClick={() => {
-                        setFormData({ ...formData, repair_status: option.value });
+                        setFormData({ ...formData, estado: option.value });
                         setIsEstadoOpen(false);
                       }}
                       className={`w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-gray-100 ${
-                        formData.repair_status === option.value ? 'bg-gray-50 font-medium' : ''
+                        formData.estado === option.value ? 'bg-gray-50 font-medium' : ''
                       }`}
                     >
                       <Icon className="h-4 w-4 text-muted-foreground" />
                       {option.label}
-                      {formData.repair_status === option.value && (
+                      {formData.estado === option.value && (
                         <CheckCircle className="h-4 w-4 text-primary ml-auto" />
                       )}
                     </button>

@@ -19,7 +19,7 @@ export interface RepairData {
   problema_reportado: string;
   diagnosis?: string;
   reparacion_realizada?: string;
-  repair_status: string;
+  estado: string;
   prioridad: string;
   fecha_ingreso: string;
   fecha_estimada_entrega?: string;
@@ -27,14 +27,14 @@ export interface RepairData {
   notas?: string;
   foto_evidencia?: string;
   repuestos?: RepairPart[];
-  
+
 }
 
 export interface FormData {
   problema_reportado: string;
   diagnosis: string;
   reparacion_realizada: string;
-  repair_status: string;
+  estado: string;
   costo_piezas: number;
   costo_mano_obra: number;
   total_reparacion: number;
@@ -60,31 +60,33 @@ export interface FormData {
   chequeo_hardware: string;
 }
 
-export interface RepairStatusOption {
+export interface EstadoOption {
   value: string;
   label: string;
   icon: any;
 }
 
 // Opciones de estado
-export const repair_statusOptions: RepairStatusOption[] = [
-  { value: 'Diagnóstico', label: 'Diagnóstico', icon: Search },
-  { value: 'En Progreso', label: 'En Progreso', icon: Wrench },
-  { value: 'Esperando Repuestos', label: 'Esperando Repuestos', icon: Clock },
-  { value: 'Reparado', label: 'Reparado', icon: CheckCircle },
-  { value: 'Garantía', label: 'Garantía', icon: Shield },
-  { value: 'Irreparable', label: 'Irreparable', icon: XCircle },
+export const estadoOptions: EstadoOption[] = [
+  { value: 'pending', label: 'Pendiente', icon: Search },
+  { value: 'diagnostic', label: 'Diagnóstico', icon: Search },
+  { value: 'in_progress', label: 'En Progreso', icon: Wrench },
+  { value: 'waiting_parts', label: 'Esperando Repuestos', icon: Clock },
+  { value: 'ready', label: 'Listo', icon: CheckCircle },
+  { value: 'delivered', label: 'Entregado', icon: CheckCircle },
+  { value: 'cancelled', label: 'Cancelado', icon: XCircle },
 ];
 
 // Funciones auxiliares
-export const getStatusColor = (repair_status: string) => {
-  switch (repair_status) {
-    case 'Diagnóstico': return 'bg-blue-100 text-blue-800 border-blue-300';
-    case 'En Progreso': return 'bg-indigo-100 text-indigo-800 border-indigo-300';
-    case 'Esperando Repuestos': return 'bg-orange-100 text-orange-800 border-orange-300';
-    case 'Reparado': return 'bg-emerald-100 text-emerald-800 border-emerald-300';
-    case 'Garantía': return 'bg-purple-100 text-purple-800 border-purple-300';
-    case 'Irreparable': return 'bg-red-100 text-red-800 border-red-300';
+export const getStatusColor = (estado: string) => {
+  switch (estado) {
+    case 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+    case 'diagnostic': return 'bg-blue-100 text-blue-800 border-blue-300';
+    case 'in_progress': return 'bg-indigo-100 text-indigo-800 border-indigo-300';
+    case 'waiting_parts': return 'bg-orange-100 text-orange-800 border-orange-300';
+    case 'ready': return 'bg-emerald-100 text-emerald-800 border-emerald-300';
+    case 'delivered': return 'bg-green-100 text-green-800 border-green-300';
+    case 'cancelled': return 'bg-red-100 text-red-800 border-red-300';
     default: return 'bg-gray-100 text-gray-800 border-gray-300';
   }
 };
@@ -98,7 +100,7 @@ export const initialFormData: FormData = {
   problema_reportado: '',
   diagnosis: '',
   reparacion_realizada: '',
-  repair_status: 'Diagnóstico',
+  estado: 'diagnostic',
   costo_piezas: 0,
   costo_mano_obra: 0,
   total_reparacion: 0,

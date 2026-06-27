@@ -31,7 +31,7 @@ export const useRepairEdit = (id: string | undefined) => {
         problema_reportado: orderData.problema_reportado || '',
         diagnosis: orderData.diagnosis || '',
         reparacion_realizada: orderData.reparacion_realizada || '',
-        repair_status: orderData.repair_status || 'Diagnóstico',
+        estado: orderData.estado || 'diagnostic',
         costo_piezas: orderData.costo_piezas || 0,
         costo_mano_obra: orderData.costo_mano_obra || 0,
         total_reparacion: orderData.total_reparacion || 0,
@@ -126,28 +126,29 @@ export const useRepairEdit = (id: string | undefined) => {
       setSaving(true);
 
       const validTransitions: Record<string, string[]> = {
-        Diagnóstico: ['En Progreso', 'Irreparable'],
-        'En Progreso': ['Esperando Repuestos', 'Reparado', 'Irreparable'],
-        'Esperando Repuestos': ['En Progreso', 'Reparado', 'Irreparable'],
-        Reparado: ['Garantía'],
-        Garantía: [],
-        Irreparable: [],
+        pending: ['diagnostic', 'cancelled'],
+        diagnostic: ['in_progress', 'cancelled'],
+        in_progress: ['waiting_parts', 'ready', 'cancelled'],
+        waiting_parts: ['in_progress', 'ready', 'cancelled'],
+        ready: ['delivered'],
+        delivered: [],
+        cancelled: [],
       };
 
       const payload: any = {};
 
-      if (formData.repair_status !== repairData.repair_status) {
-        const allowed = validTransitions[repairData.repair_status] || [];
-        if (!allowed.includes(formData.repair_status)) {
+      if (formData.estado !== repairData.estado) {
+        const allowed = validTransitions[repairData.estado] || [];
+        if (!allowed.includes(formData.estado)) {
           toast({
             title: 'Error',
-            description: `No puedes cambiar de "${repairData.repair_status}" a "${formData.repair_status}". Transición no válida.`,
+            description: `No puedes cambiar de "${repairData.estado}" a "${formData.estado}". Transición no válida.`,
             variant: 'destructive',
           });
           setSaving(false);
           return;
         }
-        payload.repair_status = formData.repair_status;
+        payload.estado = formData.estado;
       }
 
       // Campos de diagnóstico
