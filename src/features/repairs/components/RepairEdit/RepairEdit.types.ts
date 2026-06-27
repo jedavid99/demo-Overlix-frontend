@@ -60,14 +60,14 @@ export interface FormData {
   chequeo_hardware: string;
 }
 
-export interface EstadoOption {
+export interface RepairStatusOption {
   value: string;
   label: string;
   icon: any;
 }
 
 // Opciones de estado
-export const estadoOptions: EstadoOption[] = [
+export const repair_statusOptions: RepairStatusOption[] = [
   { value: 'Diagnóstico', label: 'Diagnóstico', icon: Search },
   { value: 'En Progreso', label: 'En Progreso', icon: Wrench },
   { value: 'Esperando Repuestos', label: 'Esperando Repuestos', icon: Clock },
@@ -77,8 +77,8 @@ export const estadoOptions: EstadoOption[] = [
 ];
 
 // Funciones auxiliares
-export const getStatusColor = (estado: string) => {
-  switch (estado) {
+export const getStatusColor = (repair_status: string) => {
+  switch (repair_status) {
     case 'Diagnóstico': return 'bg-blue-100 text-blue-800 border-blue-300';
     case 'En Progreso': return 'bg-indigo-100 text-indigo-800 border-indigo-300';
     case 'Esperando Repuestos': return 'bg-orange-100 text-orange-800 border-orange-300';
