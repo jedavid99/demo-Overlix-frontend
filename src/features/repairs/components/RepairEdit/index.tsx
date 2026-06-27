@@ -68,6 +68,10 @@ export default function RepairEdit() {
               eliminarRepuesto={eliminarRepuesto}
             />
           
+          <EditCostsForm
+              formData={formData}
+              setFormData={setFormData}
+            />
           </div>
 
          
@@ -90,10 +94,7 @@ export default function RepairEdit() {
               formData={formData}
               setFormData={setFormData}
             />
-              <EditCostsForm
-              formData={formData}
-              setFormData={setFormData}
-            />
+              
             
           </div>
         </div>
