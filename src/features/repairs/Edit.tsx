@@ -26,7 +26,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
 import { Textarea } from '@/shared/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select';
 import { Badge } from '@/shared/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
 import { repairService } from '@/services/repairService';
@@ -156,6 +155,24 @@ export default function RepairEdit() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // 🔥 Efecto para recalcular total cuando cambian repuestos o mano de obra
+  useEffect(() => {
+    const totalRepuestos = repuestos.reduce((sum, r) => sum + r.cantidad * r.costo_unitario, 0);
+    setFormData((prev) => ({
+      ...prev,
+      costo_piezas: totalRepuestos,
+      total_reparacion: totalRepuestos + prev.costo_mano_obra,
+    }));
+  }, [repuestos]);
+
+  // 🔥 Efecto para recalcular total cuando cambia mano de obra
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      total_reparacion: prev.costo_piezas + prev.costo_mano_obra,
+    }));
+  }, [formData.costo_mano_obra]);
+
   // Cargar datos
   useEffect(() => {
     if (id) loadRepairData(id);
@@ -242,8 +259,8 @@ export default function RepairEdit() {
             description: `No puedes cambiar de "${repairData.estado}" a "${formData.estado}". Transición no válida.`,
             variant: 'destructive',
           });
-          // setSaving(false);
-          // return;
+          setSaving(false);
+          return;
         }
         payload.estado = formData.estado;
       }
@@ -682,100 +699,98 @@ export default function RepairEdit() {
             </Card>
 
             {/* Estado y Asignación */}
-           <Card>
-  <CardHeader className="pb-2">
-    <CardTitle className="flex items-center gap-2 text-base">
-      <Clock className="h-4 w-4 text-muted-foreground" />
-      Estado y Asignación
-    </CardTitle>
-  </CardHeader>
-  <CardContent className="space-y-3">
-    {/* Estado - Custom Dropdown con Lucide icons */}
-    <div>
-      <label className="block text-xs font-medium text-muted-foreground mb-0.5">Estado</label>
-      <div className="relative" ref={estadoRef}>
-        <button
-          type="button"
-          onClick={() => setIsEstadoOpen(!isEstadoOpen)}
-          className="w-full h-9 flex items-center justify-between rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <span className="flex items-center gap-2">
-            {(() => {
-              const current = estadoOptions.find((o) => o.value === formData.estado);
-              const Icon = current?.icon || Search;
-              return <Icon className="h-4 w-4 text-muted-foreground" />;
-            })()}
-            {estadoOptions.find((o) => o.value === formData.estado)?.label || formData.estado || 'Seleccionar'}
-          </span>
-          <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${isEstadoOpen ? 'rotate-180' : ''}`} />
-        </button>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  Estado y Asignación
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {/* Estado - Custom Dropdown con Lucide icons */}
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-0.5">Estado</label>
+                  <div className="relative" ref={estadoRef}>
+                    <button
+                      type="button"
+                      onClick={() => setIsEstadoOpen(!isEstadoOpen)}
+                      className="w-full h-9 flex items-center justify-between rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    >
+                      <span className="flex items-center gap-2">
+                        <CurrentIcon className="h-4 w-4 text-muted-foreground" />
+                        {estadoOptions.find(o => o.value === formData.estado)?.label || 'Seleccionar'}
+                      </span>
+                      <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${isEstadoOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    {isEstadoOpen && (
+                      <div className="absolute z-50 mt-1 w-full rounded-md border border-border bg-white shadow-lg overflow-hidden">
+                        {estadoOptions.map(option => {
+                          const Icon = option.icon;
+                          return (
+                            <button
+                              key={option.value}
+                              type="button"
+                              onClick={() => {
+                                setFormData({ ...formData, estado: option.value });
+                                setIsEstadoOpen(false);
+                              }}
+                              className={`w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-gray-100 ${
+                                formData.estado === option.value ? 'bg-gray-50 font-medium' : ''
+                              }`}
+                            >
+                              <Icon className="h-4 w-4 text-muted-foreground" />
+                              {option.label}
+                              {formData.estado === option.value && (
+                                <CheckCircle className="h-4 w-4 text-primary ml-auto" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
 
-        {isEstadoOpen && (
-          <div className="absolute z-50 mt-1 w-full rounded-md border border-border bg-white shadow-lg overflow-hidden">
-            {estadoOptions.map((option) => {
-              const Icon = option.icon;
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => {
-                    setFormData({ ...formData, estado: option.value });
-                    setIsEstadoOpen(false);
-                  }}
-                  className={`w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-gray-100 ${
-                    formData.estado === option.value ? 'bg-gray-50 font-medium' : ''
-                  }`}
-                >
-                  <Icon className="h-4 w-4 text-muted-foreground" />
-                  {option.label}
-                  {formData.estado === option.value && (
-                    <CheckCircle className="h-4 w-4 text-primary ml-auto" />
+                {/* Técnico */}
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-0.5">Técnico</label>
+                  <Input
+                    className="h-9"
+                    value={formData.tecnico_asignado_id}
+                    onChange={e => setFormData({ ...formData, tecnico_asignado_id: e.target.value })}
+                    placeholder="Nombre o ID del técnico"
+                  />
+                </div>
+
+                {/* Fecha Estimada y Tiempo (ocultar tiempo si hay mano de obra) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-0.5">Fecha Estimada</label>
+                    <Input
+                      type="date"
+                      className="h-9"
+                      value={formData.fecha_estimada_entrega}
+                      onChange={e => setFormData({ ...formData, fecha_estimada_entrega: e.target.value })}
+                    />
+                  </div>
+                  {/* 🔥 Ocultar Tiempo (min) si hay mano de obra */}
+                  {formData.costo_mano_obra === 0 && (
+                    <div>
+                      <label className="block text-xs font-medium text-muted-foreground mb-0.5">Tiempo (min)</label>
+                      <Input
+                        type="number"
+                        className="h-9"
+                        value={formData.tiempo_estimado_minutos}
+                        onChange={e => setFormData({ ...formData, tiempo_estimado_minutos: parseInt(e.target.value) || 0 })}
+                        placeholder="Minutos"
+                        min={0}
+                        step={5}
+                      />
+                    </div>
                   )}
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </div>
-
-    {/* Técnico */}
-    <div>
-      <label className="block text-xs font-medium text-muted-foreground mb-0.5">Técnico</label>
-      <Input
-        className="h-9"
-        value={formData.tecnico_asignado_id}
-        onChange={(e) => setFormData({ ...formData, tecnico_asignado_id: e.target.value })}
-        placeholder="Nombre o ID del técnico"
-      />
-    </div>
-
-    {/* Fecha Estimada y Tiempo */}
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <div>
-        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Fecha Estimada</label>
-        <Input
-          type="date"
-          className="h-9"
-          value={formData.fecha_estimada_entrega}
-          onChange={(e) => setFormData({ ...formData, fecha_estimada_entrega: e.target.value })}
-        />
-      </div>
-      <div>
-        <label className="block text-xs font-medium text-muted-foreground mb-0.5">Tiempo (min)</label>
-        <Input
-          type="number"
-          className="h-9"
-          value={formData.tiempo_estimado_minutos}
-          onChange={(e) => setFormData({ ...formData, tiempo_estimado_minutos: parseInt(e.target.value) || 0 })}
-          placeholder="Minutos"
-          min={0}
-          step={5}
-        />
-      </div>
-    </div>
-  </CardContent>
-</Card>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Costos y Pago */}
             <Card>
@@ -816,42 +831,50 @@ export default function RepairEdit() {
                 </div>
 
                 <div className="border-t pt-3 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="pagado"
-                      checked={formData.pagado}
-                      onChange={e => {
-                        const isPaid = e.target.checked;
-                        setFormData({
-                          ...formData,
-                          pagado: isPaid,
-                          monto_pagado: isPaid ? formData.total_reparacion : 0,
-                        });
-                      }}
-                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                    />
-                    <label htmlFor="pagado" className="text-sm font-medium">
-                      {formData.pagado ? '✅ Pagado' : '❌ Pendiente'}
-                    </label>
+                  {/* 🔥 Mejora visual del estado de pago */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-medium">Estado de pago</span>
+                      <Badge
+                        variant={formData.pagado ? 'success' : 'destructive'}
+                        className="text-xs"
+                      >
+                        {formData.pagado ? 'Pagado' : 'Pendiente'}
+                      </Badge>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({
+                        ...prev,
+                        pagado: !prev.pagado,
+                        monto_pagado: !prev.pagado ? prev.total_reparacion : 0,
+                      }))}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                        formData.pagado ? 'bg-green-600' : 'bg-gray-300'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          formData.pagado ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
                   </div>
 
+                  {/* Método de pago - Select nativo con fondo sólido */}
                   <div>
                     <label className="block text-xs font-medium text-muted-foreground mb-0.5">Método de Pago</label>
-                    <Select
+                    <select
                       value={formData.metodo_pago}
-                      onValueChange={v => setFormData({ ...formData, metodo_pago: v })}
+                      onChange={e => setFormData({ ...formData, metodo_pago: e.target.value })}
+                      className="w-full h-9 rounded-md border border-input bg-white px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
-                      <SelectTrigger className="h-9">
-                        <SelectValue placeholder="Seleccionar" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="efectivo">💵 Efectivo</SelectItem>
-                        <SelectItem value="transferencia">🏦 Transferencia</SelectItem>
-                        <SelectItem value="tarjeta">💳 Tarjeta</SelectItem>
-                        <SelectItem value="cuotas">📆 Cuotas</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      <option value="">Seleccionar método</option>
+                      <option value="efectivo">💵 Efectivo</option>
+                      <option value="transferencia">🏦 Transferencia</option>
+                      <option value="tarjeta">💳 Tarjeta de Crédito</option>
+                      <option value="cuotas">📆 Cuotas</option>
+                    </select>
                   </div>
 
                   {!formData.pagado && (
@@ -892,8 +915,6 @@ export default function RepairEdit() {
                 </div>
               </CardContent>
             </Card>
-            {/* Hardware Check */}
-         
           </div>
         </div>
 
@@ -909,4 +930,3 @@ export default function RepairEdit() {
     </div>
   );
 }
-
