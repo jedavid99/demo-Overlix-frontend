@@ -19,7 +19,7 @@ export interface RepairData {
   problema_reportado: string;
   diagnosis?: string;
   reparacion_realizada?: string;
-  estado: string;
+  estado_y_diagnostico: string;
   prioridad: string;
   fecha_ingreso: string;
   fecha_estimada_entrega?: string;
@@ -27,13 +27,14 @@ export interface RepairData {
   notas?: string;
   foto_evidencia?: string;
   repuestos?: RepairPart[];
+  
 }
 
 export interface FormData {
   problema_reportado: string;
   diagnosis: string;
   reparacion_realizada: string;
-  estado: string;
+  estado_y_diagnostico: string;
   costo_piezas: number;
   costo_mano_obra: number;
   total_reparacion: number;
@@ -97,7 +98,7 @@ export const initialFormData: FormData = {
   problema_reportado: '',
   diagnosis: '',
   reparacion_realizada: '',
-  estado: 'diagnostic',
+  estado_y_diagnostico: 'diagnostic',
   costo_piezas: 0,
   costo_mano_obra: 0,
   total_reparacion: 0,
