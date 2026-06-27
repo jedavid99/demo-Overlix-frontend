@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/components/ui/dialog';
 import { Button } from '@/shared/components/ui/button';
-import { Search, Wrench, Clock, CheckCircle, Shield, XCircle, ChevronDown } from 'lucide-react';
+import { Search, Wrench, Clock, CheckCircle, Package, XCircle, ChevronDown } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { repairService } from '@/services/repairService';
 
@@ -9,28 +9,30 @@ interface EditStatusModalProps {
   open: boolean;
   onClose: () => void;
   repairId: string;
-  currentStatus: string; // Debe ser uno de los estados en español
+  currentStatus: string;
   onSuccess: () => void;
 }
 
-// 🔥 Estados en español (coinciden con el backend)
+// Estados en inglés (coinciden con el backend)
 const statusOptions = [
-  { value: 'Diagnóstico', label: 'Diagnóstico', icon: Search },
-  { value: 'En Progreso', label: 'En Progreso', icon: Wrench },
-  { value: 'Esperando Repuestos', label: 'Esperando Repuestos', icon: Clock },
-  { value: 'Reparado', label: 'Reparado', icon: CheckCircle },
-  { value: 'Garantía', label: 'Garantía', icon: Shield },
-  { value: 'Irreparable', label: 'Irreparable', icon: XCircle },
+  { value: 'pending', label: 'Pendiente', icon: Search },
+  { value: 'diagnostic', label: 'Diagnóstico', icon: Search },
+  { value: 'in_progress', label: 'En Progreso', icon: Wrench },
+  { value: 'waiting_parts', label: 'Esperando Repuestos', icon: Clock },
+  { value: 'ready', label: 'Listo', icon: CheckCircle },
+  { value: 'delivered', label: 'Entregado', icon: Package },
+  { value: 'cancelled', label: 'Cancelado', icon: XCircle },
 ];
 
-// 🔥 Transiciones válidas (claves en español)
+// Transiciones válidas (claves en inglés)
 const validTransitions: Record<string, string[]> = {
-  'Diagnóstico': ['En Progreso', 'Irreparable'],
-  'En Progreso': ['Esperando Repuestos', 'Reparado', 'Irreparable'],
-  'Esperando Repuestos': ['En Progreso', 'Reparado', 'Irreparable'],
-  'Reparado': ['Garantía'],
-  'Garantía': [],
-  'Irreparable': [],
+  pending: ['diagnostic', 'cancelled'],
+  diagnostic: ['in_progress', 'cancelled'],
+  in_progress: ['waiting_parts', 'ready', 'cancelled'],
+  waiting_parts: ['in_progress', 'ready', 'cancelled'],
+  ready: ['delivered'],
+  delivered: [],
+  cancelled: [],
 };
 
 export const EditStatusModal: React.FC<EditStatusModalProps> = ({
