@@ -129,7 +129,7 @@ export const EditStatusModal: React.FC<EditStatusModalProps> = ({
   };
 
   return (
-   <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Editar Estado de Reparación</DialogTitle>
@@ -153,7 +153,8 @@ export const EditStatusModal: React.FC<EditStatusModalProps> = ({
             <div className="relative" ref={ref}>
               <button
                 type="button"
-                onClick={() => setIsOpen(!isOpen)}
+                ref={buttonRef}
+                onClick={handleToggleDropdown}
                 className="w-full h-10 flex items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <span className="flex items-center gap-2">
@@ -163,8 +164,15 @@ export const EditStatusModal: React.FC<EditStatusModalProps> = ({
                 <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`} />
               </button>
 
-              {isOpen && (
-                <div className="absolute z-50 mt-1 w-full rounded-md border border-border bg-white shadow-lg overflow-hidden">
+              {isOpen && createPortal(
+                <div
+                  className="fixed z-[9999] rounded-md border border-border bg-white shadow-lg overflow-hidden"
+                  style={{
+                    top: `${dropdownPosition.top}px`,
+                    left: `${dropdownPosition.left}px`,
+                    width: `${dropdownPosition.width}px`,
+                  }}
+                >
                   {availableOptions.map((option) => {
                     const Icon = option.icon;
                     const isSelected = option.value === selectedStatus;
@@ -195,7 +203,8 @@ export const EditStatusModal: React.FC<EditStatusModalProps> = ({
                       </button>
                     );
                   })}
-                </div>
+                </div>,
+                document.body
               )}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
@@ -215,4 +224,4 @@ export const EditStatusModal: React.FC<EditStatusModalProps> = ({
       </DialogContent>
     </Dialog>
   );
-};
+}; 
