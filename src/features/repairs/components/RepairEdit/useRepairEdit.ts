@@ -31,7 +31,7 @@ export const useRepairEdit = (id: string | undefined) => {
         problema_reportado: orderData.problema_reportado || '',
         diagnosis: orderData.diagnosis || '',
         reparacion_realizada: orderData.reparacion_realizada || '',
-        repair_status: orderData.repair_status || 'diagnostic',
+        repair_status: orderData.repair_status || 'Diagnóstico',
         costo_piezas: orderData.costo_piezas || 0,
         costo_mano_obra: orderData.costo_mano_obra || 0,
         total_reparacion: orderData.total_reparacion || 0,
@@ -126,12 +126,12 @@ export const useRepairEdit = (id: string | undefined) => {
       setSaving(true);
 
       const validTransitions: Record<string, string[]> = {
-        diagnostic: ['in_progress', 'irreparable'],
-        in_progress: ['waiting_parts', 'repaired', 'irreparable'],
-        waiting_parts: ['in_progress', 'repaired', 'irreparable'],
-        repaired: ['warranty'],
-        warranty: [],
-        irreparable: [],
+        Diagnóstico: ['En Progreso', 'Irreparable'],
+        'En Progreso': ['Esperando Repuestos', 'Reparado', 'Irreparable'],
+        'Esperando Repuestos': ['En Progreso', 'Reparado', 'Irreparable'],
+        Reparado: ['Garantía'],
+        Garantía: [],
+        Irreparable: [],
       };
 
       const payload: any = {};

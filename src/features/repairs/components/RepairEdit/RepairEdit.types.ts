@@ -68,23 +68,23 @@ export interface EstadoOption {
 
 // Opciones de estado
 export const estadoOptions: EstadoOption[] = [
-  { value: 'diagnostic', label: 'Diagnóstico', icon: Search },
-  { value: 'in_progress', label: 'En Progreso', icon: Wrench },
-  { value: 'waiting_parts', label: 'Esperando Repuestos', icon: Clock },
-  { value: 'repaired', label: 'Reparado', icon: CheckCircle },
-  { value: 'warranty', label: 'Garantía', icon: Shield },
-  { value: 'irreparable', label: 'Irreparable', icon: XCircle },
+  { value: 'Diagnóstico', label: 'Diagnóstico', icon: Search },
+  { value: 'En Progreso', label: 'En Progreso', icon: Wrench },
+  { value: 'Esperando Repuestos', label: 'Esperando Repuestos', icon: Clock },
+  { value: 'Reparado', label: 'Reparado', icon: CheckCircle },
+  { value: 'Garantía', label: 'Garantía', icon: Shield },
+  { value: 'Irreparable', label: 'Irreparable', icon: XCircle },
 ];
 
 // Funciones auxiliares
 export const getStatusColor = (estado: string) => {
   switch (estado) {
-    case 'diagnostic': return 'bg-blue-100 text-blue-800 border-blue-300';
-    case 'in_progress': return 'bg-indigo-100 text-indigo-800 border-indigo-300';
-    case 'waiting_parts': return 'bg-orange-100 text-orange-800 border-orange-300';
-    case 'repaired': return 'bg-emerald-100 text-emerald-800 border-emerald-300';
-    case 'warranty': return 'bg-purple-100 text-purple-800 border-purple-300';
-    case 'irreparable': return 'bg-red-100 text-red-800 border-red-300';
+    case 'Diagnóstico': return 'bg-blue-100 text-blue-800 border-blue-300';
+    case 'En Progreso': return 'bg-indigo-100 text-indigo-800 border-indigo-300';
+    case 'Esperando Repuestos': return 'bg-orange-100 text-orange-800 border-orange-300';
+    case 'Reparado': return 'bg-emerald-100 text-emerald-800 border-emerald-300';
+    case 'Garantía': return 'bg-purple-100 text-purple-800 border-purple-300';
+    case 'Irreparable': return 'bg-red-100 text-red-800 border-red-300';
     default: return 'bg-gray-100 text-gray-800 border-gray-300';
   }
 };
@@ -98,7 +98,7 @@ export const initialFormData: FormData = {
   problema_reportado: '',
   diagnosis: '',
   reparacion_realizada: '',
-  repair_status: 'diagnostic',
+  repair_status: 'Diagnóstico',
   costo_piezas: 0,
   costo_mano_obra: 0,
   total_reparacion: 0,
