@@ -1,9 +1,10 @@
 import React from 'react';
-import { DollarSign, CreditCard } from 'lucide-react';
+import { DollarSign } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card';
 import { Input } from '@/shared/components/ui/input';
 import { Badge } from '@/shared/components/ui/badge';
 import type { FormData } from './RepairEdit.types';
+import { METODO_PAGO_OPTIONS } from '@/features/repairs/repair.constants';
 
 interface EditPaymentFormProps {
   formData: FormData;
@@ -55,17 +56,28 @@ export const EditPaymentForm: React.FC<EditPaymentFormProps> = ({
 
         {/* Método de pago */}
         <div>
-          <label className="block text-sm font-medium text-muted-foreground mb-1">Método de Pago</label>
-          <Input
+          <label className="block text-sm font-medium text-muted-foreground mb-1">
+            Método de Pago
+          </label>
+          <select
             value={formData.metodo_pago}
             onChange={(e) => setFormData({ ...formData, metodo_pago: e.target.value })}
-            placeholder="Efectivo, Transferencia, Tarjeta..."
-          />
+            className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <option value="">Seleccionar método</option>
+            {METODO_PAGO_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Monto pagado */}
         <div>
-          <label className="block text-sm font-medium text-muted-foreground mb-1">Monto Pagado</label>
+          <label className="block text-sm font-medium text-muted-foreground mb-1">
+            Monto Pagado
+          </label>
           <Input
             type="number"
             value={formData.monto_pagado}
