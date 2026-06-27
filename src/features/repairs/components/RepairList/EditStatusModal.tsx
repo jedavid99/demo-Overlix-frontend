@@ -1,39 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/components/ui/dialog';
 import { Button } from '@/shared/components/ui/button';
-import { Search, Wrench, Clock, CheckCircle, Package, XCircle, ChevronDown } from 'lucide-react';
+import { Search, Wrench, Clock, CheckCircle, Shield, XCircle, ChevronDown } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { repairService } from '@/services/repairService';
-import { createPortal } from 'react-dom';
 
 interface EditStatusModalProps {
   open: boolean;
   onClose: () => void;
   repairId: string;
-  currentStatus: string;
+  currentStatus: string; // Debe ser uno de los estados en español
   onSuccess: () => void;
 }
 
-// Estados en inglés (coinciden con el backend)
+// 🔥 Estados en español (coinciden con el backend)
 const statusOptions = [
-  { value: 'pending', label: 'Pendiente', icon: Search },
-  { value: 'diagnostic', label: 'Diagnóstico', icon: Search },
-  { value: 'in_progress', label: 'En Progreso', icon: Wrench },
-  { value: 'waiting_parts', label: 'Esperando Repuestos', icon: Clock },
-  { value: 'ready', label: 'Listo', icon: CheckCircle },
-  { value: 'delivered', label: 'Entregado', icon: Package },
-  { value: 'cancelled', label: 'Cancelado', icon: XCircle },
+  { value: 'Diagnóstico', label: 'Diagnóstico', icon: Search },
+  { value: 'En Progreso', label: 'En Progreso', icon: Wrench },
+  { value: 'Esperando Repuestos', label: 'Esperando Repuestos', icon: Clock },
+  { value: 'Reparado', label: 'Reparado', icon: CheckCircle },
+  { value: 'Garantía', label: 'Garantía', icon: Shield },
+  { value: 'Irreparable', label: 'Irreparable', icon: XCircle },
 ];
 
-// Transiciones válidas (claves en inglés)
+// 🔥 Transiciones válidas (claves en español)
 const validTransitions: Record<string, string[]> = {
-  pending: ['diagnostic', 'cancelled'],
-  diagnostic: ['in_progress', 'cancelled'],
-  in_progress: ['waiting_parts', 'ready', 'cancelled'],
-  waiting_parts: ['in_progress', 'ready', 'cancelled'],
-  ready: ['delivered'],
-  delivered: [],
-  cancelled: [],
+  'Diagnóstico': ['En Progreso', 'Irreparable'],
+  'En Progreso': ['Esperando Repuestos', 'Reparado', 'Irreparable'],
+  'Esperando Repuestos': ['En Progreso', 'Reparado', 'Irreparable'],
+  'Reparado': ['Garantía'],
+  'Garantía': [],
+  'Irreparable': [],
 };
 
 export const EditStatusModal: React.FC<EditStatusModalProps> = ({
@@ -46,9 +43,7 @@ export const EditStatusModal: React.FC<EditStatusModalProps> = ({
   const [selectedStatus, setSelectedStatus] = useState(currentStatus);
   const [isSaving, setIsSaving] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
-  const ref = React.useRef<HTMLDivElement>(null);
-  const buttonRef = React.useRef<HTMLButtonElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   // Resetear selección al abrir
   useEffect(() => {
@@ -57,19 +52,6 @@ export const EditStatusModal: React.FC<EditStatusModalProps> = ({
       setIsOpen(false);
     }
   }, [open, currentStatus]);
-
-  // Calcular posición del dropdown al abrir
-  const handleToggleDropdown = () => {
-    if (!isOpen && buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      setDropdownPosition({
-        top: rect.bottom + window.scrollY + 4,
-        left: rect.left + window.scrollX,
-        width: rect.width,
-      });
-    }
-    setIsOpen(!isOpen);
-  };
 
   // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
@@ -153,8 +135,7 @@ export const EditStatusModal: React.FC<EditStatusModalProps> = ({
             <div className="relative" ref={ref}>
               <button
                 type="button"
-                ref={buttonRef}
-                onClick={handleToggleDropdown}
+                onClick={() => setIsOpen(!isOpen)}
                 className="w-full h-10 flex items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <span className="flex items-center gap-2">
@@ -164,15 +145,8 @@ export const EditStatusModal: React.FC<EditStatusModalProps> = ({
                 <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`} />
               </button>
 
-              {isOpen && createPortal(
-                <div
-                  className="fixed z-[9999] rounded-md border border-border bg-white shadow-lg overflow-hidden"
-                  style={{
-                    top: `${dropdownPosition.top}px`,
-                    left: `${dropdownPosition.left}px`,
-                    width: `${dropdownPosition.width}px`,
-                  }}
-                >
+              {isOpen && (
+                <div className="absolute z-50 mt-1 w-full rounded-md border border-border bg-white shadow-lg overflow-hidden">
                   {availableOptions.map((option) => {
                     const Icon = option.icon;
                     const isSelected = option.value === selectedStatus;
@@ -203,8 +177,7 @@ export const EditStatusModal: React.FC<EditStatusModalProps> = ({
                       </button>
                     );
                   })}
-                </div>,
-                document.body
+                </div>
               )}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
