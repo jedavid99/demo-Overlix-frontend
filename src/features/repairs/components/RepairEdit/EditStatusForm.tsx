@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui
 import { Textarea } from '@/shared/components/ui/textarea';
 import { estadoOptions } from './RepairEdit.types';
 import type { FormData } from './RepairEdit.types';
-import { MdCurrencyBitcoin } from 'react-icons/md';
 
 interface EditStatusFormProps {
   formData: FormData;
@@ -50,7 +49,7 @@ export const EditStatusForm: React.FC<EditStatusFormProps> = ({
               className="w-full h-9 flex items-center justify-between rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <span className="flex items-center gap-2">
-                <MdCurrencyBitcoin className="h-4 w-4 text-muted-foreground" />
+                <currentIcon className="h-4 w-4 text-muted-foreground" />
                 {estadoOptions.find(o => o.value === formData.estado)?.label || 'Seleccionar'}
               </span>
               <svg
