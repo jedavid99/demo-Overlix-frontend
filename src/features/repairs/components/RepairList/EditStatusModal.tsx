@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/components/ui/dialog';
 import { Button } from '@/shared/components/ui/button';
-import { Search, Wrench, Clock, CheckCircle, Package, XCircle, ChevronDown } from 'lucide-react';
+import { Search, Wrench, Clock, CheckCircle, Package, XCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { repairService } from '@/services/repairService';
-import { createPortal } from 'react-dom';
 
 interface EditStatusModalProps {
   open: boolean;
@@ -45,42 +44,13 @@ export const EditStatusModal: React.FC<EditStatusModalProps> = ({
 }) => {
   const [selectedStatus, setSelectedStatus] = useState(currentStatus);
   const [isSaving, setIsSaving] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
-  const ref = React.useRef<HTMLDivElement>(null);
-  const buttonRef = React.useRef<HTMLButtonElement>(null);
 
   // Resetear selección al abrir
   useEffect(() => {
     if (open) {
       setSelectedStatus(currentStatus);
-      setIsOpen(false);
     }
   }, [open, currentStatus]);
-
-  // Calcular posición del dropdown al abrir
-  const handleToggleDropdown = () => {
-    if (!isOpen && buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      setDropdownPosition({
-        top: rect.bottom + window.scrollY + 4,
-        left: rect.left + window.scrollX,
-        width: rect.width,
-      });
-    }
-    setIsOpen(!isOpen);
-  };
-
-  // Cerrar dropdown al hacer clic fuera
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const currentOption = statusOptions.find(opt => opt.value === selectedStatus);
   const CurrentIcon = currentOption?.icon || statusOptions[0].icon;
@@ -150,63 +120,21 @@ export const EditStatusModal: React.FC<EditStatusModalProps> = ({
             <label className="block text-sm font-medium text-muted-foreground mb-2">
               Nuevo Estado
             </label>
-            <div className="relative" ref={ref}>
-              <button
-                type="button"
-                ref={buttonRef}
-                onClick={handleToggleDropdown}
-                className="w-full h-10 flex items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <span className="flex items-center gap-2">
-                  <CurrentIcon className="h-4 w-4 text-muted-foreground" />
-                  {currentOption?.label || 'Seleccionar'}
-                </span>
-                <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              {isOpen && createPortal(
-                <div
-                  className="fixed z-[9999] rounded-md border border-border bg-white shadow-lg overflow-hidden"
-                  style={{
-                    top: `${dropdownPosition.top}px`,
-                    left: `${dropdownPosition.left}px`,
-                    width: `${dropdownPosition.width}px`,
-                  }}
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="w-full h-10 px-3 py-2 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+            >
+              {availableOptions.map((option) => (
+                <option
+                  key={option.value}
+                  value={option.value}
+                  disabled={!allowedTransitions.includes(option.value) && option.value !== currentStatus}
                 >
-                  {availableOptions.map((option) => {
-                    const Icon = option.icon;
-                    const isSelected = option.value === selectedStatus;
-                    const isDisabled = !allowedTransitions.includes(option.value) && option.value !== currentStatus;
-
-                    return (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => {
-                          if (!isDisabled) {
-                            setSelectedStatus(option.value);
-                            setIsOpen(false);
-                          }
-                        }}
-                        disabled={isDisabled}
-                        className={`w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors ${
-                          isDisabled
-                            ? 'opacity-50 cursor-not-allowed'
-                            : 'hover:bg-gray-100'
-                        } ${isSelected ? 'bg-gray-50 font-medium' : ''}`}
-                      >
-                        <Icon className="h-4 w-4 text-muted-foreground" />
-                        <span>{option.label}</span>
-                        {isSelected && (
-                          <CheckCircle className="h-4 w-4 text-primary ml-auto" />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>,
-                document.body
-              )}
-            </div>
+                  {option.label}
+                </option>
+              ))}
+            </select>
             <p className="text-xs text-muted-foreground mt-1">
               Solo puedes cambiar a estados permitidos por la transición
             </p>
