@@ -1,1 +1,2 @@
-// Reexport - Este archivo ha sido refactorizado. El cÛdigo ahora est· en components/RepairAdd/index.tsx
+// Reexport - Este archivo ha sido refactorizado. El c√≥digo ahora est√° en components/RepairAdd/index.tsx
+export { default } from './components/RepairAdd'
