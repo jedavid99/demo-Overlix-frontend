@@ -134,7 +134,7 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
         payload.chequeo_hardware = state.hardwareChecks;
       }
 
-      console.log('Enviando payload:', payload);
+      console.log('Enviando payload:', JSON.stringify(payload, null, 2));
       const response = await repairService.create(payload as any);
       console.log('Respuesta completa:', response);
       console.log('Campos de respuesta:', Object.keys(response || {}));
