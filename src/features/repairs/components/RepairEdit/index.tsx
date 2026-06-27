@@ -67,13 +67,10 @@ export default function RepairEdit() {
               agregarRepuesto={agregarRepuesto}
               eliminarRepuesto={eliminarRepuesto}
             />
-            <EditCostsForm
-              formData={formData}
-              setFormData={setFormData}
-            />
+          
           </div>
 
-          {/* Columna Derecha */}
+         
           <div className="space-y-6">
             <EditAssignmentForm
               formData={formData}
@@ -93,7 +90,10 @@ export default function RepairEdit() {
               formData={formData}
               setFormData={setFormData}
             />
-            
+              <EditCostsForm
+              formData={formData}
+              setFormData={setFormData}
+            />
             
           </div>
         </div>
