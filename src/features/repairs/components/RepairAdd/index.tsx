@@ -121,8 +121,24 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
       if (state.estimatedDays) payload.tiempo_estimado_minutos = state.estimatedDays * 60 * 8; // Asumiendo 8 horas por día
       if (repairPrice) payload.total_reparacion = parseFloat(repairPrice);
       if (state.technicianNotes) payload.notas = state.technicianNotes;
-      if (state.paymentMethod) payload.metodo_pago_id = state.paymentMethod;
-      if (state.securityType) payload.tipo_seguridad = state.securityType;
+      // No enviar metodo_pago_id si no es un UUID válido
+      // if (state.paymentMethod) payload.metodo_pago_id = state.paymentMethod;
+      // Mapear tipo_seguridad a valores válidos del backend
+      if (state.securityType) {
+        const securityMap: Record<string, string> = {
+          'none': 'none',
+          'pin': 'pin',
+          'pattern': 'pattern',
+          'fingerprint': 'fingerprint',
+          'face': 'face',
+          'sin_seguridad': 'none',
+          'con_pin': 'pin',
+          'con_patron': 'pattern',
+          'huella_digital': 'fingerprint',
+          'reconocimiento_facial': 'face',
+        };
+        payload.tipo_seguridad = securityMap[state.securityType] || 'none';
+      }
       if (state.securityType === 'pin' && state.accessPin) payload.pin_acceso = state.accessPin;
       if (state.securityType === 'pattern') {
         payload.patron_puntos = null; // Implementar si es necesario
