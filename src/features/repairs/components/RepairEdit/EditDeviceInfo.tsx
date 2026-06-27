@@ -69,14 +69,7 @@ export const EditDeviceInfo: React.FC<EditDeviceInfoProps> = ({ repairData }) =>
               {repairData.dispositivo || '—'}
             </p>
           </div>
-          <div className="space-y-1">
-            <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              Marca
-            </label>
-            <p className="text-sm text-foreground">
-              {repairData.marca || '—'}
-            </p>
-          </div>
+        
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
