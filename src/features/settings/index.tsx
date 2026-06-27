@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Plus, Cloud, Clock, Bell, Key, Smartphone, Laptop, Monitor, Gamepad2, Edit, Trash2, ChevronDown, Info, DollarSign, ChevronRight, Building2, AlertCircle, CheckCircle2, Ticket, Eye, RotateCcw, CreditCard, FileText } from 'lucide-react'
 import { MdContentCopy, MdDelete, MdLink, MdEdit, MdCalendarToday, MdEmail, MdBarChart } from 'react-icons/md'
 import PDFConfig from './PDFConfig'
+import { BusinessInfo } from '@/pages/Settings/BusinessInfo'
 const sections = [
   { id: 'general', label: 'General', icon: <Cloud size={16} /> },
   { id: 'business', label: 'Información del negocio', icon: <Clock size={16} /> },
@@ -207,91 +208,7 @@ export default function Settings() {
               </div>
             </div>
           )}
-          {section === 'business' && (
-            <div className="space-y-6">
-              {/* Legal Information Section */}
-              <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-                <div className="p-6 border-b border-slate-100 dark:border-slate-800">
-                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">Información legal</h2>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Detalles de registro oficial del negocio</p>
-                </div>
-                <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-6">
-                  <div className="lg:col-span-1">
-                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Nombre legal</label>
-                    <input type="text" placeholder="Ej. Reparaciones Tech S.L." className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent" />
-                  </div>
-                  <div className="lg:col-span-1">
-                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">NIF / CIF</label>
-                    <input type="text" placeholder="Ej. B-12345678" className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent" />
-                  </div>
-                  <div className="lg:col-span-1">
-                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Teléfono</label>
-                    <input type="tel" placeholder="+34 600 000 000" className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent" />
-                  </div>
-                  <div className="lg:col-span-1">
-                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Email de negocio</label>
-                    <input type="email" placeholder="info@tutaller.com" className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent" />
-                  </div>
-                  <div className="lg:col-span-2">
-                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Sitio web</label>
-                    <div className="flex">
-                      <span className="inline-flex items-center px-4 rounded-l-lg border border-r-0 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-500 text-sm">https://</span>
-                      <input type="text" placeholder="www.tutaller.com" className="flex-1 rounded-r-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2.5 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* Operating Hours Section */}
-              <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-                <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                  <div>
-                    <h2 className="text-lg font-bold text-slate-900 dark:text-white">Horario de apertura</h2>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">Configura los horarios de tu taller</p>
-                  </div>
-                  <div className="text-xs text-slate-400 italic">Sin horario configurado</div>
-                </div>
-                <div className="p-6">
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-12 gap-4 pb-2 text-xs font-bold text-slate-400 uppercase tracking-wider px-2">
-                      <div className="col-span-3">Día</div>
-                      <div className="col-span-2">Estado</div>
-                      <div className="col-span-3 text-center">Apertura</div>
-                      <div className="col-span-3 text-center">Cierre</div>
-                      <div className="col-span-1"></div>
-                    </div>
-                    {['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'].map((day, idx) => (
-                      <div key={idx} className="grid grid-cols-12 gap-4 items-center p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                        <div className="col-span-3 font-semibold text-slate-900 dark:text-white">{day}</div>
-                        <div className="col-span-2">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400">
-                            Cerrado
-                          </span>
-                        </div>
-                        <div className="col-span-3">
-                          <input type="time" className="w-full text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent opacity-50 cursor-not-allowed" disabled />
-                        </div>
-                        <div className="col-span-3">
-                          <input type="time" className="w-full text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent opacity-50 cursor-not-allowed" disabled />
-                        </div>
-                        <div className="col-span-1 flex justify-end">
-                          <button className="text-primary hover:underline text-xs font-bold">ACTIVAR</button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-              {/* 🔽 Botón Guardar al final de la sección */}
-              <div className="flex justify-end pt-4 border-t border-slate-200 dark:border-slate-700">
-                <button
-                  onClick={() => handleSave('business')}
-                  className="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-all shadow-md shadow-blue-600/20"
-                >
-                  Guardar cambios
-                </button>
-              </div>
-            </div>
-          )}
+          {section === 'business' && <BusinessInfo />}
           {section === 'Categoria' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
