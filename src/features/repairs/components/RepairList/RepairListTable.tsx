@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft, ChevronRight, MoreVertical, Eye, Edit, FileText, Package, Trash2, Loader2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MoreVertical, Eye, Edit, FileText, Package, Trash2, Loader2, RefreshCw } from 'lucide-react';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Button } from '@/shared/components/ui/button';
 import { Badge } from '@/shared/components/ui/badge';
@@ -17,6 +17,7 @@ interface RepairListTableProps {
   onDropdownToggle: (repairId: string) => void;
   onPreview: (repairId: string) => void;
   onEdit: (repairId: string) => void;
+  onEditStatus: (repairId: string) => void;
   onPDF: (repairId: string) => void;
   onMarkDelivered: (repairId: string) => void;
   onDelete: (repairId: string) => void;
@@ -34,6 +35,7 @@ export const RepairListTable: React.FC<RepairListTableProps> = ({
   onDropdownToggle,
   onPreview,
   onEdit,
+  onEditStatus,
   onPDF,
   onMarkDelivered,
   onDelete,
@@ -158,6 +160,13 @@ export const RepairListTable: React.FC<RepairListTableProps> = ({
                             >
                               <Eye className="h-4 w-4" />
                               Vista Previa
+                            </div>
+                            <div
+                              className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer"
+                              onClick={() => onEditStatus(repair.id)}
+                            >
+                              <RefreshCw className="h-4 w-4" />
+                              Editar Estado
                             </div>
                             <div
                               className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted cursor-pointer"

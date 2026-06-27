@@ -6,6 +6,7 @@ import { RepairListKPIs } from './RepairListKPIs';
 import { RepairListFilters } from './RepairListFilters';
 import { RepairListTable } from './RepairListTable';
 import { MarkDeliveredModal } from './MarkDeliveredModal';
+import { EditStatusModal } from './EditStatusModal';
 import RepairPreviewModal from '../../RepairPreviewModal';
 
 export default function RepairsList() {
@@ -28,6 +29,10 @@ export default function RepairsList() {
     isMarkDeliveredModalOpen,
     setIsMarkDeliveredModalOpen,
     isMarkingDelivered,
+    isEditStatusModalOpen,
+    setIsEditStatusModalOpen,
+    selectedRepairIdForStatus,
+    selectedRepairCurrentStatus,
     pendingToday,
     expiringSoon,
     readyToPickup,
@@ -38,9 +43,11 @@ export default function RepairsList() {
     handleDelete,
     handleMarkAsDelivered,
     openMarkDeliveredModal,
+    openEditStatusModal,
     openPreviewModal,
     navigateToEdit,
     navigateToPDF,
+    loadRepairs,
   } = useRepairList();
 
   const handleDropdownToggle = (repairId: string) => {
@@ -84,6 +91,7 @@ export default function RepairsList() {
         onDropdownToggle={handleDropdownToggle}
         onPreview={openPreviewModal}
         onEdit={navigateToEdit}
+        onEditStatus={openEditStatusModal}
         onPDF={navigateToPDF}
         onMarkDelivered={openMarkDeliveredModal}
         onDelete={handleDelete}
@@ -101,6 +109,23 @@ export default function RepairsList() {
         }}
         isProcessing={isMarkingDelivered}
       />
+
+      {/* Modal para editar estado */}
+      {selectedRepairIdForStatus && (
+        <EditStatusModal
+          open={isEditStatusModalOpen}
+          onClose={() => {
+            setIsEditStatusModalOpen(false);
+            setSelectedRepairIdForStatus(null);
+            setSelectedRepairCurrentStatus('');
+          }}
+          repairId={selectedRepairIdForStatus}
+          currentStatus={selectedRepairCurrentStatus}
+          onSuccess={() => {
+            loadRepairs();
+          }}
+        />
+      )}
 
       {/* Modal de vista previa */}
       {selectedRepairId && (

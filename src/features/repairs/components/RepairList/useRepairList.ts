@@ -24,6 +24,11 @@ export const useRepairList = () => {
   const [selectedRepairIdForDelivery, setSelectedRepairIdForDelivery] = useState<string | null>(null);
   const [isMarkingDelivered, setIsMarkingDelivered] = useState(false);
 
+  // Estado para el modal de "Editar Estado"
+  const [isEditStatusModalOpen, setIsEditStatusModalOpen] = useState(false);
+  const [selectedRepairIdForStatus, setSelectedRepairIdForStatus] = useState<string | null>(null);
+  const [selectedRepairCurrentStatus, setSelectedRepairCurrentStatus] = useState<string>('');
+
   // Cargar TODAS las reparaciones (sin paginación)
   const loadRepairs = useCallback(async () => {
     try {
@@ -162,6 +167,17 @@ export const useRepairList = () => {
     setActiveDropdown(null);
   };
 
+  // Abrir modal de editar estado
+  const openEditStatusModal = (repairId: string) => {
+    const repair = allRepairs.find(r => r.id === repairId);
+    if (repair) {
+      setSelectedRepairIdForStatus(repairId);
+      setSelectedRepairCurrentStatus(repair.estado);
+      setIsEditStatusModalOpen(true);
+      setActiveDropdown(null);
+    }
+  };
+
   const openPreviewModal = (repairId: string) => {
     setSelectedRepairId(repairId);
     setPreviewModalOpen(true);
@@ -201,6 +217,10 @@ export const useRepairList = () => {
     setIsMarkDeliveredModalOpen,
     selectedRepairIdForDelivery,
     isMarkingDelivered,
+    isEditStatusModalOpen,
+    setIsEditStatusModalOpen,
+    selectedRepairIdForStatus,
+    selectedRepairCurrentStatus,
     pendingToday,
     expiringSoon,
     readyToPickup,
@@ -212,8 +232,10 @@ export const useRepairList = () => {
     handleDelete,
     handleMarkAsDelivered,
     openMarkDeliveredModal,
+    openEditStatusModal,
     openPreviewModal,
     navigateToEdit,
     navigateToPDF,
+    loadRepairs,
   };
 };
