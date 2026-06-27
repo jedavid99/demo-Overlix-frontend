@@ -1,4 +1,3 @@
-import { Smartphone, Laptop, Gamepad2 } from 'lucide-react';
 import { Search, Wrench, Clock, CheckCircle, Shield, XCircle } from 'lucide-react';
 
 // Interfaces
@@ -77,16 +76,6 @@ export const estadoOptions: EstadoOption[] = [
 ];
 
 // Funciones auxiliares
-export const getDeviceIcon = (categoria: string) => {
-  switch (categoria) {
-    case 'telefono': return <Smartphone className="h-5 w-5" />;
-    case 'laptop':
-    case 'pc': return <Laptop className="h-5 w-5" />;
-    case 'consola': return <Gamepad2 className="h-5 w-5" />;
-    default: return <Smartphone className="h-5 w-5" />;
-  }
-};
-
 export const getStatusColor = (estado: string) => {
   switch (estado) {
     case 'diagnostic': return 'bg-blue-100 text-blue-800 border-blue-300';

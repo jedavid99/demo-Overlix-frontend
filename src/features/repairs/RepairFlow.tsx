@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import RepairAdd from './Add';
+import RepairAdd from './components/RepairAdd';
 import RepairTechnical from './Technical';
 import RepairFinalize from './Finalize';
 export interface RepairData {
