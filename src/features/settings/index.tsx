@@ -2,7 +2,9 @@ import React, { useState } from 'react'
 import { Plus, Cloud, Clock, Bell, Key, Smartphone, Laptop, Monitor, Gamepad2, Edit, Trash2, ChevronDown, Info, DollarSign, ChevronRight, Building2, AlertCircle, CheckCircle2, Ticket, Eye, RotateCcw, CreditCard, FileText } from 'lucide-react'
 import { MdContentCopy, MdDelete, MdLink, MdEdit, MdCalendarToday, MdEmail, MdBarChart } from 'react-icons/md'
 import PDFConfig from './PDFConfig'
-import { BusinessInfo } from '@/pages/Settings/BusinessInfo'
+import { BusinessInfoCard } from '@/features/business/BusinessInfoCard'
+import { BusinessInfoForm } from '@/features/business/BusinessInfoForm'
+import { useBusinessInfo, useBusinessInfoMutations } from '@/hooks/useBusinessInfo'
 const sections = [
   { id: 'general', label: 'General', icon: <Cloud size={16} /> },
   { id: 'business', label: 'Información del negocio', icon: <Clock size={16} /> },
@@ -39,9 +41,22 @@ function LeftNav({ current, onChange }: { current: string; onChange: (id: string
 }
 export default function Settings() {
   const [section, setSection] = useState('general')
+  const [isEditingBusiness, setIsEditingBusiness] = useState(false)
+  
+  const { data: businessInfo, loading, error, refetch } = useBusinessInfo()
+  const { updateBusinessInfo, loading: mutationLoading } = useBusinessInfoMutations()
+  
   // Función simulada para guardar cambios (conectar con API)
   const handleSave = (sectionId: string) => {
     alert(`Guardando cambios de la sección: ${sections.find(s => s.id === sectionId)?.label}`)
+  }
+
+  const handleBusinessEdit = async (data: any) => {
+    const result = await updateBusinessInfo(data)
+    if (result) {
+      refetch()
+      setIsEditingBusiness(false)
+    }
   }
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 p-6 lg:p-8">
@@ -208,7 +223,37 @@ export default function Settings() {
               </div>
             </div>
           )}
-          {section === 'business' && <BusinessInfo />}
+          {section === 'business' && (
+            <div className="space-y-6">
+              {loading ? (
+                <div className="flex items-center justify-center h-64">
+                  <div className="text-slate-500">Cargando información de la empresa...</div>
+                </div>
+              ) : error ? (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+                  Error: {error}
+                </div>
+              ) : businessInfo ? (
+                isEditingBusiness ? (
+                  <BusinessInfoForm
+                    businessInfo={businessInfo}
+                    onSubmit={handleBusinessEdit}
+                    onCancel={() => setIsEditingBusiness(false)}
+                    loading={mutationLoading}
+                  />
+                ) : (
+                  <BusinessInfoCard
+                    businessInfo={businessInfo}
+                    onEdit={() => setIsEditingBusiness(true)}
+                  />
+                )
+              ) : (
+                <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-md">
+                  No hay información de la empresa configurada
+                </div>
+              )}
+            </div>
+          )}
           {section === 'Categoria' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
