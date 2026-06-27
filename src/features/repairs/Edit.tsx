@@ -242,8 +242,8 @@ export default function RepairEdit() {
             description: `No puedes cambiar de "${repairData.estado}" a "${formData.estado}". Transición no válida.`,
             variant: 'destructive',
           });
-          setSaving(false);
-          return;
+          // setSaving(false);
+          // return;
         }
         payload.estado = formData.estado;
       }
@@ -909,3 +909,4 @@ export default function RepairEdit() {
     </div>
   );
 }
+
