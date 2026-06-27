@@ -31,7 +31,7 @@ export const useRepairEdit = (id: string | undefined) => {
         problema_reportado: orderData.problema_reportado || '',
         diagnosis: orderData.diagnosis || '',
         reparacion_realizada: orderData.reparacion_realizada || '',
-        estado_y_diagnostico: orderData.estado_y_diagnostico || 'diagnostic',
+        repair_status: orderData.repair_status || 'diagnostic',
         costo_piezas: orderData.costo_piezas || 0,
         costo_mano_obra: orderData.costo_mano_obra || 0,
         total_reparacion: orderData.total_reparacion || 0,
@@ -136,18 +136,18 @@ export const useRepairEdit = (id: string | undefined) => {
 
       const payload: any = {};
 
-      if (formData.estado_y_diagnostico !== repairData.estado_y_diagnostico) {
-        const allowed = validTransitions[repairData.estado_y_diagnostico] || [];
-        if (!allowed.includes(formData.estado_y_diagnostico)) {
+      if (formData.repair_status !== repairData.repair_status) {
+        const allowed = validTransitions[repairData.repair_status] || [];
+        if (!allowed.includes(formData.repair_status)) {
           toast({
             title: 'Error',
-            description: `No puedes cambiar de "${repairData.estado_y_diagnostico}" a "${formData.estado_y_diagnostico}". Transición no válida.`,
+            description: `No puedes cambiar de "${repairData.repair_status}" a "${formData.repair_status}". Transición no válida.`,
             variant: 'destructive',
           });
           setSaving(false);
           return;
         }
-        payload.estado_y_diagnostico = formData.estado_y_diagnostico;
+        payload.repair_status = formData.repair_status;
       }
 
       // Campos de diagnóstico
