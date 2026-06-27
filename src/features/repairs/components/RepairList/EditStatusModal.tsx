@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/components/ui/dialog';
 import { Button } from '@/shared/components/ui/button';
-import { Search, Wrench, Clock, CheckCircle, Package, XCircle, ChevronDown } from 'lucide-react';
+import { Search, Wrench, Clock, CheckCircle, Shield, XCircle, ChevronDown } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { repairService } from '@/services/repairService';
 
@@ -9,28 +9,28 @@ interface EditStatusModalProps {
   open: boolean;
   onClose: () => void;
   repairId: string;
-  currentStatus: string;
+  currentStatus: string; // Debe ser uno de los estados en español
   onSuccess: () => void;
 }
 
+// 🔥 Estados en español (coinciden con el backend)
 const statusOptions = [
-  { value: 'pending', label: 'Pendiente', icon: Search },
-  { value: 'diagnostic', label: 'Diagnóstico', icon: Search },
-  { value: 'in_progress', label: 'En Progreso', icon: Wrench },
-  { value: 'waiting_parts', label: 'Esperando Repuestos', icon: Clock },
-  { value: 'ready', label: 'Listo', icon: CheckCircle },
-  { value: 'delivered', label: 'Entregado', icon: Package },
-  { value: 'cancelled', label: 'Cancelado', icon: XCircle },
+  { value: 'Diagnóstico', label: 'Diagnóstico', icon: Search },
+  { value: 'En Progreso', label: 'En Progreso', icon: Wrench },
+  { value: 'Esperando Repuestos', label: 'Esperando Repuestos', icon: Clock },
+  { value: 'Reparado', label: 'Reparado', icon: CheckCircle },
+  { value: 'Garantía', label: 'Garantía', icon: Shield },
+  { value: 'Irreparable', label: 'Irreparable', icon: XCircle },
 ];
 
+// 🔥 Transiciones válidas (claves en español)
 const validTransitions: Record<string, string[]> = {
-  pending: ['diagnostic', 'cancelled'],
-  diagnostic: ['in_progress', 'cancelled'],
-  in_progress: ['waiting_parts', 'ready', 'cancelled'],
-  waiting_parts: ['in_progress', 'ready', 'cancelled'],
-  ready: ['delivered'],
-  delivered: [],
-  cancelled: [],
+  'Diagnóstico': ['En Progreso', 'Irreparable'],
+  'En Progreso': ['Esperando Repuestos', 'Reparado', 'Irreparable'],
+  'Esperando Repuestos': ['En Progreso', 'Reparado', 'Irreparable'],
+  'Reparado': ['Garantía'],
+  'Garantía': [],
+  'Irreparable': [],
 };
 
 export const EditStatusModal: React.FC<EditStatusModalProps> = ({
@@ -45,6 +45,7 @@ export const EditStatusModal: React.FC<EditStatusModalProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
 
+  // Resetear selección al abrir
   useEffect(() => {
     if (open) {
       setSelectedStatus(currentStatus);
@@ -52,6 +53,7 @@ export const EditStatusModal: React.FC<EditStatusModalProps> = ({
     }
   }, [open, currentStatus]);
 
+  // Cerrar dropdown al hacer clic fuera
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (ref.current && !ref.current.contains(event.target as Node)) {
@@ -65,8 +67,9 @@ export const EditStatusModal: React.FC<EditStatusModalProps> = ({
   const currentOption = statusOptions.find(opt => opt.value === selectedStatus);
   const CurrentIcon = currentOption?.icon || statusOptions[0].icon;
 
+  // Estados permitidos desde el estado actual
   const allowedTransitions = validTransitions[currentStatus] || [];
-  const availableOptions = statusOptions.filter(opt => 
+  const availableOptions = statusOptions.filter(opt =>
     opt.value === currentStatus || allowedTransitions.includes(opt.value)
   );
 
@@ -88,12 +91,12 @@ export const EditStatusModal: React.FC<EditStatusModalProps> = ({
     try {
       setIsSaving(true);
       await repairService.update(repairId, { estado: selectedStatus });
-      
+
       toast({
         title: 'Éxito',
         description: 'Estado actualizado correctamente',
       });
-      
+
       onSuccess();
       onClose();
     } catch (error: any) {
@@ -113,7 +116,7 @@ export const EditStatusModal: React.FC<EditStatusModalProps> = ({
         <DialogHeader>
           <DialogTitle>Editar Estado de Reparación</DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-4 py-4">
           <div>
             <label className="block text-sm font-medium text-muted-foreground mb-2">
@@ -148,7 +151,7 @@ export const EditStatusModal: React.FC<EditStatusModalProps> = ({
                     const Icon = option.icon;
                     const isSelected = option.value === selectedStatus;
                     const isDisabled = !allowedTransitions.includes(option.value) && option.value !== currentStatus;
-                    
+
                     return (
                       <button
                         key={option.value}
@@ -161,8 +164,8 @@ export const EditStatusModal: React.FC<EditStatusModalProps> = ({
                         }}
                         disabled={isDisabled}
                         className={`w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors ${
-                          isDisabled 
-                            ? 'opacity-50 cursor-not-allowed' 
+                          isDisabled
+                            ? 'opacity-50 cursor-not-allowed'
                             : 'hover:bg-gray-100'
                         } ${isSelected ? 'bg-gray-50 font-medium' : ''}`}
                       >
