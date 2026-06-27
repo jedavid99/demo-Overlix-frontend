@@ -102,18 +102,37 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
 
     setSubmitting(true);
     try {
-      const payload = {
+      const payload: any = {
         cliente_id: state.selectedClient.id,
         dispositivo: state.brand && state.model ? `${state.brand} ${state.model}` : state.deviceType,
-        marca: state.brand || undefined,
-        modelo: state.model || undefined,
         problema_reportado: state.issueDescription,
-        diagnosis: undefined,
-        prioridad: state.priority === 'Normal' ? 'medium' : state.priority === 'Baja' ? 'low' : state.priority === 'Alta' ? 'high' : 'critical',
         fecha_ingreso: new Date().toISOString().split('T')[0],
-        tecnico_asignado_id: undefined,
-        notas: state.technicianNotes || undefined
       };
+
+      // Campos opcionales (solo si tienen valor)
+      if (state.deviceType) payload.categoria_dispositivo = state.deviceType;
+      if (state.brand) payload.marca = state.brand;
+      if (state.model) payload.modelo = state.model;
+      if (state.serial) payload.numero_serie = state.serial;
+      if (state.aestheticCondition) payload.condicion_estetica = state.aestheticCondition;
+      if (state.accessories && state.accessories.length > 0) payload.accesorios_incluidos = state.accessories;
+      if (state.priority) payload.prioridad = state.priority === 'Normal' ? 'medium' : state.priority === 'Baja' ? 'low' : state.priority === 'Alta' ? 'high' : 'critical';
+      if (state.estimatedDays) payload.fecha_estimada_entrega = new Date(Date.now() + state.estimatedDays * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+      if (state.estimatedDays) payload.tiempo_estimado_minutos = state.estimatedDays * 60 * 8; // Asumiendo 8 horas por día
+      if (repairPrice) payload.total_reparacion = parseFloat(repairPrice);
+      if (state.technicianNotes) payload.notas = state.technicianNotes;
+      if (state.paymentMethod) payload.metodo_pago_id = state.paymentMethod;
+      if (state.securityType) payload.tipo_seguridad = state.securityType;
+      if (state.securityType === 'pin' && state.accessPin) payload.pin_acceso = state.accessPin;
+      if (state.securityType === 'pattern') {
+        payload.patron_puntos = null; // Implementar si es necesario
+        payload.secuencia_patron = null; // Implementar si es necesario
+      }
+
+      // Chequeo de hardware
+      if (state.hardwareChecks && Object.keys(state.hardwareChecks).length > 0) {
+        payload.chequeo_hardware = state.hardwareChecks;
+      }
 
       console.log('Enviando payload:', payload);
       const response = await repairService.create(payload as any);
