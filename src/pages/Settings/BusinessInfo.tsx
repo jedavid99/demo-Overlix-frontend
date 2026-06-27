@@ -117,7 +117,17 @@ export const BusinessInfo = () => {
   };
 
   if (loading) return <div className="flex items-center justify-center h-64">Cargando información de la empresa...</div>;
-  if (error) return <div className="text-red-500 p-4">Error: {error}</div>;
+  if (error) {
+    if (error.includes('401') || error.includes('unauthorized')) {
+      return (
+        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-md">
+          <p className="font-semibold">No tienes permiso para acceder a esta información</p>
+          <p className="text-sm mt-1">Por favor, inicia sesión nuevamente o contacta al administrador.</p>
+        </div>
+      );
+    }
+    return <div className="text-red-500 p-4">Error: {error}</div>;
+  }
 
   return (
     <div className="space-y-6">
