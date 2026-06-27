@@ -93,14 +93,8 @@ export default function RepairEdit() {
               formData={formData}
               setFormData={setFormData}
             />
-            <EditSecurityForm
-              formData={formData}
-              setFormData={setFormData}
-            />
-            <EditHardwareForm
-              formData={formData}
-              setFormData={setFormData}
-            />
+            
+            
           </div>
         </div>
 

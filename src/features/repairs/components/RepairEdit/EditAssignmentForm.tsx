@@ -42,17 +42,7 @@ export const EditAssignmentForm: React.FC<EditAssignmentFormProps> = ({
               onChange={(e) => setFormData({ ...formData, fecha_estimada_entrega: e.target.value })}
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-muted-foreground mb-1">Tiempo (min)</label>
-            <Input
-              type="number"
-              value={formData.tiempo_estimado_minutos}
-              onChange={(e) => setFormData({ ...formData, tiempo_estimado_minutos: parseInt(e.target.value) || 0 })}
-              placeholder="Minutos"
-              min={0}
-              step={5}
-            />
-          </div>
+         
         </div>
       </CardContent>
     </Card>
