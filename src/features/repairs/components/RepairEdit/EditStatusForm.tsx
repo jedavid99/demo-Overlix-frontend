@@ -28,7 +28,7 @@ export const EditStatusForm: React.FC<EditStatusFormProps> = ({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const currentIcon = estadoOptions.find(o => o.value === formData.estado)?.icon || estadoOptions[0].icon;
+  const CurrentIcon = estadoOptions.find(o => o.value === formData.estado)?.icon || estadoOptions[0].icon;
 
   return (
     <Card>
@@ -49,7 +49,7 @@ export const EditStatusForm: React.FC<EditStatusFormProps> = ({
               className="w-full h-9 flex items-center justify-between rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <span className="flex items-center gap-2">
-                <currentIcon className="h-4 w-4 text-muted-foreground" />
+                <CurrentIcon className="h-4 w-4 text-muted-foreground" />
                 {estadoOptions.find(o => o.value === formData.estado)?.label || 'Seleccionar'}
               </span>
               <svg

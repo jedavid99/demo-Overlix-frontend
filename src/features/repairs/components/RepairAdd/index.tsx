@@ -5,7 +5,6 @@ import { toast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import { Button } from '@/shared/components/ui/button';
-import type { RepairData } from '../RepairFlow';
 import { RepairCreateProps } from './RepairAdd.types';
 import { RepairAddHeader } from './RepairAddHeader';
 import { ClientSelector } from './ClientSelector';
