@@ -230,8 +230,45 @@ export default function Settings() {
                   <div className="text-slate-500">Cargando información de la empresa...</div>
                 </div>
               ) : error ? (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
-                  Error: {error}
+                <div className="space-y-4">
+                  <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-md">
+                    <p className="font-semibold">No se pudo cargar la información</p>
+                    <p className="text-sm mt-1">{error}</p>
+                  </div>
+                  <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-md">
+                    <p className="font-semibold">Modo offline</p>
+                    <p className="text-sm mt-1">Puedes configurar la información del negocio manualmente. Los cambios se guardarán cuando tengas conexión.</p>
+                  </div>
+                  <BusinessInfoForm
+                    businessInfo={{
+                      id: '',
+                      empresa_id: '',
+                      nombre_negocio: '',
+                      propietario_nombre: '',
+                      email: '',
+                      telefono: '',
+                      direccion: '',
+                      ciudad: '',
+                      provincia: '',
+                      codigo_postal: '',
+                      sitio_web: '',
+                      descripcion: '',
+                      horarios: {
+                        lunes: '09:00-18:00',
+                        martes: '09:00-18:00',
+                        miercoles: '09:00-18:00',
+                        jueves: '09:00-18:00',
+                        viernes: '09:00-18:00',
+                        sabado: '09:00-13:00',
+                        domingo: 'Cerrado'
+                      },
+                      fecha_creacion: new Date().toISOString(),
+                      fecha_actualizacion: new Date().toISOString()
+                    }}
+                    onSubmit={handleBusinessEdit}
+                    onCancel={() => setSection('general')}
+                    loading={mutationLoading}
+                  />
                 </div>
               ) : businessInfo ? (
                 isEditingBusiness ? (
@@ -248,8 +285,40 @@ export default function Settings() {
                   />
                 )
               ) : (
-                <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-md">
-                  No hay información de la empresa configurada
+                <div className="space-y-4">
+                  <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-md">
+                    No hay información de la empresa configurada
+                  </div>
+                  <BusinessInfoForm
+                    businessInfo={{
+                      id: '',
+                      empresa_id: '',
+                      nombre_negocio: '',
+                      propietario_nombre: '',
+                      email: '',
+                      telefono: '',
+                      direccion: '',
+                      ciudad: '',
+                      provincia: '',
+                      codigo_postal: '',
+                      sitio_web: '',
+                      descripcion: '',
+                      horarios: {
+                        lunes: '09:00-18:00',
+                        martes: '09:00-18:00',
+                        miercoles: '09:00-18:00',
+                        jueves: '09:00-18:00',
+                        viernes: '09:00-18:00',
+                        sabado: '09:00-13:00',
+                        domingo: 'Cerrado'
+                      },
+                      fecha_creacion: new Date().toISOString(),
+                      fecha_actualizacion: new Date().toISOString()
+                    }}
+                    onSubmit={handleBusinessEdit}
+                    onCancel={() => setSection('general')}
+                    loading={mutationLoading}
+                  />
                 </div>
               )}
             </div>
