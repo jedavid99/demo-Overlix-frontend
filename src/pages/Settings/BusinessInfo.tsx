@@ -121,8 +121,16 @@ export const BusinessInfo = () => {
     if (error.includes('401') || error.includes('unauthorized')) {
       return (
         <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-md">
-          <p className="font-semibold">No tienes permiso para acceder a esta información</p>
-          <p className="text-sm mt-1">Por favor, inicia sesión nuevamente o contacta al administrador.</p>
+          <p className="font-semibold">No estás autenticado</p>
+          <p className="text-sm mt-1">Por favor, inicia sesión nuevamente.</p>
+        </div>
+      );
+    }
+    if (error.includes('403') || error.includes('forbidden')) {
+      return (
+        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-md">
+          <p className="font-semibold">Acceso denegado</p>
+          <p className="text-sm mt-1">No tienes permisos suficientes para acceder a esta información. Contacta al administrador.</p>
         </div>
       );
     }
