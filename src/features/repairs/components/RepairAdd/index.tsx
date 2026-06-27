@@ -109,7 +109,6 @@ export default function RepairCreate({ data, updateData, onSave = () => {}, curr
         modelo: state.model || undefined,
         problema_reportado: state.issueDescription,
         diagnosis: undefined,
-        estado: 'pending',
         prioridad: state.priority === 'Normal' ? 'medium' : state.priority === 'Baja' ? 'low' : state.priority === 'Alta' ? 'high' : 'critical',
         fecha_ingreso: new Date().toISOString().split('T')[0],
         tecnico_asignado_id: undefined,
