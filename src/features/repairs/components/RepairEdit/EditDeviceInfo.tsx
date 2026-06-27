@@ -92,15 +92,7 @@ export const EditDeviceInfo: React.FC<EditDeviceInfoProps> = ({
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-muted-foreground mb-1">Accesorios Incluidos</label>
-          <Textarea
-            value={formData.accesorios_incluidos}
-            onChange={(e) => setFormData({ ...formData, accesorios_incluidos: e.target.value })}
-            placeholder="Separar por comas: Cargador, Funda, Cable..."
-            rows={2}
-          />
-        </div>
+       
       </CardContent>
     </Card>
   );
